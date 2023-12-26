@@ -1,0 +1,9 @@
+export { default as AEPS } from "./AEPS/AEPS";
+export { default as DMT } from "./DMT/DMT";
+export { default as DMT1 } from "./DMT1/DMT1";
+export { default as DMT2 } from "./DMT2/DMT2";
+export { default as IndoNepal } from "./IndoNepalTransfer/IndoNepal";
+export { default as MATM } from "./MATM/MATM";
+export { default as AadharPay } from "./aadharpay/AadharPay";
+export { default as BillPayment } from "./billPayments/BillPayment";
+export { default as Recharges } from "./recharge/Recharges";

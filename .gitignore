@@ -1,0 +1,30 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# testing
+/coverage
+
+# production
+/build
+/build-nsfrontend
+/k1payApp_build
+/build_app_dev_tramo
+/build_app_dev_k1pay
+
+/.env.development
+/.env.production.neosprint
+/.env.production.tramo
+
+# misc
+.DS_Store
+
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+.eslintcache
