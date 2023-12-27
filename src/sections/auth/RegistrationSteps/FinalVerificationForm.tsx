@@ -1654,9 +1654,7 @@ function ConstitutionIdentification() {
   );
   const [AadharFlieMSME, setAadharFlieMSME] = useState(false);
   const [AadharFileMSMEBtnDis, setAadharFileMSMEBtnDis] = useState(false);
-  const [btnDisabledForGstDocsMSME, setbtnDisabledForGstDocsMSME] =
-    useState(true);
-
+  const [imageMSME, setImageMSME] = useState("");
   //Other Certificate
   const [otherCertificateFile, setOtherCertificateFile] = useState<any>();
   const [successOtherCertificate, setSuccessOtherCertificate] =
@@ -1670,8 +1668,6 @@ function ConstitutionIdentification() {
   const [businessProofPath, setBusinessProofpath] = useState<any>("");
   const [AadharFlieBusPrf, setAadharFlieBusPrf] = useState(false);
   const [AadharFileBusPrfBtnDis, setAadharFileBusPrfBtnDis] = useState(false);
-  const [btnDisabledForGstDocsBusPrf, setbtnDisabledForGstDocsBusPrf] =
-    useState(true);
 
   //Business pan
   const [AadharFlieBrdRes, setAadharFlieBrdRes] = useState(false);
@@ -1907,6 +1903,16 @@ function ConstitutionIdentification() {
       }
     );
   };
+
+  const gstCertificateImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: gstCertificatePath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", gstCertificateImage, (err: any, url: any) => {
+    setImageMSME(url);
+  });
 
   //Upload DOCS
   const otherCertificateUpload = () => {
@@ -2437,9 +2443,7 @@ function ConstitutionIdentification() {
                                       size="small"
                                       sx={{
                                         border: "1px solid",
-
                                         color: "black",
-
                                         fontFamily: "Public Sans",
                                         fontSize: "14px",
                                         textTransform: "none",
@@ -2457,24 +2461,40 @@ function ConstitutionIdentification() {
                                     </Button>
                                   ) : (
                                     <>
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-
-                                          color: "black",
-
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handlePIDDocuments("MSME")
-                                        }
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
                                       >
-                                        Reset
-                                      </Button>
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+
+                                            color: "black",
+
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments("MSME")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+
+                                        <Image
+                                          src={imageMSME && imageMSME}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                        />
+                                      </Stack>
                                     </>
                                   )}
                                 </>
@@ -2691,43 +2711,155 @@ function ConstitutionIdentification() {
               {/* Registered Partnership Deed */}
               {user?.constitutionType == "Partnership" ||
               user?.constitutionType == "Limited Liability Partnership" ? (
-                <Stack>
-                  <p>Choose Partnership Deed / Agreement</p>
-                  <Upload
-                    file={partnershipDeedFile || user?.Partnership_deed_File}
-                    onDrop={partnershipDeedhandleDropSingleFile}
-                    onDelete={() => setPartnershipDeedFile(null)}
-                    disabled={user?.Partnership_deed_File}
-                  />
-                  {partnershipDeedFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successPartnershipDeed == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => partnershipDeedUpload()}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successPartnershipDeed == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
+                // <Stack>
+                //   <p>Choose Partnership Deed / Agreement</p>
+                //   <Upload
+                //     file={partnershipDeedFile || user?.Partnership_deed_File}
+                //     onDrop={partnershipDeedhandleDropSingleFile}
+                //     onDelete={() => setPartnershipDeedFile(null)}
+                //     disabled={user?.Partnership_deed_File}
+                //   />
+                //   {partnershipDeedFile && (
+                //     <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
+                //       {successPartnershipDeed == "upload" ? (
+                //         <LoadingButton
+                //           variant="contained"
+                //           component="span"
+                //           onClick={() => partnershipDeedUpload()}
+                //         >
+                //           Upload file
+                //         </LoadingButton>
+                //       ) : successPartnershipDeed == "wait" ? (
+                //         <LoadingButton
+                //           variant="contained"
+                //           loading
+                //           component="span"
+                //         >
+                //           success
+                //         </LoadingButton>
+                //       ) : (
+                //         <Icon
+                //           icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
+                //           color="green"
+                //           fontSize={40}
+                //           style={{ marginRight: 15 }}
+                //         />
+                //       )}
+                //     </Stack>
+                //   )}
+                // </Stack>
+
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 2,
+                          sm: 3,
+                          md: 4,
+                          lg: 5,
+                          xl: 8,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs1}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Partnership Deed / Agreement
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieBusPrf ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileBusPrfBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+
+                                        color: "black",
+
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="BusPrf"
+                                        onChange={businessProofUpload}
+                                        type="file"
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Button
+                                        component="label"
+                                        size="small"
+                                        sx={{
+                                          border: "1px solid",
+
+                                          color: "black",
+
+                                          fontFamily: "Public Sans",
+                                          fontSize: "14px",
+                                          textTransform: "none",
+                                        }}
+                                        onClick={() =>
+                                          handlePIDDocuments("BusPrf")
+                                        }
+                                      >
+                                        Reset
+                                      </Button>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
               ) : null}
               {/* Copy of Board Resolution */}
               {user?.constitutionType.toLowerCase() == "one person company" ||

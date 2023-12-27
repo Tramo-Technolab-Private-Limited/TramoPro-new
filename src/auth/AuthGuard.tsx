@@ -31,7 +31,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     if (pathname !== requestedLocation) {
       setRequestedLocation(pathname);
     }
-    return <Navigate to={"/login"} />;
+    return <Login />;
   }
 
   if (isAuthenticated) {
@@ -47,27 +47,12 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         return <Navigate to={"/login"} />;
       }
     } else {
-      <Navigate to={pathname} />;
+      if (requestedLocation && pathname !== requestedLocation) {
+        setRequestedLocation(null);
+        <Navigate to={requestedLocation} />;
+      }
     }
   }
-
-  // if (requestedLocation && pathname !== requestedLocation) {
-  //   setRequestedLocation(null);
-  //   return user?.finalStatus !== "approved" && !user?.isNPIN ? (
-  //     <Navigate to={"/new/user/registrationsteps"} />
-  //   ) : user?.finalStatus == "approved" &&
-  //     !user?.is_eAgreement_signed &&
-  //     !user?.isNPIN ? (
-  //     <Navigate to={"/new/user/esignature"} />
-  //   ) : user?.finalStatus == "approved" &&
-  //     user?.is_eAgreement_signed &&
-  //     !user?.isNPIN ? (
-  //     <Navigate to={"/new/user/verifyusernpin"} />
-  //   ) : (
-  //     <Navigate to={requestedLocation} />
-  //   );
-  // }
-  // }
 
   return <>{children}</>;
 }
