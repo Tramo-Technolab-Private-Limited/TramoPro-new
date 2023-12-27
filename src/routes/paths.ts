@@ -48,4 +48,5 @@ export const PATH_DASHBOARD = {
   },
   setting: path(ROOTS_DASHBOARD, "/setting"),
   helpsupport: path(ROOTS_DASHBOARD, "/helpsupport"),
+  userprofilepage: path(ROOTS_DASHBOARD, "/userprofilepage"),
 };

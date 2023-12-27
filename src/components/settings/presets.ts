@@ -53,6 +53,16 @@ export const presets = [
     darker: "#793908",
     contrastText: themePalette.grey[800],
   },
+  //GREEN for neosprint
+  {
+    name: "Green",
+    lighter: "#33BC77",
+    light: "#1AB366",
+    main: "#00AB55",
+    dark: "#00913C",
+    darker: "#007822",
+    contrastText: "#FFFFFF",
+  },
   // RED
   {
     name: "red",

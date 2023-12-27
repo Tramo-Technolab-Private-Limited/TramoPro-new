@@ -102,3 +102,8 @@ export const HelpAndSupport = Loadable(
 );
 
 export const Page404 = Loadable(lazy(() => import("../pages/Page404")));
+
+//extra
+export const UserProfilePage = Loadable(
+  lazy(() => import("../pages/UserProfilePage"))
+);

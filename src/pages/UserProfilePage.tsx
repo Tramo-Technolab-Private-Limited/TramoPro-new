@@ -330,17 +330,17 @@ export default function UserProfilePage() {
           }}
         >
           <Image
-            src={user?.shopImage[0].length && AwsDocSign(user?.shopImage[0])}
+            src={user?.shopImage[0]?.length && AwsDocSign(user?.shopImage[0])}
             alt="shopImage"
             style={{ width: "100%", height: "100%" }}
           />
           <Image
-            src={user?.shopImage[1].length && AwsDocSign(user?.shopImage[1])}
+            src={user?.shopImage[1]?.length && AwsDocSign(user?.shopImage[1])}
             alt="shopImage"
             style={{ width: "100%", height: "100%" }}
           />
           <Image
-            src={user?.shopImage[2].length && AwsDocSign(user?.shopImage[2])}
+            src={user?.shopImage[2]?.length && AwsDocSign(user?.shopImage[2])}
             alt="shopImage"
             style={{ width: "100%", height: "100%" }}
           />

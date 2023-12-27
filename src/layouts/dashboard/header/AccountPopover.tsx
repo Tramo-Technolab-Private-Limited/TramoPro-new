@@ -20,7 +20,7 @@ import { sentenceCase } from "change-case";
 const OPTIONS = [
   {
     label: "Profile",
-    linkTo: "/",
+    linkTo: "/auth/userprofilepage",
   },
   {
     label: "Settings",

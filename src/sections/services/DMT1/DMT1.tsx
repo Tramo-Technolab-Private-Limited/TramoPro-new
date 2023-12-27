@@ -54,7 +54,7 @@ type FormValuesProps = {
 
 //--------------------------------------------------------------------
 
-export default function DMT1(props: any) {
+export default function DMT1() {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const [mobileNumber, setMobileNumber] = useState("");

@@ -141,16 +141,7 @@ export default function AadharPay(props: any) {
             (record: any) => record.AadhaarPayFingpayStatus !== ""
           )
         );
-        enqueueSnackbar(Response.data.message);
-        console.log(
-          "==============>>> banklist data 200",
-          Response.data.data.message
-        );
       } else {
-        console.log(
-          "==============>>> fatch beneficiary message",
-          Response.data.data.message
-        );
       }
     });
   };

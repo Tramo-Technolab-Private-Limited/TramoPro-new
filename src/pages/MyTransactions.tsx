@@ -54,6 +54,7 @@ import { sentenceCase } from "change-case";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 
 // ----------------------------------------------------------------------
 
@@ -67,16 +68,11 @@ export default function MyTransactions() {
 
   const [refId, setRefId] = useState("");
   const [sdata, setSdata] = useState([]);
-  const [pageSize, setPageSize] = useState<any>(10);
-
-  const handlePageChange = (event: any, value: any) => {
-    setCurrentPage(value);
-    getTransaction(value);
-  };
+  const [pageSize, setPageSize] = useState<any>(20);
 
   useEffect(() => {
     getTransaction();
-  }, []);
+  }, [currentPage]);
 
   const {
     startDate,
@@ -91,13 +87,13 @@ export default function MyTransactions() {
     shortLabel,
   } = useDateRangePicker(new Date(), new Date());
 
-  const getTransaction = (page: number = 1) => {
+  const getTransaction = () => {
     setLoading(true);
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
         pageSize: pageSize,
-        currentPage: page,
+        currentPage: currentPage,
       },
       clientRefId: "",
       status: "",
@@ -167,7 +163,7 @@ export default function MyTransactions() {
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
-        pageSize: 10,
+        pageSize: pageSize,
         currentPage: currentPage,
       },
       clientRefId: "",
@@ -434,10 +430,10 @@ export default function MyTransactions() {
         </Stack>
       </Stack>
       <Grid item xs={12} md={6} lg={8}>
-        {Loading ? (
-          <ApiDataLoading />
-        ) : (
-          <>
+        <>
+          {Loading ? (
+            <ApiDataLoading />
+          ) : (
             <Scrollbar>
               <Table
                 sx={{ minWidth: 720 }}
@@ -461,31 +457,16 @@ export default function MyTransactions() {
                 </TableBody>
               </Table>
             </Scrollbar>
-            <Stack
-              sx={{
-                position: "fixed",
-                bottom: 25,
-                left: "50%",
-                transform: "translate(-50%)",
-                bgcolor: "white",
-              }}
-            >
-              <Pagination
-                count={
-                  Math.floor(pageCount / pageSize) +
-                  (pageCount % pageSize === 0 ? 0 : 1)
-                }
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                variant="outlined"
-                shape="rounded"
-                showFirstButton
-                showLastButton
-              />
-            </Stack>
-          </>
-        )}
+          )}
+          <CustomPagination
+            pageSize={pageSize}
+            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+              setCurrentPage(value);
+            }}
+            page={currentPage}
+            Count={pageCount}
+          />
+        </>
       </Grid>
     </>
   );

@@ -12,7 +12,7 @@ import { CategoryContext } from "../../../pages/Services";
 
 export const SubCategoryContext = React.createContext("");
 
-export default function Recharges(props: any) {
+export default function Recharges() {
   const categoryContext: any = useContext(CategoryContext);
   const [subcategoryId, setSubcategoryId] = useState("");
   const [currentTab, setCurrentTab] = useState("Mobile Prepaid");
@@ -34,9 +34,8 @@ export default function Recharges(props: any) {
     >
       <Card
         sx={{
-          margin: "5px 0px 0px -10px",
           height: "fit-content",
-          width: "70%",
+          width: { xs: "100%", sm: "70%" },
         }}
       >
         <Tabs

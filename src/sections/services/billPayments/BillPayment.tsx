@@ -8,7 +8,7 @@ import { useSnackbar } from "notistack";
 
 //--------------------------------------------------------------------
 
-export default function BillPayment(props: any) {
+export default function BillPayment() {
   const { enqueueSnackbar } = useSnackbar();
 
   const [currentTab, setCurrentTab] = React.useState("bbps1");
