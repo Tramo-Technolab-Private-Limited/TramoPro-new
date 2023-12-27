@@ -694,7 +694,7 @@ function TransactionRow({ row }: childProps) {
             <IconButton>
               <img src={Group} alt="Receipt Icon" />
             </IconButton>
-            {newRow.status !== "success" && (
+            {newRow.status !== "success" && newRow.status !== "failed" && (
               <Tooltip title="Check Status" placement="top">
                 <IconButton
                   onClick={() => !loading && CheckTransactionStatus(newRow)}
