@@ -148,7 +148,7 @@ export default function FundFlow() {
 
   const tableLabels = [
     { id: "Date&Time", label: "Date & Time" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -160,7 +160,7 @@ export default function FundFlow() {
   ];
   const tableLabels1 = [
     { id: "Date&Time", label: "Date & Time" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -172,7 +172,7 @@ export default function FundFlow() {
   ];
   const tableLabels2 = [
     { id: "Date&Time", label: "Date & Time" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -660,7 +660,7 @@ function TransactionRow({ row }: childProps) {
               <TableHead>
                 <TableRow sx={{ border: "1px solid black" }}>
                   <TableCell sx={{ border: "1px solid black" }}>
-                    Tramo ID
+                    Client Ref Id
                   </TableCell>
                   <TableCell sx={{ border: "1px solid black" }} align="center">
                     Mode

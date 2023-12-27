@@ -192,7 +192,7 @@ export default function MyTransactions() {
 
   const tableLabels = [
     { id: "Date&Time", label: "Date & Timezzzzz" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "agent", label: "Agent" },
     { id: "dist", label: "Distributor" },
     { id: "Product", label: "Product" },
@@ -207,7 +207,7 @@ export default function MyTransactions() {
   ];
   const tableLabels1 = [
     { id: "Date&Time", label: "Date & Timeaaaaaa" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "agent", label: "Agent" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator" },
@@ -221,7 +221,7 @@ export default function MyTransactions() {
   ];
   const tableLabels2 = [
     { id: "Date&Time", label: "Date & Time" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -848,7 +848,7 @@ function TransactionRow({ row }: childProps) {
                   }}
                 >
                   <TableRow>
-                    <TableCell align="left">Tramo ID</TableCell>
+                    <TableCell align="left">Client Ref Id</TableCell>
 
                     <TableCell align="left">Mode</TableCell>
 
