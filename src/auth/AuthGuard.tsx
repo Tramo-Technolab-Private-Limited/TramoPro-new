@@ -46,6 +46,14 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       ) {
         return <Navigate to={"/login"} />;
       }
+    } else if (!!pathname.match(/new/i)) {
+      if (
+        user?.finalStatus == "approved" ||
+        user?.is_eAgreement_signed ||
+        user?.isNPIN
+      ) {
+        return <Navigate to={"/404"} />;
+      }
     } else {
       if (requestedLocation && pathname !== requestedLocation) {
         setRequestedLocation(null);
