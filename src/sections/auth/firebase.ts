@@ -23,6 +23,7 @@ export const requestPermission = () => {
         .then((currentToken) => {
           if (currentToken) {
             console.log("===============Client Token==>", currentToken);
+            return currentToken;
           } else {
             console.log("Failed to generate the app registration token.");
           }
@@ -38,8 +39,6 @@ export const requestPermission = () => {
     }
   });
 };
-
-requestPermission();
 
 export const onMessageListener = () =>
   new Promise((resolve) => {
