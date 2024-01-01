@@ -262,33 +262,29 @@ export default function AuthRegisterForm(props: any) {
   };
 
   const onSubmit = (data: FormValuesProps) => {
-    if (refName !== "") {
-      setFormValues({
-        ...formValues,
-        refCode: data.refCode,
-        mobileNumber: data.mobile,
-        email: data.email.toLowerCase(),
-        password: data.password,
-        confirmPassword: data.confirmPassword,
-      });
-      let body = {
-        email: data.email.toLowerCase(),
-        mobileNumber: data.mobile,
-      };
-      Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
-        console.log("=============>" + JSON.stringify(Response));
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            setgOTP(true);
-          } else {
-            enqueueSnackbar(Response.data.message);
-          }
+    setFormValues({
+      ...formValues,
+      refCode: data.refCode,
+      mobileNumber: data.mobile,
+      email: data.email.toLowerCase(),
+      password: data.password,
+      confirmPassword: data.confirmPassword,
+    });
+    let body = {
+      email: data.email.toLowerCase(),
+      mobileNumber: data.mobile,
+    };
+    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+      console.log("=============>" + JSON.stringify(Response));
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          enqueueSnackbar(Response.data.message);
+          setgOTP(true);
+        } else {
+          enqueueSnackbar(Response.data.message);
         }
-      });
-    } else {
-      enqueueSnackbar("Check Your Refral Code");
-    }
+      }
+    });
   };
 
   const openEditModal = (val: any) => {
