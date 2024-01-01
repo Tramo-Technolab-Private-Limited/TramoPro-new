@@ -13,13 +13,12 @@ import {
   styled,
   StepIconProps,
   Typography,
-  Alert,
+  Modal,
   Grid,
   Box,
   Container,
 } from "@mui/material";
-import Card from "@mui/material/Card";
-import CardMedia from "@mui/material/CardMedia";
+
 import LinearProgress from "@mui/material/LinearProgress";
 import DoneIcon from "@mui/icons-material/Done";
 import Docs1 from "src/assets/Onboarding/Docs1.svg";
@@ -30,19 +29,19 @@ import DocsUpload3 from "src/assets/Onboarding/DocsUpload3.svg";
 import Docs4 from "src/assets/Onboarding/Docs4.svg";
 import Docs5 from "src/assets/Onboarding/Docs5.svg";
 import Docs6 from "src/assets/Onboarding/Docs6.svg";
-import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
+
 import Paper from "@mui/material/Paper";
-import { LoadingButton } from "@mui/lab";
+
 import FileUploadIcon from "@mui/icons-material/FileUpload";
-import FormProvider, { RHFTextField } from "../../../components/hook-form";
+import FormProvider from "../../../components/hook-form";
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
-import CloseIcon from "@mui/icons-material/Close";
+
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router-dom";
 // import { useNavigate } from 'react-router-dom';
-import Upload from "../../../components/upload/Upload";
+
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import VideoLabelIcon from "@mui/icons-material/VideoLabel";
 import AWS from "aws-sdk";
@@ -255,6 +254,15 @@ function PersonalIdentification(props: any) {
     shopImage: "",
   };
 
+  const [Img, setImg] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = (val: string) => {
+    setImg(val);
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
+
   const methods = useForm<FormValuesProps>({
     // resolver: yupResolver(RegisterSchema),
     defaultValues,
@@ -287,6 +295,17 @@ function PersonalIdentification(props: any) {
     color: theme.palette.text.secondary,
     boxShadow: "none",
   }));
+
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    bgcolor: "#ffffff",
+    boxShadow: 24,
+    borderRadius: 1,
+    p: 4,
+  };
 
   const aadharFrontupload = (e: any) => {
     let token = localStorage.getItem("token");
@@ -546,45 +565,45 @@ function PersonalIdentification(props: any) {
         if (PanPath !== "") {
           if (chequePath !== "") {
             if (selfiePath !== "") {
-              if (shoppath.length !== 0) {
-                const body = {
-                  aadhaar_front: adhaarFpath,
-                  aadhaar_back: adhaarBpath,
-                  PAN_url: PanPath,
-                  selfie: [selfiePath],
-                  shop_images: shoppath,
-                  Cancelled_Cheque_File: chequePath,
-                };
-                Api(`user/KYC/save_PID_Info`, "POST", body, token).then(
-                  (Response: any) => {
-                    console.log("=============>", Response);
-                    if (Response.status == 200) {
-                      if (Response.data.code == 200) {
-                        enqueueSnackbar(Response.data.message);
-                        UpdateUserDetail({
-                          aadharFileUrl: adhaarFpath,
-                          aadharBackUrl: adhaarBpath,
-                          PANFile: PanPath,
-                          selfie: [],
-                          shopImage: shoppath,
-                          is_PID_Docs: true,
-                          chequeCancelled: chequePath,
-                        });
-                        props.callBack(1);
-                        window.scrollTo(0, 0);
-                      } else {
-                        enqueueSnackbar(Response.data.message, {
-                          variant: "error",
-                        });
-                      }
+              // if (shoppath.length !== "") {
+              const body = {
+                aadhaar_front: adhaarFpath,
+                aadhaar_back: adhaarBpath,
+                PAN_url: PanPath,
+                selfie: [selfiePath],
+                shop_images: shoppath,
+                Cancelled_Cheque_File: chequePath,
+              };
+              Api(`user/KYC/save_PID_Info`, "POST", body, token).then(
+                (Response: any) => {
+                  console.log("=============>", Response);
+                  if (Response.status == 200) {
+                    if (Response.data.code == 200) {
+                      enqueueSnackbar(Response.data.message);
+                      UpdateUserDetail({
+                        aadharFileUrl: adhaarFpath,
+                        aadharBackUrl: adhaarBpath,
+                        PANFile: PanPath,
+                        selfie: [],
+                        shopImage: shoppath,
+                        is_PID_Docs: true,
+                        chequeCancelled: chequePath,
+                      });
+                      props.callBack(1);
+                      window.scrollTo(0, 0);
+                    } else {
+                      enqueueSnackbar(Response.data.message, {
+                        variant: "error",
+                      });
                     }
                   }
-                );
-              } else {
-                enqueueSnackbar("Please Upload shop images", {
-                  variant: "error",
-                });
-              }
+                }
+              );
+              // } else {
+              //   enqueueSnackbar("Please Upload shop images", {
+              //     variant: "error",
+              //   });
+              // }
             } else {
               enqueueSnackbar("Please Upload Selfie ", { variant: "error" });
             }
@@ -606,883 +625,76 @@ function PersonalIdentification(props: any) {
     navigate("/auth/verifyaadhar");
   };
   return (
-    <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-      {!user?.is_PID_Docs ||
-      user?.aadharFileUrl === "" ||
-      user?.aadharBackUrl === "" ||
-      user?.PANFile === "" ||
-      user?.selfie[0] === "" ||
-      user?.shopImage[0] === "" ? (
-        <>
-          {/* aadhaar Front */}
-
+    <>
+      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+        {!user?.is_PID_Docs ||
+        user?.aadharFileUrl === "" ||
+        user?.aadharBackUrl === "" ||
+        user?.PANFile === "" ||
+        user?.selfie[0] === "" ||
+        user?.shopImage[0] === "" ? (
           <>
-            {!user?.aadharBackUrl && (
-              <Box>
-                <Container component="main">
-                  <Box
-                    justifyContent={"center"}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "gray",
-                      marginTop: {
-                        xs: 2,
-                        sm: 3,
-                        md: 4,
-                        lg: 5,
-                        xl: 8,
-                      },
-                      width: "100%",
-                    }}
-                  >
-                    <Box padding={0}>
-                      <Grid container>
-                        <Grid xs={10}>
-                          <Item>
-                            <Stack
-                              display={"flex"}
-                              direction={"row"}
-                              spacing={1}
-                            >
-                              <img
-                                src={Docs1}
-                                style={{
-                                  height: "20px",
-                                  width: "20px",
-                                  marginTop: "0px",
-                                }}
-                                alt=""
-                              />
-                              <Typography
-                                fontSize={14}
-                                color={"#454F5B"}
-                                fontStyle={"normal"}
-                                fontFamily={"Public Sans"}
-                                fontWeight={500}
+            {/* aadhaar Front */}
+
+            <>
+              {!user?.aadharFileUrl && (
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 2,
+                          sm: 3,
+                          md: 4,
+                          lg: 5,
+                          xl: 8,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
                               >
-                                Choose Front Side of Aadhar Card
-                              </Typography>
-                            </Stack>{" "}
-                          </Item>
-                        </Grid>
-                        <Grid xs>
-                          <Item>
-                            {AadharFlie1 ? (
-                              <LinearProgress />
-                            ) : (
-                              <>
-                                {!AadharFile1BtnDis ? (
-                                  <Button
-                                    component="label"
-                                    size="small"
-                                    sx={{
-                                      border: "1px solid",
-
-                                      color: "black",
-
-                                      fontFamily: "Public Sans",
-                                      fontSize: "14px",
-                                      textTransform: "none",
-                                    }}
-                                    startIcon={
-                                      <FileUploadIcon sx={{ mt: 0 }} />
-                                    }
-                                  >
-                                    Upload
-                                    <VisuallyHiddenInput
-                                      name="AdharFile"
-                                      onChange={aadharFrontupload}
-                                      type="file"
-                                    />
-                                  </Button>
-                                ) : (
-                                  <>
-                                    <Stack
-                                      display={"flex"}
-                                      direction={"row"}
-                                      spacing={1}
-                                    >
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-                                          color: "black",
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handleDocuments("AadharFront")
-                                        }
-                                      >
-                                        Reset
-                                      </Button>
-
-                                      <Image
-                                        src={imageAadhar && imageAadhar}
-                                        style={{
-                                          borderRadius: "3px",
-                                          border: "1px solid black",
-                                          width: 50,
-                                          height: 50,
-                                        }}
-                                      />
-                                    </Stack>
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </Item>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Container>
-              </Box>
-            )}
-            {/* aadhaar back */}
-            {/* {!agentDetail.aadharBackUrl && (
-              <Stack>
-                <p>Choose Back Side of Aadhar Card (Optional)</p>
-                <Upload
-                  file={adhaarBackFile}
-                  onDrop={ABhandleDropSingleFile}
-                  onDelete={() => setAdhaarBackFile(null)}
-                />{' '}
-                {adhaarBackFile && (
-                  <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                    {successAadharBack == 'upload' ? (
-                      <LoadingButton
-                        variant="contained"
-                        component="span"
-                        onClick={() => aadharBackupload()}
-                      >
-                        Upload File
-                      </LoadingButton>
-                    ) : successAadharBack == 'wait' ? (
-                      <LoadingButton variant="contained" loading component="span">
-                        success
-                      </LoadingButton>
-                    ) : (
-                      <Icon
-                        icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                        color="green"
-                        fontSize={40}
-                        style={{ marginRight: 15 }}
-                      />
-                    )}
-                  </Stack>
-                )}
-              </Stack>
-            )} */}
-
-            {/* aadhaar back */}
-            {!user?.aadharBackUrl && (
-              <Box>
-                <Container component="main">
-                  <Box
-                    justifyContent={"center"}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "gray",
-                      marginTop: {
-                        xs: 1,
-                        sm: 1,
-                        md: 2,
-                        lg: 2,
-                        xl: 2,
-                      },
-                      width: "100%",
-                    }}
-                  >
-                    <Box padding={0}>
-                      <Grid container>
-                        <Grid xs={10}>
-                          <Item>
-                            <Stack
-                              display={"flex"}
-                              direction={"row"}
-                              spacing={1}
-                            >
-                              <img
-                                src={Docs2}
-                                style={{
-                                  height: "20px",
-                                  width: "20px",
-                                  marginTop: "0px",
-                                }}
-                                alt=""
-                              />
-                              <Typography
-                                fontSize={14}
-                                color={"#454F5B"}
-                                fontStyle={"normal"}
-                                fontFamily={"Public Sans"}
-                                fontWeight={500}
-                              >
-                                Choose Back Side of Aadhar Card
-                              </Typography>
-                            </Stack>{" "}
-                          </Item>
-                        </Grid>
-                        <Grid xs>
-                          <Item>
-                            {AadharFlieBack ? (
-                              <LinearProgress />
-                            ) : (
-                              <>
-                                {!AadharFileBackBtnDis ? (
-                                  <Button
-                                    component="label"
-                                    size="small"
-                                    sx={{
-                                      border: "1px solid",
-
-                                      color: "black",
-
-                                      fontFamily: "Public Sans",
-                                      fontSize: "14px",
-                                      textTransform: "none",
-                                    }}
-                                    startIcon={
-                                      <FileUploadIcon sx={{ mt: 0 }} />
-                                    }
-                                  >
-                                    Upload
-                                    <VisuallyHiddenInput
-                                      name="AdharFile"
-                                      onChange={aadharBackupload}
-                                      type="file"
-                                    />
-                                  </Button>
-                                ) : (
-                                  <>
-                                    <Stack
-                                      display={"flex"}
-                                      direction={"row"}
-                                      spacing={1}
-                                    >
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-
-                                          color: "black",
-
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handleDocuments("AadharBack")
-                                        }
-                                      >
-                                        Reset
-                                      </Button>
-                                      <Image
-                                        src={imageAadharBack && imageAadharBack}
-                                        style={{
-                                          borderRadius: "3px",
-                                          border: "1px solid black",
-                                          width: 50,
-                                          height: 50,
-                                        }}
-                                      />
-                                    </Stack>
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </Item>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Container>
-              </Box>
-            )}
-            {/* Pan Card */}
-            {/* {!agentDetail.PANFile && (
-              <Stack>
-                <p>Choose Pan Card</p>
-                <Upload
-                  file={PanFile}
-                  onDrop={PANhandleDropSingleFile}
-                  onDelete={() => setPanFile(null)}
-                />{' '}
-                {PanFile && (
-                  <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                    {successPan == 'upload' ? (
-                      <LoadingButton
-                        variant="contained"
-                        component="span"
-                        onClick={() => panUpload()}
-                      >
-                        Upload File
-                      </LoadingButton>
-                    ) : successPan == 'wait' ? (
-                      <LoadingButton variant="contained" loading component="span">
-                        success
-                      </LoadingButton>
-                    ) : (
-                      <Icon
-                        icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                        color="green"
-                        fontSize={40}
-                        style={{ marginRight: 15 }}
-                      />
-                    )}
-                  </Stack>
-                )}
-              </Stack>
-            )} */}
-            {!user?.PANFile && (
-              <Box>
-                <Container component="main">
-                  <Box
-                    justifyContent={"center"}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "gray",
-                      marginTop: {
-                        xs: 1,
-                        sm: 1,
-                        md: 2,
-                        lg: 2,
-                        xl: 2,
-                      },
-                      width: "100%",
-                    }}
-                  >
-                    <Box padding={0}>
-                      <Grid container>
-                        <Grid xs={10}>
-                          <Item>
-                            <Stack
-                              display={"flex"}
-                              direction={"row"}
-                              spacing={1}
-                            >
-                              <img
-                                src={AadharFilePanBtnDis ? DocsUpload3 : Docs3}
-                                style={{
-                                  height: "20px",
-                                  width: "20px",
-                                  marginTop: "0px",
-                                }}
-                                alt=""
-                              />
-                              <Typography
-                                fontSize={14}
-                                color={"#454F5B"}
-                                fontStyle={"normal"}
-                                fontFamily={"Public Sans"}
-                                fontWeight={500}
-                              >
-                                Choose Pan Crad
-                              </Typography>
-                            </Stack>{" "}
-                          </Item>
-                        </Grid>
-                        <Grid xs>
-                          <Item>
-                            {AadharFliePan ? (
-                              <LinearProgress />
-                            ) : (
-                              <>
-                                {!AadharFilePanBtnDis ? (
-                                  <Button
-                                    component="label"
-                                    size="small"
-                                    sx={{
-                                      border: "1px solid",
-
-                                      color: "black",
-
-                                      fontFamily: "Public Sans",
-                                      fontSize: "14px",
-                                      textTransform: "none",
-                                    }}
-                                    startIcon={
-                                      <FileUploadIcon sx={{ mt: 0 }} />
-                                    }
-                                  >
-                                    Upload
-                                    <VisuallyHiddenInput
-                                      name="AdharFile"
-                                      onChange={panUpload}
-                                      type="file"
-                                    />
-                                  </Button>
-                                ) : (
-                                  <>
-                                    <Stack
-                                      display={"flex"}
-                                      direction={"row"}
-                                      spacing={1}
-                                    >
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-                                          color: "black",
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handleDocuments("PanNumber")
-                                        }
-                                      >
-                                        Reset
-                                      </Button>
-                                      <Image
-                                        src={PANCard && PANCard}
-                                        style={{
-                                          borderRadius: "3px",
-                                          border: "1px solid black",
-                                          width: 50,
-                                          height: 50,
-                                        }}
-                                      />
-                                    </Stack>
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </Item>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Container>
-              </Box>
-            )}
-            {/* cancelled cheque */}
-
-            {/* {!agentDetail.Cancelled_Cheque_File && (
-              <Stack>
-                <p>Choose Your Cancelled Cheque</p>
-                <Upload
-                  file={chequefile}
-                  onDrop={chequehandleDropSingleFile}
-                  onDelete={() => setChequefile(null)}
-                />{' '}
-                {chequefile && (
-                  <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                    {successCheque == 'upload' ? (
-                      <LoadingButton
-                        variant="contained"
-                        component="span"
-                        onClick={() => uploadCheque()}
-                      >
-                        Upload file
-                      </LoadingButton>
-                    ) : successCheque == 'wait' ? (
-                      <LoadingButton variant="contained" loading component="span">
-                        success
-                      </LoadingButton>
-                    ) : (
-                      <Icon
-                        icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                        color="green"
-                        fontSize={40}
-                        style={{ marginRight: 15 }}
-                      />
-                    )}
-                  </Stack>
-                )}
-              </Stack>
-            )} */}
-
-            {!user?.Cancelled_Cheque_File && (
-              <Box>
-                <Container component="main">
-                  <Box
-                    justifyContent={"center"}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "gray",
-                      marginTop: {
-                        xs: 1,
-                        sm: 1,
-                        md: 2,
-                        lg: 2,
-                        xl: 2,
-                      },
-                      width: "100%",
-                    }}
-                  >
-                    <Box padding={0}>
-                      <Grid container>
-                        <Grid xs={10}>
-                          <Item>
-                            <Stack
-                              display={"flex"}
-                              direction={"row"}
-                              spacing={1}
-                            >
-                              <img
-                                src={Docs4}
-                                style={{
-                                  height: "20px",
-                                  width: "20px",
-                                  marginTop: "0px",
-                                }}
-                                alt=""
-                              />
-                              <Typography
-                                fontSize={14}
-                                color={"#454F5B"}
-                                fontStyle={"normal"}
-                                fontFamily={"Public Sans"}
-                                fontWeight={500}
-                              >
-                                Choose Your Cancelled Cheque
-                              </Typography>
-                            </Stack>{" "}
-                          </Item>
-                        </Grid>
-                        <Grid xs>
-                          <Item>
-                            {AadharFlieCheque ? (
-                              <LinearProgress />
-                            ) : (
-                              <>
-                                {!AadharFileChequeBtnDis ? (
-                                  <Button
-                                    component="label"
-                                    size="small"
-                                    sx={{
-                                      border: "1px solid",
-
-                                      color: "black",
-
-                                      fontFamily: "Public Sans",
-                                      fontSize: "14px",
-                                      textTransform: "none",
-                                    }}
-                                    startIcon={
-                                      <FileUploadIcon sx={{ mt: 0 }} />
-                                    }
-                                  >
-                                    Upload
-                                    <VisuallyHiddenInput
-                                      name="AdharFile"
-                                      onChange={uploadCheque}
-                                      type="file"
-                                    />
-                                  </Button>
-                                ) : (
-                                  <>
-                                    <Stack
-                                      display={"flex"}
-                                      direction={"row"}
-                                      spacing={1}
-                                    >
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-
-                                          color: "black",
-
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handleDocuments("CancelledCheque")
-                                        }
-                                      >
-                                        Reset
-                                      </Button>
-                                      <Image
-                                        src={CancelledCheque && CancelledCheque}
-                                        style={{
-                                          borderRadius: "3px",
-                                          border: "1px solid black",
-                                          width: 50,
-                                          height: 50,
-                                        }}
-                                      />
-                                    </Stack>
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </Item>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Container>
-              </Box>
-            )}
-            {/* selfle */}
-
-            {/* {!agentDetail.selfie[0]?.length && (
-              <Stack>
-                <p>Choose your Selfie</p>
-                <Upload
-                  file={selfieFile}
-                  onDrop={selfiehandleDropSingleFile}
-                  onDelete={() => setSelfieFile(null)}
-                />{' '}
-                {selfieFile && (
-                  <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                    {successSelfie == 'upload' ? (
-                      <LoadingButton
-                        variant="contained"
-                        component="span"
-                        onClick={() => selfieUpload()}
-                      >
-                        Upload file
-                      </LoadingButton>
-                    ) : successSelfie == 'wait' ? (
-                      <LoadingButton variant="contained" loading component="span">
-                        success
-                      </LoadingButton>
-                    ) : (
-                      <Icon
-                        icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                        color="green"
-                        fontSize={40}
-                        style={{ marginRight: 15 }}
-                      />
-                    )}
-                  </Stack>
-                )}
-              </Stack>
-            )} */}
-            {!user?.selfie[0]?.length && (
-              <Box>
-                <Container component="main">
-                  <Box
-                    justifyContent={"center"}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "gray",
-                      marginTop: {
-                        xs: 1,
-                        sm: 1,
-                        md: 2,
-                        lg: 2,
-                        xl: 2,
-                      },
-                      width: "100%",
-                    }}
-                  >
-                    <Box padding={0}>
-                      <Grid container>
-                        <Grid xs={10}>
-                          <Item>
-                            <Stack
-                              display={"flex"}
-                              direction={"row"}
-                              spacing={1}
-                            >
-                              <img
-                                src={Docs5}
-                                style={{
-                                  height: "20px",
-                                  width: "20px",
-                                  marginTop: "0px",
-                                }}
-                                alt=""
-                              />
-                              <Typography
-                                fontSize={14}
-                                color={"#454F5B"}
-                                fontStyle={"normal"}
-                                fontFamily={"Public Sans"}
-                                fontWeight={500}
-                              >
-                                Choose Your Selfle
-                              </Typography>
-                            </Stack>{" "}
-                          </Item>
-                        </Grid>
-                        <Grid xs>
-                          <Item>
-                            {AadharFlieSelfie ? (
-                              <LinearProgress />
-                            ) : (
-                              <>
-                                {!AadharFileSelfieBtnDis ? (
-                                  <Button
-                                    component="label"
-                                    size="small"
-                                    sx={{
-                                      border: "1px solid",
-
-                                      color: "black",
-
-                                      fontFamily: "Public Sans",
-                                      fontSize: "14px",
-                                      textTransform: "none",
-                                    }}
-                                    startIcon={
-                                      <FileUploadIcon sx={{ mt: 0 }} />
-                                    }
-                                  >
-                                    Upload
-                                    <VisuallyHiddenInput
-                                      name="AdharFile"
-                                      onChange={selfieUpload}
-                                      type="file"
-                                    />
-                                  </Button>
-                                ) : (
-                                  <>
-                                    <Stack
-                                      display={"flex"}
-                                      direction={"row"}
-                                      spacing={1}
-                                    >
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-
-                                          color: "black",
-
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handleDocuments("Selfie")
-                                        }
-                                      >
-                                        Reset
-                                      </Button>
-
-                                      <Image
-                                        src={SelfieImage && SelfieImage}
-                                        style={{
-                                          borderRadius: "3px",
-                                          border: "1px solid black",
-                                          width: 50,
-                                          height: 50,
-                                        }}
-                                      />
-                                    </Stack>
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </Item>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Container>
-              </Box>
-            )}
-            {!user?.shopImage[0]?.length && !user?.shopImage[1]?.length && (
-              <Box>
-                <Container component="main">
-                  <Box
-                    justifyContent={"center"}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                      borderRadius: 1,
-                      border: 1,
-                      borderColor: "gray",
-                      marginTop: {
-                        xs: 1,
-                        sm: 1,
-                        md: 2,
-                        lg: 2,
-                        xl: 2,
-                      },
-                      width: "100%",
-                    }}
-                  >
-                    <Box padding={0}>
-                      <Grid container>
-                        <Grid xs={10}>
-                          <Item>
-                            <Stack
-                              display={"flex"}
-                              direction={"row"}
-                              spacing={1}
-                            >
-                              <img
-                                src={Docs6}
-                                style={{
-                                  height: "20px",
-                                  width: "20px",
-                                  marginTop: "0px",
-                                }}
-                                alt=""
-                              />
-                              <Typography
-                                fontSize={14}
-                                color={"#454F5B"}
-                                fontStyle={"normal"}
-                                fontFamily={"Public Sans"}
-                                fontWeight={500}
-                              >
-                                Choose Your Shop Image
-                              </Typography>
-                            </Stack>{" "}
-                          </Item>
-                        </Grid>
-                        <Grid xs>
-                          <Item>
-                            {AadharFlieShop ? (
-                              <LinearProgress />
-                            ) : (
-                              <>
-                                {!AadharFileShopBtnDis ? (
-                                  <Button
-                                    component="label"
-                                    size="small"
-                                    sx={{
-                                      border: "1px solid",
-
-                                      color: "black",
-
-                                      fontFamily: "Public Sans",
-                                      fontSize: "14px",
-                                      textTransform: "none",
-                                    }}
-                                    startIcon={
-                                      <FileUploadIcon sx={{ mt: 0 }} />
-                                    }
-                                  >
-                                    Upload
-                                    <VisuallyHiddenInput
-                                      name="ShopImage"
-                                      onChange={uploadshop}
-                                      type="file"
-                                    />
-                                  </Button>
-                                ) : (
-                                  <>
+                                <img
+                                  src={Docs1}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Front Side of Aadhar Card
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlie1 ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFile1BtnDis ? (
                                     <Button
                                       component="label"
                                       size="small"
@@ -1495,150 +707,785 @@ function PersonalIdentification(props: any) {
                                         fontSize: "14px",
                                         textTransform: "none",
                                       }}
-                                      onClick={() =>
-                                        handleDocuments("ShopImage")
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
                                       }
                                     >
-                                      Reset
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="AdharFile"
+                                        onChange={aadharFrontupload}
+                                        type="file"
+                                      />
                                     </Button>
-                                    <Image
-                                      src={ShopImage && ShopImage}
-                                      style={{
-                                        borderRadius: "3px",
-                                        border: "1px solid black",
-                                        width: 50,
-                                        height: 50,
-                                      }}
-                                    />
-                                    {}
-                                  </>
-                                )}
-                              </>
-                            )}
-                          </Item>
-                        </Grid>
-                      </Grid>
-                    </Box>
-                  </Box>
-                </Container>
-              </Box>
-            )}
-            {/* {!agentDetail.shopImage[0]?.length && !agentDetail.shopImage[1]?.length && (
-              <Stack>
-                <p style={{ marginTop: '20px' }}>Choose Images of Your Shop</p>
-                <Upload
-                  file={shopfile}
-                  onDrop={ShophandleDropSingleFile}
-                  onDelete={() => setShopfile(null)}
-                />{' '}
-                {shopfile && (
-                  <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                    {successShop == 'upload' ? (
-                      <LoadingButton
-                        variant="contained"
-                        component="span"
-                        onClick={() => uploadshop()}
-                      >
-                        Upload file
-                      </LoadingButton>
-                    ) : successShop == 'wait' ? (
-                      <LoadingButton variant="contained" loading component="span">
-                        success
-                      </LoadingButton>
-                    ) : (
-                      <Icon
-                        icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                        color="green"
-                        fontSize={40}
-                        style={{ marginRight: 15 }}
-                      />
-                    )}
-                  </Stack>
-                )}
-                <div style={{ display: 'flex', flexWrap: 'wrap', width: '100%' }}>
-                  {shoppath.map((item: any, index: any) => {
-                    console.log('shop images', item);
-                    return (
-                      <div
-                        key={index}
-                        style={{
-                          width: '18%',
-                          height: '65px',
-                          borderRadius: '8px',
-                          display: 'flex',
-                          marginBottom: '0px',
-                          marginRight: '10px',
-                          position: 'relative',
-                        }}
-                      >
-                        <img
-                          src={item}
-                          style={{ borderRadius: '8px', width: '100%', height: '100%' }}
-                        />
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handleDocuments("AadharFront")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
 
-                        <CloseIcon
-                          style={{
-                            width: '15px',
-                            margin: '3px',
-                            position: 'absolute',
-                            right: '0',
-                            color: '#fff',
-                            background: '#212B36',
-                            borderRadius: '50%',
-                            height: '15px',
-                          }}
-                          onClick={() =>
-                            setShoppath(
-                              shoppath.filter((image: any) => {
-                                return image !== item;
-                              })
-                            )
-                          }
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </Stack>
-            )} */}
+                                        <Image
+                                          src={imageAadhar && imageAadhar}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageAadhar &&
+                                            handleOpen(imageAadhar)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
+              )}
+
+              {/* aadhaar back */}
+              {!user?.aadharBackUrl && (
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs2}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Back Side of Aadhar Card
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieBack ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileBackBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+
+                                        color: "black",
+
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="AdharFile"
+                                        onChange={aadharBackupload}
+                                        type="file"
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+
+                                            color: "black",
+
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handleDocuments("AadharBack")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={
+                                            imageAadharBack && imageAadharBack
+                                          }
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageAadharBack &&
+                                            handleOpen(imageAadharBack)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
+              )}
+              {/* Pan Card */}
+
+              {!user?.PANFile && (
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={
+                                    AadharFilePanBtnDis ? DocsUpload3 : Docs3
+                                  }
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Pan Crad
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFliePan ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFilePanBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+
+                                        color: "black",
+
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="AdharFile"
+                                        onChange={panUpload}
+                                        type="file"
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handleDocuments("PanNumber")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={PANCard && PANCard}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            PANCard && handleOpen(PANCard)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
+              )}
+              {/* cancelled cheque */}
+
+              {!user?.Cancelled_Cheque_File && (
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs4}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Your Cancelled Cheque
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieCheque ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileChequeBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+
+                                        color: "black",
+
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="AdharFile"
+                                        onChange={uploadCheque}
+                                        type="file"
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+
+                                            color: "black",
+
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handleDocuments("CancelledCheque")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={
+                                            CancelledCheque && CancelledCheque
+                                          }
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            CancelledCheque &&
+                                            handleOpen(CancelledCheque)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
+              )}
+              {/* selfle */}
+
+              {!user?.selfie[0]?.length && (
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs5}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Your Selfle
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieSelfie ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileSelfieBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+
+                                        color: "black",
+
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="AdharFile"
+                                        onChange={selfieUpload}
+                                        type="file"
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+
+                                            color: "black",
+
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handleDocuments("Selfie")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+
+                                        <Image
+                                          src={SelfieImage && SelfieImage}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            SelfieImage &&
+                                            handleOpen(SelfieImage)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
+              )}
+              {!user?.shopImage[0]?.length && (
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs6}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Your Shop Image
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieShop ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileShopBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+
+                                        color: "black",
+
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="ShopImage"
+                                        onChange={uploadshop}
+                                        type="file"
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Button
+                                        component="label"
+                                        size="small"
+                                        sx={{
+                                          border: "1px solid",
+
+                                          color: "black",
+
+                                          fontFamily: "Public Sans",
+                                          fontSize: "14px",
+                                          textTransform: "none",
+                                        }}
+                                        onClick={() =>
+                                          handleDocuments("ShopImage")
+                                        }
+                                      >
+                                        Reset
+                                      </Button>
+                                      <Image
+                                        src={ShopImage && ShopImage}
+                                        style={{
+                                          borderRadius: "3px",
+                                          border: "1px solid black",
+                                          width: 50,
+                                          height: 50,
+                                        }}
+                                        onClick={() =>
+                                          ShopImage && handleOpen(ShopImage)
+                                        }
+                                      />
+                                      {}
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
+              )}
+            </>
+            {/* </Grid> */}
+            <Stack my={5}>
+              <Button
+                variant="contained"
+                sx={{ width: "fit-content", margin: "auto" }}
+                type="submit"
+              >
+                Confirm & Continue
+              </Button>
+            </Stack>
           </>
-          {/* </Grid> */}
-          <Stack my={5}>
-            <Button
-              variant="contained"
-              sx={{ width: "fit-content", margin: "auto" }}
-              type="submit"
+        ) : (
+          <>
+            <Stack
+              alignItems={"center"}
+              justifyContent={"center"}
+              flexDirection={"row"}
+              my={3}
+              gap={1}
             >
-              Confirm & Continue
-            </Button>
-          </Stack>
-        </>
-      ) : (
-        <>
-          <Stack
-            alignItems={"center"}
-            justifyContent={"center"}
-            flexDirection={"row"}
-            my={3}
-            gap={1}
-          >
-            <Typography variant="h4" color="green">
-              Personal Identification Documents already Uploaded{" "}
-            </Typography>
-            <Icon icon="el:ok" color="green" fontSize={25} />
-          </Stack>
-          <Stack my={5}>
-            <Button
-              variant="contained"
-              sx={{ width: "fit-content", margin: "auto" }}
-              type="submit"
-            >
-              Continue
-            </Button>
-          </Stack>
-        </>
-      )}
-    </FormProvider>
+              <Typography variant="h4" color="green">
+                Personal Identification Documents already Uploaded{" "}
+              </Typography>
+              <Icon icon="el:ok" color="green" fontSize={25} />
+            </Stack>
+            <Stack my={5}>
+              <Button
+                variant="contained"
+                sx={{ width: "fit-content", margin: "auto" }}
+                type="submit"
+              >
+                Continue
+              </Button>
+            </Stack>
+          </>
+        )}
+      </FormProvider>
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} width={{ sm: "95%", md: "70%" }}>
+          <Image src={Img} alt={"IMAGE"} />
+          <Button variant="contained" onClick={handleClose}>
+            close
+          </Button>
+        </Box>
+      </Modal>
+    </>
   );
 }
 
@@ -1647,14 +1494,14 @@ function ConstitutionIdentification() {
   const { user, UpdateUserDetail, initialize } = useAuthContext();
 
   //Gst Certificate
-  const [gstCertificateFile, setGstCertificateFile] = useState<any>();
-  const [successGstCertificate, setSuccessGstCertificate] = useState("upload");
+
   const [gstCertificatePath, setGstCertificatepath] = useState<any>(
     user?.GSTFile || ""
   );
+  const [imageMSME, setImageMSME] = useState("");
   const [AadharFlieMSME, setAadharFlieMSME] = useState(false);
   const [AadharFileMSMEBtnDis, setAadharFileMSMEBtnDis] = useState(false);
-  const [imageMSME, setImageMSME] = useState("");
+
   //Other Certificate
   const [otherCertificateFile, setOtherCertificateFile] = useState<any>();
   const [successOtherCertificate, setSuccessOtherCertificate] =
@@ -1670,53 +1517,65 @@ function ConstitutionIdentification() {
   const [AadharFileBusPrfBtnDis, setAadharFileBusPrfBtnDis] = useState(false);
 
   //Business pan
-  const [AadharFlieBrdRes, setAadharFlieBrdRes] = useState(false);
-  const [AadharFileBrdResBtnDis, setAadharFileBrdResBtnDis] = useState(false);
+  const [imagePAN, setImagePAN] = useState("");
+  const [AadharFileBusPanBtnDis, setAadharFileBusPanBtnDis] = useState<any>("");
+  const [AadharFlieBusPan, setAadharFlieBusPan] = useState(false);
   const [businessPanPath, setBusinessPanpath] = useState<any>(
     user?.PANFile_Company || ""
   );
 
   //Partnership Deed
-  const [partnershipDeedFile, setPartnershipDeedFile] = useState<any>();
-  const [successPartnershipDeed, setSuccessPartnershipDeed] =
-    useState("upload");
+  const [imagepartnershipDeed, setImagepartnershipDeed] = useState("");
+  const [AadharFilepDeedBtnDis, setAadharFilepDeedBtnDis] = useState<any>("");
+  const [AadharFliepDeed, setAadharFliepDeed] = useState(false);
   const [partnershipDeedPath, setPartnershipDeedpath] = useState<any>(
     user?.Partnership_deed_File || ""
   );
 
-  //board Resolution BrdRes
-  const [boardResolutionFile, setBoardResolutionFile] = useState<any>();
-  const [successBoardResolution, setSuccessBoardResolution] =
-    useState("upload");
+  //board Resolution
+  const [imageboardResolution, setimageboardResolution] = useState("");
+  const [AadharFlieBrdRes, setAadharFlieBrdRes] = useState(false);
+  const [AadharFileBrdResBtnDis, setAadharFileBrdResBtnDis] = useState(false);
   const [boardResolutionPath, setBoardResolutionpath] = useState<any>(
     user?.Board_Resolution_File || ""
   );
 
   //Certificate Of Incorporation
-  const [COIFile, setCOIFile] = useState<any>();
-  const [successCOI, setSuccessCOI] = useState("upload");
+  const [imageCOI, setimageCOI] = useState("");
+  const [AadharFlieCOI, setAadharFlieCOI] = useState(false);
+  const [AadharFileCOIBtnDis, setAadharFileCOIBtnDis] = useState(false);
   const [COIPath, setCOIpath] = useState<any>(user?.COI_File || "");
 
   //Memorandum Of Association
-  const [MOAFile, setMOAFile] = useState<any>();
-  const [successMOA, setSuccessMOA] = useState("upload");
+  const [imageMOA, setImageMOA] = useState("");
+  const [AadharFlieMOA, setAadharFlieMOA] = useState(false);
+  const [AadharFileMOABtnDis, setAadharFileMOABtnDis] = useState(false);
   const [MOAPath, setMOApath] = useState<any>(user?.MOA_File || "");
 
   //Article Of Association
-  const [AOAFile, setAOAFile] = useState<any>();
-  const [successAOA, setSuccessAOA] = useState("upload");
+  const [imageAOA, setImageAOA] = useState("");
+  const [AadharFlieAOA, setAadharFlieAOA] = useState(false);
+  const [AadharFileAOABtnDis, setAadharFileAOABtnDis] = useState(false);
   const [AOAPath, setAOApath] = useState<any>(user?.AOA_File || "");
 
   //Consent Letter
-  const [consentLetterFile, setConsentLetterFile] = useState<any>();
-  const [successConsentLetter, setSuccessConsentLetter] = useState("upload");
+  const [imageNominatedPartner, setImageNominatedPartner] = useState("");
+  const [AadharFlieNominatedPartner, setAadharFlieNominatedPartner] =
+    useState(false);
+  const [
+    AadharFileNominatedPartnerBtnDis,
+    setAadharFileNominatedPartnerBtnDis,
+  ] = useState(false);
   const [consentLetterPath, setConsentLetterpath] = useState<any>(
     user?.Consent_Letter_File || ""
   );
 
   //Consent Letter
-  const [DPINFile, setDPINFile] = useState<any>();
-  const [successDPIN, setSuccessDPIN] = useState("upload");
+  const [imagePartnerIdentity, setImagePartnerIdentity] = useState("");
+  const [AadharFliePartnerIdentity, setAadharFliePartnerIdentity] =
+    useState(false);
+  const [AadharFilePartnerIdentityBtnDis, setAadharFilePartnerIdentityBtnDis] =
+    useState(false);
   const [DPINPath, setDPINpath] = useState<any>(user?.DPIN_File || "");
 
   const [docType, setDocType] = useState(user?.otherDocs[0]?.docType || "");
@@ -1737,6 +1596,26 @@ function ConstitutionIdentification() {
     setDocIssuedBy(e.target.type);
   };
   const navigate = useNavigate();
+
+  const [Img, setImg] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = (val: string) => {
+    setImg(val);
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
+
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    bgcolor: "#ffffff",
+    boxShadow: 24,
+    borderRadius: 1,
+    p: 4,
+  };
 
   const VisuallyHiddenInput = styled("input")({
     clip: "rect(0 0 0 0)",
@@ -1759,17 +1638,9 @@ function ConstitutionIdentification() {
     boxShadow: "none",
   }));
 
-  const gsthandleDropSingleFile = useCallback((acceptedFiles: File[]) => {
-    setSuccessGstCertificate("upload");
-    const docfile = acceptedFiles[0];
-    if (docfile) {
-      setGstCertificateFile(
-        Object.assign(docfile, {
-          preview: URL.createObjectURL(docfile),
-        })
-      );
-    }
-  }, []);
+  // const LOGIN = () => {
+  //   navigate(PATH_AUTH.login);
+  // };
 
   const otherhandleDropSingleFile = useCallback((acceptedFiles: File[]) => {
     setSuccessOtherCertificate("upload");
@@ -1783,102 +1654,9 @@ function ConstitutionIdentification() {
     }
   }, []);
 
-  const partnershipDeedhandleDropSingleFile = useCallback(
-    (acceptedFiles: File[]) => {
-      setSuccessPartnershipDeed("upload");
-      const docfile = acceptedFiles[0];
-      if (docfile) {
-        setPartnershipDeedFile(
-          Object.assign(docfile, {
-            preview: URL.createObjectURL(docfile),
-          })
-        );
-      }
-    },
-    []
-  );
-
-  const boardResolutionhandleDropSingleFile = useCallback(
-    (acceptedFiles: File[]) => {
-      setSuccessBoardResolution("upload");
-      const docfile = acceptedFiles[0];
-      if (docfile) {
-        setBoardResolutionFile(
-          Object.assign(docfile, {
-            preview: URL.createObjectURL(docfile),
-          })
-        );
-      }
-    },
-    []
-  );
-
-  const COIhandleDropSingleFile = useCallback((acceptedFiles: File[]) => {
-    setSuccessCOI("upload");
-    const docfile = acceptedFiles[0];
-    if (docfile) {
-      setCOIFile(
-        Object.assign(docfile, {
-          preview: URL.createObjectURL(docfile),
-        })
-      );
-    }
-  }, []);
-
-  const MOAhandleDropSingleFile = useCallback((acceptedFiles: File[]) => {
-    setSuccessMOA("upload");
-    const docfile = acceptedFiles[0];
-    if (docfile) {
-      setMOAFile(
-        Object.assign(docfile, {
-          preview: URL.createObjectURL(docfile),
-        })
-      );
-    }
-  }, []);
-
-  const AOAhandleDropSingleFile = useCallback((acceptedFiles: File[]) => {
-    setSuccessAOA("upload");
-    const docfile = acceptedFiles[0];
-    if (docfile) {
-      setAOAFile(
-        Object.assign(docfile, {
-          preview: URL.createObjectURL(docfile),
-        })
-      );
-    }
-  }, []);
-
-  const consentLetterhandleDropSingleFile = useCallback(
-    (acceptedFiles: File[]) => {
-      setSuccessConsentLetter("upload");
-      const docfile = acceptedFiles[0];
-      if (docfile) {
-        setConsentLetterFile(
-          Object.assign(docfile, {
-            preview: URL.createObjectURL(docfile),
-          })
-        );
-      }
-    },
-    []
-  );
-
-  const DPINhandleDropSingleFile = useCallback((acceptedFiles: File[]) => {
-    setSuccessDPIN("upload");
-    const docfile = acceptedFiles[0];
-    if (docfile) {
-      setDPINFile(
-        Object.assign(docfile, {
-          preview: URL.createObjectURL(docfile),
-        })
-      );
-    }
-  }, []);
-
-  //Upload DOCS
-
   const gstCertificateUpload = (e: any) => {
+    console.log("gst");
+
     setAadharFlieMSME(true);
     let token = localStorage.getItem("token");
     let formData = new FormData();
@@ -1892,12 +1670,11 @@ function ConstitutionIdentification() {
             console.log("===200=gstCertificate====", Response.data.filePath);
             setGstCertificatepath(Response.data.filePath);
             setAadharFileMSMEBtnDis(true);
+            setAadharFlieMSME(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
           }
-          setAadharFlieMSME(false);
         } else {
-          setAadharFlieMSME(false);
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
         }
       }
@@ -1914,7 +1691,6 @@ function ConstitutionIdentification() {
     setImageMSME(url);
   });
 
-  //Upload DOCS
   const otherCertificateUpload = () => {
     setSuccessOtherCertificate("wait");
     let token = localStorage.getItem("token");
@@ -1928,14 +1704,11 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=gstCertificate====", Response.data.filePath);
             setOtherCertificatepath(Response.data.filePath);
-            setSuccessOtherCertificate("success");
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessGstCertificate("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessOtherCertificate("upload");
         }
       }
     );
@@ -1955,12 +1728,11 @@ function ConstitutionIdentification() {
             console.log("===200=businessProof====", Response.data.filePath);
             setBusinessProofpath(Response.data.filePath);
             setAadharFileBusPrfBtnDis(true);
+            setAadharFlieBusPrf(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
           }
-          setAadharFlieBusPrf(false);
         } else {
-          setAadharFlieBusPrf(false);
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
         }
       }
@@ -1968,8 +1740,8 @@ function ConstitutionIdentification() {
   };
 
   const businessPanUpload = (e: any) => {
-    // BrdRes
-    setAadharFlieBrdRes(true);
+    console.log("bpan");
+    setAadharFlieBusPan(true);
     let token = localStorage.getItem("token");
     let formData = new FormData();
     formData.append("document", e.target.files[0]);
@@ -1981,24 +1753,33 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=businessPan====", Response.data.filePath);
             setBusinessPanpath(Response.data.filePath);
-            setAadharFileBrdResBtnDis(true);
+            setAadharFileBusPanBtnDis(true);
+            setAadharFlieBusPan(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
           }
-          setAadharFlieBrdRes(false);
         } else {
-          setAadharFlieBrdRes(false);
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
         }
       }
     );
   };
 
-  const partnershipDeedUpload = () => {
-    setSuccessPartnershipDeed("wait");
+  const BusPANImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: businessPanPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", BusPANImage, (err: any, url: any) => {
+    setImagePAN(url);
+  });
+
+  const partnershipDeedUpload = (e: any) => {
+    setAadharFliepDeed(true);
     let token = localStorage.getItem("token");
     let formData = new FormData();
-    formData.append("document", partnershipDeedFile);
+    formData.append("document", e.target.files[0]);
     formData.append("directoryName", "partnershipDeed");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
@@ -2007,24 +1788,34 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=partnershipDeed====", Response.data.filePath);
             setPartnershipDeedpath(Response.data.filePath);
-            setSuccessPartnershipDeed("success");
+
+            setAadharFliepDeed(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessPartnershipDeed("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessPartnershipDeed("upload");
         }
       }
     );
   };
 
-  const boardResolutionUpload = () => {
-    setSuccessBoardResolution("wait");
+  const NominatedPartnerImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: partnershipDeedPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", NominatedPartnerImage, (err: any, url: any) => {
+    setImagepartnershipDeed(url);
+  });
+
+  const boardResolutionUpload = (e: any) => {
+    console.log("brdr");
+    setAadharFlieBrdRes(true);
     let token = localStorage.getItem("token");
     let formData = new FormData();
-    formData.append("document", boardResolutionFile);
+    formData.append("document", e.target.files[0]);
     formData.append("directoryName", "boardResolution");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
@@ -2033,24 +1824,34 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=boardResolution====", Response.data.filePath);
             setBoardResolutionpath(Response.data.filePath);
-            setSuccessBoardResolution("success");
+            setAadharFileBrdResBtnDis(true);
+            setAadharFlieBrdRes(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessBoardResolution("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessBoardResolution("upload");
         }
       }
     );
   };
 
-  const COIUpload = () => {
-    setSuccessCOI("wait");
+  const boardResolutionImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: boardResolutionPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", boardResolutionImage, (err: any, url: any) => {
+    setimageboardResolution(url);
+  });
+
+  const COIUpload = (e: any) => {
+    setAadharFlieCOI(false);
+    console.log("coi");
     let token = localStorage.getItem("token");
     let formData = new FormData();
-    formData.append("document", COIFile);
+    formData.append("document", e.target.files[0]);
     formData.append("directoryName", "COI");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
@@ -2059,25 +1860,35 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=COI====", Response.data.filePath);
             setCOIpath(Response.data.filePath);
-            setSuccessCOI("success");
+            setAadharFileCOIBtnDis(true);
+            setAadharFlieCOI(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessCOI("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessCOI("upload");
         }
       }
     );
   };
 
-  const MOAUpload = () => {
-    setSuccessMOA("wait");
+  const COIImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: COIPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", COIImage, (err: any, url: any) => {
+    setimageCOI(url);
+  });
+
+  const MOAUpload = (e: any) => {
+    console.log("moa");
+    setAadharFlieMOA(false);
     let token = localStorage.getItem("token");
     let formData = new FormData();
-    formData.append("document", MOAFile);
-    formData.append("directoryName", "COI");
+    formData.append("document", e.target.files[0]);
+    formData.append("directoryName", "MOA");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
         if (Response.status == 200) {
@@ -2085,24 +1896,34 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=MOAFile====", Response.data.filePath);
             setMOApath(Response.data.filePath);
-            setSuccessMOA("success");
+            setAadharFileMOABtnDis(true);
+            setAadharFlieMOA(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessMOA("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessMOA("upload");
         }
       }
     );
   };
 
-  const AOAUpload = () => {
-    setSuccessAOA("wait");
+  const MOAImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: MOAPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", MOAImage, (err: any, url: any) => {
+    setImageMOA(url);
+  });
+
+  const AOAUpload = (e: any) => {
+    setAadharFlieAOA(false);
+    console.log("aoa");
     let token = localStorage.getItem("token");
     let formData = new FormData();
-    formData.append("document", AOAFile);
+    formData.append("document", e.target.files[0]);
     formData.append("directoryName", "AOA");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
@@ -2111,24 +1932,35 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=AOA====", Response.data.filePath);
             setAOApath(Response.data.filePath);
-            setSuccessAOA("success");
+            setAadharFileAOABtnDis(true);
+            setAadharFlieAOA(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessAOA("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessAOA("upload");
         }
       }
     );
   };
 
-  const consentLetterUpload = () => {
-    setSuccessConsentLetter("wait");
+  // setImageAOA
+
+  const AOAImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: AOAPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", AOAImage, (err: any, url: any) => {
+    setImageAOA(url);
+  });
+
+  const consentLetterUpload = (e: any) => {
+    setAadharFlieNominatedPartner(false);
     let token = localStorage.getItem("token");
     let formData = new FormData();
-    formData.append("document", consentLetterFile);
+    formData.append("document", e.target.files[0]);
     formData.append("directoryName", "COI");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
@@ -2137,24 +1969,33 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=consentLetterFile====", Response.data.filePath);
             setConsentLetterpath(Response.data.filePath);
-            setSuccessConsentLetter("success");
+            setAadharFileNominatedPartnerBtnDis(true);
+            setAadharFlieNominatedPartner(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessConsentLetter("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessConsentLetter("upload");
         }
       }
     );
   };
 
-  const DPINUpload = () => {
-    setSuccessDPIN("wait");
+  const PartnershipDeedImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: consentLetterPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", PartnershipDeedImage, (err: any, url: any) => {
+    setImageNominatedPartner(url);
+  });
+
+  const DPINUpload = (e: any) => {
+    setAadharFliePartnerIdentity(false);
     let token = localStorage.getItem("token");
     let formData = new FormData();
-    formData.append("document", DPINFile);
+    formData.append("document", e.target.files[0]);
     formData.append("directoryName", "COI");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
@@ -2163,18 +2004,27 @@ function ConstitutionIdentification() {
             enqueueSnackbar("successfully file uploaded");
             console.log("===200=DPINFile====", Response.data.filePath);
             setDPINpath(Response.data.filePath);
-            setSuccessDPIN("success");
+            setAadharFilePartnerIdentityBtnDis(true);
+            setAadharFliePartnerIdentity(false);
           } else {
             enqueueSnackbar("Server didn`t response", { variant: "error" });
-            setSuccessDPIN("upload");
           }
         } else {
           enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-          setSuccessDPIN("upload");
         }
       }
     );
   };
+
+  const PartnerIdentityImage = {
+    Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+    Key: DPINPath?.split("/").splice(4, 4).join("/"),
+    Expires: 600, // Expiration time in seconds
+  };
+
+  s3.getSignedUrl("getObject", PartnerIdentityImage, (err: any, url: any) => {
+    setImagePartnerIdentity(url);
+  });
 
   const constitutionDocs = Yup.object().shape({});
 
@@ -2184,9 +2034,19 @@ function ConstitutionIdentification() {
     if (docVal == "MSME") {
       setAadharFileMSMEBtnDis(false);
     } else if (docVal == "BusPrf") {
-      setAadharFileBusPrfBtnDis(false);
+      setAadharFileBusPanBtnDis(false);
     } else if (docVal == "Boardresolution") {
       setAadharFileBrdResBtnDis(false);
+    } else if (docVal == "Incorporation") {
+      setAadharFileBrdResBtnDis(false);
+    } else if (docVal == "AOA") {
+      setAadharFileAOABtnDis(false);
+    } else if (docVal == "partnershipDeed") {
+      setAadharFilepDeedBtnDis(false);
+    } else if (docVal == "NominatedPartner") {
+      setAadharFileNominatedPartnerBtnDis(false);
+    } else if (docVal == "PartnerIdentity") {
+      setAadharFilePartnerIdentityBtnDis(false);
     }
   };
 
@@ -2330,11 +2190,7 @@ function ConstitutionIdentification() {
       user?.constitutionType.toLowerCase() !== "individual" ? (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           {user?.constitutionType.toLowerCase() !== "individual" ? (
-            <Grid
-            // display={'grid'}
-            // gridTemplateColumns={{ xs: 'repeat(1, 1fr)', sm: 'repeat(2, 1fr)' }}
-            // gap={3}
-            >
+            <Grid>
               {/* gst certificate */}
               {!user?.isGST &&
               (user?.constitutionType.toLowerCase() ==
@@ -2343,43 +2199,6 @@ function ConstitutionIdentification() {
                 user?.constitutionType == "Partnership" ||
                 user?.constitutionType == "Limited Liability Partnership" ||
                 user?.constitutionType.toLowerCase() == "proprietorship") ? (
-                // <Stack>
-                //   <Typography>
-                //     Shops and Establishment Reg. Certificate/Udyog Aadhaar Registration certificate
-                //     for MSME
-                //   </Typography>
-                //   <Upload
-                //     file={gstCertificateFile || agentDetail.GSTFile}
-                //     onDrop={gsthandleDropSingleFile}
-                //     onDelete={() => setGstCertificateFile(null)}
-                //     disabled={agentDetail.GSTFile}
-                //   />
-                //   {gstCertificateFile && (
-                //     <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                //       {successGstCertificate == 'upload' ? (
-                //         <LoadingButton
-                //           variant="contained"
-                //           component="span"
-                //           onClick={() => gstCertificateUpload()}
-                //         >
-                //           Upload file
-                //         </LoadingButton>
-                //       ) : successGstCertificate == 'wait' ? (
-                //         <LoadingButton variant="contained" loading component="span">
-                //           success
-                //         </LoadingButton>
-                //       ) : (
-                //         <Icon
-                //           icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                //           color="green"
-                //           fontSize={40}
-                //           style={{ marginRight: 15 }}
-                //         />
-                //       )}
-                //     </Stack>
-                //   )}
-                // </Stack>
-
                 <Box>
                   <Container component="main">
                     <Box
@@ -2391,11 +2210,11 @@ function ConstitutionIdentification() {
                         border: 1,
                         borderColor: "gray",
                         marginTop: {
-                          xs: 2,
-                          sm: 3,
-                          md: 4,
-                          lg: 5,
-                          xl: 8,
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
                         },
                         width: "100%",
                       }}
@@ -2443,7 +2262,9 @@ function ConstitutionIdentification() {
                                       size="small"
                                       sx={{
                                         border: "1px solid",
+
                                         color: "black",
+
                                         fontFamily: "Public Sans",
                                         fontSize: "14px",
                                         textTransform: "none",
@@ -2457,6 +2278,7 @@ function ConstitutionIdentification() {
                                         name="MSME"
                                         onChange={gstCertificateUpload}
                                         type="file"
+                                        disabled={user?.GSTFile}
                                       />
                                     </Button>
                                   ) : (
@@ -2493,6 +2315,9 @@ function ConstitutionIdentification() {
                                             width: 50,
                                             height: 50,
                                           }}
+                                          onClick={() =>
+                                            imageMSME && handleOpen(imageMSME)
+                                          }
                                         />
                                       </Stack>
                                     </>
@@ -2514,241 +2339,6 @@ function ConstitutionIdentification() {
                 user?.constitutionType == "Partnership" ||
                 user?.constitutionType == "Limited Liability Partnership" ||
                 user?.constitutionType.toLowerCase() == "proprietorship") ? (
-                <Stack>
-                  <Typography>GST certificate</Typography>
-                  <Upload
-                    file={gstCertificateFile || user?.GSTFile}
-                    onDrop={gsthandleDropSingleFile}
-                    onDelete={() => setGstCertificateFile(null)}
-                    disabled={user?.GSTFile}
-                  />
-                  {gstCertificateFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successGstCertificate == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => gstCertificateUpload}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successGstCertificate == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
-              ) : null}
-
-              {user?.constitutionType.toLowerCase() ==
-                "private limited company" ||
-              user?.constitutionType.toLowerCase() == "one person company" ||
-              user?.constitutionType == "Limited Liability Partnership" ||
-              user?.constitutionType == "Partnership" ? (
-                <>
-                  {/* <Stack>
-                    <p>Choose Business pan</p>
-                    <Upload
-                      file={businessPanFile || agentDetail.PANFile_Company}
-                      onDrop={PanhandleDropSingleFile}
-                      onDelete={() => setBusinessPanFile(null)}
-                      disabled={agentDetail.PANFile_Company}
-                    />
-                    {businessPanFile && (
-                      <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                        {successBusinessPan == 'upload' ? (
-                          <LoadingButton
-                            variant="contained"
-                            component="span"
-                            onClick={() => businessPanUpload()}
-                          >
-                            Upload file
-                          </LoadingButton>
-                        ) : successBusinessPan == 'wait' ? (
-                          <LoadingButton variant="contained" loading component="span">
-                            success
-                          </LoadingButton>
-                        ) : (
-                          <Icon
-                            icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                            color="green"
-                            fontSize={40}
-                            style={{ marginRight: 15 }}
-                          />
-                        )}
-                      </Stack>
-                    )}
-                  </Stack> */}
-
-                  <Box>
-                    <Container component="main">
-                      <Box
-                        justifyContent={"center"}
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                          borderRadius: 1,
-                          border: 1,
-                          borderColor: "gray",
-                          marginTop: {
-                            xs: 2,
-                            sm: 3,
-                            md: 4,
-                            lg: 5,
-                            xl: 8,
-                          },
-                          width: "100%",
-                        }}
-                      >
-                        <Box padding={0}>
-                          <Grid container>
-                            <Grid xs={10}>
-                              <Item>
-                                <Stack
-                                  display={"flex"}
-                                  direction={"row"}
-                                  spacing={1}
-                                >
-                                  <img
-                                    src={Docs1}
-                                    style={{
-                                      height: "20px",
-                                      width: "20px",
-                                      marginTop: "0px",
-                                    }}
-                                    alt=""
-                                  />
-                                  <Typography
-                                    fontSize={14}
-                                    color={"#454F5B"}
-                                    fontStyle={"normal"}
-                                    fontFamily={"Public Sans"}
-                                    fontWeight={500}
-                                  >
-                                    Choose Business pan
-                                  </Typography>
-                                </Stack>{" "}
-                              </Item>
-                            </Grid>
-                            <Grid xs>
-                              <Item>
-                                {AadharFlieBusPrf ? (
-                                  <LinearProgress />
-                                ) : (
-                                  <>
-                                    {!AadharFileBusPrfBtnDis ? (
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-
-                                          color: "black",
-
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        startIcon={
-                                          <FileUploadIcon sx={{ mt: 0 }} />
-                                        }
-                                      >
-                                        Upload
-                                        <VisuallyHiddenInput
-                                          name="BusPrf"
-                                          onChange={businessProofUpload}
-                                          type="file"
-                                        />
-                                      </Button>
-                                    ) : (
-                                      <>
-                                        <Button
-                                          component="label"
-                                          size="small"
-                                          sx={{
-                                            border: "1px solid",
-
-                                            color: "black",
-
-                                            fontFamily: "Public Sans",
-                                            fontSize: "14px",
-                                            textTransform: "none",
-                                          }}
-                                          onClick={() =>
-                                            handlePIDDocuments("BusPrf")
-                                          }
-                                        >
-                                          Reset
-                                        </Button>
-                                      </>
-                                    )}
-                                  </>
-                                )}
-                              </Item>
-                            </Grid>
-                          </Grid>
-                        </Box>
-                      </Box>
-                    </Container>
-                  </Box>
-                </>
-              ) : (
-                ""
-              )}
-              {/* Registered Partnership Deed */}
-              {user?.constitutionType == "Partnership" ||
-              user?.constitutionType == "Limited Liability Partnership" ? (
-                // <Stack>
-                //   <p>Choose Partnership Deed / Agreement</p>
-                //   <Upload
-                //     file={partnershipDeedFile || user?.Partnership_deed_File}
-                //     onDrop={partnershipDeedhandleDropSingleFile}
-                //     onDelete={() => setPartnershipDeedFile(null)}
-                //     disabled={user?.Partnership_deed_File}
-                //   />
-                //   {partnershipDeedFile && (
-                //     <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                //       {successPartnershipDeed == "upload" ? (
-                //         <LoadingButton
-                //           variant="contained"
-                //           component="span"
-                //           onClick={() => partnershipDeedUpload()}
-                //         >
-                //           Upload file
-                //         </LoadingButton>
-                //       ) : successPartnershipDeed == "wait" ? (
-                //         <LoadingButton
-                //           variant="contained"
-                //           loading
-                //           component="span"
-                //         >
-                //           success
-                //         </LoadingButton>
-                //       ) : (
-                //         <Icon
-                //           icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                //           color="green"
-                //           fontSize={40}
-                //           style={{ marginRight: 15 }}
-                //         />
-                //       )}
-                //     </Stack>
-                //   )}
-                // </Stack>
-
                 <Box>
                   <Container component="main">
                     <Box
@@ -2760,11 +2350,11 @@ function ConstitutionIdentification() {
                         border: 1,
                         borderColor: "gray",
                         marginTop: {
-                          xs: 2,
-                          sm: 3,
-                          md: 4,
-                          lg: 5,
-                          xl: 8,
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
                         },
                         width: "100%",
                       }}
@@ -2794,18 +2384,18 @@ function ConstitutionIdentification() {
                                   fontFamily={"Public Sans"}
                                   fontWeight={500}
                                 >
-                                  Choose Partnership Deed / Agreement
+                                  GST Certificate
                                 </Typography>
                               </Stack>{" "}
                             </Item>
                           </Grid>
                           <Grid xs>
                             <Item>
-                              {AadharFlieBusPrf ? (
+                              {AadharFlieMSME ? (
                                 <LinearProgress />
                               ) : (
                                 <>
-                                  {!AadharFileBusPrfBtnDis ? (
+                                  {!AadharFileMSMEBtnDis ? (
                                     <Button
                                       component="label"
                                       size="small"
@@ -2824,9 +2414,10 @@ function ConstitutionIdentification() {
                                     >
                                       Upload
                                       <VisuallyHiddenInput
-                                        name="BusPrf"
-                                        onChange={businessProofUpload}
+                                        name="MSME"
+                                        onChange={gstCertificateUpload}
                                         type="file"
+                                        disabled={user?.GSTFile}
                                       />
                                     </Button>
                                   ) : (
@@ -2844,7 +2435,7 @@ function ConstitutionIdentification() {
                                           textTransform: "none",
                                         }}
                                         onClick={() =>
-                                          handlePIDDocuments("BusPrf")
+                                          handlePIDDocuments("MSME")
                                         }
                                       >
                                         Reset
@@ -2861,44 +2452,150 @@ function ConstitutionIdentification() {
                   </Container>
                 </Box>
               ) : null}
-              {/* Copy of Board Resolution */}
-              {user?.constitutionType.toLowerCase() == "one person company" ||
-              user?.constitutionType.toLowerCase() ==
-                "private limited company" ? (
-                // <Stack>
-                //   <p>Choose Copy of Board resolution</p>
-                //   <Upload
-                //     file={boardResolutionFile || agentDetail.Board_Resolution_File}
-                //     onDrop={boardResolutionhandleDropSingleFile}
-                //     onDelete={() => setBoardResolutionFile(null)}
-                //     disabled={agentDetail.Board_Resolution_File}
-                //   />
-                //   {boardResolutionFile && (
-                //     <Stack flexDirection={'row'} justifyContent={'end'} mt={1}>
-                //       {successBoardResolution == 'upload' ? (
-                //         <LoadingButton
-                //           variant="contained"
-                //           component="span"
-                //           onClick={() => boardResolutionUpload()}
-                //         >
-                //           Upload file
-                //         </LoadingButton>
-                //       ) : successBoardResolution == 'wait' ? (
-                //         <LoadingButton variant="contained" loading component="span">
-                //           success
-                //         </LoadingButton>
-                //       ) : (
-                //         <Icon
-                //           icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                //           color="green"
-                //           fontSize={40}
-                //           style={{ marginRight: 15 }}
-                //         />
-                //       )}
-                //     </Stack>
-                //   )}
-                // </Stack>
 
+              {user?.constitutionType.toLowerCase() ==
+                "private limited company" ||
+              user?.constitutionType.toLowerCase() == "one person company" ||
+              user?.constitutionType == "Limited Liability Partnership" ||
+              user?.constitutionType == "Partnership" ? (
+                <>
+                  <Box>
+                    <Container component="main">
+                      <Box
+                        justifyContent={"center"}
+                        sx={{
+                          display: "flex",
+                          flexDirection: "column",
+                          borderRadius: 1,
+                          border: 1,
+                          borderColor: "gray",
+                          marginTop: {
+                            xs: 1,
+                            sm: 1,
+                            md: 2,
+                            lg: 2,
+                            xl: 2,
+                          },
+                          width: "100%",
+                        }}
+                      >
+                        <Box padding={0}>
+                          <Grid container>
+                            <Grid xs={10}>
+                              <Item>
+                                <Stack
+                                  display={"flex"}
+                                  direction={"row"}
+                                  spacing={1}
+                                >
+                                  <img
+                                    src={Docs2}
+                                    style={{
+                                      height: "20px",
+                                      width: "20px",
+                                      marginTop: "0px",
+                                    }}
+                                    alt=""
+                                  />
+                                  <Typography
+                                    fontSize={14}
+                                    color={"#454F5B"}
+                                    fontStyle={"normal"}
+                                    fontFamily={"Public Sans"}
+                                    fontWeight={500}
+                                  >
+                                    Choose Business pan
+                                  </Typography>
+                                </Stack>{" "}
+                              </Item>
+                            </Grid>
+                            <Grid xs>
+                              <Item>
+                                {AadharFlieBusPan ? (
+                                  <LinearProgress />
+                                ) : (
+                                  <>
+                                    {!AadharFileBusPanBtnDis ? (
+                                      <Button
+                                        component="label"
+                                        size="small"
+                                        sx={{
+                                          border: "1px solid",
+
+                                          color: "black",
+
+                                          fontFamily: "Public Sans",
+                                          fontSize: "14px",
+                                          textTransform: "none",
+                                        }}
+                                        startIcon={
+                                          <FileUploadIcon sx={{ mt: 0 }} />
+                                        }
+                                      >
+                                        Upload
+                                        <VisuallyHiddenInput
+                                          name="BusPrf"
+                                          onChange={businessPanUpload}
+                                          type="file"
+                                          disabled={user?.PANFile_Company}
+                                        />
+                                      </Button>
+                                    ) : (
+                                      <>
+                                        <Stack
+                                          display={"flex"}
+                                          direction={"row"}
+                                          spacing={1}
+                                        >
+                                          <Button
+                                            component="label"
+                                            size="small"
+                                            sx={{
+                                              border: "1px solid",
+
+                                              color: "black",
+
+                                              fontFamily: "Public Sans",
+                                              fontSize: "14px",
+                                              textTransform: "none",
+                                            }}
+                                            onClick={() =>
+                                              handlePIDDocuments("BusPrf")
+                                            }
+                                          >
+                                            Reset
+                                          </Button>
+                                          <Image
+                                            src={imagePAN && imagePAN}
+                                            style={{
+                                              borderRadius: "3px",
+                                              border: "1px solid black",
+                                              width: 50,
+                                              height: 50,
+                                            }}
+                                            onClick={() =>
+                                              imagePAN && handleOpen(imagePAN)
+                                            }
+                                          />
+                                        </Stack>
+                                      </>
+                                    )}
+                                  </>
+                                )}
+                              </Item>
+                            </Grid>
+                          </Grid>
+                        </Box>
+                      </Box>
+                    </Container>
+                  </Box>
+                </>
+              ) : (
+                ""
+              )}
+              {/* Registered Partnership Deed */}
+              {user?.constitutionType == "Partnership" ||
+              user?.constitutionType == "Limited Liability Partnership" ? (
                 <Box>
                   <Container component="main">
                     <Box
@@ -2910,11 +2607,11 @@ function ConstitutionIdentification() {
                         border: 1,
                         borderColor: "gray",
                         marginTop: {
-                          xs: 2,
-                          sm: 3,
-                          md: 4,
-                          lg: 5,
-                          xl: 8,
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
                         },
                         width: "100%",
                       }}
@@ -2929,7 +2626,145 @@ function ConstitutionIdentification() {
                                 spacing={1}
                               >
                                 <img
-                                  src={Docs1}
+                                  src={Docs6}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Partnership Deed / Agreement
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFliepDeed ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFilepDeedBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+                                        color: "black",
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="partnershipDeed"
+                                        onChange={partnershipDeedUpload}
+                                        type="file"
+                                        disabled={user?.Partnership_deed_File}
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        direction={"row"}
+                                        display={"flex"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments(
+                                              "partnershipDeed"
+                                            )
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+
+                                        <Image
+                                          src={
+                                            imagepartnershipDeed &&
+                                            imagepartnershipDeed
+                                          }
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imagepartnershipDeed &&
+                                            handleOpen(imagepartnershipDeed)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
+              ) : null}
+              {/* Copy of Board Resolution */}
+              {user?.constitutionType.toLowerCase() == "one person company" ||
+              user?.constitutionType.toLowerCase() ==
+                "private limited company" ? (
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs3}
                                   style={{
                                     height: "20px",
                                     width: "20px",
@@ -2973,28 +2808,53 @@ function ConstitutionIdentification() {
                                       Upload
                                       <VisuallyHiddenInput
                                         name="BusPrf"
-                                        onChange={businessPanUpload}
+                                        onChange={boardResolutionUpload}
                                         type="file"
+                                        disabled={user?.Board_Resolution_File}
                                       />
                                     </Button>
                                   ) : (
                                     <>
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-                                          color: "black",
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handlePIDDocuments("Boardresolution")
-                                        }
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
                                       >
-                                        Reset
-                                      </Button>
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments(
+                                              "Boardresolution"
+                                            )
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={
+                                            imageboardResolution &&
+                                            imageboardResolution
+                                          }
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageboardResolution &&
+                                            handleOpen(imageboardResolution)
+                                          }
+                                        />
+                                      </Stack>
                                     </>
                                   )}
                                 </>
@@ -3011,290 +2871,669 @@ function ConstitutionIdentification() {
               {user?.constitutionType.toLowerCase() ==
                 "private limited company" ||
               user?.constitutionType.toLowerCase() == "one person company" ? (
-                <Stack>
-                  <p>Choose Certificate Of Incorporation</p>
-                  <Upload
-                    file={COIFile || user?.COI_File}
-                    onDrop={COIhandleDropSingleFile}
-                    onDelete={() => setCOIFile(null)}
-                    disabled={user?.COI_File}
-                  />
-                  {COIFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successCOI == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => COIUpload()}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successCOI == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs4}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Certificate Of Incorporation
+                                </Typography>
+                              </Stack>
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieCOI ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileCOIBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+                                        color: "black",
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="Incorporation"
+                                        onChange={COIUpload}
+                                        type="file"
+                                        disabled={user?.COI_File}
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments("Incorporation")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={imageCOI && imageCOI}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageCOI && handleOpen(imageCOI)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
               ) : null}
               {/* Memorandum Of Association */}
               {user?.constitutionType.toLowerCase() == "one person company" ||
               user?.constitutionType.toLowerCase() ==
                 "private limited company" ? (
-                <Stack>
-                  <p>Choose Memorandum Of Association</p>
-                  <Upload
-                    file={MOAFile || user?.MOA_File}
-                    onDrop={MOAhandleDropSingleFile}
-                    onDelete={() => setMOAFile(null)}
-                    disabled={user?.MOA_File}
-                  />
-                  {MOAFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successMOA == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => MOAUpload()}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successMOA == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs5}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Memorandum Of Association
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieMOA ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileMOABtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+                                        color: "black",
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="MOA"
+                                        onChange={MOAUpload}
+                                        type="file"
+                                        disabled={user?.MOA_File}
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments("MOA")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={imageMOA && imageMOA}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageMOA && handleOpen(imageMOA)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
               ) : null}
               {/* Article Of Association */}
               {user?.constitutionType.toLowerCase() == "one person company" ||
               user?.constitutionType.toLowerCase() ==
                 "private limited company" ? (
-                <Stack>
-                  <p>Choose Article Of Association</p>
-                  <Upload
-                    file={AOAFile || user?.AOA_File}
-                    onDrop={AOAhandleDropSingleFile}
-                    onDelete={() => setAOAFile(null)}
-                    disabled={user?.AOA_File}
-                  />
-                  {AOAFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successAOA == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => AOAUpload()}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successAOA == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs6}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Article Of Association
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieAOA ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileAOABtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+                                        color: "black",
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="MOA"
+                                        onChange={AOAUpload}
+                                        type="file"
+                                        disabled={user?.AOA_File}
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments("AOA")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+
+                                        <Image
+                                          src={imageAOA && imageAOA}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageAOA && handleOpen(imageAOA)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
               ) : null}
               {/* Consent Letter */}
               {user?.constitutionType.toLowerCase() ==
                 "limited liability partnership" ||
               user?.constitutionType == "Partnership" ? (
-                <Stack>
-                  <p>
-                    Authority letter authorizing Desiginated Partner / Nominated
-                    Partner to sign Agtreement and Other Documents.
-                  </p>
-                  <Upload
-                    file={consentLetterFile || user?.Consent_Letter_File}
-                    onDrop={consentLetterhandleDropSingleFile}
-                    onDelete={() => setConsentLetterFile(null)}
-                    disabled={user?.Consent_Letter_File}
-                  />
-                  {consentLetterFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successConsentLetter == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => consentLetterUpload()}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successConsentLetter == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs6}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Authority letter authorizing Desiginated
+                                  Partner / Nominated Partner to sign Agtreement
+                                  and Other Documents.
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFlieNominatedPartner ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFileNominatedPartnerBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+                                        color: "black",
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="Consent_Letter_File"
+                                        onChange={consentLetterUpload}
+                                        type="file"
+                                        disabled={user?.Consent_Letter_File}
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments(
+                                              "NominatedPartner"
+                                            )
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={
+                                            imageNominatedPartner &&
+                                            imageNominatedPartner
+                                          }
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageNominatedPartner &&
+                                            handleOpen(imageNominatedPartner)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
               ) : null}
               {/* DPIN Designated Partner Identity Number */}
               {user?.constitutionType == "Limited Liability Partnership" ? (
-                <Stack>
-                  <p>Choose Designated Partner Identity Number</p>
-                  <Upload
-                    file={DPINFile || user?.DPIN_File}
-                    onDrop={DPINhandleDropSingleFile}
-                    onDelete={() => setDPINFile(null)}
-                    disabled={user?.DPIN_File}
-                  />
-                  {DPINFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successDPIN == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => DPINUpload()}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successDPIN == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
-              ) : null}
-              {(user?.constitutionType.toLowerCase() == "proprietorship" &&
-                user?.isGST) ||
-              user?.constitutionType.toLowerCase() == "one person company" ||
-              user?.constitutionType.toLowerCase() ==
-                "limited liability partnership " ||
-              user?.constitutionType.toLowerCase() == "partnership" ||
-              user?.isGST ? (
-                <Stack>
-                  <p>Other Doc. </p>
-                  <p>
-                    {" "}
-                    <RHFTextField
-                      name="docType"
-                      label="Doc Type"
-                      size="small"
-                      disabled={user?.otherDocs[0]?.docType}
-                      value={docType}
-                      onChange={DocTypeHandle}
-                    />
-                  </p>
-                  <p>
-                    {" "}
-                    <RHFTextField
-                      name="docIdNum"
-                      label="Doc ID Number"
-                      size="small"
-                      disabled={user?.otherDocs[0]?.docIdNumber}
-                      value={docIdNum}
-                      onChange={DocIdNumHandle}
-                    />
-                  </p>
-                  <p>
-                    <RHFTextField
-                      name="docIssuedBy"
-                      label="Issued By"
-                      size="small"
-                      disabled={user?.otherDocs[0]?.issuedBy}
-                      value={docIssuedBy}
-                      onChange={DocIssuedByHandle}
-                    />
-                  </p>
-
-                  <Upload
-                    file={otherCertificateFile || user?.otherDocs[0]?.docURL}
-                    onDrop={otherhandleDropSingleFile}
-                    onDelete={() => setOtherCertificateFile(null)}
-                    disabled={user?.otherDocs[0]?.docURL}
-                  />
-                  {otherCertificateFile && (
-                    <Stack flexDirection={"row"} justifyContent={"end"} mt={1}>
-                      {successOtherCertificate == "upload" ? (
-                        <LoadingButton
-                          variant="contained"
-                          component="span"
-                          onClick={() => otherCertificateUpload()}
-                        >
-                          Upload file
-                        </LoadingButton>
-                      ) : successOtherCertificate == "wait" ? (
-                        <LoadingButton
-                          variant="contained"
-                          loading
-                          component="span"
-                        >
-                          success
-                        </LoadingButton>
-                      ) : (
-                        <Icon
-                          icon="streamline:interface-validation-check-check-form-validation-checkmark-success-add-addition"
-                          color="green"
-                          fontSize={40}
-                          style={{ marginRight: 15 }}
-                        />
-                      )}
-                    </Stack>
-                  )}
-                </Stack>
+                <Box>
+                  <Container component="main">
+                    <Box
+                      justifyContent={"center"}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        borderRadius: 1,
+                        border: 1,
+                        borderColor: "gray",
+                        marginTop: {
+                          xs: 1,
+                          sm: 1,
+                          md: 2,
+                          lg: 2,
+                          xl: 2,
+                        },
+                        width: "100%",
+                      }}
+                    >
+                      <Box padding={0}>
+                        <Grid container>
+                          <Grid xs={10}>
+                            <Item>
+                              <Stack
+                                display={"flex"}
+                                direction={"row"}
+                                spacing={1}
+                              >
+                                <img
+                                  src={Docs6}
+                                  style={{
+                                    height: "20px",
+                                    width: "20px",
+                                    marginTop: "0px",
+                                  }}
+                                  alt=""
+                                />
+                                <Typography
+                                  fontSize={14}
+                                  color={"#454F5B"}
+                                  fontStyle={"normal"}
+                                  fontFamily={"Public Sans"}
+                                  fontWeight={500}
+                                >
+                                  Choose Designated Partner Identity Number
+                                </Typography>
+                              </Stack>{" "}
+                            </Item>
+                          </Grid>
+                          <Grid xs>
+                            <Item>
+                              {AadharFliePartnerIdentity ? (
+                                <LinearProgress />
+                              ) : (
+                                <>
+                                  {!AadharFilePartnerIdentityBtnDis ? (
+                                    <Button
+                                      component="label"
+                                      size="small"
+                                      sx={{
+                                        border: "1px solid",
+                                        color: "black",
+                                        fontFamily: "Public Sans",
+                                        fontSize: "14px",
+                                        textTransform: "none",
+                                      }}
+                                      startIcon={
+                                        <FileUploadIcon sx={{ mt: 0 }} />
+                                      }
+                                    >
+                                      Upload
+                                      <VisuallyHiddenInput
+                                        name="Consent_Letter_File"
+                                        onChange={DPINUpload}
+                                        type="file"
+                                        disabled={user?.Consent_Letter_File}
+                                      />
+                                    </Button>
+                                  ) : (
+                                    <>
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
+                                      >
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments(
+                                              "PartnerIdentity"
+                                            )
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={
+                                            imagePartnerIdentity &&
+                                            imagePartnerIdentity
+                                          }
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imagePartnerIdentity &&
+                                            handleOpen(imagePartnerIdentity)
+                                          }
+                                        />
+                                      </Stack>
+                                    </>
+                                  )}
+                                </>
+                              )}
+                            </Item>
+                          </Grid>
+                        </Grid>
+                      </Box>
+                    </Box>
+                  </Container>
+                </Box>
               ) : null}
             </Grid>
           ) : (
@@ -3320,7 +3559,7 @@ function ConstitutionIdentification() {
       ) : (
         <>
           <Stack alignItems={"center"} justifyContent={"center"} my={3} gap={1}>
-            {user?.constitutionType.toLowerCase() == "individual" ? (
+            {user?.constitutionType.toLowerCase() == "Individual" ? (
               <Typography variant="h4" color="green">
                 Constitution Documents Uploaded Successfully
                 <Icon icon="el:ok" color="green" fontSize={25} />
@@ -3351,6 +3590,19 @@ function ConstitutionIdentification() {
           </Stack>
         </>
       )}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} width={{ sm: "95%", md: "70%" }}>
+          <Image src={Img} alt={"IMAGE"} />
+          <Button variant="contained" onClick={handleClose}>
+            close
+          </Button>
+        </Box>
+      </Modal>
     </>
   );
 }
