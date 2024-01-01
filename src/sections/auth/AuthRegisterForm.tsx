@@ -153,7 +153,12 @@ export default function AuthRegisterForm(props: any) {
     email: Yup.string()
       .email("Invalid email address")
       .required("email is required"),
-    refCode: Yup.string().required("Please Check Your Refral Code"),
+    refCode:
+      radioVal === "directagent" ||
+      radioVal === "directdistributor" ||
+      value2 === "m_distributor"
+        ? Yup.string()
+        : Yup.string().required("Referral code is required"),
     password: Yup.string()
       .min(6, "Password must be at least 6 characters")
       .max(15, "Password must be less than 15 characters")
