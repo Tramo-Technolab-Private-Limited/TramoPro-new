@@ -146,13 +146,8 @@ export default function WalletLadger() {
           setWalletCount(Response.data.data.totalNumberOfRecords);
           enqueueSnackbar(Response.data.message);
           setSendLoading(false);
-          console.log(
-            "======getUser===data.data Transaction====>",
-            Response.data.data
-          );
         } else {
           enqueueSnackbar(Response.data.message);
-          console.log("======Transaction=======>" + Response);
           setSendLoading(false);
         }
       }
@@ -262,7 +257,7 @@ export default function WalletLadger() {
         <title>Wallet Ladger | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
 
-      <Card>
+      <>
         <Stack flexDirection={"row"} justifyContent={"end"}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -306,38 +301,39 @@ export default function WalletLadger() {
             </Button>
           </Stack>
         </Stack>
-        <Grid item xs={12} md={6} lg={8}>
-          <Scrollbar>
-            <TableContainer>
-              <Table
-                sx={{ minWidth: 720 }}
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHeadCustom
-                  headLabel={
-                    user?.role == "m_distributor"
-                      ? MDtableLabels
-                      : user?.role == "distributor"
-                      ? distributortableLabels
-                      : agenttableLabels
-                  }
-                />
-                {sendLoding ? (
-                  <ApiDataLoading />
-                ) : (
+        {sendLoding ? (
+          <ApiDataLoading />
+        ) : (
+          <Grid item xs={12} md={6} lg={8}>
+            <Scrollbar>
+              <TableContainer>
+                <Table
+                  sx={{ minWidth: 720 }}
+                  stickyHeader
+                  aria-label="sticky table"
+                >
+                  <TableHeadCustom
+                    headLabel={
+                      user?.role == "m_distributor"
+                        ? MDtableLabels
+                        : user?.role == "distributor"
+                        ? distributortableLabels
+                        : agenttableLabels
+                    }
+                  />
+
                   <TableBody>
                     {Array.isArray(ladgerData) &&
                       ladgerData.map((row: any) => (
                         <LadgerRow key={row._id} row={row} />
                       ))}
                   </TableBody>
-                )}
-              </Table>
-            </TableContainer>
-          </Scrollbar>
-        </Grid>
-      </Card>
+                </Table>
+              </TableContainer>
+            </Scrollbar>
+          </Grid>
+        )}
+      </>
 
       <CustomPagination
         pageSize={pageSize}

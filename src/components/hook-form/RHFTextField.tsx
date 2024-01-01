@@ -11,7 +11,6 @@ type Props = TextFieldProps & {
 
 export default function RHFTextField({ name, ...other }: Props) {
   const { control } = useFormContext();
-  console.log(name);
   return (
     <Controller
       name={name}

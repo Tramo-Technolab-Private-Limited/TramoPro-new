@@ -14,6 +14,7 @@ import FormProvider, { RHFTextField } from "../../components/hook-form";
 import { Api } from "src/webservices";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router";
+import { requestPermission } from "./firebase";
 
 // ----------------------------------------------------------------------
 
@@ -67,7 +68,12 @@ export default function AuthLoginForm() {
   } = methods;
 
   const onSubmit = async (data: FormValuesProps) => {
-    let body = { username: data.email, password: data.password };
+    let FCMtoken = await requestPermission();
+    let body = {
+      username: data.email,
+      password: data.password,
+      FCM_Token: FCMtoken,
+    };
     try {
       await Api(`auth/login_in`, "POST", body, "").then((Response: any) => {
         if (Response.status == 200) {

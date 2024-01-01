@@ -7,8 +7,7 @@ import {
 } from "react";
 // utils
 import axios from "../utils/axios";
-//
-import { isValidToken, setSession } from "./utils";
+
 import {
   ActionMapType,
   AuthStateType,
@@ -130,8 +129,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         typeof window !== "undefined" ? localStorage.getItem("token") : "";
       if (token) {
         await Api(`auth/userData`, "GET", "", token).then((Response: any) => {
-          if ((Response.status = 200)) {
-            if (Response.data.code == 200) {
+          if (Response.status === 200) {
+            if (Response.data.code === 200) {
               if (Response.data.data.userData == null) {
                 localStorage.removeItem("token");
                 dispatch({
@@ -151,6 +150,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
                   },
                 });
               }
+            } else {
+              localStorage.removeItem("token");
+              dispatch({
+                type: Types.LOGOUT,
+              });
             }
           }
         });
@@ -185,7 +189,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     fetch("https://api.ipify.org?format=json")
       .then((response) => response.json())
       .then((data) => localStorage.setItem("ip", data.ip));
-  }, [localStorage.getItem("token")]);
+  }, []);
 
   useEffect(() => {
     initialize();
@@ -203,7 +207,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // LOGIN
   const login = async (token: string, user: any) => {
-    console.log(token, user);
     dispatch({
       type: Types.LOGIN,
       payload: {

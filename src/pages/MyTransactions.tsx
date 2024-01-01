@@ -54,6 +54,7 @@ import { sentenceCase } from "change-case";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 
 // ----------------------------------------------------------------------
 
@@ -67,16 +68,11 @@ export default function MyTransactions() {
 
   const [refId, setRefId] = useState("");
   const [sdata, setSdata] = useState([]);
-  const [pageSize, setPageSize] = useState<any>(10);
-
-  const handlePageChange = (event: any, value: any) => {
-    setCurrentPage(value);
-    getTransaction(value);
-  };
+  const [pageSize, setPageSize] = useState<any>(20);
 
   useEffect(() => {
     getTransaction();
-  }, []);
+  }, [currentPage]);
 
   const {
     startDate,
@@ -91,13 +87,13 @@ export default function MyTransactions() {
     shortLabel,
   } = useDateRangePicker(new Date(), new Date());
 
-  const getTransaction = (page: number = 1) => {
+  const getTransaction = () => {
     setLoading(true);
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
         pageSize: pageSize,
-        currentPage: page,
+        currentPage: currentPage,
       },
       clientRefId: "",
       status: "",
@@ -167,7 +163,7 @@ export default function MyTransactions() {
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
-        pageSize: 10,
+        pageSize: pageSize,
         currentPage: currentPage,
       },
       clientRefId: "",
@@ -196,7 +192,7 @@ export default function MyTransactions() {
 
   const tableLabels = [
     { id: "Date&Time", label: "Date & Timezzzzz" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "agent", label: "Agent" },
     { id: "dist", label: "Distributor" },
     { id: "Product", label: "Product" },
@@ -211,7 +207,7 @@ export default function MyTransactions() {
   ];
   const tableLabels1 = [
     { id: "Date&Time", label: "Date & Timeaaaaaa" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "agent", label: "Agent" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator" },
@@ -225,7 +221,7 @@ export default function MyTransactions() {
   ];
   const tableLabels2 = [
     { id: "Date&Time", label: "Date & Time" },
-    { id: "Tramo ID", label: "Tramo ID" },
+    { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -434,10 +430,10 @@ export default function MyTransactions() {
         </Stack>
       </Stack>
       <Grid item xs={12} md={6} lg={8}>
-        {Loading ? (
-          <ApiDataLoading />
-        ) : (
-          <>
+        <>
+          {Loading ? (
+            <ApiDataLoading />
+          ) : (
             <Scrollbar>
               <Table
                 sx={{ minWidth: 720 }}
@@ -461,31 +457,16 @@ export default function MyTransactions() {
                 </TableBody>
               </Table>
             </Scrollbar>
-            <Stack
-              sx={{
-                position: "fixed",
-                bottom: 25,
-                left: "50%",
-                transform: "translate(-50%)",
-                bgcolor: "white",
-              }}
-            >
-              <Pagination
-                count={
-                  Math.floor(pageCount / pageSize) +
-                  (pageCount % pageSize === 0 ? 0 : 1)
-                }
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                variant="outlined"
-                shape="rounded"
-                showFirstButton
-                showLastButton
-              />
-            </Stack>
-          </>
-        )}
+          )}
+          <CustomPagination
+            pageSize={pageSize}
+            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+              setCurrentPage(value);
+            }}
+            page={currentPage}
+            Count={pageCount}
+          />
+        </>
       </Grid>
     </>
   );
@@ -713,7 +694,7 @@ function TransactionRow({ row }: childProps) {
             <IconButton>
               <img src={Group} alt="Receipt Icon" />
             </IconButton>
-            {newRow.status !== "success" && (
+            {newRow.status !== "success" && newRow.status !== "failed" && (
               <Tooltip title="Check Status" placement="top">
                 <IconButton
                   onClick={() => !loading && CheckTransactionStatus(newRow)}
@@ -867,7 +848,7 @@ function TransactionRow({ row }: childProps) {
                   }}
                 >
                   <TableRow>
-                    <TableCell align="left">Tramo ID</TableCell>
+                    <TableCell align="left">Client Ref Id</TableCell>
 
                     <TableCell align="left">Mode</TableCell>
 

@@ -36,6 +36,7 @@ import {
   Network,
   ManageFundFlow,
   MyNetwrokFunds,
+  UserProfilePage,
 } from "./elements";
 
 // ----------------------------------------------------------------------
@@ -157,6 +158,7 @@ export default function Router() {
         },
         { path: "setting", element: <Setting /> },
         { path: "helpsupport", element: <HelpAndSupport /> },
+        { path: "userprofilepage", element: <UserProfilePage /> },
       ],
     },
 

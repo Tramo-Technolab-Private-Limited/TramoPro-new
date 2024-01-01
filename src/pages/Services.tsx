@@ -13,6 +13,7 @@ import {
   BillPayment,
   Recharges,
 } from "../sections/services";
+import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 
 // ----------------------------------------------------------------------
 
@@ -21,6 +22,7 @@ export const CategoryContext = React.createContext({});
 export default function Services(props: any) {
   const [categoryList, setCategoryList] = useState([]);
   const [superCurrentTab, setSuperCurrentTab] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setSuperCurrentTab(props.title);
@@ -31,6 +33,7 @@ export default function Services(props: any) {
   }, []);
 
   const getCategoryList = () => {
+    setIsLoading(true);
     let token = localStorage.getItem("token");
     Api(`category/get_CategoryList`, "GET", "", token).then((Response: any) => {
       console.log("======getcategory_list====>", Response);
@@ -50,8 +53,10 @@ export default function Services(props: any) {
           });
           setCategoryList(sortedData);
           setSuperCurrentTab(sortedData[0].category_name);
-        } else {
         }
+        setIsLoading(false);
+      } else {
+        setIsLoading(false);
       }
     });
   };
@@ -62,51 +67,57 @@ export default function Services(props: any) {
         <title> Recharges | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
       <Grid>
-        <Tabs
-          value={superCurrentTab}
-          variant="scrollable"
-          sx={{ background: "#F4F6F8" }}
-          onChange={(event, newValue) => setSuperCurrentTab(newValue)}
-          aria-label="icon label tabs example"
-        >
-          {categoryList.map((tab: any) => (
-            <Tab
-              key={tab._id}
-              sx={{ mx: { xs: 0.5, sm: 2 }, fontSize: { xs: 12, sm: 16 } }}
-              label={tab.category_name}
-              iconPosition="top"
-              value={tab.category_name}
-            />
-          ))}
-        </Tabs>
+        {isLoading ? (
+          <ApiDataLoading />
+        ) : (
+          <>
+            <Tabs
+              value={superCurrentTab}
+              variant="scrollable"
+              sx={{ background: "#F4F6F8" }}
+              onChange={(event, newValue) => setSuperCurrentTab(newValue)}
+              aria-label="icon label tabs example"
+            >
+              {categoryList.map((tab: any) => (
+                <Tab
+                  key={tab._id}
+                  sx={{ mx: { xs: 0.5, sm: 2 }, fontSize: { xs: 12, sm: 16 } }}
+                  label={tab.category_name}
+                  iconPosition="top"
+                  value={tab.category_name}
+                />
+              ))}
+            </Tabs>
 
-        {categoryList.map(
-          (tab: any) =>
-            tab.category_name == superCurrentTab && (
-              <CategoryContext.Provider value={tab} key={tab.category_name}>
-                <Box sx={{ m: 3 }}>
-                  {superCurrentTab.toLowerCase() == "recharges" ? (
-                    <Recharges supCategory={tab} />
-                  ) : superCurrentTab.toLowerCase() == "money transfer" ? (
-                    <DMT />
-                  ) : superCurrentTab.toLowerCase() == "aeps" ? (
-                    <AEPS supCategory={tab} />
-                  ) : superCurrentTab.toLowerCase() == "indo nepal" ? (
-                    <IndoNepal supCategory={tab} />
-                  ) : superCurrentTab.toLowerCase() == "bill payment" ? (
-                    <BillPayment supCategory={tab} />
-                  ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
-                    <AadharPay supCategory={tab} />
-                  ) : superCurrentTab.toLowerCase() == "matm" ? (
-                    <MATM supCategory={tab} />
-                  ) : superCurrentTab.toLowerCase() == "dmt1" ? (
-                    <DMT1 supCategory={tab} />
-                  ) : superCurrentTab.toLowerCase() == "dmt2" ? (
-                    <DMT2 />
-                  ) : null}
-                </Box>
-              </CategoryContext.Provider>
-            )
+            {categoryList.map(
+              (tab: any) =>
+                tab.category_name == superCurrentTab && (
+                  <CategoryContext.Provider value={tab} key={tab.category_name}>
+                    <Box sx={{ m: 3 }}>
+                      {superCurrentTab.toLowerCase() == "recharges" ? (
+                        <Recharges />
+                      ) : superCurrentTab.toLowerCase() == "money transfer" ? (
+                        <DMT />
+                      ) : superCurrentTab.toLowerCase() == "aeps" ? (
+                        <AEPS supCategory={tab} />
+                      ) : superCurrentTab.toLowerCase() == "indo nepal" ? (
+                        <IndoNepal supCategory={tab} />
+                      ) : superCurrentTab.toLowerCase() == "bill payment" ? (
+                        <BillPayment />
+                      ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
+                        <AadharPay supCategory={tab} />
+                      ) : superCurrentTab.toLowerCase() == "matm" ? (
+                        <MATM supCategory={tab} />
+                      ) : superCurrentTab.toLowerCase() == "dmt1" ? (
+                        <DMT1 />
+                      ) : superCurrentTab.toLowerCase() == "dmt2" ? (
+                        <DMT2 />
+                      ) : null}
+                    </Box>
+                  </CategoryContext.Provider>
+                )
+            )}
+          </>
         )}
       </Grid>
     </>

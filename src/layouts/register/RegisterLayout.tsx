@@ -1,9 +1,10 @@
 // @mui
-import { Typography, Stack, Box, Container } from "@mui/material";
+import { Typography, Stack, Box, Container, useTheme } from "@mui/material";
 // components
 import Logo from "../../components/logo";
 import Image from "../../components/image";
-import DashBoardImage from "../../assets/images/dashboard.png";
+import neoDashBoardImage from "../../assets/images/neodashboard.svg";
+import tramoDashBoardImage from "../../assets/images/tramodashboard.svg";
 
 //
 import {
@@ -13,15 +14,7 @@ import {
   StyledContent,
 } from "./styles";
 import Marquee from "react-fast-marquee";
-import Recharge from "../../assets/images/recharge.svg";
-import dmt from "../../assets/images/dmt.svg";
-import dmt1 from "../../assets/images/dmt1.svg";
-import dmt2 from "../../assets/images/dmt2.svg";
-import aadhaarpay from "../../assets/images/aadhaarpay.svg";
-import aeps from "../../assets/images/aeps.svg";
-import billpayment from "../../assets/images/billpayment.svg";
-import indonepal from "../../assets/images/indonepal.svg";
-import matm from "../../assets/images/matm.svg";
+import SvgColor from "src/components/svg-color";
 
 // ----------------------------------------------------------------------
 
@@ -36,6 +29,7 @@ export default function RegisterLayout({
   illustration,
   title,
 }: Props) {
+  const theme = useTheme();
   return (
     <StyledRoot>
       <Logo
@@ -59,7 +53,11 @@ export default function RegisterLayout({
           disabledEffect
           visibleByDefault
           alt="auth"
-          src={DashBoardImage}
+          src={
+            process.env.REACT_APP_LOGO == "Tramo"
+              ? tramoDashBoardImage
+              : neoDashBoardImage
+          }
           sx={{ maxWidth: 720 }}
         />
         <Typography
@@ -87,16 +85,43 @@ export default function RegisterLayout({
         }}
       >
         {/* <Divider /> */}
-        <Marquee style={{ background: "white", paddingBottom: 2 }} pauseOnHover>
-          <img src={Recharge} />
-          <img src={dmt} />
-          <img src={dmt1} />
-          <img src={dmt2} />
-          <img src={billpayment} />
-          <img src={aeps} />
-          <img src={matm} />
-          <img src={aadhaarpay} />
-          <img src={indonepal} />
+        <Marquee style={{ background: "white" }} pauseOnHover>
+          <SvgColor
+            src={"/assets/icons/marqueeimages/recharge.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/dmt.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/dmt1.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/dmt2.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/billpayment.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/indonepal.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/matm.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/aeps.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
+          <SvgColor
+            src={"/assets/icons/marqueeimages/aadhaarpay.svg"}
+            sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
+          />
         </Marquee>
         <Container>
           <Stack

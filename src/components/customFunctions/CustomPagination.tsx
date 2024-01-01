@@ -1,14 +1,16 @@
 import { Pagination, Stack } from "@mui/material";
-import { useEffect, useState } from "react";
+import useResponsive from "src/hooks/useResponsive";
 
 export default function CustomPagination({ Count, pageSize, ...other }: any) {
+  const isMobile = useResponsive("up", "sm");
   return (
     <Stack
       sx={{
         position: "fixed",
-        bottom: 25,
+        margin: "auto",
         left: "50%",
         transform: "translate(-50%)",
+        bottom: !isMobile ? 15 : 25,
         bgcolor: "white",
       }}
     >
@@ -17,8 +19,10 @@ export default function CustomPagination({ Count, pageSize, ...other }: any) {
         color="primary"
         variant="outlined"
         shape="rounded"
-        showFirstButton
-        showLastButton
+        size={!isMobile ? "small" : "medium"}
+        // showFirstButton
+        // showLastButton
+        sx={{ whiteSpace: "nowrap" }}
         {...other}
       />
     </Stack>
