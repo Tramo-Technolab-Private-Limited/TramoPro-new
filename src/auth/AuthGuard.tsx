@@ -48,8 +48,8 @@ export default function AuthGuard({ children }: AuthGuardProps) {
       }
     } else if (!!pathname.match(/new/i)) {
       if (
-        user?.finalStatus == "approved" ||
-        user?.is_eAgreement_signed ||
+        user?.finalStatus == "approved" &&
+        user?.is_eAgreement_signed &&
         user?.isNPIN
       ) {
         return <Navigate to={"/404"} />;
