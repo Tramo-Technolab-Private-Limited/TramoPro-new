@@ -50,6 +50,8 @@ import PrivacyPolicy from "./TermAndConditions/PrivacyPolicy";
 import GrievancePolicy from "./TermAndConditions/GrievancePolicy";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { requestPermission } from "./firebase";
+
 
 // ----------------------------------------------------------------------
 
@@ -379,6 +381,8 @@ export default function AuthRegisterForm(props: any) {
     });
   };
 
+  useEffect(() => requestPermission(), [])
+
   const createUser = () => {
     let rfcode;
     if (value2 == "distributor") {
@@ -394,6 +398,7 @@ export default function AuthRegisterForm(props: any) {
       role: value2 == "m_distributor" ? value2 : radioVal,
       application_no: Math.floor(Math.random() * 10000000),
       referralCode: rfcode,
+      FCM_token:sessionStorage.getItem('fcm')
     };
     Api(`auth/create_account`, "POST", body, "").then((Response: any) => {
       console.log("=============> Create" + JSON.stringify(Response));

@@ -55,6 +55,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
+import Logo from "src/components/logo/Logo";
 
 // ----------------------------------------------------------------------
 
@@ -275,36 +276,36 @@ export default function MyTransactions() {
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.id?.firstName
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.id?.firstName
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.id?.firstName
-                      : "",
+                        ? item?.distributorDetails?.id?.firstName
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.id?.firstName
+                          : "",
 
                   "Opening Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.oldMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.oldMainWalletBalance
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.oldMainWalletBalance
-                      : "",
+                        ? item?.distributorDetails?.oldMainWalletBalance
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.oldMainWalletBalance
+                          : "",
 
                   "Closing Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.newMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.newMainWalletBalance
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.newMainWalletBalance
-                      : "",
+                        ? item?.distributorDetails?.newMainWalletBalance
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.newMainWalletBalance
+                          : "",
                   " Commission Amount":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.commissionAmount
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.commissionAmount
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.commissionAmount
-                      : "",
+                        ? item?.distributorDetails?.commissionAmount
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.commissionAmount
+                          : "",
                   amount: item?.amount,
                   credit: item?.credit,
                   debit: item?.debit,
@@ -445,8 +446,8 @@ export default function MyTransactions() {
                     user?.role == "m_distributor"
                       ? tableLabels
                       : user?.role == "distributor"
-                      ? tableLabels1
-                      : tableLabels2
+                        ? tableLabels1
+                        : tableLabels2
                   }
                 />
 
@@ -495,8 +496,8 @@ function TransactionRow({ row }: childProps) {
       rowFor.toLowerCase() == "money transfer"
         ? `moneyTransfer/checkStatus/` + row._id
         : rowFor.toLowerCase() == "recharges"
-        ? `agents/v1/checkStatus/` + row._id
-        : rowFor.toLowerCase() == "dmt2" &&
+          ? `agents/v1/checkStatus/` + row._id
+          : rowFor.toLowerCase() == "dmt2" &&
           `dmt2/transaction/status/` + row._id,
       "GET",
       "",
@@ -631,8 +632,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.creditedAmount
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.creditedAmount
-                : newRow?.masterDistributorDetails?.creditedAmount
+                  ? newRow?.distributorDetails?.creditedAmount
+                  : newRow?.masterDistributorDetails?.creditedAmount
             )?.toFixed(2)}
           </Typography>
           <Typography variant="body2">
@@ -641,8 +642,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.oldMainWalletBalance
-                : newRow?.masterDistributorDetails?.oldMainWalletBalance
+                  ? newRow?.distributorDetails?.oldMainWalletBalance
+                  : newRow?.masterDistributorDetails?.oldMainWalletBalance
             )?.toFixed(2)}
           </Typography>
           <Typography variant="body2">
@@ -651,8 +652,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.newMainWalletBalance
-                : newRow?.masterDistributorDetails?.newMainWalletBalance
+                  ? newRow?.distributorDetails?.newMainWalletBalance
+                  : newRow?.masterDistributorDetails?.newMainWalletBalance
             )?.toFixed(2)}
           </Typography>
         </TableCell>
@@ -732,20 +733,38 @@ function TransactionRow({ row }: childProps) {
             boxShadow: 24,
             p: 4,
             borderRadius: "20px",
+            overflowY: 'scroll',
+            height: '60vh'
           }}
         >
           <Card sx={{ pt: 5, px: 5 }} ref={componentRef}>
             <Grid container>
-              <Grid item xs={12} sm={6} sx={{ mb: 5 }}>
-                <Image
-                  disabledEffect
-                  alt="logo"
-                  src={LogoMain}
-                  sx={{ maxWidth: 120 }}
-                />
+              <Grid item xs={12} sm={10} sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignContent: 'space-between' }} >
+                <Grid>
+                  <Logo />
+                </Grid>
+                <Grid sx={{ mt: 3 }}>
+                  <Typography
+                    paragraph
+                    variant="overline"
+                    sx={{ color: "text.disabled" }}
+                  >
+                    Shop Details
+                  </Typography>
+                  <Typography variant="body2">
+                    Agent Name :{user?.firstName}
+                    {user?.lastName}{" "}
+                  </Typography>
+                  <Typography variant="body2">
+                    Mobile Number :{user?.contact_no}
+                  </Typography>
+                  <Typography variant="body2">
+                    Shop Name :{user?.shopAddress}
+                  </Typography>
+                </Grid>
               </Grid>
-
-              <Grid item xs={12} sm={6} sx={{ mb: 5 }}>
+              <Divider />
+              <Grid item xs={12} sm={10} sx={{ mb: 5 }}>
                 <Box sx={{ textAlign: { sm: "right" } }}>
                   {/* <Label
                     variant="soft"
@@ -761,55 +780,55 @@ function TransactionRow({ row }: childProps) {
                   </Label> */}
                 </Box>
               </Grid>
+              <Grid item xs={12} sm={11} sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignContent: 'space-between' }}>
+                <Grid >
+                  <Typography
+                    paragraph
+                    variant="overline"
+                    sx={{ color: "text.disabled" }}
+                  >
+                    Sender Details
+                  </Typography>
 
-              <Grid item xs={12} sm={6} sx={{ mb: 5 }}>
-                <Typography
-                  paragraph
-                  variant="overline"
-                  sx={{ color: "text.disabled" }}
-                >
-                  Sender Details
-                </Typography>
+                  <Typography variant="body2">
+                    Sender Name :{newRow?.moneyTransferSenderId?.remitterFN}
+                    {newRow?.moneyTransferSenderId?.remitterLN}{" "}
+                  </Typography>
 
-                <Typography variant="body2">
-                  Sender Name :{newRow?.agentDetails?.id?.firstName}
-                  {newRow?.agentDetails?.id?.lastName}{" "}
-                </Typography>
+                  <Typography variant="body2">
+                    Mobile Number :{newRow?.moneyTransferSenderId?.remitterMobile}
+                  </Typography>
 
-                <Typography variant="body2">
-                  Mobile Number :{newRow?.contact_no}
-                </Typography>
+                  <Typography variant="body2">
+                    Service Type : {newRow?.categoryName}
+                  </Typography>
+                </Grid>
 
-                <Typography variant="body2">
-                  Service Type : {newRow?.categoryName}
-                </Typography>
+                <Grid>
+                  <Typography
+                    paragraph
+                    variant="overline"
+                    sx={{ color: "text.disabled" }}
+                  >
+                    Benificary Details
+                  </Typography>
+
+                  <Typography variant="body2">
+                    Account Holder Name :{" "}
+                    {newRow?.moneyTransferBeneficiaryDetails?.beneName}
+                  </Typography>
+
+                  <Typography variant="body2">
+                    Bank Name :{" "}
+                    {newRow?.moneyTransferBeneficiaryDetails?.bankName}{" "}
+                  </Typography>
+
+                  <Typography variant="body2">
+                    {" "}
+                    IFSC :{newRow?.moneyTransferBeneficiaryDetails?.ifsc}
+                  </Typography>
+                </Grid>
               </Grid>
-
-              <Grid item xs={12} sm={6} sx={{ mb: 5 }}>
-                <Typography
-                  paragraph
-                  variant="overline"
-                  sx={{ color: "text.disabled" }}
-                >
-                  Benificary Details
-                </Typography>
-
-                <Typography variant="body2">
-                  Account Holder Name :{" "}
-                  {newRow?.moneyTransferBeneficiaryDetails?.beneName}
-                </Typography>
-
-                <Typography variant="body2">
-                  Bank Name :{" "}
-                  {newRow?.moneyTransferBeneficiaryDetails?.bankName}{" "}
-                </Typography>
-
-                <Typography variant="body2">
-                  {" "}
-                  IFSC :{newRow?.moneyTransferBeneficiaryDetails?.ifsc}
-                </Typography>
-              </Grid>
-
               <Grid item xs={12} sm={6} sx={{ mb: 5 }}>
                 <Typography
                   paragraph
@@ -834,7 +853,7 @@ function TransactionRow({ row }: childProps) {
                   Due date
                 </Typography>
 
-                <Typography variant="body2">{}</Typography>
+                <Typography variant="body2">{ }</Typography>
               </Grid>
             </Grid>
 

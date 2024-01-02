@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as Yup from "yup";
 // form
 import { useForm } from "react-hook-form";
@@ -63,16 +63,18 @@ export default function AuthLoginForm() {
   const {
     reset,
     setError,
+    setValue,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
+  useEffect(() => requestPermission(), [])
+
   const onSubmit = async (data: FormValuesProps) => {
-    let FCMtoken = await requestPermission();
     let body = {
       username: data.email,
       password: data.password,
-      FCM_Token: FCMtoken,
+      FCM_token: sessionStorage.getItem('fcm')
     };
     try {
       await Api(`auth/login_in`, "POST", body, "").then((Response: any) => {
