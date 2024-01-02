@@ -48,6 +48,7 @@ type FormValuesProps = {
   address: string;
   stateJurisdiction: string;
   panNumber: string;
+  ShopName: string;
   taxpayerType: string;
   Status: string;
   gstNumber: string;
@@ -140,6 +141,7 @@ export default function GovernanceForm(props: any) {
     BusinessName: Yup.string().required("Business Name is required"),
     address: Yup.string().required("Address is required"),
     stateJurisdiction: Yup.string().required("State is required"),
+    ShopName: Yup.string().required("State is required"),
     panNumber:
       radioVal !== "Individual"
         ? Yup.string()
@@ -161,6 +163,7 @@ export default function GovernanceForm(props: any) {
     address: "",
     stateJurisdiction: "",
     panNumber: "",
+    ShopName: "",
     Status: "",
     taxpayerType: "",
     gstNumber: "",
@@ -267,6 +270,7 @@ export default function GovernanceForm(props: any) {
 
         // pan_number: data.panNumber,
         // gst_number: data.gstNumber,
+        company_name: data.ShopName,
         status: data.Status,
         userId: user?._id,
         constitution_type: radioVal,
@@ -579,7 +583,13 @@ export default function GovernanceForm(props: any) {
                       </MenuItem>
                     ))}
                   </RHFSelect>
-                  {radioVal !== "Individual" && !user?.isGSTVerified && (
+                  {radioVal == "Individual" && !user?.isGSTVerified ? (
+                    <RHFTextField
+                      name="ShopName"
+                      label="Shop Name"
+                      disabled={gstData}
+                    />
+                  ) : (
                     <RHFTextField
                       name="panNumber"
                       label=" Business Pan "

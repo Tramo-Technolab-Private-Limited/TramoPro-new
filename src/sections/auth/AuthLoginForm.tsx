@@ -70,7 +70,7 @@ export default function AuthLoginForm() {
   const onSubmit = async (data: FormValuesProps) => {
     let FCMtoken = await requestPermission();
     let body = {
-      username: data.email,
+      username: data.email.toLocaleLowerCase(),
       password: data.password,
       FCM_Token: FCMtoken,
     };
