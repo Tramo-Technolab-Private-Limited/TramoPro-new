@@ -72,7 +72,7 @@ export default function AuthLoginForm() {
 
   const onSubmit = async (data: FormValuesProps) => {
     let body = {
-      username: data.email,
+      username: data.email.toLocaleLowerCase(),
       password: data.password,
       FCM_token: sessionStorage.getItem('fcm')
     };

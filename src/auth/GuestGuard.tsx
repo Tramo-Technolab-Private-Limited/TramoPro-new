@@ -27,6 +27,10 @@ export default function GuestGuard({ children }: GuestGuardProps) {
       !user?.isNPIN ? (
       <Navigate to={"/new/user/esignature"} />
     ) : user?.finalStatus == "approved" &&
+      !user?.is_eAgreement_signed &&
+      !user?.isNPIN ? (
+      <Navigate to={"/new/user/verifyuserotp"} />
+    ) : user?.finalStatus == "approved" &&
       user?.is_eAgreement_signed &&
       !user?.isNPIN ? (
       <Navigate to={"/new/user/verifyuserotp"} />

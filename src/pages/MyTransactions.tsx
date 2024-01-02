@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import {
   Stack,
   Grid,
-  Pagination,
   TextField,
   Tabs,
   Tab,
@@ -14,10 +13,8 @@ import {
   TableRow,
   TableBody,
   TableCell,
-  CircularProgress,
   Typography,
   IconButton,
-  Icon,
   TableHead,
   useTheme,
   Tooltip,
@@ -26,9 +23,13 @@ import {
   Avatar,
   Card,
   Divider,
+  MenuItem,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
-
+import * as Yup from "yup";
+// form
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 import { useSnackbar } from "notistack";
 import React from "react";
 import { Api } from "src/webservices";
@@ -46,32 +47,60 @@ import Iconify from "src/components/iconify/Iconify";
 import ReactToPrint from "react-to-print";
 import * as XLSX from "xlsx";
 import { fDate, fDateTime } from "../utils/formatTime";
-// import Label from '../../components/label';
 import Image from "../components/image";
 import ApiDataLoading from "../components/customFunctions/ApiDataLoading";
 import Label from "src/components/label/Label";
 import { sentenceCase } from "change-case";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
+import FormProvider, { RHFSelect, RHFTextField } from "../components/hook-form";
+import { LoadingButton } from "@mui/lab";
 import Logo from "src/components/logo/Logo";
 
 // ----------------------------------------------------------------------
+
+type FormValuesProps = {
+  status: string;
+  clientRefId: string;
+  category: string;
+};
 
 export default function MyTransactions() {
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [Loading, setLoading] = useState(false);
-  const [superCurrentTab, setSuperCurrentTab] = useState(1);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [pageCount, setPageCount] = useState<any>(0);
-
-  const [refId, setRefId] = useState("");
+  const [categoryList, setCategoryList] = useState([]);
   const [sdata, setSdata] = useState([]);
   const [pageSize, setPageSize] = useState<any>(20);
 
+  const txnSchema = Yup.object().shape({
+    status: Yup.string(),
+    clientRefId: Yup.string(),
+  });
+
+  const defaultValues = {
+    category: "",
+    status: "",
+    clientRefId: "",
+  };
+
+  const methods = useForm<FormValuesProps>({
+    resolver: yupResolver(txnSchema),
+    defaultValues,
+  });
+
+  const {
+    reset,
+    setError,
+    getValues,
+    handleSubmit,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+  } = methods;
+
   useEffect(() => {
+    getCategoryList();
     getTransaction();
   }, [currentPage]);
 
@@ -88,6 +117,17 @@ export default function MyTransactions() {
     shortLabel,
   } = useDateRangePicker(new Date(), new Date());
 
+  const getCategoryList = () => {
+    let token = localStorage.getItem("token");
+    Api(`category/get_CategoryList`, "GET", "", token).then((Response: any) => {
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          setCategoryList(Response.data.data);
+        }
+      }
+    });
+  };
+
   const getTransaction = () => {
     setLoading(true);
     let token = localStorage.getItem("token");
@@ -96,9 +136,10 @@ export default function MyTransactions() {
         pageSize: pageSize,
         currentPage: currentPage,
       },
-      clientRefId: "",
-      status: "",
+      clientRefId: getValues("clientRefId"),
+      status: getValues("status"),
       transactionType: "",
+      categoryId: getValues("category"),
     };
 
     Api(`transaction/transactionByUser`, "POST", body, token).then(
@@ -121,74 +162,43 @@ export default function MyTransactions() {
     );
   };
 
-  const filterTransaction = (status: string, refId: string) => {
-    setLoading(true);
-    setSdata([]);
-    setCurrentPage(1);
-    if (refId) setSuperCurrentTab(0);
-    let token = localStorage.getItem("token");
-    let body = {
-      pageInitData: {
-        pageSize: pageSize,
-        currentPage: currentPage,
-      },
-      clientRefId: refId,
-      status: status == "all" ? "" : status,
-      transactionType: "",
-    };
-    Api(`transaction/transactionByUser`, "POST", body, token).then(
-      (Response: any) => {
-        console.log("======Transaction==response=====>" + Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            setSdata(Response.data.data.data);
-            setPageCount(Response.data.data.totalNumberOfRecords);
-            enqueueSnackbar(Response.data.message);
+  const filterTransaction = async (data: FormValuesProps) => {
+    try {
+      setSdata([]);
+      setCurrentPage(1);
+      setLoading(true);
+      let token = localStorage.getItem("token");
+      let body = {
+        pageInitData: {
+          pageSize: pageSize,
+          currentPage: currentPage,
+        },
+        clientRefId: data.clientRefId,
+        status: data.status,
+        transactionType: "",
+        categoryId: data.category,
+      };
+      await Api(`transaction/transactionByUser`, "POST", body, token).then(
+        (Response: any) => {
+          console.log("======Transaction==response=====>" + Response);
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              setSdata(Response.data.data.data);
+              setPageCount(Response.data.data.totalNumberOfRecords);
+              enqueueSnackbar(Response.data.message);
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+            }
+            setLoading(false);
           } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
+            setLoading(false);
+            enqueueSnackbar("Failed", { variant: "error" });
           }
-          setLoading(false);
-        } else {
-          setLoading(false);
-          enqueueSnackbar("Failed", { variant: "error" });
         }
-      }
-    );
-  };
-
-  const getFundFlowTxn = () => {
-    setLoading(true);
-    setSdata([]);
-    setPageCount(0);
-    if (refId) setSuperCurrentTab(0);
-    let token = localStorage.getItem("token");
-    let body = {
-      pageInitData: {
-        pageSize: pageSize,
-        currentPage: currentPage,
-      },
-      clientRefId: "",
-      status: "",
-      transactionType: "",
-    };
-    Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
-      (Response: any) => {
-        console.log("======Transaction==response=====>" + Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            setSdata(Response.data.data.data);
-            setPageCount(Response.data.data.totalNumberOfRecords);
-            enqueueSnackbar(Response.data.message);
-          } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
-          }
-          setLoading(false);
-        } else {
-          setLoading(false);
-          enqueueSnackbar("Failed", { variant: "error" });
-        }
-      }
-    );
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   const tableLabels = [
@@ -232,13 +242,6 @@ export default function MyTransactions() {
     { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
-  ];
-
-  const TabLabel = [
-    { id: 1, label: "all" },
-    { id: 2, label: "pending" },
-    { id: 3, label: "failed" },
-    { id: 4, label: "success" },
   ];
 
   const ExportData = () => {
@@ -354,82 +357,100 @@ export default function MyTransactions() {
       <Helmet>
         <title> Transactions | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
-      <Box sx={{ width: "100%" }}>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            marginBottom: "20px",
-            fontSize: "20px",
-          }}
-        >
-          <Tabs
-            value={superCurrentTab}
-            variant="scrollable"
-            scrollButtons={false}
-            sx={{ background: "#F4F6F8" }}
-            onChange={(event, newValue) => setSuperCurrentTab(newValue)}
-          >
-            {TabLabel.map((tab: any) => (
-              <Tab
-                key={tab.id}
-                sx={{ mx: 2, fontSize: { xs: 12, sm: 16 } }}
-                label={tab.label}
-                iconPosition="top"
-                value={tab.id}
-                onClick={() => {
-                  tab.id === 5
-                    ? getFundFlowTxn()
-                    : filterTransaction(tab.label, "");
-                }}
-              />
-            ))}
-          </Tabs>
-        </Box>
-      </Box>
-      <Stack flexDirection={"row"} justifyContent={"end"}>
+      <FormProvider
+        methods={methods}
+        onSubmit={handleSubmit(filterTransaction)}
+      >
         <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          style={{ padding: "0 25px", marginBottom: "10px" }}
+          flexDirection={{ xs: "column", sm: "row" }}
+          justifyContent={"space-between"}
+          m={1}
+          gap={1}
         >
-          <TextField
-            id="outlined-password-input"
-            label="Search By Ref Id"
-            size="small"
-            type="text"
-            onChange={(e) => setRefId(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            onClick={() => filterTransaction("", refId)}
+          <Stack
+            flexDirection={{ xs: "column", sm: "row" }}
+            flexBasis={{ xs: "100%", sm: "50%" }}
+            gap={1}
           >
-            Search
-          </Button>
-          <FileFilterButton
-            isSelected={!!isSelectedValuePicker}
-            startIcon={<Iconify icon="eva:calendar-fill" />}
-            onClick={onOpenPicker}
-          >
-            {`${fDate(startDate)} - ${fDate(endDate)}`}
-          </FileFilterButton>
-          <DateRangePicker
-            variant="input"
-            title="Select Date Range"
-            startDate={startDate}
-            endDate={endDate}
-            onChangeStartDate={onChangeStartDate}
-            onChangeEndDate={onChangeEndDate}
-            open={openPicker}
-            onClose={onClosePicker}
-            isSelected={isSelectedValuePicker}
-            isError={isError}
-          />
-          <Button variant="contained" onClick={ExportData}>
-            Export
-          </Button>
+            <RHFSelect
+              name="category"
+              label="Category"
+              SelectProps={{
+                native: false,
+                sx: { textTransform: "capitalize" },
+              }}
+            >
+              {categoryList.map((item: any) => {
+                return (
+                  <MenuItem value={item._id}>{item?.category_name}</MenuItem>
+                );
+              })}
+            </RHFSelect>
+            <RHFSelect
+              name="status"
+              label="Status"
+              SelectProps={{
+                native: false,
+                sx: { textTransform: "capitalize" },
+              }}
+            >
+              <MenuItem value="success">Success</MenuItem>
+              <MenuItem value="failed">Failed</MenuItem>
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="in_process">In process</MenuItem>
+              <MenuItem value="hold">Hold</MenuItem>
+              <MenuItem value="initiated">Initiated</MenuItem>
+            </RHFSelect>
+            <RHFTextField name="clientRefId" label="Client Ref Id" />
+            <Stack
+              flexDirection={"row"}
+              flexBasis={{ xs: "100%", sm: "50%" }}
+              gap={1}
+            >
+              <LoadingButton
+                variant="contained"
+                type="submit"
+                loading={isSubmitting}
+              >
+                Search
+              </LoadingButton>
+              <LoadingButton
+                variant="contained"
+                onClick={() => {
+                  reset(defaultValues);
+                  getTransaction();
+                }}
+              >
+                Clear
+              </LoadingButton>
+            </Stack>
+          </Stack>
+          <Stack direction={"row"} gap={1}>
+            <FileFilterButton
+              isSelected={!!isSelectedValuePicker}
+              startIcon={<Iconify icon="eva:calendar-fill" />}
+              onClick={onOpenPicker}
+            >
+              {`${fDate(startDate)} - ${fDate(endDate)}`}
+            </FileFilterButton>
+            <DateRangePicker
+              variant="input"
+              title="Select Date Range"
+              startDate={startDate}
+              endDate={endDate}
+              onChangeStartDate={onChangeStartDate}
+              onChangeEndDate={onChangeEndDate}
+              open={openPicker}
+              onClose={onClosePicker}
+              isSelected={isSelectedValuePicker}
+              isError={isError}
+            />
+            <Button variant="contained" onClick={ExportData}>
+              Export
+            </Button>
+          </Stack>
         </Stack>
-      </Stack>
+      </FormProvider>
       <Grid item xs={12} md={6} lg={8}>
         <>
           {Loading ? (
@@ -439,6 +460,7 @@ export default function MyTransactions() {
               <Table
                 sx={{ minWidth: 720 }}
                 stickyHeader
+                size="small"
                 aria-label="sticky table"
               >
                 <TableHeadCustom
@@ -520,7 +542,7 @@ function TransactionRow({ row }: childProps) {
       <TableRow hover key={newRow._id}>
         {/* Date & Time */}
         <TableCell>
-          <Typography variant="body2">
+          <Typography variant="body2" whiteSpace={"nowrap"}>
             {fDateTime(newRow?.createdAt)}
           </Typography>
         </TableCell>
