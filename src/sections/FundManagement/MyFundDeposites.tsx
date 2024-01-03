@@ -46,6 +46,7 @@ import AllBankDetails from "./AllBankDetails";
 import AllRequests from "./AllRequests";
 import Image from "src/components/image/Image";
 import neodeposit from "../../assets/icons/neodeposit.svg";
+import { convertToWords } from "src/components/customFunctions/ToWords";
 
 type FormValuesProps = {
   rupee: string;
@@ -111,8 +112,6 @@ function MyFundDeposits() {
   const handleSelectChange = (event: any) => {
     setSelectedItem(event.target.value);
 
-    console.log("ids>>================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", event);
-
     setSelectedBankID(event.target.value._id);
     let token = localStorage.getItem("token");
     Api(
@@ -161,6 +160,7 @@ function MyFundDeposits() {
 
   const {
     reset,
+    watch,
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
@@ -218,7 +218,7 @@ function MyFundDeposits() {
     let body = {
       bankId: selectedBankID,
       modeId: selectedModeId,
-      // amount: allAmount,
+
       amount: data.amount,
       date_of_deposit: formattedDate,
       transactional_details: {
@@ -243,7 +243,6 @@ function MyFundDeposits() {
             setMinAmount("");
             setSelectedModes([]);
             setUploadFile("");
-            // setAllAmount();
 
             enqueueSnackbar(Response.data.message);
           } else {
@@ -298,9 +297,6 @@ function MyFundDeposits() {
             <FormControl variant="outlined" size="small">
               <InputLabel id="data-select-label">Select Bank</InputLabel>
 
-              {/* {verifyLoding ? (
-                <ApiDataLoading />
-              ) : ( */}
               <Select
                 labelId="data-select-label"
                 id="data-select"
@@ -338,26 +334,36 @@ function MyFundDeposits() {
                 Min Amount :{minAmount} And Max Amount : {maxAmount}
               </Typography>
               <RHFTextField name="amount" label="Amount" />
+
               {selectedModes?.transactionFeeValue && (
                 <Typography variant="overline" display="block" gutterBottom>
                   {/* Charge : {newAmmount} */}
                   {selectedModes.transactionFeeType === "Charge" &&
                   selectedModes?.transactionFeeValue?.for_Agent > 0 ? (
                     <>
-                      {" "}
-                      <Typography color={"red"}>
-                        Charge : {selectedModes?.transactionFeeValue?.for_Agent}{" "}
-                      </Typography>{" "}
+                      <Stack direction="row" gap={6}>
+                        <Typography color={"red"}>
+                          Charge :{" "}
+                          {selectedModes?.transactionFeeValue?.for_Agent}{" "}
+                        </Typography>{" "}
+                        <Typography textAlign="end">
+                          {convertToWords(+watch("amount"))}
+                        </Typography>
+                      </Stack>
                     </>
                   ) : selectedModes.transactionFeeType === "Commission" &&
                     selectedModes?.transactionFeeValue?.for_Agent > 0 ? (
                     <>
-                      {" "}
-                      <Typography color={"green"}>
-                        {" "}
-                        Commission :{" "}
-                        {selectedModes?.transactionFeeValue?.for_Agent}{" "}
-                      </Typography>
+                      <Stack direction="row" gap={6}>
+                        <Typography color={"green"}>
+                          {" "}
+                          Commission :{" "}
+                          {selectedModes?.transactionFeeValue?.for_Agent}{" "}
+                        </Typography>
+                        <Typography textAlign="end">
+                          {convertToWords(+watch("amount"))}
+                        </Typography>
+                      </Stack>
                     </>
                   ) : (
                     ""
@@ -365,6 +371,8 @@ function MyFundDeposits() {
                 </Typography>
               )}
             </Stack>
+            {/* {convertToWords(+watch("amount"))} */}
+
             <RHFTextField
               type="number"
               name="mobile"
