@@ -65,12 +65,12 @@ export default function DMTpay(props: any) {
     setConfirm(false);
     setCheckNPIN(false);
     setTxn(true);
+    reset(defaultValues);
   };
   const [open1, setOpen1] = useState(false);
   const handleOpen1 = () => setOpen1(true);
   const handleClose1 = () => {
     setOpen1(false);
-    reset(defaultValues);
   };
   useEffect(() => {
     handleOpen1();
@@ -190,6 +190,8 @@ export default function DMTpay(props: any) {
     }
   };
 
+  const onsubmit = () => {};
+
   return (
     <>
       <Modal
@@ -202,7 +204,7 @@ export default function DMTpay(props: any) {
           style={{ borderRadius: "20px" }}
           width={{ xs: "100%", sm: 400 }}
         >
-          <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
+          <FormProvider methods={methods} onSubmit={handleSubmit(onsubmit)}>
             <Stack justifyContent={"space-between"} mb={2}>
               <Stack gap={1}>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
@@ -364,7 +366,7 @@ export default function DMTpay(props: any) {
               sx={style}
               style={{ borderRadius: "20px" }}
               p={2}
-              width={{ xs: "100%", sm: 400 }}
+              width={{ xs: "100%", sm: 450 }}
             >
               <Stack
                 sx={{ border: "1.5px dashed #000000" }}
