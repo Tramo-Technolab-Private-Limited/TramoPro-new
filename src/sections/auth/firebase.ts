@@ -23,7 +23,7 @@ export const requestPermission = () => {
         .then((currentToken) => {
           if (currentToken) {
             console.log("===============Client Token==>", currentToken);
-            return currentToken;
+            sessionStorage.setItem('fcm', currentToken)
           } else {
             console.log("Failed to generate the app registration token.");
           }
@@ -40,9 +40,11 @@ export const requestPermission = () => {
   });
 };
 
+
 export const onMessageListener = () =>
   new Promise((resolve) => {
     onMessage(messaging, (payload) => {
+      console.log('onmessage',payload)
       resolve(payload);
     });
   });
