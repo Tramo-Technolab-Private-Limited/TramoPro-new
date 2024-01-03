@@ -769,7 +769,7 @@ function TransactionRow({ row }: childProps) {
                 </IconButton>
               </Tooltip>
             )}
-               {user?.role === "agent" && (
+            {user?.role === "agent" && (
               <Tooltip title="Download" placement="top">
                 <IconButton>
                   <img
