@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Modal, Box, Grid, Typography, Button, useTheme } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
-import { PATH_AUTH } from "src/routes/paths";
+import { useAuthContext } from "src/auth/useAuthContext";
+import { LoadingButton } from "@mui/lab";
 
 const style = {
   position: "absolute" as "absolute",
@@ -16,8 +17,7 @@ const style = {
 };
 
 const AutoLogout = ({ children }: any) => {
-  const navigate = useNavigate();
-  const pathName = useLocation();
+  const { logout } = useAuthContext();
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -25,9 +25,8 @@ const AutoLogout = ({ children }: any) => {
   const timeoutRef: any = useRef();
 
   const handleLogout = () => {
-    if (window.location.href.split("/").includes("dashboard")) {
-      handleOpen();
-    }
+    localStorage.getItem("token") && handleOpen();
+    logout();
   };
 
   const resetTimeout = () => {
@@ -58,12 +57,6 @@ const AutoLogout = ({ children }: any) => {
     };
   }, []);
 
-  const logout = () => {
-    handleClose();
-    localStorage.clear();
-    navigate(PATH_AUTH.login);
-  };
-
   return (
     <>
       {children}
@@ -85,8 +78,10 @@ const AutoLogout = ({ children }: any) => {
             <Typography variant="subtitle1" textAlign={"center"}>
               You have been automatically logged out due to inactivity.
             </Typography>
-            <Button
-              onClick={logout}
+            <LoadingButton
+              onClick={() => {
+                handleClose();
+              }}
               variant="contained"
               sx={{
                 mt: 1,
@@ -95,7 +90,7 @@ const AutoLogout = ({ children }: any) => {
               }}
             >
               login
-            </Button>
+            </LoadingButton>
           </Grid>
         </Box>
       </Modal>
