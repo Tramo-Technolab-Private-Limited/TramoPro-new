@@ -728,15 +728,17 @@ function TransactionRow({ row }: childProps) {
                 </IconButton>
               </Tooltip>
             )}
-            <Tooltip title="Download" placement="top">
-              <IconButton>
-                <img
-                  src={receipt_long}
-                  alt="Receipt Icon"
-                  onClick={openModal}
-                />
-              </IconButton>
-            </Tooltip>
+               {user?.role === "agent" && (
+              <Tooltip title="Download" placement="top">
+                <IconButton>
+                  <img
+                    src={receipt_long}
+                    alt="Receipt Icon"
+                    onClick={openModal}
+                  />
+                </IconButton>
+              </Tooltip>
+            )}
           </Stack>
         </TableCell>
       </TableRow>
