@@ -17,16 +17,16 @@ export default function App() {
   return (
     <MotionLazyContainer>
       <ThemeProvider>
-        <ThemeSettings>
-          <AutoLogout>
+        <AutoLogout>
+          <ThemeSettings>
             <ThemeLocalization>
               <SnackbarProvider>
                 <Router />
-                <Notification/>
+                <Notification />
               </SnackbarProvider>
             </ThemeLocalization>
-          </AutoLogout>
-        </ThemeSettings>
+          </ThemeSettings>
+        </AutoLogout>
       </ThemeProvider>
     </MotionLazyContainer>
   );

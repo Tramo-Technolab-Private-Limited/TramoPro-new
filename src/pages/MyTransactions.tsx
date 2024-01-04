@@ -56,6 +56,9 @@ import CustomPagination from "src/components/customFunctions/CustomPagination";
 import FormProvider, { RHFSelect, RHFTextField } from "../components/hook-form";
 import { LoadingButton } from "@mui/lab";
 import Logo from "src/components/logo/Logo";
+import { fCurrency } from "src/utils/formatNumber";
+import useCopyToClipboard from "src/hooks/useCopyToClipboard";
+import { Icon } from "@iconify/react";
 
 // ----------------------------------------------------------------------
 
@@ -67,6 +70,7 @@ type FormValuesProps = {
 
 export default function MyTransactions() {
   const { user } = useAuthContext();
+  const { copy } = useCopyToClipboard();
   const { enqueueSnackbar } = useSnackbar();
   const [Loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState<any>(1);
@@ -202,16 +206,18 @@ export default function MyTransactions() {
   };
 
   const tableLabels = [
-    { id: "Date&Time", label: "Date & Timezzzzz" },
+    { id: "Date&Time", label: "Date & Time" },
     { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "agent", label: "Agent" },
     { id: "dist", label: "Distributor" },
     { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator" },
+    { id: "Operator", label: "Operator/Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "Operator Txn ID" },
-    { id: "Transaction Type", label: "Transaction" },
-    { id: "Commission", label: "Commission" },
+    { id: "Operator Txn ID", label: "UTR/Reference Number" },
+    { id: "Opening Balance", label: "Opening Balance" },
+    { id: "Txn Amount", label: "Txn Amount" },
+    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Closing Balance", label: "Closing Balance" },
     { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
@@ -221,11 +227,13 @@ export default function MyTransactions() {
     { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "agent", label: "Agent" },
     { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator" },
+    { id: "Operator", label: "Operator/Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "Operator Txn ID" },
-    { id: "Transaction Type", label: "Transaction" },
-    { id: "Commission", label: "Commission" },
+    { id: "Operator Txn ID", label: "UTR/Reference Number" },
+    { id: "Opening Balance", label: "Opening Balance" },
+    { id: "Txn Amount", label: "Txn Amount" },
+    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Closing Balance", label: "Closing Balance" },
     { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
@@ -234,11 +242,13 @@ export default function MyTransactions() {
     { id: "Date&Time", label: "Date & Time" },
     { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator" },
+    { id: "Operator", label: "Operator/Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "Operator Txn ID" },
-    { id: "Transaction Type", label: "Transaction" },
-    { id: "Commission", label: "Commission" },
+    { id: "Operator Txn ID", label: "UTR/Reference Number" },
+    { id: "Opening Balance", label: "Opening Balance" },
+    { id: "Txn Amount", label: "Txn Amount" },
+    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Closing Balance", label: "Closing Balance" },
     { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
@@ -279,36 +289,36 @@ export default function MyTransactions() {
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.id?.firstName
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.id?.firstName
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.id?.firstName
-                          : "",
+                      ? item?.distributorDetails?.id?.firstName
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.id?.firstName
+                      : "",
 
                   "Opening Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.oldMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.oldMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.oldMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.oldMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.oldMainWalletBalance
+                      : "",
 
                   "Closing Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.newMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.newMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.newMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.newMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.newMainWalletBalance
+                      : "",
                   " Commission Amount":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.commissionAmount
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.commissionAmount
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.commissionAmount
-                          : "",
+                      ? item?.distributorDetails?.commissionAmount
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.commissionAmount
+                      : "",
                   amount: item?.amount,
                   credit: item?.credit,
                   debit: item?.debit,
@@ -380,6 +390,7 @@ export default function MyTransactions() {
                 sx: { textTransform: "capitalize" },
               }}
             >
+              <MenuItem value="">None</MenuItem>
               {categoryList.map((item: any) => {
                 return (
                   <MenuItem value={item._id}>{item?.category_name}</MenuItem>
@@ -394,6 +405,7 @@ export default function MyTransactions() {
                 sx: { textTransform: "capitalize" },
               }}
             >
+              <MenuItem value="">None</MenuItem>
               <MenuItem value="success">Success</MenuItem>
               <MenuItem value="failed">Failed</MenuItem>
               <MenuItem value="pending">Pending</MenuItem>
@@ -468,8 +480,8 @@ export default function MyTransactions() {
                     user?.role == "m_distributor"
                       ? tableLabels
                       : user?.role == "distributor"
-                        ? tableLabels1
-                        : tableLabels2
+                      ? tableLabels1
+                      : tableLabels2
                   }
                 />
 
@@ -481,14 +493,16 @@ export default function MyTransactions() {
               </Table>
             </Scrollbar>
           )}
-          <CustomPagination
-            pageSize={pageSize}
-            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-              setCurrentPage(value);
-            }}
-            page={currentPage}
-            Count={pageCount}
-          />
+          {!Loading && (
+            <CustomPagination
+              pageSize={pageSize}
+              onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+                setCurrentPage(value);
+              }}
+              page={currentPage}
+              Count={pageCount}
+            />
+          )}
         </>
       </Grid>
     </>
@@ -501,6 +515,7 @@ type childProps = {
 
 function TransactionRow({ row }: childProps) {
   const theme = useTheme();
+  const { copy } = useCopyToClipboard();
   const { user } = useAuthContext();
   const componentRef = useRef<any>();
   const { enqueueSnackbar } = useSnackbar();
@@ -518,8 +533,8 @@ function TransactionRow({ row }: childProps) {
       rowFor.toLowerCase() == "money transfer"
         ? `moneyTransfer/checkStatus/` + row._id
         : rowFor.toLowerCase() == "recharges"
-          ? `agents/v1/checkStatus/` + row._id
-          : rowFor.toLowerCase() == "dmt2" &&
+        ? `agents/v1/checkStatus/` + row._id
+        : rowFor.toLowerCase() == "dmt2" &&
           `dmt2/transaction/status/` + row._id,
       "GET",
       "",
@@ -537,6 +552,13 @@ function TransactionRow({ row }: childProps) {
     });
   };
 
+  const onCopy = (text: string) => {
+    if (text) {
+      enqueueSnackbar("Copied!");
+      copy(text);
+    }
+  };
+
   return (
     <>
       <TableRow hover key={newRow._id}>
@@ -549,7 +571,14 @@ function TransactionRow({ row }: childProps) {
 
         <TableCell>
           <Typography variant="body2">{newRow?.transactionType}</Typography>
-          <Typography variant="body2">{newRow?.clientRefId}</Typography>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {newRow?.clientRefId}{" "}
+            <Tooltip title="Copy" placement="top">
+              <IconButton onClick={() => onCopy(newRow?.clientRefId)}>
+                <Iconify icon="eva:copy-fill" width={20} />
+              </IconButton>
+            </Tooltip>
+          </Typography>
         </TableCell>
 
         {/* Agent Detail */}
@@ -615,7 +644,9 @@ function TransactionRow({ row }: childProps) {
 
         {/* Product  */}
         <TableCell>
-          <Typography variant="body2">{newRow?.productName || "-"}</Typography>
+          <Typography variant="body2" textAlign={"center"}>
+            {newRow?.productName || "-"}
+          </Typography>
         </TableCell>
 
         {/* Operator */}
@@ -632,51 +663,61 @@ function TransactionRow({ row }: childProps) {
 
         {/* Operator Txn Id */}
         <TableCell>
-          <Typography variant="body2">{newRow?.vendorUtrNumber}</Typography>
-        </TableCell>
-
-        {/* Transaction */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
-          <Typography variant="body2">Txn Amount : {newRow.amount}</Typography>
-          <Typography color={theme.palette.success.main} variant="body2">
-            Credit : {newRow?.credit}
-          </Typography>
-          <Typography color={theme.palette.error.main} variant="body2">
-            Debit : {newRow?.debit}
+          <Typography variant="body2" textAlign={"center"}>
+            {newRow?.vendorUtrNumber || "-"}
           </Typography>
         </TableCell>
 
-        {/* Commission */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
-          <Typography variant="body2">
-            Commission :{" "}
-            {parseFloat(
-              user?.role === "agent"
-                ? newRow?.agentDetails?.creditedAmount
-                : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.creditedAmount
-                  : newRow?.masterDistributorDetails?.creditedAmount
-            )?.toFixed(2)}
-          </Typography>
-          <Typography variant="body2">
-            Opening Balance :{" "}
-            {parseFloat(
+        {/* Opening Balance */}
+        <TableCell>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {fCurrency(
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.oldMainWalletBalance
-                  : newRow?.masterDistributorDetails?.oldMainWalletBalance
-            )?.toFixed(2)}
+                ? newRow?.distributorDetails?.oldMainWalletBalance
+                : newRow?.masterDistributorDetails?.oldMainWalletBalance
+            )}
           </Typography>
-          <Typography variant="body2">
-            Closing Balance :{" "}
-            {parseFloat(
+        </TableCell>
+
+        {/* Transaction Amount */}
+        <TableCell>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {fCurrency(newRow.amount) || 0}
+          </Typography>
+        </TableCell>
+
+        {/* Charge/Commission */}
+        <TableCell>
+          <Stack flexDirection={"row"} justifyContent={"center"}>
+            <Typography variant="body2" whiteSpace={"nowrap"} color={"error"}>
+              - {fCurrency(newRow.debit) || 0}
+            </Typography>{" "}
+            /
+            <Typography variant="body2" whiteSpace={"nowrap"} color={"green"}>
+              +{" "}
+              {fCurrency(
+                user?.role === "agent"
+                  ? newRow?.agentDetails?.creditedAmount
+                  : user?.role === "distributor"
+                  ? newRow?.distributorDetails?.creditedAmount
+                  : newRow?.masterDistributorDetails?.creditedAmount
+              ) || 0}
+            </Typography>
+          </Stack>
+        </TableCell>
+
+        {/* Closing Balance */}
+        <TableCell>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {fCurrency(
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.newMainWalletBalance
-                  : newRow?.masterDistributorDetails?.newMainWalletBalance
-            )?.toFixed(2)}
+                ? newRow?.distributorDetails?.newMainWalletBalance
+                : newRow?.masterDistributorDetails?.newMainWalletBalance
+            )}
           </Typography>
         </TableCell>
 
@@ -694,7 +735,7 @@ function TransactionRow({ row }: childProps) {
           sx={{
             textTransform: "lowercase",
             fontWeight: 600,
-            textAlign: "left",
+            textAlign: "center",
           }}
         >
           <Label
@@ -728,7 +769,7 @@ function TransactionRow({ row }: childProps) {
                 </IconButton>
               </Tooltip>
             )}
-               {user?.role === "agent" && (
+            {user?.role === "agent" && (
               <Tooltip title="Download" placement="top">
                 <IconButton>
                   <img
@@ -757,13 +798,23 @@ function TransactionRow({ row }: childProps) {
             boxShadow: 24,
             p: 4,
             borderRadius: "20px",
-            overflowY: 'scroll',
-            height: '60vh'
+            overflowY: "scroll",
+            height: "60vh",
           }}
         >
           <Card sx={{ pt: 5, px: 5 }} ref={componentRef}>
             <Grid container>
-              <Grid item xs={12} sm={10} sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignContent: 'space-between' }} >
+              <Grid
+                item
+                xs={12}
+                sm={10}
+                sx={{
+                  mb: 5,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignContent: "space-between",
+                }}
+              >
                 <Grid>
                   <Logo />
                 </Grid>
@@ -804,8 +855,18 @@ function TransactionRow({ row }: childProps) {
                   </Label> */}
                 </Box>
               </Grid>
-              <Grid item xs={12} sm={11} sx={{ mb: 5, display: 'flex', justifyContent: 'space-between', alignContent: 'space-between' }}>
-                <Grid >
+              <Grid
+                item
+                xs={12}
+                sm={11}
+                sx={{
+                  mb: 5,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignContent: "space-between",
+                }}
+              >
+                <Grid>
                   <Typography
                     paragraph
                     variant="overline"
@@ -820,7 +881,8 @@ function TransactionRow({ row }: childProps) {
                   </Typography>
 
                   <Typography variant="body2">
-                    Mobile Number :{newRow?.moneyTransferSenderId?.remitterMobile}
+                    Mobile Number :
+                    {newRow?.moneyTransferSenderId?.remitterMobile}
                   </Typography>
 
                   <Typography variant="body2">
@@ -877,7 +939,7 @@ function TransactionRow({ row }: childProps) {
                   Due date
                 </Typography>
 
-                <Typography variant="body2">{ }</Typography>
+                <Typography variant="body2">{}</Typography>
               </Grid>
             </Grid>
 

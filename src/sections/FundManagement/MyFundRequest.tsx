@@ -22,6 +22,9 @@ import { useSnackbar } from "notistack";
 import { Api } from "src/webservices";
 import { fDateTime } from "src/utils/formatTime";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
+import Label from "src/components/label/Label";
+import { sentenceCase } from "change-case";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 // ----------------------------------------------------------------------
 
 export default function (props: any) {
@@ -29,6 +32,7 @@ export default function (props: any) {
 
   const [sdata, setSdata] = useState([]);
   const [refId, setRefId] = useState("");
+  const [pageSize, setPageSize] = useState(20);
   const [pageCount, setPageCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -50,16 +54,12 @@ export default function (props: any) {
     getFundReq();
   }, [currentPage]);
 
-  const handlePageChange = (event: any, newValue: number) => {
-    setCurrentPage(newValue);
-  };
-
   const getFundReq = () => {
     setIsLoading(true);
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
-        pageSize: 20,
+        pageSize: pageSize,
         currentPage: currentPage,
       },
     };
@@ -167,37 +167,23 @@ export default function (props: any) {
                   // hover
                 >
                   <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
+                    <Typography variant="body1">
                       {fDateTime(row?.createdAt)}
                     </Typography>
                   </TableCell>
 
                   <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
-                      Rs. {row?.amount}
-                    </Typography>
+                    <Typography variant="body1">Rs. {row?.amount}</Typography>
                   </TableCell>
 
                   <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
+                    <Typography variant="body1" textAlign={"center"}>
                       {!isNaN(row?.Charge) ? "Rs. " + row?.Charge : "-"}
                     </Typography>
                   </TableCell>
 
                   <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
+                    <Typography variant="body1" textAlign={"center"}>
                       {!isNaN(row?.Commission)
                         ? "Rs. " + parseFloat(row?.Commission).toFixed(2)
                         : "-"}
@@ -205,69 +191,56 @@ export default function (props: any) {
                   </TableCell>
 
                   <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
-                      {row?.deposit_type}
-                    </Typography>
+                    <Typography variant="body1">{row?.deposit_type}</Typography>
                   </TableCell>
 
                   <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
+                    <Typography variant="body1">
                       {row?.transactional_details?.mobile}
                     </Typography>
                   </TableCell>
 
                   <TableCell>
-                    <Typography
-                      variant="body2"
-                      sx={{ color: "text.secondary" }}
-                    >
+                    <Typography variant="body1">
                       {row?.transactional_details?.branch}
                     </Typography>
                   </TableCell>
 
-                  <TableCell>
-                    <Stack direction="row" alignItems="center">
-                      <Box sx={{ ml: 2 }}>
-                        <Typography
-                          variant="body2"
-                          sx={
-                            row.status.toLowerCase() == "pending" ||
-                            row.status.toLowerCase() == "hold"
-                              ? { color: "#ffc107" }
-                              : row.status.toLowerCase() == "failed"
-                              ? { color: "#dc3545" }
-                              : { color: "#198754" }
-                          }
-                        >
-                          {row?.status}
-                        </Typography>
-                      </Box>
-                    </Stack>
+                  <TableCell
+                    sx={{
+                      textTransform: "lowercase",
+                      fontWeight: 600,
+                      textAlign: "center",
+                    }}
+                  >
+                    <Label
+                      variant="soft"
+                      color={
+                        (row.status.toLowerCase() === "failed" && "error") ||
+                        ((row.status.toLowerCase() === "pending" ||
+                          row.status.toLowerCase() === "in_process") &&
+                          "warning") ||
+                        "success"
+                      }
+                      sx={{ textTransform: "capitalize" }}
+                    >
+                      {row.status.toLowerCase()
+                        ? sentenceCase(row.status.toLowerCase())
+                        : ""}
+                    </Label>
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
-          <Stack flexDirection={"row"} justifyContent={"center"} mt={2}>
-            <Pagination
-              count={
-                Math.floor(pageCount / 20) + (pageCount % 20 === 0 ? 0 : 1)
-              }
-              page={currentPage}
-              onChange={handlePageChange}
-              color="primary"
-              variant="outlined"
-              shape="rounded"
-              showFirstButton
-              showLastButton
-            />
-          </Stack>
+          <CustomPagination
+            pageSize={pageSize}
+            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+              setCurrentPage(value);
+            }}
+            page={currentPage}
+            Count={pageCount}
+          />
         </Grid>
       )}
     </>

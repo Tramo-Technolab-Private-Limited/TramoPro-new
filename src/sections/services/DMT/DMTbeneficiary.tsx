@@ -354,6 +354,7 @@ export default function DMTbeneficiary() {
             </Stack>
             <TableContainer component={Paper}>
               <Table
+                size="small"
                 stickyHeader
                 aria-label="sticky table"
                 style={{ borderBottom: "1px solid #dadada" }}
@@ -712,13 +713,6 @@ function BeneList({
               }}
             >
               Pay
-            </Button>
-            <Button onClick={() => openEditModal2(cell)} sx={{ ml: 3 }}>
-              <Icon
-                icon="ic:outline-delete"
-                fontSize={25}
-                color={theme.palette.primary.main}
-              />
             </Button>
           </Stack>
         </TableCell>

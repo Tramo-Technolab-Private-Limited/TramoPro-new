@@ -5,6 +5,8 @@ import { Box } from "@mui/material";
 //
 import Logo from "../logo";
 import ProgressBar from "../progress-bar";
+import Lottie from "lottie-react";
+import TramoLoading from "../JsonAnimations/Tramo Loader.json";
 
 // ----------------------------------------------------------------------
 
@@ -42,6 +44,7 @@ export default function LoadingScreen() {
           }}
         >
           <Logo disabledLink sx={{ width: 64, height: 64 }} />
+          {/* <Lottie animationData={TramoLoading} /> */}
         </m.div>
 
         <Box
