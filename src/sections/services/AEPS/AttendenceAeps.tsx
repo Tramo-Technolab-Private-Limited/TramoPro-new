@@ -140,6 +140,8 @@ export default function AttendenceAeps(props: any) {
             : UpdateUserDetail({
                 attendanceAEPS: true,
               });
+          window.location.reload();
+
           setMessage(Response.data.message);
         } else if (Response.data.responseCode == 410) {
           enqueueSnackbar(Response.data.err.message);

@@ -15,6 +15,7 @@ import {
   JWTContextType,
 } from "./types";
 import { Api } from "src/webservices";
+import { useNavigate } from "react-router";
 
 // ----------------------------------------------------------------------
 
@@ -120,6 +121,7 @@ type AuthProviderProps = {
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const navigate = useNavigate();
   const [state, dispatch] = useReducer(reducer, initialState);
   const [location, setLocation] = useState<boolean | null>(true);
 
@@ -252,6 +254,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     dispatch({
       type: Types.LOGOUT,
     });
+    navigate("/login");
   };
 
   return (
