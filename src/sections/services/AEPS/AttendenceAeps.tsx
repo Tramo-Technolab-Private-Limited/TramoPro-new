@@ -137,7 +137,11 @@ export default function AttendenceAeps(props: any) {
           enqueueSnackbar(Response.data.data.message);
           props.attendance == "AP"
             ? UpdateUserDetail({ attendanceAP: true })
-            : UpdateUserDetail({ attendanceAEPS: true });
+            : UpdateUserDetail({
+                attendanceAEPS: true,
+                timlyAttendence: true,
+                attendenceTimestamp: new Date(),
+              });
           setMessage(Response.data.message);
         } else if (Response.data.responseCode == 410) {
           enqueueSnackbar(Response.data.err.message);
@@ -145,10 +149,6 @@ export default function AttendenceAeps(props: any) {
         } else {
           enqueueSnackbar(Response.data.data.message);
           setMessage(Response.data.data.message);
-          console.log(
-            "==============>>> fatch beneficiary message",
-            Response.data.message
-          );
         }
         handleClose();
         handleCloseLoading();
@@ -309,8 +309,9 @@ export default function AttendenceAeps(props: any) {
       </Helmet>
       <FormProvider methods={methods} onSubmit={handleSubmit(capture)}>
         <Stack
-          width={{ sm: "90%", md: "60%" }}
+          width={{ xs: "100%", sm: 450 }}
           margin={"auto"}
+          bgcolor={"#fff"}
           border={"1px solid #dadada"}
           borderRadius={"10px"}
           textAlign={"center"}
