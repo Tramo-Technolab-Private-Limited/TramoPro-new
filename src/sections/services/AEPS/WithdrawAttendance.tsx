@@ -35,7 +35,7 @@ type FormValuesProps = {
   AP: string;
 };
 
-export default function AttendenceAeps(props: any) {
+export default function WithdrawAttendance(props: any) {
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail } = useAuthContext();
   const theme = useTheme();
@@ -135,10 +135,11 @@ export default function AttendenceAeps(props: any) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.data.message);
+          props.handleCloseAttendance();
           props.attendance == "AP"
             ? UpdateUserDetail({ attendanceAP: true })
             : UpdateUserDetail({
-                attendanceAEPS: true,
+                presenceAt: Date.now(),
               });
           setMessage(Response.data.message);
         } else if (Response.data.responseCode == 410) {
@@ -341,13 +342,19 @@ export default function AttendenceAeps(props: any) {
             placeholder="Remark"
             sx={{ width: "90%", margin: "auto" }}
           />
-          <Stack>
+          <Stack
+            flexDirection={"row"}
+            gap={1}
+            sx={{ width: "90%", margin: "auto" }}
+          >
+            <Button variant="contained" type="submit">
+              Scan fingure to continue
+            </Button>
             <Button
               variant="contained"
-              type="submit"
-              sx={{ width: "fit-content", margin: "auto" }}
+              onClick={() => props.handleCloseAttendance()}
             >
-              Scan fingure to continue
+              Cancel
             </Button>
           </Stack>
         </Stack>

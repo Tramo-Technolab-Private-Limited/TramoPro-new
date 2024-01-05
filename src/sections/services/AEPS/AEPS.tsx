@@ -40,6 +40,8 @@ import AttendenceAeps from "./AttendenceAeps";
 import Lottie from "lottie-react";
 import fingerScan from "../../../components/JsonAnimations/fingerprint-scan.json";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { Link } from "react-router-dom";
+import WithdrawAttendance from "./WithdrawAttendance";
 
 // ----------------------------------------------------------------------
 
@@ -120,8 +122,12 @@ export default function AEPS(props: any) {
   const handleOpenT = () => setOpenT(true);
   const handleCloseT = () => setOpenT(false);
 
-  // modal for Troubleshoot
+  // modal for withdrawal attendence
+  const [attend, setAttend] = React.useState(true);
   const [localAttendance, setLocalAttendance] = React.useState(0);
+  const [openAttendance, setOpenAttendance] = React.useState(false);
+  const handleOpenAttendance = () => setOpenAttendance(true);
+  const handleCloseAttendance = () => setOpenAttendance(false);
 
   const AEPSSchema = Yup.object().shape({
     bank: Yup.object().shape({
@@ -610,25 +616,21 @@ export default function AEPS(props: any) {
   }, [autoClose]);
 
   useEffect(() => {
-    user?.attendenceTimestamp &&
+    setTimeout(() => {
       setLocalAttendance(
-        Math.floor(
-          new Date(user?.attendenceTimestamp + 120000 - Date.now()).valueOf() /
-            1000
-        )
+        Math.floor((user?.presenceAt + 150000 - Date.now()) / 1000)
       );
-  }, [user]);
+      setAttend(true);
+    }, 0);
+  }, []);
 
   useEffect(() => {
     localTime = setTimeout(() => {
       setLocalAttendance(localAttendance - 1);
     }, 1000);
-    if (localAttendance == 0) {
+    if (localAttendance <= 0) {
       clearTimeout(localTime);
-      setLocalAttendance(0);
-      UpdateUserDetail({
-        timlyAttendence: false,
-      });
+      setAttend(false);
     }
   }, [localAttendance]);
 
@@ -637,25 +639,23 @@ export default function AEPS(props: any) {
       <Helmet>
         <title>AEPS | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
-      {Math.floor(localAttendance) ? (
+      {attend && (
         <Typography variant="subtitle2" textAlign={"end"}>
-          AEPS Attendence Timeout:{" "}
+          Withdrawal Attendence Timeout:{" "}
           <span style={{ color: "red" }}> {Math.floor(localAttendance)} </span>{" "}
-        </Typography>
-      ) : (
-        <Typography variant="subtitle2" textAlign={"end"} color={"error"}>
-          Please Mark AEPS Attendence
+          seconds
         </Typography>
       )}
       <Typography variant="h4"></Typography>
       {!user?.fingPayAPESRegistrationStatus || !user?.fingPayAEPSKycStatus ? (
         <RegistrationAeps />
-      ) : !user?.attendanceAEPS ? (
+      ) : new Date(user?.presenceAt).toLocaleDateString() !==
+        new Date().toLocaleDateString() ? (
         <AttendenceAeps attendance={"AEPS"} />
       ) : (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
           <>
-            <Stack my={7}>
+            <Stack>
               <Box
                 columnGap={2}
                 display="grid"
@@ -683,10 +683,15 @@ export default function AEPS(props: any) {
                       />
                     ))}
                   </Tabs>
-                  {CurrentTab.match(/with/i) && !user?.timlyAttendence ? (
-                    <Grid rowGap={2} display="grid">
-                      <AttendenceAeps attendance={"AEPS"} />
-                    </Grid>
+                  {CurrentTab.match(/with/i) && !attend ? (
+                    <Typography
+                      variant="subtitle2"
+                      textAlign={"end"}
+                      color={"error"}
+                    >
+                      Withdraw Attendence Timeout.{" "}
+                      <Button onClick={handleOpenAttendance}>Click here</Button>
+                    </Typography>
                   ) : (
                     <Grid rowGap={2} display="grid">
                       <RHFSelect
@@ -761,8 +766,22 @@ export default function AEPS(props: any) {
                 </Box>
               </Box>
             </Stack>
-            {CurrentTab.match(/with/i) && !user?.timlyAttendence ? null : (
-              <Stack flexDirection={"row"} gap={1}>
+            {CurrentTab.match(/with/i) && attend && (
+              <Stack flexDirection={"row"} gap={1} my={2}>
+                <LoadingButton variant="contained" type="submit">
+                  Continue to Finger print
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  component="span"
+                  onClick={() => reset(defaultValues)}
+                >
+                  Reset
+                </LoadingButton>
+              </Stack>
+            )}
+            {!CurrentTab.match(/with/i) && (
+              <Stack flexDirection={"row"} gap={1} my={2}>
                 <LoadingButton variant="contained" type="submit">
                   Continue to Finger print
                 </LoadingButton>
@@ -1098,6 +1117,21 @@ export default function AEPS(props: any) {
               </Button>
             </FormProvider>
           ) : null}
+        </Box>
+      </Modal>
+
+      {/* confirm payment detail modal */}
+      <Modal
+        open={openAttendance}
+        onClose={handleCloseAttendance}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} style={{ borderRadius: "20px" }} width={"fit-content"}>
+          <WithdrawAttendance
+            attendance={"AEPS"}
+            handleCloseAttendance={handleCloseAttendance}
+          />
         </Box>
       </Modal>
     </>
