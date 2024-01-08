@@ -37,7 +37,7 @@ type FormValuesProps = {
 
 export default function AttendenceAeps(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, initialize } = useAuthContext();
   const theme = useTheme();
   const [message, setMessage] = useState("");
   const [arrofObj, setarrofObj] = useState<any>([]);
@@ -135,12 +135,12 @@ export default function AttendenceAeps(props: any) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.data.message);
-          props.attendance == "AP"
-            ? UpdateUserDetail({ attendanceAP: true })
-            : UpdateUserDetail({
-                attendanceAEPS: true,
-              });
-          window.location.reload();
+          // props.attendance == "AP"
+          //   ? UpdateUserDetail({ attendanceAP: true })
+          //   : UpdateUserDetail({
+          //       attendanceAEPS: true,
+          //     });
+          initialize();
 
           setMessage(Response.data.message);
         } else if (Response.data.responseCode == 410) {

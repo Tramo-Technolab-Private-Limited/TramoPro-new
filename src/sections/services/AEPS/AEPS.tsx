@@ -622,7 +622,7 @@ export default function AEPS(props: any) {
       );
       setAttend(true);
     }, 0);
-  }, [user]);
+  }, [user?.presenceAt]);
 
   useEffect(() => {
     localTime = setTimeout(() => {
