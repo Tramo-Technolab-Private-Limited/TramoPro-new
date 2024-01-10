@@ -639,13 +639,7 @@ export default function AEPS(props: any) {
       <Helmet>
         <title>AEPS | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
-      {attend && (
-        <Typography variant="subtitle2" textAlign={"end"}>
-          Withdrawal Attendence Timeout:{" "}
-          <span style={{ color: "red" }}> {Math.floor(localAttendance)} </span>{" "}
-          seconds
-        </Typography>
-      )}
+
       <Typography variant="h4"></Typography>
       {!user?.fingPayAPESRegistrationStatus || !user?.fingPayAEPSKycStatus ? (
         <RegistrationAeps />
@@ -684,84 +678,112 @@ export default function AEPS(props: any) {
                     ))}
                   </Tabs>
                   {CurrentTab.match(/with/i) && !attend ? (
-                    <Typography
-                      variant="subtitle2"
-                      textAlign={"end"}
-                      color={"error"}
-                    >
-                      Withdraw Attendence Timeout.{" "}
-                      <Button onClick={handleOpenAttendance}>Click here</Button>
-                    </Typography>
+                    <>
+                      <Typography variant="body2">
+                        <strong>Note :</strong> It is mandatory to mark agent
+                        attendance before any AEPS withdrawal.
+                      </Typography>
+                      <Typography variant="body2">
+                        Please mark the attendance to before customer
+                        withdrawal.
+                      </Typography>
+                      <Stack alignItems={"flex-end"} my={1}>
+                        <Button
+                          onClick={handleOpenAttendance}
+                          variant="contained"
+                        >
+                          Mark your attendance
+                        </Button>
+                      </Stack>
+                    </>
                   ) : (
-                    <Grid rowGap={2} display="grid">
-                      <RHFSelect
-                        name="deviceName"
-                        label="Select Device"
-                        placeholder="Select Device"
-                        SelectProps={{
-                          native: false,
-                          sx: { textTransform: "capitalize" },
-                        }}
-                        fullWidth
-                      >
-                        <MenuItem value={"MORPHO"}>MORPHO</MenuItem>
-                        <MenuItem value={"STARTEK"}>STARTEK</MenuItem>
-                        <MenuItem value={"MANTRA"}>MANTRA</MenuItem>
-                        <MenuItem value={"SECUGEN"}>SECUGEN</MenuItem>
-                      </RHFSelect>
-                      <RHFAutocomplete
-                        name="bank"
-                        value={watch("bank")}
-                        onChange={(event, newValue) => {
-                          setValue("bank", newValue);
-                        }}
-                        options={bankList.map((option: any) => option)}
-                        getOptionLabel={(option: any) => option.bankName}
-                        renderOption={(props, option) => (
-                          <Box
-                            component="li"
-                            sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                            {...props}
-                          >
-                            {option.bankName}
-                          </Box>
-                        )}
-                        renderInput={(params) => (
-                          <RHFTextField
-                            name="bank.bankName"
-                            label="Bank Name"
-                            {...params}
-                          />
-                        )}
-                      />
-                      <RHFTextField
-                        name="aadharNumber"
-                        label="Customer AadharCard No."
-                        type="text"
-                      />
-                      {CurrentTab.toLowerCase() == "withdraw" && (
-                        <>
-                          <RHFTextField
-                            name="mobileNumber"
-                            type="number"
-                            label="Mobile Number"
-                          />
-                          <RHFTextField
-                            type="number"
-                            name="amount"
-                            label="Amount"
-                            placeholder="Amount"
-                            InputProps={{
-                              startAdornment: (
-                                <InputAdornment position="start">
-                                  ₹
-                                </InputAdornment>
-                              ),
+                    <>
+                      {attend && (
+                        <Typography variant="subtitle2" textAlign={"end"}>
+                          Withdrawal Attendence Timeout:{" "}
+                          <span
+                            style={{
+                              color:
+                                Math.floor(localAttendance) < 60
+                                  ? "red"
+                                  : "green",
                             }}
-                          />
-                        </>
+                          >
+                            {Math.floor(localAttendance)}{" "}
+                          </span>
+                          seconds
+                        </Typography>
                       )}
-                    </Grid>
+                      <Grid rowGap={2} display="grid">
+                        <RHFSelect
+                          name="deviceName"
+                          label="Select Device"
+                          placeholder="Select Device"
+                          SelectProps={{
+                            native: false,
+                            sx: { textTransform: "capitalize" },
+                          }}
+                          fullWidth
+                        >
+                          <MenuItem value={"MORPHO"}>MORPHO</MenuItem>
+                          <MenuItem value={"STARTEK"}>STARTEK</MenuItem>
+                          <MenuItem value={"MANTRA"}>MANTRA</MenuItem>
+                          <MenuItem value={"SECUGEN"}>SECUGEN</MenuItem>
+                        </RHFSelect>
+                        <RHFAutocomplete
+                          name="bank"
+                          value={watch("bank")}
+                          onChange={(event, newValue) => {
+                            setValue("bank", newValue);
+                          }}
+                          options={bankList.map((option: any) => option)}
+                          getOptionLabel={(option: any) => option.bankName}
+                          renderOption={(props, option) => (
+                            <Box
+                              component="li"
+                              sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                              {...props}
+                            >
+                              {option.bankName}
+                            </Box>
+                          )}
+                          renderInput={(params) => (
+                            <RHFTextField
+                              name="bank.bankName"
+                              label="Bank Name"
+                              {...params}
+                            />
+                          )}
+                        />
+                        <RHFTextField
+                          name="aadharNumber"
+                          label="Customer AadharCard No."
+                          type="text"
+                        />
+                        {CurrentTab.toLowerCase() == "withdraw" && (
+                          <>
+                            <RHFTextField
+                              name="mobileNumber"
+                              type="number"
+                              label="Mobile Number"
+                            />
+                            <RHFTextField
+                              type="number"
+                              name="amount"
+                              label="Amount"
+                              placeholder="Amount"
+                              InputProps={{
+                                startAdornment: (
+                                  <InputAdornment position="start">
+                                    ₹
+                                  </InputAdornment>
+                                ),
+                              }}
+                            />
+                          </>
+                        )}
+                      </Grid>
+                    </>
                   )}
                 </Box>
               </Box>

@@ -64,7 +64,7 @@ export default function WithdrawAttendance(props: any) {
 
   const defaultValues = {
     deviceName: "",
-    remark: `Pre-Withdrawal attendance, ${fDateTime(new Date())}`,
+    remark: `Attendance, ${fDateTime(new Date())}`,
   };
 
   const methods = useForm<FormValuesProps>({
