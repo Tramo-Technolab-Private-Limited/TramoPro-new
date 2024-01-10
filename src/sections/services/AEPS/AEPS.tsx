@@ -709,7 +709,8 @@ export default function AEPS(props: any) {
                                   : "green",
                             }}
                           >
-                            {Math.floor(localAttendance)}{" "}
+                            {Math.floor(localAttendance / 60)} Minutes{" "}
+                            {Math.floor(localAttendance % 60)} Seconds
                           </span>
                           seconds
                         </Typography>
