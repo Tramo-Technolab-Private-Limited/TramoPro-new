@@ -33,6 +33,7 @@ import { Icon } from "@iconify/react";
 import { convertToWords } from "src/components/customFunctions/ToWords";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
+import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 
 // ----------------------------------------------------------------------
 
@@ -187,6 +188,7 @@ export default function DMT2pay(props: any) {
                 });
               });
               setTransactionDetail(Response.data.response);
+              TextToSpeak(Response.data.message);
               handleClose();
               handleOpen1();
               setCount(5);

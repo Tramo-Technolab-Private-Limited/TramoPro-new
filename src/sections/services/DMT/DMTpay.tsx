@@ -28,6 +28,7 @@ import { Icon } from "@iconify/react";
 import { convertToWords } from "src/components/customFunctions/ToWords";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
+import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 
 // ----------------------------------------------------------------------
 
@@ -163,6 +164,7 @@ export default function DMTpay(props: any) {
                 enqueueSnackbar(Response.data.message);
                 setTransactionDetail(Response.data.data);
                 setErrorMsg("");
+                TextToSpeak(Response.data.message);
                 setTxn(false);
                 UpdateUserDetail({
                   main_wallet_amount:
@@ -171,10 +173,6 @@ export default function DMTpay(props: any) {
               } else {
                 enqueueSnackbar(Response.data.message, { variant: "error" });
                 setErrorMsg(Response.data.message);
-                console.log(
-                  "==============>>> register beneficiary msg",
-                  Response.data.message
-                );
               }
               setIsLoading(false);
             } else {
