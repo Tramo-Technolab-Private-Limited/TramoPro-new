@@ -67,7 +67,7 @@ export default function ResetPassLayout({
       <Box
         component="footer"
         sx={{
-          position: "absolute",
+          position: "fixed",
           width: "100%",
           bottom: 0,
           backgroundColor: "#375168",

@@ -45,10 +45,11 @@ export const StyledContent = styled("div")(({ theme }) => ({
   margin: "auto",
   display: "flex",
   minHeight: "100vh",
+  alignItems: "center",
   justifyContent: "center",
-  padding: theme.spacing(15, 2),
+  padding: theme.spacing(15, 2, 20, 2),
   [theme.breakpoints.up("md")]: {
     flexShrink: 0,
-    padding: theme.spacing(35, 8, 0, 8),
+    // padding: theme.spacing(35, 8, 0, 8),
   },
 }));
