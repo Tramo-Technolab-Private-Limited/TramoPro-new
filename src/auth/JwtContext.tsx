@@ -157,6 +157,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 type: Types.LOGOUT,
               });
             }
+          } else {
+            localStorage.removeItem("token");
+            dispatch({
+              type: Types.LOGOUT,
+            });
           }
         });
       } else {

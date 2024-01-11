@@ -51,6 +51,8 @@ import { Api, UploadFile } from "src/webservices";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { STEP_DASHBOARD } from "src/routes/paths";
 import Image from "src/components/image/Image";
+//image compressor
+import Compressor from "compressorjs";
 
 type FormValuesProps = {
   gstCertificateFile: string;
@@ -311,28 +313,36 @@ function PersonalIdentification(props: any) {
     let token = localStorage.getItem("token");
     setAadharFlie1(true);
     console.log("aadhar file", e.target.files[0]);
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "AadharFront");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=aadharFront====", Response.data.filePath);
-            setAadharFile1BtnDis(true);
-            setbtnDisabledForGstDocs(false);
-            setAdhaarFpath(Response.data.filePath);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        console.log(compressedResult);
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "AadharFront");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=aadharFront====", Response.data.filePath);
+                setAadharFile1BtnDis(true);
+                setbtnDisabledForGstDocs(false);
+                setAdhaarFpath(Response.data.filePath);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+              setAadharFlie1(false);
+            } else {
+              setAadharFlie1(false);
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-          setAadharFlie1(false);
-        } else {
-          setAadharFlie1(false);
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const params = {
@@ -348,27 +358,34 @@ function PersonalIdentification(props: any) {
   const aadharBackupload = (e: any) => {
     setAadharFlieBack(true);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "AadharBack");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            setAdhaarBpath(Response.data.filePath);
-            setAadharFileBackBtnDis(true);
-            setbtnDisabledForGstDocsBack(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "AadharBack");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                setAdhaarBpath(Response.data.filePath);
+                setAadharFileBackBtnDis(true);
+                setbtnDisabledForGstDocsBack(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+              setAadharFlieBack(false);
+            } else {
+              setAadharFlieBack(false);
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-          setAadharFlieBack(false);
-        } else {
-          setAadharFlieBack(false);
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const adharBack = {
@@ -384,28 +401,34 @@ function PersonalIdentification(props: any) {
   const panUpload = (e: any) => {
     let token = localStorage.getItem("token");
     setAadharFliePan(true);
-    console.log("panfile");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "Pancard");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            setPanPath(Response.data.filePath);
-            setAadharFilePanBtnDis(true);
-            setbtnDisabledForGstDocsPan(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "Pancard");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                setPanPath(Response.data.filePath);
+                setAadharFilePanBtnDis(true);
+                setbtnDisabledForGstDocsPan(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+              setAadharFliePan(false);
+            } else {
+              setAadharFliePan(false);
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-          setAadharFliePan(false);
-        } else {
-          setAadharFliePan(false);
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const PanCard = {
@@ -421,31 +444,37 @@ function PersonalIdentification(props: any) {
   const uploadCheque = (e: any) => {
     setAadharFlieCheque(true);
     let token = localStorage.getItem("token");
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "Cheque");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            console.log("=====upload doc========>" + JSON.stringify(Response));
 
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "Cheque");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        console.log("=====upload doc========>" + JSON.stringify(Response));
-
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=doc====", Response.data.filePath);
-            setChequePath(Response.data.filePath);
-            setAadharFileChequeBtnDis(true);
-            setbtnDisabledForGstDocsCheque(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=doc====", Response.data.filePath);
+                setChequePath(Response.data.filePath);
+                setAadharFileChequeBtnDis(true);
+                setbtnDisabledForGstDocsCheque(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+              setAadharFlieCheque(false);
+            } else {
+              setAadharFlieCheque(false);
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-          setAadharFlieCheque(false);
-        } else {
-          setAadharFlieCheque(false);
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const SelfieImageCard = {
@@ -461,31 +490,35 @@ function PersonalIdentification(props: any) {
   const selfieUpload = (e: any) => {
     setAadharFlieSelfie(true);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "governance");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        console.log(
-          "=====uploadAadharfrontResponse========>" + JSON.stringify(Response)
-        );
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=aadharFront====", Response.data.filePath);
-            setSelfiePath(Response.data.filePath);
-            setAadharFileSelfieBtnDis(true);
-            setbtnDisabledForGstDocsSelfie(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "governance");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=aadharFront====", Response.data.filePath);
+                setSelfiePath(Response.data.filePath);
+                setAadharFileSelfieBtnDis(true);
+                setbtnDisabledForGstDocsSelfie(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+              setAadharFlieSelfie(false);
+            } else {
+              setAadharFlieSelfie(false);
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-          setAadharFlieSelfie(false);
-        } else {
-          setAadharFlieSelfie(false);
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const CancelledChequeImage = {
@@ -502,35 +535,42 @@ function PersonalIdentification(props: any) {
     setAadharFlieShop(true);
 
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "governance");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        console.log("=====upload shop========>" + JSON.stringify(Response));
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=shop====", Response.data.filePath);
-            // shopImg.push(Response.data.filePath)
-            let path = Response.data.filePath;
-            if (shoppath?.length < 3) {
-              setShoppath((shoppath) => [...shoppath, path]);
-              setAadharFileShopBtnDis(true);
-              setbtnDisabledForGstDocsShop(false);
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "governance");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            console.log("=====upload shop========>" + JSON.stringify(Response));
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=shop====", Response.data.filePath);
+                // shopImg.push(Response.data.filePath)
+                let path = Response.data.filePath;
+                if (shoppath?.length < 3) {
+                  setShoppath((shoppath) => [...shoppath, path]);
+                  setAadharFileShopBtnDis(true);
+                  setbtnDisabledForGstDocsShop(false);
+                } else {
+                  enqueueSnackbar("Only 3 images you can select!");
+                }
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+              setAadharFlieShop(false);
             } else {
-              enqueueSnackbar("Only 3 images you can select!");
+              setAadharFlieShop(false);
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
             }
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
           }
-          setAadharFlieShop(false);
-        } else {
-          setAadharFlieShop(false);
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
   const ShopImageCard = {
     Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
@@ -1659,26 +1699,36 @@ function ConstitutionIdentification() {
 
     setAadharFlieMSME(true);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "gstCertificate");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=gstCertificate====", Response.data.filePath);
-            setGstCertificatepath(Response.data.filePath);
-            setAadharFileMSMEBtnDis(true);
-            setAadharFlieMSME(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "gstCertificate");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log(
+                  "===200=gstCertificate====",
+                  Response.data.filePath
+                );
+                setGstCertificatepath(Response.data.filePath);
+                setAadharFileMSMEBtnDis(true);
+                setAadharFlieMSME(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const gstCertificateImage = {
@@ -1717,52 +1767,66 @@ function ConstitutionIdentification() {
   const businessProofUpload = (e: any) => {
     setAadharFlieBusPrf(true);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "businessProof");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=businessProof====", Response.data.filePath);
-            setBusinessProofpath(Response.data.filePath);
-            setAadharFileBusPrfBtnDis(true);
-            setAadharFlieBusPrf(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "businessProof");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=businessProof====", Response.data.filePath);
+                setBusinessProofpath(Response.data.filePath);
+                setAadharFileBusPrfBtnDis(true);
+                setAadharFlieBusPrf(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const businessPanUpload = (e: any) => {
     console.log("bpan");
     setAadharFlieBusPan(true);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "businessPan");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=businessPan====", Response.data.filePath);
-            setBusinessPanpath(Response.data.filePath);
-            setAadharFileBusPanBtnDis(true);
-            setAadharFlieBusPan(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "businessPan");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=businessPan====", Response.data.filePath);
+                setBusinessPanpath(Response.data.filePath);
+                setAadharFileBusPanBtnDis(true);
+                setAadharFlieBusPan(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const BusPANImage = {
@@ -1778,26 +1842,36 @@ function ConstitutionIdentification() {
   const partnershipDeedUpload = (e: any) => {
     setAadharFliepDeed(true);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "partnershipDeed");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=partnershipDeed====", Response.data.filePath);
-            setPartnershipDeedpath(Response.data.filePath);
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "partnershipDeed");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log(
+                  "===200=partnershipDeed====",
+                  Response.data.filePath
+                );
+                setPartnershipDeedpath(Response.data.filePath);
 
-            setAadharFliepDeed(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+                setAadharFliepDeed(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const NominatedPartnerImage = {
@@ -1814,26 +1888,36 @@ function ConstitutionIdentification() {
     console.log("brdr");
     setAadharFlieBrdRes(true);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "boardResolution");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=boardResolution====", Response.data.filePath);
-            setBoardResolutionpath(Response.data.filePath);
-            setAadharFileBrdResBtnDis(true);
-            setAadharFlieBrdRes(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "boardResolution");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log(
+                  "===200=boardResolution====",
+                  Response.data.filePath
+                );
+                setBoardResolutionpath(Response.data.filePath);
+                setAadharFileBrdResBtnDis(true);
+                setAadharFlieBrdRes(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const boardResolutionImage = {
@@ -1850,26 +1934,33 @@ function ConstitutionIdentification() {
     setAadharFlieCOI(false);
     console.log("coi");
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "COI");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=COI====", Response.data.filePath);
-            setCOIpath(Response.data.filePath);
-            setAadharFileCOIBtnDis(true);
-            setAadharFlieCOI(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "COI");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=COI====", Response.data.filePath);
+                setCOIpath(Response.data.filePath);
+                setAadharFileCOIBtnDis(true);
+                setAadharFlieCOI(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const COIImage = {
@@ -1886,26 +1977,33 @@ function ConstitutionIdentification() {
     console.log("moa");
     setAadharFlieMOA(false);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "MOA");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=MOAFile====", Response.data.filePath);
-            setMOApath(Response.data.filePath);
-            setAadharFileMOABtnDis(true);
-            setAadharFlieMOA(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "MOA");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=MOAFile====", Response.data.filePath);
+                setMOApath(Response.data.filePath);
+                setAadharFileMOABtnDis(true);
+                setAadharFlieMOA(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const MOAImage = {
@@ -1922,26 +2020,33 @@ function ConstitutionIdentification() {
     setAadharFlieAOA(false);
     console.log("aoa");
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "AOA");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=AOA====", Response.data.filePath);
-            setAOApath(Response.data.filePath);
-            setAadharFileAOABtnDis(true);
-            setAadharFlieAOA(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "AOA");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=AOA====", Response.data.filePath);
+                setAOApath(Response.data.filePath);
+                setAadharFileAOABtnDis(true);
+                setAadharFlieAOA(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   // setImageAOA
@@ -1959,26 +2064,36 @@ function ConstitutionIdentification() {
   const consentLetterUpload = (e: any) => {
     setAadharFlieNominatedPartner(false);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "COI");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=consentLetterFile====", Response.data.filePath);
-            setConsentLetterpath(Response.data.filePath);
-            setAadharFileNominatedPartnerBtnDis(true);
-            setAadharFlieNominatedPartner(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "COI");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log(
+                  "===200=consentLetterFile====",
+                  Response.data.filePath
+                );
+                setConsentLetterpath(Response.data.filePath);
+                setAadharFileNominatedPartnerBtnDis(true);
+                setAadharFlieNominatedPartner(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const PartnershipDeedImage = {
@@ -1994,26 +2109,33 @@ function ConstitutionIdentification() {
   const DPINUpload = (e: any) => {
     setAadharFliePartnerIdentity(false);
     let token = localStorage.getItem("token");
-    let formData = new FormData();
-    formData.append("document", e.target.files[0]);
-    formData.append("directoryName", "COI");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.status == "success") {
-            enqueueSnackbar("successfully file uploaded");
-            console.log("===200=DPINFile====", Response.data.filePath);
-            setDPINpath(Response.data.filePath);
-            setAadharFilePartnerIdentityBtnDis(true);
-            setAadharFliePartnerIdentity(false);
-          } else {
-            enqueueSnackbar("Server didn`t response", { variant: "error" });
+    new Compressor(e.target.files[0], {
+      quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
+      success: (compressedResult) => {
+        let formData = new FormData();
+        formData.append("document", compressedResult);
+        formData.append("directoryName", "COI");
+        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.status == "success") {
+                enqueueSnackbar("successfully file uploaded");
+                console.log("===200=DPINFile====", Response.data.filePath);
+                setDPINpath(Response.data.filePath);
+                setAadharFilePartnerIdentityBtnDis(true);
+                setAadharFliePartnerIdentity(false);
+              } else {
+                enqueueSnackbar("Server didn`t response", { variant: "error" });
+              }
+            } else {
+              enqueueSnackbar("file must be less then 1mb", {
+                variant: "error",
+              });
+            }
           }
-        } else {
-          enqueueSnackbar("file must be less then 1mb", { variant: "error" });
-        }
-      }
-    );
+        );
+      },
+    });
   };
 
   const PartnerIdentityImage = {
