@@ -44,6 +44,7 @@ import ReactToPrint from "react-to-print";
 import ApiDataLoading from "../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDate, fDateTime } from "src/utils/formatTime";
+import * as XLSX from 'xlsx';
 // ----------------------------------------------------------------------
 
 export default function FundFlow() {
@@ -187,21 +188,67 @@ export default function FundFlow() {
 
   const ExportData = () => {
     let token = localStorage.getItem("token");
+
     let body = {
+      pageInitData: {
+        pageSize: "",
+        currentPage: "",
+      },
+      clientRefId: "",
+      status: "",
+      transactionType: "",
       startDate: startDate,
       endDate: endDate,
     };
-    Api(`transaction/transactionByUser`, "POST", body, token).then(
+
+    Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
         console.log("======Transaction==response=====>" + Response);
         if (Response.status == 200) {
           if (Response.data.code == 200) {
-            setSdata(Response.data.data.data);
-            enqueueSnackbar(Response.data.message);
-            console.log(
-              "======getUser===data.data ===Transaction====>",
-              Response
-            );
+            if (Response.data.data.data.length) {
+              const Dataapi = Response.data.data.data;
+              console.log("Dataapi", Dataapi);
+
+              const formattedData = Response.data.data.data.map(
+                (item: any) => ({
+                  createdAt: new Date(item?.createdAt).toLocaleString(),
+                  client_ref_Id: item?.client_ref_Id,
+                  transactionType: item?.transactionType,
+                  productName: item?.productName,
+                  categoryName: item?.categoryName,
+          
+                  " Commission Amount":
+                    user?._id === item?.agentDetails?.id?._id
+                      ? item?.agentDetails?.commissionAmount
+                      : user?._id === item?.distributorDetails?.id?._id
+                      ? item?.distributorDetails?.commissionAmount
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.commissionAmount
+                      : "",
+                  amount: item?.amount,
+                  TDS: item?.TDS,
+                  GST: item?.GST,
+                  status: item?.status,
+                  operator: item?.key1,
+                  mobileNumber: item?.mobileNumber,
+                })
+              );
+
+              const ws = XLSX.utils.json_to_sheet(formattedData);
+              const wb = XLSX.utils.book_new();
+              XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+              const currentDate = fDateTime(new Date());
+              XLSX.writeFile(wb, `Transaction${currentDate}.xlsx`);
+
+              console.log(
+                "======getUser===data.data ===Transaction====>",
+                Response
+              );
+            } else {
+              enqueueSnackbar("Data Not Found ");
+            }
           } else {
             console.log("======Transaction=======>" + Response);
           }
@@ -265,26 +312,25 @@ export default function FundFlow() {
           >
             Search
           </Button>
-          <FileFilterButton
-            isSelected={!!isSelectedValuePicker}
-            startIcon={<Iconify icon="eva:calendar-fill" />}
-            onClick={onOpenPicker}
-          >
-            {`${fDate(startDate)} - ${fDate(endDate)}`}
-          </FileFilterButton>
-
-          <DateRangePicker
-            variant="calendar"
-            title="Select Date Range"
-            startDate={startDate}
-            endDate={endDate}
-            onChangeStartDate={onChangeStartDate}
-            onChangeEndDate={onChangeEndDate}
-            open={openPicker}
-            onClose={onClosePicker}
-            isSelected={isSelectedValuePicker}
-            isError={isError}
-          />
+              <FileFilterButton
+              isSelected={!!isSelectedValuePicker}
+              startIcon={<Iconify icon="eva:calendar-fill" />}
+              onClick={onOpenPicker}
+            >
+              {`${fDate(startDate)} - ${fDate(endDate)}`}
+            </FileFilterButton>
+            <DateRangePicker
+              variant="input"
+              title="Select Date Range"
+              startDate={startDate}
+              endDate={endDate}
+              onChangeStartDate={onChangeStartDate}
+              onChangeEndDate={onChangeEndDate}
+              open={openPicker}
+              onClose={onClosePicker}
+              isSelected={isSelectedValuePicker}
+              isError={isError}
+            />
           <Button variant="contained" onClick={ExportData}>
             Export
           </Button>
