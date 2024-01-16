@@ -142,12 +142,14 @@ const SettlementToBank = ({ userBankList }: childProps) => {
     reset,
     setError,
     setValue,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = methods;
 
   useEffect(() => {
     getEligibleSettlementAmount();
+    setEligibleSettlementAmount('')
   }, []);
 
   const getEligibleSettlementAmount = () => {
@@ -285,7 +287,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
               <LoadingButton
                 variant="contained"
                 type="submit"
-                disabled={!isValid}
+                disabled={(+watch("amount") > 1000 ? false : true)}
                 loading={isSubmitting}
                 sx={{ width: "fit-content", alignSelf: "center" }}
               >
@@ -338,11 +340,13 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
   const {
     reset,
     setError,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = methods;
 
-  useEffect(() => {
+
+  useEffect(() => { 
     getEligibleSettlementAmount();
   }, []);
 
@@ -407,59 +411,57 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
               // sm: 'repeat(2, 1fr)'
             }}
           >
-            <Typography variant="subtitle1" textAlign={"center"}>
-              Maximum Eligible Settlement Amount for Bank account is{" "}
-              {Number(eligibleSettlementAmount)}
-            </Typography>
-            {Number(eligibleSettlementAmount) < 500 && (
-              <Typography variant="caption" textAlign={"center"} color={"red"}>
-                Minimum amount for AEPS settlement is 500
-              </Typography>
-            )}
-            {resetNpin ? (
-              <NPinReset />
-            ) : (
-              <Stack gap={2}>
-                <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
-                  <RHFTextField
-                    name="amount"
-                    label="Amount"
-                    placeholder="Amount"
-                  />
-                </Stack>
-                <Stack alignSelf={"center"}>
-                  <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                    <Typography variant="h5" textAlign={"center"}>
-                      NPIN
-                    </Typography>
-                    {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
-                  </Stack>
-                  <RHFCodes
-                    keyName="otp"
-                    inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                    type="password"
-                  />
-                  {(!!errors.otp1 ||
-                    !!errors.otp2 ||
-                    !!errors.otp3 ||
-                    !!errors.otp4 ||
-                    !!errors.otp5 ||
-                    !!errors.otp6) && (
-                    <FormHelperText error sx={{ px: 2 }}>
-                      Code is required
-                    </FormHelperText>
-                  )}
-                </Stack>
+ <Typography variant="subtitle1" textAlign="center">
+        Maximum Eligible Settlement Amount for Bank account is{' '}
+        {Number(eligibleSettlementAmount)}
+      </Typography>
 
-                <LoadingButton
-                  variant="contained"
-                  type="submit"
-                  disabled={!isValid}
-                  loading={isSubmitting}
-                  sx={{ width: "fit-content", alignSelf: "center" }}
-                >
-                  Settle amount to Main Wallet
-                </LoadingButton>
+      {Number(eligibleSettlementAmount) < 500 && (
+        <Typography variant="caption" textAlign="center" color="red">
+          Minimum amount for AEPS settlement is 500
+        </Typography>
+      )}
+
+      {resetNpin ? (
+        <NPinReset />
+      ) : (
+          <Stack gap={2}>
+            <Stack sx={{ width: 250, alignSelf: 'center' }} gap={1}>
+              <RHFTextField name="amount" label="Amount" placeholder="Amount" />
+            </Stack>
+
+            <Stack alignSelf="center">
+              <Stack flexDirection="row" justifyContent="space-between">
+                <Typography variant="h5" textAlign="center">
+                  NPIN
+                </Typography>
+                {/* Add your reset NPIN button here if needed */}
+              </Stack>
+
+              <RHFCodes
+                keyName="otp"
+                inputs={['otp1', 'otp2', 'otp3', 'otp4', 'otp5', 'otp6']}
+                type="password"
+              />
+
+              {(Object.values(errors).some((error) => !!error)) && (
+                <FormHelperText error sx={{ px: 2 }}>
+                  Code is required
+                </FormHelperText>
+              )}
+            </Stack>
+
+            <LoadingButton
+              variant="contained"
+              type="submit"
+              disabled={(+watch("amount") > 500 ? false : true)}
+              loading={isSubmitting}
+              sx={{ width: 'fit-content', alignSelf: 'center' }}
+            >
+            
+              Settle amount to Main Wallet
+            </LoadingButton>
+
               </Stack>
             )}
           </Grid>
