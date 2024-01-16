@@ -137,6 +137,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(FilterSchema),
     defaultValues,
+    mode: "onChange",
   });
   const {
     reset,
@@ -149,7 +150,6 @@ const SettlementToBank = ({ userBankList }: childProps) => {
 
   useEffect(() => {
     getEligibleSettlementAmount();
-    setEligibleSettlementAmount('')
   }, []);
 
   const getEligibleSettlementAmount = () => {
@@ -185,6 +185,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
               AEPS_wallet_amount:
                 user?.AEPS_wallet_amount - Number(data.amount),
             });
+            reset(defaultValues);
             enqueueSnackbar(Response.data.message);
           } else {
             enqueueSnackbar(Response.data.message);
@@ -258,7 +259,6 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                   name="amount"
                   label="Amount"
                   placeholder="Amount"
-                  // onChange={(e: any) => convertNumberToWords(Number(e.target.value))}
                 />
               </Stack>
               <Stack alignSelf={"center"}>
@@ -287,7 +287,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
               <LoadingButton
                 variant="contained"
                 type="submit"
-                disabled={(+watch("amount") > 1000 ? false : true)}
+                disabled={!isValid}
                 loading={isSubmitting}
                 sx={{ width: "fit-content", alignSelf: "center" }}
               >
@@ -345,8 +345,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
     formState: { errors, isSubmitting, isValid },
   } = methods;
 
-
-  useEffect(() => { 
+  useEffect(() => {
     getEligibleSettlementAmount();
   }, []);
 
@@ -411,57 +410,59 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
               // sm: 'repeat(2, 1fr)'
             }}
           >
- <Typography variant="subtitle1" textAlign="center">
-        Maximum Eligible Settlement Amount for Bank account is{' '}
-        {Number(eligibleSettlementAmount)}
-      </Typography>
+            <Typography variant="subtitle1" textAlign="center">
+              Maximum Eligible Settlement Amount for Bank account is{" "}
+              {Number(eligibleSettlementAmount)}
+            </Typography>
 
-      {Number(eligibleSettlementAmount) < 500 && (
-        <Typography variant="caption" textAlign="center" color="red">
-          Minimum amount for AEPS settlement is 500
-        </Typography>
-      )}
+            {Number(eligibleSettlementAmount) < 500 && (
+              <Typography variant="caption" textAlign="center" color="red">
+                Minimum amount for AEPS settlement is 500
+              </Typography>
+            )}
 
-      {resetNpin ? (
-        <NPinReset />
-      ) : (
-          <Stack gap={2}>
-            <Stack sx={{ width: 250, alignSelf: 'center' }} gap={1}>
-              <RHFTextField name="amount" label="Amount" placeholder="Amount" />
-            </Stack>
+            {resetNpin ? (
+              <NPinReset />
+            ) : (
+              <Stack gap={2}>
+                <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
+                  <RHFTextField
+                    name="amount"
+                    label="Amount"
+                    placeholder="Amount"
+                  />
+                </Stack>
 
-            <Stack alignSelf="center">
-              <Stack flexDirection="row" justifyContent="space-between">
-                <Typography variant="h5" textAlign="center">
-                  NPIN
-                </Typography>
-                {/* Add your reset NPIN button here if needed */}
-              </Stack>
+                <Stack alignSelf="center">
+                  <Stack flexDirection="row" justifyContent="space-between">
+                    <Typography variant="h5" textAlign="center">
+                      NPIN
+                    </Typography>
+                    {/* Add your reset NPIN button here if needed */}
+                  </Stack>
 
-              <RHFCodes
-                keyName="otp"
-                inputs={['otp1', 'otp2', 'otp3', 'otp4', 'otp5', 'otp6']}
-                type="password"
-              />
+                  <RHFCodes
+                    keyName="otp"
+                    inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+                    type="password"
+                  />
 
-              {(Object.values(errors).some((error) => !!error)) && (
-                <FormHelperText error sx={{ px: 2 }}>
-                  Code is required
-                </FormHelperText>
-              )}
-            </Stack>
+                  {Object.values(errors).some((error) => !!error) && (
+                    <FormHelperText error sx={{ px: 2 }}>
+                      Code is required
+                    </FormHelperText>
+                  )}
+                </Stack>
 
-            <LoadingButton
-              variant="contained"
-              type="submit"
-              disabled={(+watch("amount") > 500 ? false : true)}
-              loading={isSubmitting}
-              sx={{ width: 'fit-content', alignSelf: 'center' }}
-            >
-            
-              Settle amount to Main Wallet
-            </LoadingButton>
-
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  disabled={+watch("amount") > 500 ? false : true}
+                  loading={isSubmitting}
+                  sx={{ width: "fit-content", alignSelf: "center" }}
+                >
+                  Settle amount to Main Wallet
+                </LoadingButton>
               </Stack>
             )}
           </Grid>
