@@ -145,12 +145,17 @@ const SettlementToBank = ({ userBankList }: childProps) => {
     setValue,
     watch,
     handleSubmit,
-    formState: { errors, isSubmitting, isValid },
+    formState: { errors, isSubmitting, isValid},
   } = methods;
 
   useEffect(() => {
     getEligibleSettlementAmount();
-  }, []);
+    userBankList.map((item: any) => {
+      if (item.isDefaultBank === true) {
+        setValue('accountNumber', item.accountNumber);
+      }
+    }); 
+    }, [userBankList]);
 
   const getEligibleSettlementAmount = () => {
     let token = localStorage.getItem("token");
@@ -226,6 +231,9 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                     name="accountNumber"
                     label="Bank account"
                     placeholder="Bank account"
+                    // defaultValue={}
+                    disabled
+                    variant="filled"
                     SelectProps={{
                       native: false,
                       sx: { textTransform: "capitalize" },
@@ -279,10 +287,10 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                   !!errors.otp4 ||
                   !!errors.otp5 ||
                   !!errors.otp6) && (
-                  <FormHelperText error sx={{ px: 2 }}>
-                    Code is required
-                  </FormHelperText>
-                )}
+                    <FormHelperText error sx={{ px: 2 }}>
+                      Code is required
+                    </FormHelperText>
+                  )}
               </Stack>
               <LoadingButton
                 variant="contained"
