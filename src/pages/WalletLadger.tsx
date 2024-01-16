@@ -1,26 +1,6 @@
 import { useEffect, useState } from "react";
-
-// @mui
-import {
-  Card,
-  Stack,
-  Grid,
-  TableHead,
-  Modal,
-  Button,
-  TextField,
-} from "@mui/material";
-// redux
-// routes
-// components
-// sections
-
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Card, Stack, Grid, TableHead, Modal, Button } from "@mui/material";
 import { Helmet } from "react-helmet-async";
-
-import * as Yup from "yup";
-// form
-
 import { useSnackbar } from "notistack";
 import DateRangePicker, {
   useDateRangePicker,
@@ -48,7 +28,7 @@ import { fDate, fDateTime } from "src/utils/formatTime";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import { Label } from '@mui/icons-material';
+
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -71,7 +51,6 @@ export default function WalletLadger() {
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [ladgerData, setLadgerData] = useState([]);
-  const [refId, setRefId] = useState("");
   const [pageSize, setPageSize] = useState<any>(20);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [sendLoding, setSendLoading] = useState(false);
@@ -85,7 +64,7 @@ export default function WalletLadger() {
     { id: "productName", label: "Product/TransactionType " },
     { id: "walletType", label: "WalletType " },
     { id: "reason", label: "reason " },
-    // { id: "remarks", label: "remarks" },
+
     { id: "walletId", label: "Wallet Id" },
   ];
   const distributortableLabels = [
@@ -96,7 +75,7 @@ export default function WalletLadger() {
     { id: "productName", label: "Product/TransactionType " },
     { id: "walletType", label: "WalletType " },
     { id: "reason", label: "reason " },
-    // { id: "remarks", label: "remarks" },
+
     { id: "walletId", label: "Wallet Id" },
   ];
   const MDtableLabels = [
@@ -153,8 +132,6 @@ export default function WalletLadger() {
       }
     });
   };
-
-  // const filterWalletLadger = () => {};
 
   const ExportData = () => {
     let token = localStorage.getItem("token");
@@ -259,17 +236,6 @@ export default function WalletLadger() {
             spacing={2}
             style={{ padding: "0 25px", marginBottom: "10px" }}
           >
-            {/* <TextField
-              id="outlined-password-input"
-              label="Search By Ref Id"
-              size="small"
-              type="text"
-              onChange={(e) => setRefId(e.target.value)}
-            />
-            <Button variant="contained" onClick={() => filterWalletLadger()}>
-              Search
-            </Button> */}
-
             <FileFilterButton
               isSelected={!!isSelectedValuePicker}
               startIcon={<Iconify icon="eva:calendar-fill" />}
@@ -575,11 +541,6 @@ const LadgerRow = ({ row }: any) => {
             {parseFloat(row?.reason) || "-"}
           </Typography>
         </TableCell>
-        {/* <TableCell>
-          <Typography variant="body1" sx={{ color: "text.secondary" }}>
-            {parseFloat(row?.remarks) || "-"}
-          </Typography>
-        </TableCell> */}
 
         {row?.transaction?.clientRefId ? (
           <TableCell onClick={() => openEditModal(row)}>
@@ -633,14 +594,6 @@ const LadgerRow = ({ row }: any) => {
                   >
                     <TableCell>
                       {row?.transaction?.productName && (
-                        // <Typography
-                        //   variant="body1"
-                        //   sx={{ color: "text.secondary" }}
-                        // >
-                        //   {" "}
-                        //   Product: {row?.transaction?.productName || "-"}
-                        // </Typography>
-
                         <Stack direction="row" gap={0.5}>
                           <Typography variant="subtitle2">Product:</Typography>
                           <Typography variant="body2">

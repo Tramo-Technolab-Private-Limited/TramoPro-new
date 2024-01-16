@@ -30,7 +30,7 @@ import FormProvider, {
   RHFSelect,
 } from "../../components/hook-form";
 import { Helmet } from "react-helmet-async";
-
+import { _ecommerceBestSalesman } from "src/_mock/arrays";
 import { useSnackbar } from "notistack";
 import React from "react";
 import { Api } from "src/webservices";
@@ -47,8 +47,10 @@ import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import moment from "moment";
-import { AwsDocSign } from "../../components/customFunctions/AwsDocSign";
-import { fDateTime } from "src/utils/formatTime";
+// import { myCompany } from 'src/components/company-name/companyName';
+import EditRequest from "./EditRequest";
+import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
+import { FileUpload } from "@mui/icons-material";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -74,14 +76,17 @@ export default function (props: any) {
   const [selectedModes, setSelectedModes] = useState<any>([]);
   const [selectedModeId, setSelectedModeId] = useState(null);
   const [success, setSuccess] = useState("upload");
-  const [selectedBankID, setSelectedBankID] = useState<any>([]);
+  const [selectedBankID, setSelectedBankID] = useState<any>();
   const [selectedItem, setSelectedItem] = useState("");
   let [updateBnakID, setupdatedBid] = useState("");
+
   // const [fundRequestCreatedAt, setFundRequestCreatedAt] = useState('');
   const handleDropSingleFile = useCallback((acceptedFiles: File[]) => {
     const uploadFile = acceptedFiles[0];
     setSuccess("upload");
     if (uploadFile) {
+      console.log("");
+
       setUploadFile(
         Object.assign(uploadFile, {
           preview: URL.createObjectURL(uploadFile),
@@ -92,6 +97,7 @@ export default function (props: any) {
 
   const handleSelectChange = (event: any) => {
     setSelectedItem(event.target.value);
+
     setSelectedBankID(event.target.value._id);
     let token = localStorage.getItem("token");
     Api(
@@ -132,7 +138,6 @@ export default function (props: any) {
           enqueueSnackbar(Response.data.message);
           setReqData(Response.data.data[0]);
 
-          // setUploadFile(Response.data.data[0].transactionSlip);
           setOpenRequestEdit(true);
 
           setupdatedBid(Response.data.data[0].bankId._id);
@@ -187,7 +192,7 @@ export default function (props: any) {
     },
   }));
 
-  const handleChange: any = (date: dayjs.Dayjs | null) => {
+  const handleChange = (date: dayjs.Dayjs | null) => {
     setSelectedDate(date);
   };
 
@@ -196,7 +201,6 @@ export default function (props: any) {
     top: "10%",
     left: "30%",
 
-    // transform: 'translate(-50%, -50%)',
     height: 500,
     width: 600,
 
@@ -204,9 +208,9 @@ export default function (props: any) {
     boxShadow: 24,
     p: 4,
   };
-  const [selectedDate, setSelectedDate] = React.useState<
-    Dayjs | string | null | any
-  >(dayjs(ReqData.date_of_deposit));
+  const [selectedDate, setSelectedDate] = React.useState<Dayjs | null>(
+    dayjs(ReqData.date_of_deposit)
+  );
 
   const dateObj = new Date(ReqData.date_of_deposit);
   const [page, setPage] = React.useState(1);
@@ -332,7 +336,7 @@ export default function (props: any) {
     let token = localStorage.getItem("token");
 
     let body = {
-      bankId: updateBnakID ? updateBnakID : selectedBankID,
+      bankId: selectedBankID ? selectedBankID : updateBnakID,
       modeId: selectedModeId ? selectedModeId : ReqData.modeId?._id,
       fund_request_Id: ReqData.fund_request_Id,
       request_to: "ADMIN",
@@ -384,7 +388,7 @@ export default function (props: any) {
   return (
     <>
       <Helmet>
-        <title> Transactions |{process.env.REACT_APP_COMPANY_NAME}</title>
+        <title> Transactions |</title>
       </Helmet>
 
       <Grid item xs={12} md={6} lg={8}>
@@ -415,7 +419,7 @@ export default function (props: any) {
                           variant="body2"
                           sx={{ whiteSpace: "nowrap" }}
                         >
-                          {fDateTime(row?.createdAt)}
+                          {new Date(row?.createdAt).toLocaleString()}
                         </Typography>
                       </Box>
                     </Stack>
@@ -540,7 +544,6 @@ export default function (props: any) {
                   </StyledTableCell>
                   <StyledTableCell>
                     <Stack direction="row" alignItems="center">
-                      {}
                       <Button
                         variant="contained"
                         size="medium"
@@ -579,8 +582,7 @@ export default function (props: any) {
           <Grid rowGap={3} columnGap={2} display="grid">
             <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
               <FormLabel id="demo-row-radio-buttons-group-label">
-                {" "}
-                Fund Request Update
+                <Typography variant="h4">Fund Request Update</Typography>
               </FormLabel>
               <Typography
                 variant="h3"
@@ -645,6 +647,7 @@ export default function (props: any) {
                 <RHFTextField
                   name="amount"
                   label="Amount"
+                  size="small"
                   defaultValue={ReqData?.amount}
                   sx={{ width: 250 }}
                 />
@@ -652,6 +655,7 @@ export default function (props: any) {
                   name="mobile"
                   label="Mobile"
                   defaultValue={ReqData?.transactional_details?.mobile}
+                  size="small"
                   sx={{ width: 250 }}
                 />
               </Typography>
@@ -664,12 +668,14 @@ export default function (props: any) {
                   name="branch"
                   label="Branch"
                   defaultValue={ReqData?.transactional_details?.branch}
+                  size="small"
                   sx={{ width: 250 }}
                 />
                 <RHFTextField
                   name="trxId"
                   label="TRXID"
                   value={ReqData?.transactional_details?.trxId}
+                  size="small"
                   sx={{ width: 250 }}
                 />
               </Typography>
@@ -686,7 +692,7 @@ export default function (props: any) {
                       value={selectedDate}
                       // defaultValue={selectedDate}
                       onChange={handleChange}
-                      renderInput={(params: any) => (
+                      renderInput={(params) => (
                         <TextField {...params} sx={{ my: 1, width: 250 }} />
                       )}
                     />
@@ -697,8 +703,9 @@ export default function (props: any) {
                   <Upload
                     sx={{ display: "flex", marginLeft: "", marginTop: "" }}
                     file={
-                      ReqData.transactionSlip &&
-                      AwsDocSign(ReqData.transactionSlip)
+                      uploadFile
+                        ? uploadFile
+                        : AwsDocSign(ReqData?.transactionSlip)
                     }
                     onDrop={handleDropSingleFile}
                     onDelete={() => setUploadFile(null)}

@@ -52,14 +52,6 @@ type FormValuesProps = {
   otp6: string;
 };
 
-AWS.config.update({
-  accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-  region: "ap-south-1",
-});
-
-const s3 = new AWS.S3();
-
 export default function AadharForm(props: any) {
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail } = useAuthContext();
@@ -127,10 +119,6 @@ export default function AadharForm(props: any) {
     Key: user?.image_on_aadhaar?.split("/").splice(4, 4).join("/"),
     Expires: 600, // Expiration time in seconds
   };
-
-  s3.getSignedUrl("getObject", params, (err: any, url: any) => {
-    setImageAadhar(url);
-  });
 
   const onSubmit = async (data: FormValuesProps) => {
     try {

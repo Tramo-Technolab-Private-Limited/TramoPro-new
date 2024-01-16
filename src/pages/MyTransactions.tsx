@@ -223,7 +223,7 @@ export default function MyTransactions() {
     { id: "Action", label: "Action" },
   ];
   const tableLabels1 = [
-    { id: "Date&Time", label: "Date & Timeaaaaaa" },
+    { id: "Date&Time", label: "Date & Time" },
     { id: "Client Ref Id", label: "Client Ref Id" },
     { id: "agent", label: "Agent" },
     { id: "Product", label: "Product" },
