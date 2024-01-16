@@ -2,9 +2,6 @@
 import { Typography, Stack, Box, Container, useTheme } from "@mui/material";
 // components
 import Logo from "../../components/logo";
-import Image from "../../components/image";
-import neoDashBoardImage from "../../assets/images/neodashboard.svg";
-import tramoDashBoardImage from "../../assets/images/tramodashboard.svg";
 
 //
 import {
@@ -15,6 +12,7 @@ import {
 } from "./styles";
 import Marquee from "react-fast-marquee";
 import SvgColor from "src/components/svg-color";
+import DashboardIcon from "src/assets/icons/DashboardIcon";
 
 // ----------------------------------------------------------------------
 
@@ -49,17 +47,8 @@ export default function ResetPassLayout({
           Join Tramo to drive the Financial Inclusion in the country!
         </Typography>
 
-        <Image
-          disabledEffect
-          visibleByDefault
-          alt="auth"
-          src={
-            process.env.REACT_APP_LOGO == "Tramo"
-              ? tramoDashBoardImage
-              : neoDashBoardImage
-          }
-          sx={{ maxWidth: 720 }}
-        />
+        <DashboardIcon />
+
         <Typography
           variant="subtitle1"
           sx={{ mt: 5, maxWidth: 580, textAlign: "center" }}
@@ -78,7 +67,7 @@ export default function ResetPassLayout({
       <Box
         component="footer"
         sx={{
-          position: "absolute",
+          position: "fixed",
           width: "100%",
           bottom: 0,
           backgroundColor: "#375168",

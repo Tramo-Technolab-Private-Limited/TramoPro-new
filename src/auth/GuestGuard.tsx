@@ -37,6 +37,8 @@ export default function GuestGuard({ children }: GuestGuardProps) {
     ) : (
       <Navigate to={"/auth/mystats"} />
     );
+  } else {
+    <Navigate to={"/login"} />;
   }
 
   if (!isInitialized) {

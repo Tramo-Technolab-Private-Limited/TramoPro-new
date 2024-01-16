@@ -21,6 +21,7 @@ import {
   Box,
   FormHelperText,
   Button,
+  InputAdornment,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 // components
@@ -93,6 +94,7 @@ const Reducer = (state: any, action: any) => {
 function MobilePrepaid() {
   const { user, UpdateUserDetail } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
+  const [isLoading, setIsLoading] = useState(false);
   const subCategoryContext: any = useContext(SubCategoryContext);
   const categoryContext: any = useContext(CategoryContext);
   const [planState, planDispatch] = useReducer(Reducer, initialPlanState);
@@ -434,8 +436,11 @@ function MobilePrepaid() {
           <RHFTextField
             name="amount"
             label="Amount"
-            placeholder="Amount"
+            placeholder="amount"
             InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">₹</InputAdornment>
+              ),
               endAdornment: (
                 <LoadingButton
                   variant="contained"

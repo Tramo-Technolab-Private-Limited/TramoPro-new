@@ -26,6 +26,7 @@ import Label from "src/components/label/Label";
 import { useAuthContext } from "src/auth/useAuthContext";
 import useResponsive from "src/hooks/useResponsive";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
+import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 
 type FormValuesProps = {
   operator: {
@@ -654,10 +655,13 @@ const BbpsBillPayment = ({
         (Response: any) => {
           if (Response.status == 200) {
             if (Response.data.code == 200) {
-              UpdateUserDetail({
-                main_wallet_amount:
-                  Response?.data?.data?.agentDetails?.newMainWalletBalance,
-              });
+              if (Response.data.data.status == "success") {
+                UpdateUserDetail({
+                  main_wallet_amount:
+                    Response?.data?.data?.agentDetails?.newMainWalletBalance,
+                });
+              }
+              TextToSpeak(Response.data.message);
               enqueueSnackbar(Response.data.message);
             } else {
               enqueueSnackbar(Response.data.error.message, {

@@ -559,6 +559,16 @@ function TransactionRow({ row }: childProps) {
     }
   };
 
+  const style = {
+    position: "absolute" as "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    width: { xs: "90%", sm: 720 },
+    bgcolor: "#ffffff",
+    borderRadius: 2,
+  };
+
   return (
     <>
       <TableRow hover key={newRow._id}>
@@ -769,284 +779,307 @@ function TransactionRow({ row }: childProps) {
                 </IconButton>
               </Tooltip>
             )}
-            {user?.role === "agent" && (
-              <Tooltip title="Download" placement="top">
-                <IconButton>
-                  <img
-                    src={receipt_long}
-                    alt="Receipt Icon"
-                    onClick={openModal}
-                  />
-                </IconButton>
-              </Tooltip>
-            )}
+            {user?.role === "agent" &&
+              (newRow?.categoryName == "MONEY TRANSFER" ||
+                newRow?.categoryName == "DMT2") && (
+                <Tooltip title="View Receipt" placement="top">
+                  <IconButton>
+                    <img
+                      src={receipt_long}
+                      alt="Receipt Icon"
+                      onClick={openModal}
+                    />
+                  </IconButton>
+                </Tooltip>
+              )}
           </Stack>
         </TableCell>
       </TableRow>
       <Modal
         open={modalOpen}
+        onClose={closeModal}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        <Grid
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "#ffffff",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "20px",
-            overflowY: "scroll",
-            height: "60vh",
-          }}
-        >
-          <Card sx={{ pt: 5, px: 5 }} ref={componentRef}>
-            <Grid container>
-              <Grid
-                item
-                xs={12}
-                sm={10}
-                sx={{
-                  mb: 5,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignContent: "space-between",
-                }}
-              >
-                <Grid>
-                  <Logo />
-                </Grid>
-                <Grid sx={{ mt: 3 }}>
-                  <Typography
-                    paragraph
-                    variant="overline"
-                    sx={{ color: "text.disabled" }}
-                  >
-                    Shop Details
-                  </Typography>
-                  <Typography variant="body2">
-                    Agent Name :{user?.firstName}
-                    {user?.lastName}{" "}
-                  </Typography>
-                  <Typography variant="body2">
-                    Mobile Number :{user?.contact_no}
-                  </Typography>
-                  <Typography variant="body2">
-                    Shop Name :{user?.shopAddress}
-                  </Typography>
-                </Grid>
-              </Grid>
-              <Divider />
-              <Grid item xs={12} sm={10} sx={{ mb: 5 }}>
-                <Box sx={{ textAlign: { sm: "right" } }}>
-                  {/* <Label
-                    variant="soft"
-                    color={
-                      (status === 'paid' && 'success') ||
-                      (status === 'unpaid' && 'warning') ||
-                      (status === 'overdue' && 'error') ||
-                      'default'
-                    }
-                    sx={{ textTransform: 'uppercase', mb: 1 }}
-                  >
-                    {status}
-                  </Label> */}
-                </Box>
-              </Grid>
-              <Grid
-                item
-                xs={12}
-                sm={11}
-                sx={{
-                  mb: 5,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignContent: "space-between",
-                }}
-              >
-                <Grid>
-                  <Typography
-                    paragraph
-                    variant="overline"
-                    sx={{ color: "text.disabled" }}
-                  >
-                    Sender Details
-                  </Typography>
-
-                  <Typography variant="body2">
-                    Sender Name :{newRow?.moneyTransferSenderId?.remitterFN}
-                    {newRow?.moneyTransferSenderId?.remitterLN}{" "}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    Mobile Number :
-                    {newRow?.moneyTransferSenderId?.remitterMobile}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    Service Type : {newRow?.categoryName}
-                  </Typography>
-                </Grid>
-
-                <Grid>
-                  <Typography
-                    paragraph
-                    variant="overline"
-                    sx={{ color: "text.disabled" }}
-                  >
-                    Benificary Details
-                  </Typography>
-
-                  <Typography variant="body2">
-                    Account Holder Name :{" "}
-                    {newRow?.moneyTransferBeneficiaryDetails?.beneName}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    Bank Name :{" "}
-                    {newRow?.moneyTransferBeneficiaryDetails?.bankName}{" "}
-                  </Typography>
-
-                  <Typography variant="body2">
-                    {" "}
-                    IFSC :{newRow?.moneyTransferBeneficiaryDetails?.ifsc}
-                  </Typography>
-                </Grid>
-              </Grid>
-              <Grid item xs={12} sm={6} sx={{ mb: 5 }}>
-                <Typography
-                  paragraph
-                  variant="overline"
-                  sx={{ color: "text.disabled" }}
-                >
-                  date create
-                </Typography>
-
-                <Typography variant="body2">
-                  {" "}
-                  {fDateTime(newRow?.createdAt)}
-                </Typography>
-              </Grid>
-
-              <Grid item xs={12} sm={6} sx={{ mb: 5 }}>
-                <Typography
-                  paragraph
-                  variant="overline"
-                  sx={{ color: "text.disabled" }}
-                >
-                  Due date
-                </Typography>
-
-                <Typography variant="body2">{}</Typography>
-              </Grid>
-            </Grid>
-
-            <TableContainer sx={{ overflow: "unset" }}>
-              <Table>
-                <TableHead
-                  sx={{
-                    borderBottom: (theme) =>
-                      `solid 1px ${theme.palette.divider}`,
-                    "& th": { backgroundColor: "lightgrey" },
-                  }}
-                >
-                  <TableRow>
-                    <TableCell align="left">Client Ref Id</TableCell>
-
-                    <TableCell align="left">Mode</TableCell>
-
-                    <TableCell align="center">UTR</TableCell>
-
-                    <TableCell align="center">Amount</TableCell>
-
-                    <TableCell align="center">Status</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  <TableRow
-                    sx={{
-                      borderBottom: (theme) =>
-                        `solid 1px ${theme.palette.divider}`,
-                    }}
-                  >
-                    <TableCell align="left">
-                      <Box sx={{ maxWidth: 560 }}>
-                        <Typography variant="subtitle2">{row.title}</Typography>
-
-                        <Typography
-                          variant="body2"
-                          sx={{ color: "text.secondary" }}
-                          noWrap
-                        >
-                          {newRow?.clientRefId}
-                        </Typography>
-                      </Box>
-                    </TableCell>
-
-                    <TableCell align="center">{newRow?.productName}</TableCell>
-
-                    <TableCell align="center">
-                      {newRow?.vendorUtrNumber}
-                    </TableCell>
-                    <TableCell align="center">{newRow?.amount}</TableCell>
-
-                    <TableCell align="center">{newRow?.status}</TableCell>
-                  </TableRow>
-
-                  <TableCell colSpan={3} />
-
-                  <Typography align="right" sx={{ typography: "body1" }}>
-                    <Box sx={{ mt: 2 }} />
-                    Transaction Amount:{newRow.amount}
-                  </Typography>
-
-                  <Typography align="right" sx={{ typography: "body1" }}>
-                    Convienience Fee:{newRow.amount}
-                  </Typography>
-
-                  <Typography align="right" sx={{ typography: "body1" }}>
-                    Total Amount:{newRow.newMainWalletBalance}
-                  </Typography>
-                </TableBody>
-              </Table>
-            </TableContainer>
-
-            <Divider sx={{ mt: 5 }} />
-
-            <Grid container>
-              <Grid item xs={12} md={9} sx={{ py: 3 }}>
-                <Typography variant="subtitle2">NOTES</Typography>
-
-                <Typography variant="body2">
-                  This transaction receipt is generated automatically and dose
-                  not require a physical signature. It is not a tax invoice but
-                  serves as a record of your transaction with Tramo. Please
-                  retain it for your refrence, and if you have any queries, fell
-                  free to contact our Customer Support team.
-                </Typography>
-              </Grid>
-
-              <Grid item xs={12} md={3} sx={{ py: 3, textAlign: "right" }}>
-                <Typography variant="subtitle2">Have a Question?</Typography>
-
-                <Typography variant="body2">
-                  {process.env.REACT_APP_COMPANY_EMAIL}
-                </Typography>
-              </Grid>
-            </Grid>
-          </Card>
-
-          <Stack flexDirection={"row"}>
-            <Button onClick={closeModal}>close</Button>
+        <Grid sx={style}>
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"flex-end"}
+            mt={1}
+            mx={1}
+          >
+            <Tooltip title="Close" onClick={closeModal}>
+              <IconButton>
+                <Iconify icon="carbon:close-outline" />
+              </IconButton>
+            </Tooltip>
             <ReactToPrint
-              trigger={() => <Button>Print this out!</Button>}
+              trigger={() => (
+                <Tooltip title="Print">
+                  <IconButton>
+                    <Iconify icon="eva:printer-fill" />
+                  </IconButton>
+                </Tooltip>
+              )}
               content={() => componentRef.current}
               onAfterPrint={closeModal}
             />
           </Stack>
+          <Card ref={componentRef} sx={{ p: 3 }}>
+            <Scrollbar sx={{ maxHeight: 600 }}>
+              <Stack sx={{ pr: 2 }}>
+                <Stack>
+                  {/* shop detail */}
+                  <Stack
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    justifyContent={"space-between"}
+                    mb={1}
+                  >
+                    <Stack>
+                      <Logo />
+                    </Stack>
+                    <Grid sx={{ mt: 1 }}>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          Agent Name:{" "}
+                        </Typography>
+                        <Typography variant="subtitle2">
+                          {`${user?.firstName} ${user?.lastName}`}
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">User code: </Typography>
+                        <Typography variant="subtitle2">
+                          {`${user?.userCode}`}
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          {" "}
+                          Mobile Number:{" "}
+                        </Typography>
+                        <Typography variant="subtitle2">
+                          {user?.contact_no}
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          {" "}
+                          Shop Name:{" "}
+                        </Typography>
+                        <Typography variant="subtitle2">
+                          {user?.shopAddress}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Stack>
+                  <Divider />
+                  {/* sender & beneficiary  detail */}
+                  <Stack
+                    flexDirection={{ xs: "column", sm: "row" }}
+                    justifyContent={"space-between"}
+                    mt={3}
+                  >
+                    <Grid sx={{ mt: 1 }}>
+                      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                        Sender Details
+                      </Typography>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          Sender Name :{" "}
+                        </Typography>
+                        <Typography variant="body2">
+                          {newRow?.moneyTransferSenderId?.remitterFN}
+                          {newRow?.moneyTransferSenderId?.remitterLN}{" "}
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          {" "}
+                          Mobile Number:{" "}
+                        </Typography>
+                        <Typography variant="body2">
+                          {newRow?.moneyTransferSenderId?.remitterMobile}
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          {" "}
+                          Service Type:{" "}
+                        </Typography>
+                        <Typography variant="body2">
+                          {newRow?.productName}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                    <Grid sx={{ mt: 1 }}>
+                      <Typography variant="subtitle1" sx={{ mb: 1 }}>
+                        Benificary Details
+                      </Typography>
+
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          {" "}
+                          Account Holder Name:{" "}
+                        </Typography>
+                        <Typography variant="body2">
+                          {newRow?.moneyTransferBeneficiaryDetails?.beneName}
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          {" "}
+                          Bank Name:{" "}
+                        </Typography>
+                        <Typography variant="body2">
+                          {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2">
+                          {" "}
+                          Account Number:{" "}
+                        </Typography>
+                        <Typography variant="body2">
+                          {
+                            newRow?.moneyTransferBeneficiaryDetails
+                              ?.accountNumber
+                          }
+                        </Typography>
+                      </Stack>
+                      <Stack flexDirection={"row"} gap={1}>
+                        <Typography variant="subtitle2"> IFSC : </Typography>
+                        <Typography variant="body2">
+                          {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
+                        </Typography>
+                      </Stack>
+                    </Grid>
+                  </Stack>
+                  {/* careated at dat */}
+                  <Stack my={3}>
+                    <Typography variant="subtitle2">
+                      Transaction Date
+                    </Typography>
+                    <Typography variant="body2">
+                      {fDateTime(newRow?.createdAt)}
+                    </Typography>
+                  </Stack>
+                </Stack>
+
+                <Typography variant="subtitle1" my={1}>
+                  #Transaction Detail
+                </Typography>
+
+                <TableContainer sx={{ overflow: "unset" }}>
+                  <Table>
+                    <TableRow
+                      sx={{
+                        borderBottom: (theme) =>
+                          `solid 1.5px ${theme.palette.divider}`,
+                      }}
+                    >
+                      <TableCell align="center">
+                        <Typography variant="subtitle1">
+                          Transaction Id
+                        </Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="subtitle1">Service</Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="subtitle1">UTR</Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="subtitle1">Status</Typography>
+                      </TableCell>
+                      <TableCell align="center">
+                        <Typography variant="subtitle1">Amount</Typography>
+                      </TableCell>
+                    </TableRow>
+
+                    <TableBody>
+                      <TableRow
+                        sx={{
+                          borderBottom: (theme) =>
+                            `solid 1.5px ${theme.palette.divider}`,
+                        }}
+                      >
+                        <TableCell align="left">
+                          <Typography variant="body2" noWrap>
+                            {newRow?.clientRefId}
+                          </Typography>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography variant="body2" noWrap>
+                            {newRow?.productName}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell align="center">
+                          <Typography variant="body2" noWrap>
+                            {newRow?.vendorUtrNumber || "-"}
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell align="center">
+                          <Label
+                            variant="soft"
+                            color={
+                              (newRow.status === "failed" && "error") ||
+                              ((newRow.status === "pending" ||
+                                newRow.status === "in_process") &&
+                                "warning") ||
+                              "success"
+                            }
+                            sx={{ textTransform: "capitalize" }}
+                          >
+                            {newRow.status ? sentenceCase(newRow.status) : ""}
+                          </Label>
+                        </TableCell>
+                        <TableCell align="center">
+                          <Typography variant="body2" noWrap>
+                            Rs.{fCurrency(newRow?.amount)}
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <Stack my={2}>
+                  <Typography align="right" variant="h6" whiteSpace={"nowrap"}>
+                    Total Amount : {" " + fCurrency(newRow.amount)}
+                  </Typography>
+                </Stack>
+
+                <Divider sx={{ mt: 5 }} />
+
+                <Grid container>
+                  <Grid item xs={12} md={9} sx={{ py: 3 }}>
+                    <Typography variant="subtitle2">NOTES</Typography>
+
+                    <Typography variant="body2">
+                      This transaction receipt is generated automatically and
+                      dose not require a physical signature. It is not a tax
+                      invoice but serves as a record of your transaction with
+                      Tramo. Please retain it for your refrence, and if you have
+                      any queries, fell free to contact our Customer Support
+                      team.
+                    </Typography>
+                  </Grid>
+
+                  <Grid item xs={12} md={3} sx={{ py: 3, textAlign: "right" }}>
+                    <Typography variant="subtitle2">
+                      Have a Question?
+                    </Typography>
+
+                    <Typography variant="body2">
+                      {process.env.REACT_APP_COMPANY_EMAIL}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Stack>
+            </Scrollbar>
+          </Card>
         </Grid>
       </Modal>
     </>

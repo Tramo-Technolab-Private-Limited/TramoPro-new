@@ -119,7 +119,7 @@ export default function (props: any) {
       </Helmet>
 
       <Stack flexDirection={"row"} justifyContent={"end"}>
-        <Stack
+        {/* <Stack
           direction={{ xs: "column", sm: "row" }}
           spacing={2}
           style={{ padding: "0 25px", marginBottom: "10px" }}
@@ -134,7 +134,7 @@ export default function (props: any) {
           <Button variant="contained" onClick={() => filterRequest(refId)}>
             Search
           </Button>
-        </Stack>
+        </Stack> */}
       </Stack>
       {isLoading ? (
         <ApiDataLoading />

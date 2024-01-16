@@ -2,9 +2,6 @@
 import { Typography, Stack, Box, Container, useTheme } from "@mui/material";
 // components
 import Logo from "../../components/logo";
-import Image from "../../components/image";
-import neoDashBoardImage from "../../assets/images/neodashboard.svg";
-import tramoDashBoardImage from "../../assets/images/tramodashboard.svg";
 //
 import {
   StyledRoot,
@@ -14,6 +11,7 @@ import {
 } from "./styles";
 import Marquee from "react-fast-marquee";
 import SvgColor from "src/components/svg-color";
+import DashboardIcon from "src/assets/icons/DashboardIcon";
 
 // ----------------------------------------------------------------------
 
@@ -44,17 +42,7 @@ export default function LoginLayout({ children, illustration, title }: Props) {
           Join Tramo to drive the Financial Inclusion in the country!
         </Typography>
 
-        <Image
-          disabledEffect
-          visibleByDefault
-          alt="auth"
-          src={
-            process.env.REACT_APP_LOGO == "Tramo"
-              ? tramoDashBoardImage
-              : neoDashBoardImage
-          }
-          sx={{ maxWidth: 720 }}
-        />
+        <DashboardIcon />
         <Typography
           variant="subtitle1"
           sx={{ mt: 5, mb: 10, maxWidth: 580, textAlign: "center" }}

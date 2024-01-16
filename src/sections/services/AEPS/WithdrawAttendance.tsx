@@ -25,6 +25,7 @@ import { useSnackbar } from "notistack";
 import Lottie from "lottie-react";
 import fingerScan from "../../../components/JsonAnimations/fingerprint-scan.json";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { fDateTime } from "src/utils/formatTime";
 
 // ----------------------------------------------------------------------
 
@@ -35,7 +36,7 @@ type FormValuesProps = {
   AP: string;
 };
 
-export default function AttendenceAeps(props: any) {
+export default function WithdrawAttendance(props: any) {
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail, initialize } = useAuthContext();
   const theme = useTheme();
@@ -62,8 +63,8 @@ export default function AttendenceAeps(props: any) {
   });
 
   const defaultValues = {
-    adhaar: "",
-    remark: "",
+    deviceName: "",
+    remark: `Attendance, ${fDateTime(new Date())}`,
   };
 
   const methods = useForm<FormValuesProps>({
@@ -135,13 +136,13 @@ export default function AttendenceAeps(props: any) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.data.message);
+          props.handleCloseAttendance();
           // props.attendance == "AP"
           //   ? UpdateUserDetail({ attendanceAP: true })
           //   : UpdateUserDetail({
-          //       attendanceAEPS: true,
+          //       presenceAt: Date.now(),
           //     });
           initialize();
-
           setMessage(Response.data.message);
         } else if (Response.data.responseCode == 410) {
           enqueueSnackbar(Response.data.err.message);
@@ -341,15 +342,23 @@ export default function AttendenceAeps(props: any) {
             name="remark"
             label="Remark"
             placeholder="Remark"
+            disabled
+            variant="filled"
             sx={{ width: "90%", margin: "auto" }}
           />
-          <Stack>
+          <Stack
+            flexDirection={"row"}
+            gap={1}
+            sx={{ width: "90%", margin: "auto" }}
+          >
+            <Button variant="contained" type="submit">
+              Scan fingure to continue
+            </Button>
             <Button
               variant="contained"
-              type="submit"
-              sx={{ width: "fit-content", margin: "auto" }}
+              onClick={() => props.handleCloseAttendance()}
             >
-              Scan fingure to continue
+              Cancel
             </Button>
           </Stack>
         </Stack>

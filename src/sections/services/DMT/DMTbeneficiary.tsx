@@ -507,6 +507,7 @@ export default function DMTbeneficiary() {
                   <MenuItem value="Aunt/Uncle">Aunt/Uncle</MenuItem>
                   <MenuItem value="Niece/Nephew">Niece/Nephew</MenuItem>
                   <MenuItem value="Friends">Friends</MenuItem>
+                  <MenuItem value="Self">Self</MenuItem>
                   <MenuItem value="Other">other</MenuItem>
                 </RHFSelect>
                 <Divider />

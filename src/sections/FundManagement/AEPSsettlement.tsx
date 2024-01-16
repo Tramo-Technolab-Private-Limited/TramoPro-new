@@ -137,11 +137,13 @@ const SettlementToBank = ({ userBankList }: childProps) => {
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(FilterSchema),
     defaultValues,
+    mode: "onChange",
   });
   const {
     reset,
     setError,
     setValue,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = methods;
@@ -183,6 +185,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
               AEPS_wallet_amount:
                 user?.AEPS_wallet_amount - Number(data.amount),
             });
+            reset(defaultValues);
             enqueueSnackbar(Response.data.message);
           } else {
             enqueueSnackbar(Response.data.message);
@@ -256,7 +259,6 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                   name="amount"
                   label="Amount"
                   placeholder="Amount"
-                  // onChange={(e: any) => convertNumberToWords(Number(e.target.value))}
                 />
               </Stack>
               <Stack alignSelf={"center"}>
@@ -338,6 +340,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
   const {
     reset,
     setError,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = methods;
@@ -407,15 +410,17 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
               // sm: 'repeat(2, 1fr)'
             }}
           >
-            <Typography variant="subtitle1" textAlign={"center"}>
+            <Typography variant="subtitle1" textAlign="center">
               Maximum Eligible Settlement Amount for Bank account is{" "}
               {Number(eligibleSettlementAmount)}
             </Typography>
+
             {Number(eligibleSettlementAmount) < 500 && (
-              <Typography variant="caption" textAlign={"center"} color={"red"}>
+              <Typography variant="caption" textAlign="center" color="red">
                 Minimum amount for AEPS settlement is 500
               </Typography>
             )}
+
             {resetNpin ? (
               <NPinReset />
             ) : (
@@ -427,24 +432,22 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
                     placeholder="Amount"
                   />
                 </Stack>
-                <Stack alignSelf={"center"}>
-                  <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                    <Typography variant="h5" textAlign={"center"}>
+
+                <Stack alignSelf="center">
+                  <Stack flexDirection="row" justifyContent="space-between">
+                    <Typography variant="h5" textAlign="center">
                       NPIN
                     </Typography>
-                    {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
+                    {/* Add your reset NPIN button here if needed */}
                   </Stack>
+
                   <RHFCodes
                     keyName="otp"
                     inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
                     type="password"
                   />
-                  {(!!errors.otp1 ||
-                    !!errors.otp2 ||
-                    !!errors.otp3 ||
-                    !!errors.otp4 ||
-                    !!errors.otp5 ||
-                    !!errors.otp6) && (
+
+                  {Object.values(errors).some((error) => !!error) && (
                     <FormHelperText error sx={{ px: 2 }}>
                       Code is required
                     </FormHelperText>
@@ -454,7 +457,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
                 <LoadingButton
                   variant="contained"
                   type="submit"
-                  disabled={!isValid}
+                  disabled={+watch("amount") > 500 ? false : true}
                   loading={isSubmitting}
                   sx={{ width: "fit-content", alignSelf: "center" }}
                 >
