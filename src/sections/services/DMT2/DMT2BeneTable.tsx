@@ -39,6 +39,7 @@ import { RemitterContext } from "./DMT2";
 import DMT2pay from "./DMT2pay";
 import ApiDataLoading from "../../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
+import Scrollbar from "src/components/scrollbar/Scrollbar";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -334,7 +335,7 @@ export default function DMT2BeneTable() {
   }
   return (
     <>
-      <Grid>
+      <Grid sx={{ maxHeight: window.innerHeight - 250 }}>
         {getBene.isLoading ? (
           <ApiDataLoading />
         ) : (
@@ -354,40 +355,44 @@ export default function DMT2BeneTable() {
               </LoadingButton>
             </Stack>
             <TableContainer component={Paper}>
-              <Table
-                stickyHeader
-                size="small"
-                aria-label="sticky table"
-                style={{ borderBottom: "1px solid #dadada" }}
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 800 }}>
-                      Beneficiary Name
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>A/c No.</TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>
-                      Mobile Number
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>Verification</TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Action
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {getBene.data.map((row: any) => (
-                    <BeneList
-                      key={row._id}
-                      row={row}
-                      callback={setPayoutData}
-                      remitterNumber={remitterContext.remitterMobile}
-                      deleteBene={deleteBene}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
+              <Scrollbar sx={{ maxHeight: window.innerHeight - 250 }}>
+                <Table
+                  stickyHeader
+                  size="small"
+                  aria-label="sticky table"
+                  style={{ borderBottom: "1px solid #dadada" }}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        Beneficiary Name
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>A/c No.</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        Mobile Number
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        Verification
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
+                        Action
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {getBene.data.map((row: any) => (
+                      <BeneList
+                        key={row._id}
+                        row={row}
+                        callback={setPayoutData}
+                        remitterNumber={remitterContext.remitterMobile}
+                        deleteBene={deleteBene}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </Scrollbar>
             </TableContainer>
           </Paper>
         )}

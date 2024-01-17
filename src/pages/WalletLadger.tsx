@@ -1,5 +1,14 @@
 import { useEffect, useState } from "react";
-import { Card, Stack, Grid, TableHead, Modal, Button } from "@mui/material";
+import {
+  Card,
+  Stack,
+  Grid,
+  TableHead,
+  Modal,
+  Button,
+  tableCellClasses,
+  styled,
+} from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
 import DateRangePicker, {
@@ -365,27 +374,35 @@ const LadgerRow = ({ row }: any) => {
     );
   };
 
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "90%",
-    bgcolor: "#ffffff",
-    boxShadow: 24,
-    p: 4,
-  };
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 12,
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.grey[300],
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
 
   return (
     <>
-      <TableRow
+      <StyledTableRow
         key={row._id}
-        hover
         role="checkbox"
         tabIndex={-1}
         sx={{ borderBottom: "1px solid #dadada" }}
       >
-        <TableCell>
+        <StyledTableCell>
           <Typography
             variant="body2"
             sx={{ color: "text.secondary", cursor: "pointer" }}
@@ -395,8 +412,8 @@ const LadgerRow = ({ row }: any) => {
               : fDateTime(row?.transaction?.createdAt)}
           </Typography>
           <Typography variant="body2">{row?.walletId}</Typography>
-        </TableCell>
-        <TableCell>
+        </StyledTableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -426,8 +443,8 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
-        <TableCell>
+        </StyledTableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -443,8 +460,8 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
-        <TableCell>
+        </StyledTableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -480,9 +497,9 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell>
+        <StyledTableCell>
           {row?.transaction?.productName && (
             <Stack direction="row" gap={0.5}>
               <Typography variant="subtitle2">Product :</Typography>
@@ -498,9 +515,9 @@ const LadgerRow = ({ row }: any) => {
               {row?.transaction?.transactionType}
             </Typography>
           </Stack>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -534,27 +551,27 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {parseFloat(row?.reason) || "-"}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
         {row?.transaction?.clientRefId ? (
-          <TableCell onClick={() => openEditModal(row)}>
+          <StyledTableCell onClick={() => openEditModal(row)}>
             <Typography
               variant="body1"
               sx={{ color: "blue", textDecoration: "underline" }}
             >
               {row?.transaction?.clientRefId || "-"}
             </Typography>
-          </TableCell>
+          </StyledTableCell>
         ) : (
           "No Trasaction"
         )}
-      </TableRow>
+      </StyledTableRow>
 
       <Modal
         open={open}
