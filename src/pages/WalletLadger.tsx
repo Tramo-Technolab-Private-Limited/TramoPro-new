@@ -266,44 +266,41 @@ export default function WalletLadger() {
           <ApiDataLoading />
         ) : (
           <Grid item xs={12} md={6} lg={8}>
-            <Scrollbar>
-              <TableContainer>
-                <Table
-                  sx={{ minWidth: 720 }}
-                  stickyHeader
-                  aria-label="sticky table"
-                >
-                  <TableHeadCustom
-                    headLabel={
-                      user?.role == "m_distributor"
-                        ? MDtableLabels
-                        : user?.role == "distributor"
-                        ? distributortableLabels
-                        : agenttableLabels
-                    }
-                  />
+            <TableContainer sx={{ maxHeight: 580, minHeight: 550 }}>
+              <Table
+                sx={{ minWidth: 720 }}
+                stickyHeader
+                aria-label="sticky table"
+              >
+                <TableHeadCustom
+                  headLabel={
+                    user?.role == "m_distributor"
+                      ? MDtableLabels
+                      : user?.role == "distributor"
+                      ? distributortableLabels
+                      : agenttableLabels
+                  }
+                />
 
-                  <TableBody>
-                    {Array.isArray(ladgerData) &&
-                      ladgerData.map((row: any) => (
-                        <LadgerRow key={row._id} row={row} />
-                      ))}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-            </Scrollbar>
+                <TableBody>
+                  {Array.isArray(ladgerData) &&
+                    ladgerData.map((row: any) => (
+                      <LadgerRow key={row._id} row={row} />
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <CustomPagination
+              pageSize={pageSize}
+              onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+                setCurrentPage(value);
+              }}
+              page={currentPage}
+              Count={WalletCount}
+            />
           </Grid>
         )}
       </>
-
-      <CustomPagination
-        pageSize={pageSize}
-        onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-          setCurrentPage(value);
-        }}
-        page={currentPage}
-        Count={WalletCount}
-      />
     </>
   );
 }
