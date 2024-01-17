@@ -229,7 +229,7 @@ export default function WalletLadger() {
         <title>Wallet Ladger | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
 
-      <>
+      <Stack sx={{ maxHeight: window.innerHeight - 220 }}>
         <Stack flexDirection={"row"} justifyContent={"end"}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -266,41 +266,44 @@ export default function WalletLadger() {
           <ApiDataLoading />
         ) : (
           <Grid item xs={12} md={6} lg={8}>
-            <TableContainer sx={{ maxHeight: 580, minHeight: 550 }}>
-              <Table
-                sx={{ minWidth: 720 }}
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHeadCustom
-                  headLabel={
-                    user?.role == "m_distributor"
-                      ? MDtableLabels
-                      : user?.role == "distributor"
-                      ? distributortableLabels
-                      : agenttableLabels
-                  }
-                />
+            <TableContainer>
+              <Scrollbar sx={{ maxHeight: window.innerHeight - 200 }}>
+                <Table
+                  sx={{ minWidth: 720 }}
+                  aria-label="customized table"
+                  stickyHeader
+                >
+                  <TableHeadCustom
+                    headLabel={
+                      user?.role == "m_distributor"
+                        ? MDtableLabels
+                        : user?.role == "distributor"
+                        ? distributortableLabels
+                        : agenttableLabels
+                    }
+                  />
 
-                <TableBody>
-                  {Array.isArray(ladgerData) &&
-                    ladgerData.map((row: any) => (
-                      <LadgerRow key={row._id} row={row} />
-                    ))}
-                </TableBody>
-              </Table>
+                  <TableBody>
+                    {Array.isArray(ladgerData) &&
+                      ladgerData.map((row: any) => (
+                        <LadgerRow key={row._id} row={row} />
+                      ))}
+                  </TableBody>
+                </Table>
+              </Scrollbar>
             </TableContainer>
-            <CustomPagination
-              pageSize={pageSize}
-              onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-                setCurrentPage(value);
-              }}
-              page={currentPage}
-              Count={WalletCount}
-            />
           </Grid>
         )}
-      </>
+      </Stack>
+
+      <CustomPagination
+        pageSize={pageSize}
+        onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+          setCurrentPage(value);
+        }}
+        page={currentPage}
+        Count={WalletCount}
+      />
     </>
   );
 }
