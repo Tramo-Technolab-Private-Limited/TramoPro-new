@@ -398,7 +398,11 @@ export default function DMT2BeneTable() {
         )}
       </Grid>
       {payoutData._id && (
-        <DMT2pay remitter={remitterContext} beneficiary={payoutData} />
+        <DMT2pay
+          clearPayout={() => setPayoutData({ ...payoutData, _id: "" })}
+          remitter={remitterContext}
+          beneficiary={payoutData}
+        />
       )}
 
       {/* modal for add beneficiary */}
