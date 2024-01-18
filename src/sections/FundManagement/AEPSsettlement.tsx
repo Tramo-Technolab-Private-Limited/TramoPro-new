@@ -3,6 +3,7 @@ import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
 import {
   Box,
+  Button,
   FormHelperText,
   Grid,
   MenuItem,
@@ -24,6 +25,8 @@ import { Api } from "src/webservices";
 import NPinReset from "../Settings/NPinReset";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { useNavigate } from "react-router-dom"
+import { PATH_DASHBOARD } from "src/routes/paths";
 
 type FormValuesProps = {
   amount: string;
@@ -99,6 +102,7 @@ type childProps = {
 };
 
 const SettlementToBank = ({ userBankList }: childProps) => {
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail } = useAuthContext();
   const [eligibleSettlementAmount, setEligibleSettlementAmount] = useState("");
@@ -143,8 +147,13 @@ const SettlementToBank = ({ userBankList }: childProps) => {
     setValue,
     watch,
     handleSubmit,
-    formState: { errors, isSubmitting, isValid},
+    formState: { errors, isSubmitting, isValid },
   } = methods;
+
+  function goTomybankaccount() {
+    navigate(PATH_DASHBOARD.fundmanagement.mybankaccount);
+  }
+
 
   useEffect(() => {
     getEligibleSettlementAmount();
@@ -152,8 +161,8 @@ const SettlementToBank = ({ userBankList }: childProps) => {
       if (item.isDefaultBank === true) {
         setValue('accountNumber', item.accountNumber);
       }
-    }); 
-    }, [userBankList]);
+    });
+  }, [userBankList]);
 
   const getEligibleSettlementAmount = () => {
     let token = localStorage.getItem("token");
@@ -201,107 +210,113 @@ const SettlementToBank = ({ userBankList }: childProps) => {
   return (
     <Box style={{ borderRadius: "20px" }}>
       <FormProvider methods={methods} onSubmit={handleSubmit(settleToBank)}>
-        <Scrollbar sx={{ maxHeight: 600, pr: 1 }}>
-          <Grid
-            rowGap={3}
-            columnGap={2}
-            display="grid"
-            pt={1}
-            gridTemplateColumns={{
-              xs: "repeat(1, 1fr)",
-              // sm: 'repeat(2, 1fr)'
-            }}
-          >
-            <Typography variant="subtitle1" textAlign={"center"}>
-              Maximum Eligible Settlement Amount for Bank account is{" "}
-              {Number(eligibleSettlementAmount)}
-            </Typography>
-            {Number(eligibleSettlementAmount) < 1000 && (
-              <Typography variant="caption" textAlign={"center"} color={"red"}>
-                Minimum amount for AEPS settlement is 1000
+        {userBankList.length ? (
+          <Scrollbar sx={{ maxHeight: 600, pr: 1 }}>
+            <Grid
+              rowGap={3}
+              columnGap={2}
+              display="grid"
+              pt={1}
+              gridTemplateColumns={{
+                xs: "repeat(1, 1fr)",
+                // sm: 'repeat(2, 1fr)'
+              }}
+            >
+              <Typography variant="subtitle1" textAlign={"center"}>
+                Maximum Eligible Settlement Amount for Bank account is{" "}
+                {Number(eligibleSettlementAmount)}
               </Typography>
-            )}
+              {Number(eligibleSettlementAmount) < 1000 && (
+                <Typography variant="caption" textAlign={"center"} color={"red"}>
+                  Minimum amount for AEPS settlement is 1000
+                </Typography>
+              )}
 
-            <Stack gap={2}>
-              <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
-                {!transferTo && (
-                  <RHFSelect
-                    name="accountNumber"
-                    label="Bank account"
-                    placeholder="Bank account"
-                    // defaultValue={}
-                    disabled
-                    variant="filled"
-                    SelectProps={{
-                      native: false,
-                      sx: { textTransform: "capitalize" },
-                    }}
-                  >
-                    {userBankList.length &&
-                      userBankList.map((item: any) => {
-                        const lastFourDigits = item.accountNumber.slice(
-                          item.accountNumber.length - 4
-                        );
-                        const maskedDigits = "*".repeat(
-                          item.accountNumber.length - 4
-                        );
-                        const maskedNumber = maskedDigits + lastFourDigits;
-                        return (
-                          <MenuItem
-                            key={item._id}
-                            value={item.accountNumber}
-                            onClick={() => setValue("ifsc", item.ifsc)}
-                          >
-                            <Stack>
-                              <span>{item.bankName}</span>
-                              <span>{maskedNumber}</span>
-                            </Stack>
-                          </MenuItem>
-                        );
-                      })}
-                  </RHFSelect>
-                )}
-                <RHFTextField
-                  name="amount"
-                  label="Amount"
-                  placeholder="Amount"
-                />
-              </Stack>
-              <Stack alignSelf={"center"}>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="h5" textAlign={"center"}>
-                    NPIN
-                  </Typography>
-                  {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
-                </Stack>
-                <RHFCodes
-                  keyName="otp"
-                  inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                  type="password"
-                />
-                {(!!errors.otp1 ||
-                  !!errors.otp2 ||
-                  !!errors.otp3 ||
-                  !!errors.otp4 ||
-                  !!errors.otp5 ||
-                  !!errors.otp6) && (
-                    <FormHelperText error sx={{ px: 2 }}>
-                      Code is required
-                    </FormHelperText>
+              <Stack gap={2}>
+                <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
+                  {!transferTo && (
+                    <>
+                      <RHFSelect
+                        name="accountNumber"
+                        label="Bank account"
+                        placeholder="Bank account"
+                        // defaultValue={}
+                        disabled
+                        variant="filled"
+                        SelectProps={{
+                          native: false,
+                          sx: { textTransform: "capitalize" },
+                        }}
+                      >
+                        {userBankList.map((item: any) => {
+                          const lastFourDigits = item.accountNumber.slice(
+                            item.accountNumber.length - 4
+                          );
+                          const maskedDigits = "*".repeat(item.accountNumber.length - 4);
+                          const maskedNumber = maskedDigits + lastFourDigits;
+                          return (
+                            <MenuItem
+                              key={item._id}
+                              value={item.accountNumber}
+                              onClick={() => setValue("ifsc", item.ifsc)}
+                            >
+                              <Stack>
+                                <span>{item.bankName}</span>
+                                <span>{maskedNumber}</span>
+                              </Stack>
+                            </MenuItem>
+                          );
+                        })}
+                      </RHFSelect>
+                    </>
                   )}
+
+                  <RHFTextField
+                    name="amount"
+                    label="Amount"
+                    placeholder="Amount"
+                  />
+                </Stack>
+                <Stack alignSelf={"center"}>
+                  <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                    <Typography variant="h5" textAlign={"center"}>
+                      NPIN
+                    </Typography>
+                    {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
+                  </Stack>
+                  <RHFCodes
+                    keyName="otp"
+                    inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+                    type="password"
+                  />
+                  {(!!errors.otp1 ||
+                    !!errors.otp2 ||
+                    !!errors.otp3 ||
+                    !!errors.otp4 ||
+                    !!errors.otp5 ||
+                    !!errors.otp6) && (
+                      <FormHelperText error sx={{ px: 2 }}>
+                        Code is required
+                      </FormHelperText>
+                    )}
+                </Stack>
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  disabled={!isValid}
+                  loading={isSubmitting}
+                  sx={{ width: "fit-content", alignSelf: "center" }}
+                >
+                  Settle amount to Bank account
+                </LoadingButton>
               </Stack>
-              <LoadingButton
-                variant="contained"
-                type="submit"
-                disabled={!isValid}
-                loading={isSubmitting}
-                sx={{ width: "fit-content", alignSelf: "center" }}
-              >
-                Settle amount to Bank account
-              </LoadingButton>
-            </Stack>
-          </Grid>
-        </Scrollbar>
+            </Grid>
+          </Scrollbar>
+        ) : (
+          <Stack sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 20 }}>
+            <LoadingButton variant="contained" onClick={goTomybankaccount}>Add New Bank Account</LoadingButton>
+          </Stack>
+        )}
       </FormProvider>
     </Box>
   );
