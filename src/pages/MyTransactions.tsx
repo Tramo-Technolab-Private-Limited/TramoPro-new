@@ -209,6 +209,7 @@ export default function MyTransactions() {
     { id: "Date&Time", label: "Txn Details" },
     { id: "agent", label: "Agent" },
     { id: "dist", label: "Distributor" },
+    { id: "mode", label: "Mode" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator/ Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -225,6 +226,7 @@ export default function MyTransactions() {
     { id: "Date&Time", label: "Txn Details" },
 
     { id: "agent", label: "Agent" },
+    { id: "mode", label: "Mode" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator/ Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -239,7 +241,7 @@ export default function MyTransactions() {
   ];
   const tableLabels2 = [
     { id: "Date&Time", label: "Txn Details" },
-
+    { id: "mode", label: "Mode" },
     { id: "Product", label: "Product" },
     { id: "Operator", label: "Operator/ Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
@@ -668,6 +670,12 @@ function TransactionRow({ row }: childProps) {
             </StyledTableCell>
           </>
         )}
+        {/* mode of payment */}
+        <StyledTableCell>
+          <Typography variant="body2">
+            {newRow?.modeOfPayment || "-"}
+          </Typography>
+        </StyledTableCell>
 
         {/* Product  */}
         <StyledTableCell>
