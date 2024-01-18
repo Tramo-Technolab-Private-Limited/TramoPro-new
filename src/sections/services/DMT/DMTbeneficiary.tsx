@@ -193,7 +193,6 @@ export default function DMTbeneficiary() {
     getbeneDispatch({ type: "GET_BENE_REQUEST" });
     Api("moneyTransfer/beneficiary/" + val, "GET", "", token).then(
       (Response: any) => {
-        console.log("==============>>>fatch beneficiary Response", Response);
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             enqueueSnackbar(Response.data.message);
@@ -214,7 +213,6 @@ export default function DMTbeneficiary() {
     getBankDispatch({ type: "ADD_BANK_REQUEST" });
     let token = localStorage.getItem("token");
     Api("bankManagement/get_bank", "GET", "", token).then((Response: any) => {
-      console.log("==============>>>fatch beneficiary Response", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           getBankDispatch({
@@ -227,16 +225,8 @@ export default function DMTbeneficiary() {
           });
           openEditModal();
           enqueueSnackbar(Response.data.message);
-          console.log(
-            "==============>>> banklist data 200",
-            Response.data.data.data
-          );
         } else {
           getbeneDispatch({ type: "GET_BANK_FAILURE" });
-          console.log(
-            "==============>>> fatch beneficiary message",
-            Response.data.message
-          );
         }
       }
     });
@@ -253,10 +243,6 @@ export default function DMTbeneficiary() {
     (await trigger(["ifsc", "accountNumber", "bankName"])) &&
       Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
         (Response: any) => {
-          console.log(
-            "==============>>> verify beneficiary Response",
-            Response
-          );
           if (Response.status == 200) {
             if (Response.data.code == 200) {
               remitterVerifyDispatch({
@@ -272,10 +258,6 @@ export default function DMTbeneficiary() {
             } else {
               remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
               enqueueSnackbar(Response.data.message);
-              console.log(
-                "==============>>> verify beneficiary msg",
-                Response.data.message
-              );
             }
           }
         }
@@ -299,7 +281,6 @@ export default function DMTbeneficiary() {
     };
     Api("moneyTransfer/beneficiary", "POST", body, token).then(
       (Response: any) => {
-        console.log("==============>>> verify beneficiary Response", Response);
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             getbeneDispatch({
@@ -398,7 +379,11 @@ export default function DMTbeneficiary() {
         )}
       </Grid>
       {payoutData._id && (
-        <DMTpay remitter={remitterContext} beneficiary={payoutData} />
+        <DMTpay
+          clearPayout={() => setPayoutData({ ...payoutData, _id: "" })}
+          remitter={remitterContext}
+          beneficiary={payoutData}
+        />
       )}
 
       {/* modal for add beneficiary */}
@@ -591,7 +576,6 @@ function BeneList({
     };
     Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
       (Response: any) => {
-        console.log("==============>>> verify beneficiary Response", Response);
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             enqueueSnackbar(Response.data.message);
@@ -623,7 +607,6 @@ function BeneList({
       "",
       token
     ).then((Response: any) => {
-      console.log("=====>>> del beneficiary Response", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
@@ -643,7 +626,6 @@ function BeneList({
     };
     Api("moneyTransfer/beneficiary/delete", "POST", body, token).then(
       (Response: any) => {
-        console.log("========>>> verify beneficiary Response", Response);
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             enqueueSnackbar(Response.data.message);
@@ -674,8 +656,6 @@ function BeneList({
     deleteBeneficiary(remitterNumber);
     setCount(30);
   }
-
-  console.log(theme.palette.primary.main);
 
   return (
     <>

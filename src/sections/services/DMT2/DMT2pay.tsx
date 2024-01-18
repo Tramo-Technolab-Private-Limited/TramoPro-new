@@ -49,7 +49,9 @@ type FormValuesProps = {
 
 //--------------------------------------------------------------------
 
-export default function DMT2pay(props: any) {
+export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
+  const { dmt2RemitterAvailableLimit } = remitter;
+  const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
   const { UpdateUserDetail } = useAuthContext();
   const [txn, setTxn] = useState(true);
@@ -77,11 +79,10 @@ export default function DMT2pay(props: any) {
   const handleOpen2 = () => setOpen2(true);
   const handleClose2 = () => {
     setOpen2(false);
-    reset(defaultValues);
   };
   useEffect(() => {
-    handleOpen2();
-  }, [props.beneficiary]);
+    beneficiary._id && handleOpen2();
+  }, [beneficiary._id]);
 
   const style = {
     position: "absolute" as "absolute",
@@ -114,10 +115,8 @@ export default function DMT2pay(props: any) {
       )
       .test(
         "is-less-than-max",
-        "Limit Exceed ! available limit is " +
-          props.remitter.dmt2RemitterAvailableLimit,
-        (value: any) =>
-          +value > props.remitter.dmt2RemitterAvailableLimit ? false : true
+        "Limit Exceed ! available limit is " + dmt2RemitterAvailableLimit,
+        (value: any) => (+value > dmt2RemitterAvailableLimit ? false : true)
       ),
   });
   const defaultValues = {
@@ -159,9 +158,9 @@ export default function DMT2pay(props: any) {
   const transaction = (data: FormValuesProps) => {
     let token = localStorage.getItem("token");
     let body = {
-      beneficiaryId: props.beneficiary._id,
+      beneficiaryId: beneficiary._id,
       amount: data.payAmount,
-      remitterId: props.remitter._id,
+      remitterId: remitter._id,
       mode: +mode,
       note1: "",
       note2: "",
@@ -198,12 +197,12 @@ export default function DMT2pay(props: any) {
               enqueueSnackbar(Response.data.message, { variant: "error" });
               setErrorMsg(Response.data.message);
             }
+            clearPayout();
           } else {
             setCheckNPIN(false);
             enqueueSnackbar(Response, { variant: "error" });
+            clearPayout();
           }
-          setTxn(false);
-          reset(defaultValues);
         });
     }
   };
@@ -225,27 +224,19 @@ export default function DMT2pay(props: any) {
               <Stack gap={1}>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2">Beneficiary Name</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.beneName}
-                  </Typography>
+                  <Typography variant="subtitle2">{beneName}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2"> Bank Name</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.bankName}
-                  </Typography>
+                  <Typography variant="subtitle2">{bankName}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2"> Account Number</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.accountNumber}
-                  </Typography>
+                  <Typography variant="subtitle2">{accountNumber}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2">IFSC</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.ifsc}
-                  </Typography>
+                  <Typography variant="subtitle2">{ifsc}</Typography>
                 </Stack>
               </Stack>
 
@@ -290,7 +281,7 @@ export default function DMT2pay(props: any) {
               <Stack flexDirection={"row"} gap={1}>
                 <Button
                   onClick={() => {
-                    handleClose1();
+                    handleClose2();
                     handleOpen();
                   }}
                   variant="contained"
@@ -304,8 +295,7 @@ export default function DMT2pay(props: any) {
                       : +watch("payAmount") < 100
                       ? false
                       : true) ||
-                    !(+watch("payAmount") >
-                    props.remitter.dmt2RemitterAvailableLimit
+                    !(+watch("payAmount") > dmt2RemitterAvailableLimit
                       ? false
                       : true)
                   }
@@ -313,7 +303,10 @@ export default function DMT2pay(props: any) {
                   Pay Now
                 </Button>
                 <Button
-                  onClick={handleClose2}
+                  onClick={() => {
+                    handleClose2();
+                    clearPayout();
+                  }}
                   variant="contained"
                   sx={{ mt: 1 }}
                 >
@@ -376,7 +369,11 @@ export default function DMT2pay(props: any) {
               <Stack flexDirection={"row"} justifyContent={"center"}>
                 <Button
                   variant="contained"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    clearPayout();
+                    reset(defaultValues);
+                  }}
                   sx={{ mt: 2 }}
                 >
                   Close
@@ -406,9 +403,7 @@ export default function DMT2pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Beneficiary Name</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.beneName}
-              </Typography>
+              <Typography variant="body1">{beneName}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -416,9 +411,7 @@ export default function DMT2pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Bank Name</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.bankName}
-              </Typography>
+              <Typography variant="body1">{bankName}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -426,9 +419,7 @@ export default function DMT2pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Account Number</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.accountNumber}
-              </Typography>
+              <Typography variant="body1">{accountNumber}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -436,7 +427,7 @@ export default function DMT2pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">IFSC code</Typography>
-              <Typography variant="body1">{props.beneficiary.ifsc}</Typography>
+              <Typography variant="body1">{ifsc}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -444,9 +435,7 @@ export default function DMT2pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Mobile Number</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.mobileNumber || "-"}
-              </Typography>
+              <Typography variant="body1">{mobileNumber || "-"}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -491,7 +480,11 @@ export default function DMT2pay(props: any) {
                     <Button
                       variant="contained"
                       color="warning"
-                      onClick={handleClose}
+                      onClick={() => {
+                        handleClose();
+                        clearPayout();
+                        reset(defaultValues);
+                      }}
                     >
                       Close{" "}
                     </Button>
@@ -507,7 +500,11 @@ export default function DMT2pay(props: any) {
                 <Button
                   variant="contained"
                   color="warning"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    clearPayout();
+                    reset(defaultValues);
+                  }}
                 >
                   Close
                 </Button>

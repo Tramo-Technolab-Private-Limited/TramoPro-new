@@ -44,7 +44,9 @@ type FormValuesProps = {
 
 //--------------------------------------------------------------------
 
-export default function DMTpay(props: any) {
+export default function DMTpay({ clearPayout, remitter, beneficiary }: any) {
+  const { availableLimitForMoneyTransfer } = remitter;
+  const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
   const { UpdateUserDetail } = useAuthContext();
   const [isLoading, setIsLoading] = useState(false);
@@ -74,8 +76,8 @@ export default function DMTpay(props: any) {
     setOpen1(false);
   };
   useEffect(() => {
-    handleOpen1();
-  }, [props.beneficiary]);
+    beneficiary._id && handleOpen1();
+  }, [beneficiary._id]);
 
   const style = {
     position: "absolute" as "absolute",
@@ -103,10 +105,8 @@ export default function DMTpay(props: any) {
       )
       .test(
         "is-less-than-max",
-        "Limit Exceed ! available limit is " +
-          props.remitter.availableLimitForMoneyTransfer,
-        (value: any) =>
-          +value > props.remitter.availableLimitForMoneyTransfer ? false : true
+        "Limit Exceed ! available limit is " + availableLimitForMoneyTransfer,
+        (value: any) => (+value > availableLimitForMoneyTransfer ? false : true)
       ),
   });
   const defaultValues = {
@@ -136,9 +136,9 @@ export default function DMTpay(props: any) {
     setIsLoading(true);
     let token = localStorage.getItem("token");
     let body = {
-      beneficiaryId: props.beneficiary._id,
+      beneficiaryId: beneficiary._id,
       amount: data.payAmount,
-      remitterId: props.remitter._id,
+      remitterId: remitter._id,
       mode: mode,
       note1: "",
       note2: "",
@@ -174,15 +174,14 @@ export default function DMTpay(props: any) {
                 enqueueSnackbar(Response.data.message, { variant: "error" });
                 setErrorMsg(Response.data.message);
               }
+              clearPayout();
               setIsLoading(false);
             } else {
               setIsLoading(false);
               setCheckNPIN(false);
+              clearPayout();
               enqueueSnackbar(Response, { variant: "error" });
             }
-            setIsLoading(false);
-            setTxn(false);
-            reset(defaultValues);
           }
         );
     }
@@ -207,27 +206,19 @@ export default function DMTpay(props: any) {
               <Stack gap={1}>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2">Beneficiary Name</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.beneName}
-                  </Typography>
+                  <Typography variant="subtitle2">{beneName}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2"> Bank Name</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.bankName}
-                  </Typography>
+                  <Typography variant="subtitle2">{bankName}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2"> Account Number</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.accountNumber}
-                  </Typography>
+                  <Typography variant="subtitle2">{accountNumber}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} justifyContent={"space-between"}>
                   <Typography variant="subtitle2">IFSC</Typography>
-                  <Typography variant="subtitle2">
-                    {props.beneficiary.ifsc}
-                  </Typography>
+                  <Typography variant="subtitle2">{ifsc}</Typography>
                 </Stack>
               </Stack>
 
@@ -283,8 +274,7 @@ export default function DMTpay(props: any) {
                   disabled={
                     !mode ||
                     !(+watch("payAmount") > 99 ? true : false) ||
-                    !(+watch("payAmount") >
-                    props.remitter.availableLimitForMoneyTransfer
+                    !(+watch("payAmount") > availableLimitForMoneyTransfer
                       ? false
                       : true)
                   }
@@ -292,7 +282,10 @@ export default function DMTpay(props: any) {
                   Pay Now
                 </Button>
                 <Button
-                  onClick={handleClose1}
+                  onClick={() => {
+                    handleClose1();
+                    clearPayout();
+                  }}
                   variant="contained"
                   sx={{ mt: 1 }}
                 >
@@ -352,7 +345,10 @@ export default function DMTpay(props: any) {
               <Stack flexDirection={"row"} justifyContent={"center"}>
                 <Button
                   variant="contained"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    clearPayout();
+                  }}
                   sx={{ mt: 2 }}
                 >
                   Close
@@ -431,7 +427,14 @@ export default function DMTpay(props: any) {
                 {/* <Button variant="contained" onClick={handleClose} size="small">
                   Download Receipt
                 </Button> */}
-                <Button variant="contained" onClick={handleClose} size="small">
+                <Button
+                  variant="contained"
+                  onClick={() => {
+                    handleClose();
+                    clearPayout();
+                  }}
+                  size="small"
+                >
                   Close
                 </Button>
               </Stack>
@@ -453,9 +456,7 @@ export default function DMTpay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Beneficiary Name</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.beneName}
-              </Typography>
+              <Typography variant="body1">{beneName}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -463,9 +464,7 @@ export default function DMTpay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Bank Name</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.bankName}
-              </Typography>
+              <Typography variant="body1">{bankName}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -473,9 +472,7 @@ export default function DMTpay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Account Number</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.accountNumber}
-              </Typography>
+              <Typography variant="body1">{accountNumber}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -483,7 +480,7 @@ export default function DMTpay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">IFSC code</Typography>
-              <Typography variant="body1">{props.beneficiary.ifsc}</Typography>
+              <Typography variant="body1">{ifsc}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -491,9 +488,7 @@ export default function DMTpay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Mobile Number</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.mobileNumber || "-"}
-              </Typography>
+              <Typography variant="body1">{mobileNumber || "-"}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -542,7 +537,10 @@ export default function DMTpay(props: any) {
                     <Button
                       variant="contained"
                       color="warning"
-                      onClick={handleClose}
+                      onClick={() => {
+                        handleClose();
+                        clearPayout();
+                      }}
                     >
                       Close
                     </Button>
@@ -558,7 +556,10 @@ export default function DMTpay(props: any) {
                 <Button
                   variant="contained"
                   color="warning"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    clearPayout();
+                  }}
                 >
                   Close
                 </Button>
