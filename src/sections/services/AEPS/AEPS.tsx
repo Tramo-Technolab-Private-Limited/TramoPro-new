@@ -151,7 +151,7 @@ export default function AEPS(props: any) {
             .test(
               "minimum_100",
               "Please enter minimum Rs. 100",
-              (value: any) => Number(value) > 100
+              (value: any) => Number(value) > 99
             )
         : Yup.string(),
   });
@@ -309,7 +309,7 @@ export default function AEPS(props: any) {
           setResAmount(Response.data.data.data.balanceAmount);
           handleOpenResponse();
         } else {
-          setFailedMessage(Response.data.data.message);
+          setFailedMessage(Response.data.message);
           handleOpenError();
         }
         handleCloseLoading();
@@ -378,7 +378,7 @@ export default function AEPS(props: any) {
                 Response?.data?.data?.agentDetails?.newMainWalletBalance,
             });
           } else {
-            setFailedMessage(Response.data.data.message);
+            setFailedMessage(Response.data.message);
             handleOpenError();
           }
           handleCloseLoading();
@@ -442,7 +442,7 @@ export default function AEPS(props: any) {
             setResAmount(Response.data.data.data.balanceAmount);
             enqueueSnackbar(Response.data.data.message);
           } else {
-            setFailedMessage(Response.data.data.message);
+            setFailedMessage(Response.data.message);
             handleOpenError();
           }
           handleCloseLoading();

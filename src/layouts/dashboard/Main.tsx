@@ -25,12 +25,16 @@ export default function Main({ children, sx, ...other }: BoxProps) {
       <Box
         component="main"
         sx={{
+          height: `${window.innerHeight - HEADER.H_MOBILE + SPACING}px`,
+          overflow: "hidden",
           pt: `${HEADER.H_MOBILE + SPACING}px`,
-          pb: `${HEADER.H_MOBILE + SPACING}px`,
+          // pb: `${HEADER.H_MOBILE + SPACING}px`,
           ...(isDesktop && {
-            px: 2,
-            pt: `${HEADER.H_DASHBOARD_DESKTOP + 40}px`,
-            pb: `${HEADER.H_DASHBOARD_DESKTOP + SPACING}px`,
+            height: `${window.innerHeight - HEADER.H_DASHBOARD_DESKTOP + 80}px`,
+            overflow: "hidden",
+            px: 1,
+            pt: `${HEADER.H_DASHBOARD_DESKTOP + 33}px`,
+            // pb: `${HEADER.H_DASHBOARD_DESKTOP + SPACING}px`,
           }),
         }}
       >
@@ -44,10 +48,16 @@ export default function Main({ children, sx, ...other }: BoxProps) {
       component="main"
       sx={{
         flexGrow: 1,
-        py: `${HEADER.H_MOBILE + SPACING}px`,
+        height: `${window.innerHeight - HEADER.H_MOBILE + SPACING}px`,
+        overflow: "hidden",
+        pt: `${HEADER.H_MOBILE + SPACING}px`,
         ...(isDesktop && {
-          px: 2,
-          py: `${HEADER.H_DASHBOARD_DESKTOP + SPACING}px`,
+          height: `${
+            window.innerHeight - HEADER.H_DASHBOARD_DESKTOP + SPACING
+          }px`,
+          overflow: "hidden",
+          px: 1,
+          pt: `${HEADER.H_DASHBOARD_DESKTOP + SPACING}px`,
           width: `calc(100% - ${NAV.W_DASHBOARD}px)`,
           ...(isNavMini && {
             width: `calc(100% - ${NAV.W_DASHBOARD_MINI}px)`,
