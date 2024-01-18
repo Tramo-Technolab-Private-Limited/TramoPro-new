@@ -98,12 +98,20 @@ function MyFundDeposits() {
   // ----------------------------------------------------------------------
 
   const RegisterSchema = Yup.object().shape({
+    amount: Yup.string().required("Amount is required"),
+    branch: Yup.string().required("Branch is required"),
+    trxID: Yup.string().required("TRXID is required"),
     mobile: Yup.string()
       .matches(/^\d{10}$/, "Mobile number must contain only 10 numbers")
       .min(10, "Mobile number must be at least 10 digits")
       .max(10, "Mobile number must not exceed 10 digits")
       .required("Mobile number is required"),
   });
+
+  const Handleslip = () => {
+    setUploadFile(null);
+    setDocUrl("");
+  };
 
   useEffect(() => {
     getBankDeatails();
@@ -213,45 +221,49 @@ function MyFundDeposits() {
   };
 
   const onSubmit = async (data: FormValuesProps) => {
-    setVerifyLoading(true);
-    let token = localStorage.getItem("token");
-    let body = {
-      bankId: selectedBankID,
-      modeId: selectedModeId,
+    if (docUrl !== "") {
+      setVerifyLoading(true);
+      let token = localStorage.getItem("token");
+      let body = {
+        bankId: selectedBankID,
+        modeId: selectedModeId,
 
-      amount: data.amount,
-      date_of_deposit: formattedDate,
-      transactional_details: {
-        branch: data.branch,
-        trxId: data.trxID,
-        mobile: data.mobile,
-      },
-      request_to: "ADMIN",
-      transactionSlip: docUrl,
-    };
+        amount: data.amount,
+        date_of_deposit: formattedDate,
+        transactional_details: {
+          branch: data.branch,
+          trxId: data.trxID,
+          mobile: data.mobile,
+        },
+        request_to: "ADMIN",
+        transactionSlip: docUrl,
+      };
 
-    Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            setRequestRaise(Response.data.Id);
+      Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              setRequestRaise(Response.data.Id);
 
-            setVerifyLoading(false);
-            reset(defaultValues);
-            setSelectedItem("");
-            setMaxAmount("");
-            setMinAmount("");
-            setSelectedModes([]);
-            setUploadFile("");
-
-            enqueueSnackbar(Response.data.message);
-          } else {
-            enqueueSnackbar(Response.data.message);
-            setVerifyLoading(false);
+              setVerifyLoading(false);
+              reset(defaultValues);
+              setSelectedItem("");
+              setMaxAmount("");
+              setMinAmount("");
+              setSelectedModes([]);
+              setUploadFile("");
+              setDocUrl("");
+              enqueueSnackbar(Response.data.message);
+            } else {
+              enqueueSnackbar(Response.data.message);
+              setVerifyLoading(false);
+            }
           }
         }
-      }
-    );
+      );
+    } else {
+      enqueueSnackbar("Please upload Trasaction slip");
+    }
   };
 
   return (
@@ -342,11 +354,14 @@ function MyFundDeposits() {
                   selectedModes?.transactionFeeValue?.for_Agent > 0 ? (
                     <>
                       <Stack direction="row" gap={6}>
-                        <Typography color={"red"}>
-                          Charge :{" "}
-                          {selectedModes?.transactionFeeValue?.for_Agent}{" "}
-                        </Typography>{" "}
-                        <Typography textAlign="end">
+                        <Stack direction="row" gap={1}>
+                          <Typography variant="body2">Charge=</Typography>
+                          <Typography color={"red"}>
+                            {selectedModes?.transactionFeeValue?.for_Agent}
+                          </Typography>
+                        </Stack>
+
+                        <Typography textAlign="end" variant="body2">
                           {convertToWords(+watch("amount"))}
                         </Typography>
                       </Stack>
@@ -355,12 +370,14 @@ function MyFundDeposits() {
                     selectedModes?.transactionFeeValue?.for_Agent > 0 ? (
                     <>
                       <Stack direction="row" gap={6}>
-                        <Typography color={"green"}>
-                          {" "}
-                          Commission :{" "}
-                          {selectedModes?.transactionFeeValue?.for_Agent}{" "}
-                        </Typography>
-                        <Typography textAlign="end">
+                        <Stack direction="row" gap={1}>
+                          <Typography variant="body2">Commission= </Typography>
+                          <Typography color={"green"}>
+                            {selectedModes?.transactionFeeValue?.for_Agent}{" "}
+                          </Typography>
+                        </Stack>
+
+                        <Typography textAlign="end" variant="body2">
                           {convertToWords(+watch("amount"))}
                         </Typography>
                       </Stack>
@@ -371,7 +388,6 @@ function MyFundDeposits() {
                 </Typography>
               )}
             </Stack>
-            {/* {convertToWords(+watch("amount"))} */}
 
             <RHFTextField
               type="number"
@@ -400,7 +416,7 @@ function MyFundDeposits() {
               <Upload
                 file={uploadFile}
                 onDrop={handleDropSingleFile}
-                onDelete={() => setUploadFile(null)}
+                onDelete={Handleslip}
               />
               <Stack
                 flexDirection={"row"}
@@ -430,7 +446,7 @@ function MyFundDeposits() {
               type="submit"
               variant="contained"
               loading={isSubmitting || verifyLoding}
-              sx={{ mt: 1 }}
+              sx={{ mt: 1, mb: 2 }}
             >
               Submit
             </LoadingButton>

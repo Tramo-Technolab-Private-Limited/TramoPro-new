@@ -1,6 +1,4 @@
 import { useEffect, useState } from "react";
-
-// @mui
 import {
   Card,
   Stack,
@@ -8,19 +6,10 @@ import {
   TableHead,
   Modal,
   Button,
-  TextField,
+  tableCellClasses,
+  styled,
 } from "@mui/material";
-// redux
-// routes
-// components
-// sections
-
-import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
-
-import * as Yup from "yup";
-// form
-
 import { useSnackbar } from "notistack";
 import DateRangePicker, {
   useDateRangePicker,
@@ -48,7 +37,7 @@ import { fDate, fDateTime } from "src/utils/formatTime";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-// import { Label } from '@mui/icons-material';
+
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -71,7 +60,6 @@ export default function WalletLadger() {
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [ladgerData, setLadgerData] = useState([]);
-  const [refId, setRefId] = useState("");
   const [pageSize, setPageSize] = useState<any>(20);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [sendLoding, setSendLoading] = useState(false);
@@ -85,7 +73,7 @@ export default function WalletLadger() {
     { id: "productName", label: "Product/TransactionType " },
     { id: "walletType", label: "WalletType " },
     { id: "reason", label: "reason " },
-    // { id: "remarks", label: "remarks" },
+
     { id: "walletId", label: "Wallet Id" },
   ];
   const distributortableLabels = [
@@ -96,7 +84,7 @@ export default function WalletLadger() {
     { id: "productName", label: "Product/TransactionType " },
     { id: "walletType", label: "WalletType " },
     { id: "reason", label: "reason " },
-    // { id: "remarks", label: "remarks" },
+
     { id: "walletId", label: "Wallet Id" },
   ];
   const MDtableLabels = [
@@ -153,8 +141,6 @@ export default function WalletLadger() {
       }
     });
   };
-
-  // const filterWalletLadger = () => {};
 
   const ExportData = () => {
     let token = localStorage.getItem("token");
@@ -252,24 +238,13 @@ export default function WalletLadger() {
         <title>Wallet Ladger | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
 
-      <>
+      <Stack sx={{ maxHeight: window.innerHeight - 220 }}>
         <Stack flexDirection={"row"} justifyContent={"end"}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
             style={{ padding: "0 25px", marginBottom: "10px" }}
           >
-            {/* <TextField
-              id="outlined-password-input"
-              label="Search By Ref Id"
-              size="small"
-              type="text"
-              onChange={(e) => setRefId(e.target.value)}
-            />
-            <Button variant="contained" onClick={() => filterWalletLadger()}>
-              Search
-            </Button> */}
-
             <FileFilterButton
               isSelected={!!isSelectedValuePicker}
               startIcon={<Iconify icon="eva:calendar-fill" />}
@@ -300,12 +275,12 @@ export default function WalletLadger() {
           <ApiDataLoading />
         ) : (
           <Grid item xs={12} md={6} lg={8}>
-            <Scrollbar>
-              <TableContainer>
+            <TableContainer>
+              <Scrollbar sx={{ maxHeight: window.innerHeight - 200 }}>
                 <Table
                   sx={{ minWidth: 720 }}
+                  aria-label="customized table"
                   stickyHeader
-                  aria-label="sticky table"
                 >
                   <TableHeadCustom
                     headLabel={
@@ -324,11 +299,11 @@ export default function WalletLadger() {
                       ))}
                   </TableBody>
                 </Table>
-              </TableContainer>
-            </Scrollbar>
+              </Scrollbar>
+            </TableContainer>
           </Grid>
         )}
-      </>
+      </Stack>
 
       <CustomPagination
         pageSize={pageSize}
@@ -399,27 +374,35 @@ const LadgerRow = ({ row }: any) => {
     );
   };
 
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: "90%",
-    bgcolor: "#ffffff",
-    boxShadow: 24,
-    p: 4,
-  };
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 12,
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.grey[300],
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
 
   return (
     <>
-      <TableRow
+      <StyledTableRow
         key={row._id}
-        hover
         role="checkbox"
         tabIndex={-1}
         sx={{ borderBottom: "1px solid #dadada" }}
       >
-        <TableCell>
+        <StyledTableCell>
           <Typography
             variant="body2"
             sx={{ color: "text.secondary", cursor: "pointer" }}
@@ -429,8 +412,8 @@ const LadgerRow = ({ row }: any) => {
               : fDateTime(row?.transaction?.createdAt)}
           </Typography>
           <Typography variant="body2">{row?.walletId}</Typography>
-        </TableCell>
-        <TableCell>
+        </StyledTableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -460,8 +443,8 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
-        <TableCell>
+        </StyledTableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -477,8 +460,8 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
-        <TableCell>
+        </StyledTableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -514,9 +497,9 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell>
+        <StyledTableCell>
           {row?.transaction?.productName && (
             <Stack direction="row" gap={0.5}>
               <Typography variant="subtitle2">Product :</Typography>
@@ -532,9 +515,9 @@ const LadgerRow = ({ row }: any) => {
               {row?.transaction?.transactionType}
             </Typography>
           </Stack>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {user?._id === row?.to?.id?._id ? (
               <>
@@ -568,32 +551,27 @@ const LadgerRow = ({ row }: any) => {
               </>
             )}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body1" sx={{ color: "text.secondary" }}>
             {parseFloat(row?.reason) || "-"}
           </Typography>
-        </TableCell>
-        {/* <TableCell>
-          <Typography variant="body1" sx={{ color: "text.secondary" }}>
-            {parseFloat(row?.remarks) || "-"}
-          </Typography>
-        </TableCell> */}
+        </StyledTableCell>
 
         {row?.transaction?.clientRefId ? (
-          <TableCell onClick={() => openEditModal(row)}>
+          <StyledTableCell onClick={() => openEditModal(row)}>
             <Typography
               variant="body1"
               sx={{ color: "blue", textDecoration: "underline" }}
             >
               {row?.transaction?.clientRefId || "-"}
             </Typography>
-          </TableCell>
+          </StyledTableCell>
         ) : (
           "No Trasaction"
         )}
-      </TableRow>
+      </StyledTableRow>
 
       <Modal
         open={open}
@@ -633,14 +611,6 @@ const LadgerRow = ({ row }: any) => {
                   >
                     <TableCell>
                       {row?.transaction?.productName && (
-                        // <Typography
-                        //   variant="body1"
-                        //   sx={{ color: "text.secondary" }}
-                        // >
-                        //   {" "}
-                        //   Product: {row?.transaction?.productName || "-"}
-                        // </Typography>
-
                         <Stack direction="row" gap={0.5}>
                           <Typography variant="subtitle2">Product:</Typography>
                           <Typography variant="body2">

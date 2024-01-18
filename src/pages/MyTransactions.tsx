@@ -6,7 +6,7 @@ import {
   Grid,
   TextField,
   Tabs,
-  Tab,
+  tableCellClasses,
   Button,
   Box,
   Table,
@@ -15,7 +15,7 @@ import {
   TableCell,
   Typography,
   IconButton,
-  TableHead,
+  styled,
   useTheme,
   Tooltip,
   Modal,
@@ -206,48 +206,47 @@ export default function MyTransactions() {
   };
 
   const tableLabels = [
-    { id: "Date&Time", label: "Date & Time" },
-    { id: "Client Ref Id", label: "Client Ref Id" },
+    { id: "Date&Time", label: "Txn Details" },
     { id: "agent", label: "Agent" },
     { id: "dist", label: "Distributor" },
     { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator/Beneficiary" },
+    { id: "Operator", label: "Operator/ Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "UTR/Reference Number" },
+    { id: "Operator Txn ID", label: "UTR/ Ref Number" },
     { id: "Opening Balance", label: "Opening Balance" },
     { id: "Txn Amount", label: "Txn Amount" },
-    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Charge/Commission", label: "Charge/ Commission" },
     { id: "Closing Balance", label: "Closing Balance" },
     { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
   ];
   const tableLabels1 = [
-    { id: "Date&Time", label: "Date & Timeaaaaaa" },
-    { id: "Client Ref Id", label: "Client Ref Id" },
+    { id: "Date&Time", label: "Txn Details" },
+
     { id: "agent", label: "Agent" },
     { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator/Beneficiary" },
+    { id: "Operator", label: "Operator/ Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "UTR/Reference Number" },
+    { id: "Operator Txn ID", label: "UTR/ Ref Number" },
     { id: "Opening Balance", label: "Opening Balance" },
     { id: "Txn Amount", label: "Txn Amount" },
-    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Charge/ Commission", label: "Charge/ Commission" },
     { id: "Closing Balance", label: "Closing Balance" },
     { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
   ];
   const tableLabels2 = [
-    { id: "Date&Time", label: "Date & Time" },
-    { id: "Client Ref Id", label: "Client Ref Id" },
+    { id: "Date&Time", label: "Txn Details" },
+
     { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator/Beneficiary" },
+    { id: "Operator", label: "Operator/ Beneficiary" },
     { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "UTR/Reference Number" },
+    { id: "Operator Txn ID", label: "UTR/ Ref Number" },
     { id: "Opening Balance", label: "Opening Balance" },
     { id: "Txn Amount", label: "Txn Amount" },
-    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Charge/ Commission", label: "Charge/ Commission" },
     { id: "Closing Balance", label: "Closing Balance" },
     { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
@@ -367,144 +366,144 @@ export default function MyTransactions() {
       <Helmet>
         <title> Transactions | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
-      <FormProvider
-        methods={methods}
-        onSubmit={handleSubmit(filterTransaction)}
-      >
-        <Stack
-          flexDirection={{ xs: "column", sm: "row" }}
-          justifyContent={"space-between"}
-          m={1}
-          gap={1}
+      <Stack sx={{ maxHeight: window.innerHeight - 220 }}>
+        <FormProvider
+          methods={methods}
+          onSubmit={handleSubmit(filterTransaction)}
         >
           <Stack
             flexDirection={{ xs: "column", sm: "row" }}
-            flexBasis={{ xs: "100%", sm: "50%" }}
+            justifyContent={"space-between"}
+            m={1}
             gap={1}
           >
-            <RHFSelect
-              name="category"
-              label="Category"
-              SelectProps={{
-                native: false,
-                sx: { textTransform: "capitalize" },
-              }}
-            >
-              <MenuItem value="">None</MenuItem>
-              {categoryList.map((item: any) => {
-                return (
-                  <MenuItem value={item._id}>{item?.category_name}</MenuItem>
-                );
-              })}
-            </RHFSelect>
-            <RHFSelect
-              name="status"
-              label="Status"
-              SelectProps={{
-                native: false,
-                sx: { textTransform: "capitalize" },
-              }}
-            >
-              <MenuItem value="">None</MenuItem>
-              <MenuItem value="success">Success</MenuItem>
-              <MenuItem value="failed">Failed</MenuItem>
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="in_process">In process</MenuItem>
-              <MenuItem value="hold">Hold</MenuItem>
-              <MenuItem value="initiated">Initiated</MenuItem>
-            </RHFSelect>
-            <RHFTextField name="clientRefId" label="Client Ref Id" />
             <Stack
-              flexDirection={"row"}
+              flexDirection={{ xs: "column", sm: "row" }}
               flexBasis={{ xs: "100%", sm: "50%" }}
               gap={1}
             >
-              <LoadingButton
-                variant="contained"
-                type="submit"
-                loading={isSubmitting}
-              >
-                Search
-              </LoadingButton>
-              <LoadingButton
-                variant="contained"
-                onClick={() => {
-                  reset(defaultValues);
-                  getTransaction();
+              <RHFSelect
+                name="category"
+                label="Category"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
                 }}
               >
-                Clear
-              </LoadingButton>
+                <MenuItem value="">None</MenuItem>
+                {categoryList.map((item: any) => {
+                  return (
+                    <MenuItem value={item._id}>{item?.category_name}</MenuItem>
+                  );
+                })}
+              </RHFSelect>
+              <RHFSelect
+                name="status"
+                label="Status"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                <MenuItem value="success">Success</MenuItem>
+                <MenuItem value="failed">Failed</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="in_process">In process</MenuItem>
+                <MenuItem value="hold">Hold</MenuItem>
+                <MenuItem value="initiated">Initiated</MenuItem>
+              </RHFSelect>
+              <RHFTextField name="clientRefId" label="Client Ref Id" />
+              <Stack
+                flexDirection={"row"}
+                flexBasis={{ xs: "100%", sm: "50%" }}
+                gap={1}
+              >
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  loading={isSubmitting}
+                >
+                  Search
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => {
+                    reset(defaultValues);
+                    getTransaction();
+                  }}
+                >
+                  Clear
+                </LoadingButton>
+              </Stack>
+            </Stack>
+            <Stack direction={"row"} gap={1}>
+              <FileFilterButton
+                isSelected={!!isSelectedValuePicker}
+                startIcon={<Iconify icon="eva:calendar-fill" />}
+                onClick={onOpenPicker}
+              >
+                {`${fDate(startDate)} - ${fDate(endDate)}`}
+              </FileFilterButton>
+              <DateRangePicker
+                variant="input"
+                title="Select Date Range"
+                startDate={startDate}
+                endDate={endDate}
+                onChangeStartDate={onChangeStartDate}
+                onChangeEndDate={onChangeEndDate}
+                open={openPicker}
+                onClose={onClosePicker}
+                isSelected={isSelectedValuePicker}
+                isError={isError}
+              />
+              <Button variant="contained" onClick={ExportData}>
+                Export
+              </Button>
             </Stack>
           </Stack>
-          <Stack direction={"row"} gap={1}>
-            <FileFilterButton
-              isSelected={!!isSelectedValuePicker}
-              startIcon={<Iconify icon="eva:calendar-fill" />}
-              onClick={onOpenPicker}
-            >
-              {`${fDate(startDate)} - ${fDate(endDate)}`}
-            </FileFilterButton>
-            <DateRangePicker
-              variant="input"
-              title="Select Date Range"
-              startDate={startDate}
-              endDate={endDate}
-              onChangeStartDate={onChangeStartDate}
-              onChangeEndDate={onChangeEndDate}
-              open={openPicker}
-              onClose={onClosePicker}
-              isSelected={isSelectedValuePicker}
-              isError={isError}
-            />
-            <Button variant="contained" onClick={ExportData}>
-              Export
-            </Button>
-          </Stack>
-        </Stack>
-      </FormProvider>
-      <Grid item xs={12} md={6} lg={8}>
-        <>
-          {Loading ? (
-            <ApiDataLoading />
-          ) : (
-            <Scrollbar>
-              <Table
-                sx={{ minWidth: 720 }}
-                stickyHeader
-                size="small"
-                aria-label="sticky table"
-              >
-                <TableHeadCustom
-                  headLabel={
-                    user?.role == "m_distributor"
-                      ? tableLabels
-                      : user?.role == "distributor"
-                      ? tableLabels1
-                      : tableLabels2
-                  }
-                />
+        </FormProvider>
+        <Grid item xs={12} md={6} lg={8}>
+          <>
+            {Loading ? (
+              <ApiDataLoading />
+            ) : (
+              <Scrollbar sx={{ maxHeight: window.innerHeight - 200 }}>
+                <Table size="small" aria-label="customized table" stickyHeader>
+                  <TableHeadCustom
+                    headLabel={
+                      user?.role == "m_distributor"
+                        ? tableLabels
+                        : user?.role == "distributor"
+                        ? tableLabels1
+                        : tableLabels2
+                    }
+                  />
 
-                <TableBody>
-                  {sdata.map((row: any) => (
-                    <TransactionRow key={row._id} row={row} />
-                  ))}
-                </TableBody>
-              </Table>
-            </Scrollbar>
-          )}
-          {!Loading && (
-            <CustomPagination
-              pageSize={pageSize}
-              onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-                setCurrentPage(value);
-              }}
-              page={currentPage}
-              Count={pageCount}
-            />
-          )}
-        </>
-      </Grid>
+                  <TableBody>
+                    {sdata.map((row: any) => (
+                      <TransactionRow key={row._id} row={row} />
+                    ))}
+                  </TableBody>
+                </Table>
+              </Scrollbar>
+            )}
+            {!Loading && (
+              <CustomPagination
+                pageSize={pageSize}
+                onChange={(
+                  event: React.ChangeEvent<unknown>,
+                  value: number
+                ) => {
+                  setCurrentPage(value);
+                }}
+                page={currentPage}
+                Count={pageCount}
+              />
+            )}
+          </>
+        </Grid>
+      </Stack>
     </>
   );
 }
@@ -569,17 +568,32 @@ function TransactionRow({ row }: childProps) {
     borderRadius: 2,
   };
 
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 12,
+      padding: 6,
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.grey[300],
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
   return (
     <>
-      <TableRow hover key={newRow._id}>
+      <StyledTableRow key={newRow._id}>
         {/* Date & Time */}
-        <TableCell>
-          <Typography variant="body2" whiteSpace={"nowrap"}>
-            {fDateTime(newRow?.createdAt)}
-          </Typography>
-        </TableCell>
-
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body2">{newRow?.transactionType}</Typography>
           <Typography variant="body2" whiteSpace={"nowrap"}>
             {newRow?.clientRefId}{" "}
@@ -589,11 +603,14 @@ function TransactionRow({ row }: childProps) {
               </IconButton>
             </Tooltip>
           </Typography>
-        </TableCell>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {fDateTime(newRow?.createdAt)}
+          </Typography>
+        </StyledTableCell>
 
         {/* Agent Detail */}
         {user?.role === "distributor" && (
-          <TableCell>
+          <StyledTableCell>
             <Stack flexDirection={"row"} gap={1}>
               <Avatar
                 alt={newRow?.agentDetails?.id?.firstName}
@@ -609,13 +626,13 @@ function TransactionRow({ row }: childProps) {
                 </Typography>
               </Stack>
             </Stack>
-          </TableCell>
+          </StyledTableCell>
         )}
 
         {/* Distributor Detail */}
         {user?.role === "m_distributor" && (
           <>
-            <TableCell>
+            <StyledTableCell>
               <Stack flexDirection={"row"} gap={1}>
                 <Avatar
                   alt={newRow?.agentDetails?.id?.firstName}
@@ -631,8 +648,8 @@ function TransactionRow({ row }: childProps) {
                   </Typography>
                 </Stack>
               </Stack>
-            </TableCell>
-            <TableCell>
+            </StyledTableCell>
+            <StyledTableCell>
               <Stack flexDirection={"row"} gap={1}>
                 <Avatar
                   alt={newRow?.distributorDetails?.id?.firstName}
@@ -648,38 +665,36 @@ function TransactionRow({ row }: childProps) {
                   </Typography>
                 </Stack>
               </Stack>
-            </TableCell>
+            </StyledTableCell>
           </>
         )}
 
         {/* Product  */}
-        <TableCell>
-          <Typography variant="body2" textAlign={"center"}>
-            {newRow?.productName || "-"}
-          </Typography>
-        </TableCell>
+        <StyledTableCell>
+          <Typography variant="body2">{newRow?.productName || "-"}</Typography>
+        </StyledTableCell>
 
         {/* Operator */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
+        <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
           <Typography variant="body2">{newRow?.operator?.key1}</Typography>
           <Typography variant="body2">{newRow?.operator?.key2}</Typography>
           <Typography variant="body2">{newRow?.operator?.key3}</Typography>
-        </TableCell>
+        </StyledTableCell>
 
         {/* Mobile Number */}
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body2">{newRow?.mobileNumber}</Typography>
-        </TableCell>
+        </StyledTableCell>
 
         {/* Operator Txn Id */}
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body2" textAlign={"center"}>
             {newRow?.vendorUtrNumber || "-"}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
         {/* Opening Balance */}
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body2" whiteSpace={"nowrap"}>
             {fCurrency(
               user?.role === "agent"
@@ -689,17 +704,17 @@ function TransactionRow({ row }: childProps) {
                 : newRow?.masterDistributorDetails?.oldMainWalletBalance
             )}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
         {/* Transaction Amount */}
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body2" whiteSpace={"nowrap"}>
             {fCurrency(newRow.amount) || 0}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
         {/* Charge/Commission */}
-        <TableCell>
+        <StyledTableCell>
           <Stack flexDirection={"row"} justifyContent={"center"}>
             <Typography variant="body2" whiteSpace={"nowrap"} color={"error"}>
               - {fCurrency(newRow.debit) || 0}
@@ -716,10 +731,10 @@ function TransactionRow({ row }: childProps) {
               ) || 0}
             </Typography>
           </Stack>
-        </TableCell>
+        </StyledTableCell>
 
         {/* Closing Balance */}
-        <TableCell>
+        <StyledTableCell>
           <Typography variant="body2" whiteSpace={"nowrap"}>
             {fCurrency(
               user?.role === "agent"
@@ -729,19 +744,33 @@ function TransactionRow({ row }: childProps) {
                 : newRow?.masterDistributorDetails?.newMainWalletBalance
             )}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
         {/* GST/TDS */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
+        <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
           <Typography variant="body2">
-            GST : {parseFloat(newRow?.GST)?.toFixed(2)}
+            GST :{" "}
+            {fCurrency(
+              user?.role == "agent"
+                ? newRow?.agentDetails?.GST
+                : user?.role == "distributor"
+                ? newRow?.distributorDetails?.GST
+                : newRow?.masterDistributorDetails?.GST
+            ) || 0}
           </Typography>
           <Typography variant="body2">
-            TDS : {parseFloat(newRow?.TDS)?.toFixed(3)}
+            TDS :{" "}
+            {fCurrency(
+              user?.role == "agent"
+                ? newRow?.agentDetails?.TDSAmount
+                : user?.role == "distributor"
+                ? newRow?.distributorDetails?.TDSAmount
+                : newRow?.masterDistributorDetails?.TDSAmount
+            ) || 0}
           </Typography>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell
+        <StyledTableCell
           sx={{
             textTransform: "lowercase",
             fontWeight: 600,
@@ -761,10 +790,10 @@ function TransactionRow({ row }: childProps) {
           >
             {newRow.status ? sentenceCase(newRow.status) : ""}
           </Label>
-        </TableCell>
+        </StyledTableCell>
 
-        <TableCell>
-          <Stack flexDirection={"row"} flexWrap={"nowrap"} width={100}>
+        <StyledTableCell sx={{ width: "fit-content" }}>
+          <Stack flexDirection={"row"} flexWrap={"nowrap"}>
             <IconButton>
               <img src={Group} alt="Receipt Icon" />
             </IconButton>
@@ -793,8 +822,8 @@ function TransactionRow({ row }: childProps) {
                 </Tooltip>
               )}
           </Stack>
-        </TableCell>
-      </TableRow>
+        </StyledTableCell>
+      </StyledTableRow>
       <Modal
         open={modalOpen}
         onClose={closeModal}
@@ -978,23 +1007,23 @@ function TransactionRow({ row }: childProps) {
                           `solid 1.5px ${theme.palette.divider}`,
                       }}
                     >
-                      <TableCell align="center">
+                      <StyledTableCell align="center">
                         <Typography variant="subtitle1">
                           Transaction Id
                         </Typography>
-                      </TableCell>
-                      <TableCell align="center">
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
                         <Typography variant="subtitle1">Service</Typography>
-                      </TableCell>
-                      <TableCell align="center">
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
                         <Typography variant="subtitle1">UTR</Typography>
-                      </TableCell>
-                      <TableCell align="center">
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
                         <Typography variant="subtitle1">Status</Typography>
-                      </TableCell>
-                      <TableCell align="center">
+                      </StyledTableCell>
+                      <StyledTableCell align="center">
                         <Typography variant="subtitle1">Amount</Typography>
-                      </TableCell>
+                      </StyledTableCell>
                     </TableRow>
 
                     <TableBody>

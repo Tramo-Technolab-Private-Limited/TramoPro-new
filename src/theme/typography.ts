@@ -8,15 +8,23 @@ export function pxToRem(value: number) {
   return `${value / 16}rem`;
 }
 
-export function responsiveFontSizes({ sm, md, lg }: { sm: number; md: number; lg: number }) {
+export function responsiveFontSizes({
+  sm,
+  md,
+  lg,
+}: {
+  sm: number;
+  md: number;
+  lg: number;
+}) {
   return {
-    '@media (min-width:600px)': {
+    "@media (min-width:600px)": {
       fontSize: pxToRem(sm),
     },
-    '@media (min-width:900px)': {
+    "@media (min-width:900px)": {
       fontSize: pxToRem(md),
     },
-    '@media (min-width:1200px)': {
+    "@media (min-width:1200px)": {
       fontSize: pxToRem(lg),
     },
   };
@@ -24,7 +32,7 @@ export function responsiveFontSizes({ sm, md, lg }: { sm: number; md: number; lg
 
 // ----------------------------------------------------------------------
 
-const FONT_PRIMARY = 'Public Sans, sans-serif'; // Google Font
+const FONT_PRIMARY = "Public Sans, sans-serif"; // Google Font
 // const FONT_SECONDARY = 'CircularStd, sans-serif'; // Local Font
 
 const typography = {
@@ -64,7 +72,7 @@ const typography = {
   },
   h6: {
     fontWeight: 700,
-    lineHeight: 28 / 18,
+    lineHeight: 24 / 16,
     fontSize: pxToRem(17),
     ...responsiveFontSizes({ sm: 18, md: 18, lg: 18 }),
   },
@@ -75,32 +83,32 @@ const typography = {
   },
   subtitle2: {
     fontWeight: 600,
-    lineHeight: 22 / 14,
+    lineHeight: 20 / 12,
     fontSize: pxToRem(14),
   },
   body1: {
     lineHeight: 1.5,
-    fontSize: pxToRem(16),
+    fontSize: pxToRem(14),
   },
   body2: {
-    lineHeight: 22 / 14,
-    fontSize: pxToRem(14),
+    lineHeight: 20 / 12,
+    fontSize: pxToRem(12),
   },
   caption: {
     lineHeight: 1.5,
-    fontSize: pxToRem(12),
+    fontSize: pxToRem(11),
   },
   overline: {
     fontWeight: 700,
     lineHeight: 1.5,
-    fontSize: pxToRem(12),
-    textTransform: 'uppercase',
+    fontSize: pxToRem(10),
+    textTransform: "uppercase",
   },
   button: {
     fontWeight: 700,
     lineHeight: 24 / 14,
     fontSize: pxToRem(14),
-    textTransform: 'capitalize',
+    textTransform: "capitalize",
   },
 } as const;
 

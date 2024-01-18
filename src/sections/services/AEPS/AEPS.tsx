@@ -141,7 +141,18 @@ export default function AEPS(props: any) {
         : Yup.string(),
     amount:
       CurrentTab.toLowerCase() === "withdraw"
-        ? Yup.string().required("Amount is required")
+        ? Yup.string()
+            .required("Amount is required")
+            .test(
+              "is-multiple-of-50",
+              "Amount must be a multiple of 50",
+              (value: any) => Number(value) % 50 === 0
+            )
+            .test(
+              "minimum_100",
+              "Please enter minimum Rs. 100",
+              (value: any) => Number(value) > 99
+            )
         : Yup.string(),
   });
 
@@ -298,7 +309,7 @@ export default function AEPS(props: any) {
           setResAmount(Response.data.data.data.balanceAmount);
           handleOpenResponse();
         } else {
-          setFailedMessage(Response.data.data.message);
+          setFailedMessage(Response.data.message);
           handleOpenError();
         }
         handleCloseLoading();
@@ -367,7 +378,7 @@ export default function AEPS(props: any) {
                 Response?.data?.data?.agentDetails?.newMainWalletBalance,
             });
           } else {
-            setFailedMessage(Response.data.data.message);
+            setFailedMessage(Response.data.message);
             handleOpenError();
           }
           handleCloseLoading();
@@ -431,7 +442,7 @@ export default function AEPS(props: any) {
             setResAmount(Response.data.data.data.balanceAmount);
             enqueueSnackbar(Response.data.data.message);
           } else {
-            setFailedMessage(Response.data.data.message);
+            setFailedMessage(Response.data.message);
             handleOpenError();
           }
           handleCloseLoading();
@@ -678,14 +689,13 @@ export default function AEPS(props: any) {
                     ))}
                   </Tabs>
                   {CurrentTab.match(/with/i) && !attend ? (
-                    <>
+                    <Stack my={1}>
                       <Typography variant="body2">
                         <strong>Note :</strong> It is mandatory to mark agent
                         attendance before any AEPS withdrawal.
                       </Typography>
                       <Typography variant="body2">
-                        Please mark the attendance to before customer
-                        withdrawal.
+                        Please mark the attendance before customer withdrawal.
                       </Typography>
                       <Stack alignItems={"flex-end"} my={1}>
                         <Button
@@ -695,12 +705,12 @@ export default function AEPS(props: any) {
                           Mark your attendance
                         </Button>
                       </Stack>
-                    </>
+                    </Stack>
                   ) : (
                     <>
                       {attend && (
                         <Typography variant="subtitle2" textAlign={"end"}>
-                          Withdrawal Attendence Timeout:{" "}
+                          Withdrawal Attendance Timeout:{" "}
                           <span
                             style={{
                               color:
@@ -712,7 +722,6 @@ export default function AEPS(props: any) {
                             {Math.floor(localAttendance / 60)} Minutes{" "}
                             {Math.floor(localAttendance % 60)} Seconds
                           </span>
-                          seconds
                         </Typography>
                       )}
                       <Grid rowGap={2} display="grid">

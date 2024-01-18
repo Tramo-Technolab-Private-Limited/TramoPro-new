@@ -162,7 +162,7 @@ export default function DMT2pay(props: any) {
       beneficiaryId: props.beneficiary._id,
       amount: data.payAmount,
       remitterId: props.remitter._id,
-      mode: mode,
+      mode: +mode,
       note1: "",
       note2: "",
       nPin:

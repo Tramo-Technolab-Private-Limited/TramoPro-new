@@ -9,10 +9,11 @@ import {
   TableRow,
   TableBody,
   TableCell,
-  TextField,
+  tableCellClasses,
   Button,
   Typography,
   Pagination,
+  styled,
 } from "@mui/material";
 
 import { Helmet } from "react-helmet-async";
@@ -25,6 +26,8 @@ import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import Label from "src/components/label/Label";
 import { sentenceCase } from "change-case";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
+import Scrollbar from "src/components/scrollbar/Scrollbar";
+import { TableHeadCustom } from "src/components/table";
 // ----------------------------------------------------------------------
 
 export default function (props: any) {
@@ -112,6 +115,26 @@ export default function (props: any) {
     );
   };
 
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 12,
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.grey[300],
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
   return (
     <>
       <Helmet>
@@ -140,99 +163,92 @@ export default function (props: any) {
         <ApiDataLoading />
       ) : (
         <Grid item xs={16} md={12} lg={12}>
-          <Table
-            sx={{ minWidth: 720 }}
-            stickyHeader
-            size="medium"
-            aria-label="customized table"
-          >
-            <TableHead>
-              <TableRow>
-                {tableLabels.map((column: any) => (
-                  <TableCell key={column.id} align="center">
-                    {column.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
+          <Scrollbar sx={{ maxHeight: window.innerHeight - 160 }}>
+            <Table
+              sx={{ minWidth: 720 }}
+              aria-label="customized table"
+              stickyHeader
+            >
+              <TableHeadCustom headLabel={tableLabels} />
 
-            <TableBody>
-              {sdata.map((row: any) => (
-                <TableRow
-                  key={row._id}
-                  hover
-                  role="checkbox"
-                  tabIndex={-1}
-                  sx={{ borderBottom: "1px solid #dadada" }}
-                  // hover
-                >
-                  <TableCell>
-                    <Typography variant="body1">
-                      {fDateTime(row?.createdAt)}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Typography variant="body1">Rs. {row?.amount}</Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Typography variant="body1" textAlign={"center"}>
-                      {!isNaN(row?.Charge) ? "Rs. " + row?.Charge : "-"}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Typography variant="body1" textAlign={"center"}>
-                      {!isNaN(row?.Commission)
-                        ? "Rs. " + parseFloat(row?.Commission).toFixed(2)
-                        : "-"}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Typography variant="body1">{row?.deposit_type}</Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Typography variant="body1">
-                      {row?.transactional_details?.mobile}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Typography variant="body1">
-                      {row?.transactional_details?.branch}
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell
-                    sx={{
-                      textTransform: "lowercase",
-                      fontWeight: 600,
-                      textAlign: "center",
-                    }}
+              <TableBody>
+                {sdata.map((row: any) => (
+                  <StyledTableRow
+                    key={row._id}
+                    role="checkbox"
+                    tabIndex={-1}
+                    sx={{ borderBottom: "1px solid #dadada" }}
                   >
-                    <Label
-                      variant="soft"
-                      color={
-                        (row.status.toLowerCase() === "failed" && "error") ||
-                        ((row.status.toLowerCase() === "pending" ||
-                          row.status.toLowerCase() === "in_process") &&
-                          "warning") ||
-                        "success"
-                      }
-                      sx={{ textTransform: "capitalize" }}
+                    <StyledTableCell>
+                      <Typography variant="body1">
+                        {fDateTime(row?.createdAt)}
+                      </Typography>
+                    </StyledTableCell>
+
+                    <StyledTableCell>
+                      <Typography variant="body1">Rs. {row?.amount}</Typography>
+                    </StyledTableCell>
+
+                    <StyledTableCell>
+                      <Typography variant="body1" textAlign={"center"}>
+                        {!isNaN(row?.Charge) ? "Rs. " + row?.Charge : "-"}
+                      </Typography>
+                    </StyledTableCell>
+
+                    <StyledTableCell>
+                      <Typography variant="body1" textAlign={"center"}>
+                        {!isNaN(row?.Commission)
+                          ? "Rs. " + parseFloat(row?.Commission).toFixed(2)
+                          : "-"}
+                      </Typography>
+                    </StyledTableCell>
+
+                    <StyledTableCell>
+                      <Typography variant="body1">
+                        {row?.deposit_type}
+                      </Typography>
+                    </StyledTableCell>
+
+                    <StyledTableCell>
+                      <Typography variant="body1">
+                        {row?.transactional_details?.mobile}
+                      </Typography>
+                    </StyledTableCell>
+
+                    <StyledTableCell>
+                      <Typography variant="body1">
+                        {row?.transactional_details?.branch}
+                      </Typography>
+                    </StyledTableCell>
+
+                    <StyledTableCell
+                      sx={{
+                        textTransform: "lowercase",
+                        fontWeight: 600,
+                        textAlign: "center",
+                      }}
                     >
-                      {row.status.toLowerCase()
-                        ? sentenceCase(row.status.toLowerCase())
-                        : ""}
-                    </Label>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+                      <Label
+                        variant="soft"
+                        color={
+                          (row.status.toLowerCase() === "failed" && "error") ||
+                          ((row.status.toLowerCase() === "pending" ||
+                            row.status.toLowerCase() === "in_process") &&
+                            "warning") ||
+                          "success"
+                        }
+                        sx={{ textTransform: "capitalize" }}
+                      >
+                        {row.status.toLowerCase()
+                          ? sentenceCase(row.status.toLowerCase())
+                          : ""}
+                      </Label>
+                    </StyledTableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </Scrollbar>
           <CustomPagination
             pageSize={pageSize}
             onChange={(event: React.ChangeEvent<unknown>, value: number) => {
