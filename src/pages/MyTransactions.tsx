@@ -288,36 +288,36 @@ export default function MyTransactions() {
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.id?.firstName
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.id?.firstName
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.id?.firstName
-                      : "",
+                        ? item?.distributorDetails?.id?.firstName
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.id?.firstName
+                          : "",
 
                   "Opening Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.oldMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.oldMainWalletBalance
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.oldMainWalletBalance
-                      : "",
+                        ? item?.distributorDetails?.oldMainWalletBalance
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.oldMainWalletBalance
+                          : "",
 
                   "Closing Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.newMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.newMainWalletBalance
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.newMainWalletBalance
-                      : "",
+                        ? item?.distributorDetails?.newMainWalletBalance
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.newMainWalletBalance
+                          : "",
                   " Commission Amount":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.commissionAmount
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.commissionAmount
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.commissionAmount
-                      : "",
+                        ? item?.distributorDetails?.commissionAmount
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.commissionAmount
+                          : "",
                   amount: item?.amount,
                   credit: item?.credit,
                   debit: item?.debit,
@@ -475,8 +475,8 @@ export default function MyTransactions() {
                       user?.role == "m_distributor"
                         ? tableLabels
                         : user?.role == "distributor"
-                        ? tableLabels1
-                        : tableLabels2
+                          ? tableLabels1
+                          : tableLabels2
                     }
                   />
 
@@ -527,14 +527,16 @@ function TransactionRow({ row }: childProps) {
   const CheckTransactionStatus = (row: any) => {
     setLoading(true);
     let token = localStorage.getItem("token");
-    let rowFor = row.categoryName.toLowerCase();
+    let rowFor = row
     Api(
-      rowFor.toLowerCase() == "money transfer"
-        ? `moneyTransfer/checkStatus/` + row._id
-        : rowFor.toLowerCase() == "recharges"
-        ? `agents/v1/checkStatus/` + row._id
-        : rowFor.toLowerCase() == "dmt2" &&
-          `dmt2/transaction/status/` + row._id,
+      rowFor.categoryName.toLowerCase() == "money transfer"
+        ? `moneyTransfer/checkStatus/` + rowFor._id
+        : rowFor.categoryName.toLowerCase() == "recharges"
+          ? `agents/v1/checkStatus/` + rowFor._id
+          : rowFor.categoryName.toLowerCase() == "dmt2"
+            ? `dmt2/transaction/status/` + rowFor._id
+            : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
+            `settlement/checkStatus/` + rowFor._id,
       "GET",
       "",
       token
@@ -547,6 +549,9 @@ function TransactionRow({ row }: childProps) {
           enqueueSnackbar(Response.data.message, { variant: "error" });
         }
         setLoading(false);
+      } else {
+        setLoading(false);
+
       }
     });
   };
@@ -700,8 +705,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.oldMainWalletBalance
-                : newRow?.masterDistributorDetails?.oldMainWalletBalance
+                  ? newRow?.distributorDetails?.oldMainWalletBalance
+                  : newRow?.masterDistributorDetails?.oldMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -726,8 +731,8 @@ function TransactionRow({ row }: childProps) {
                 user?.role === "agent"
                   ? newRow?.agentDetails?.creditedAmount
                   : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.creditedAmount
-                  : newRow?.masterDistributorDetails?.creditedAmount
+                    ? newRow?.distributorDetails?.creditedAmount
+                    : newRow?.masterDistributorDetails?.creditedAmount
               ) || 0}
             </Typography>
           </Stack>
@@ -740,8 +745,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.newMainWalletBalance
-                : newRow?.masterDistributorDetails?.newMainWalletBalance
+                  ? newRow?.distributorDetails?.newMainWalletBalance
+                  : newRow?.masterDistributorDetails?.newMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -754,8 +759,8 @@ function TransactionRow({ row }: childProps) {
               user?.role == "agent"
                 ? newRow?.agentDetails?.GST
                 : user?.role == "distributor"
-                ? newRow?.distributorDetails?.GST
-                : newRow?.masterDistributorDetails?.GST
+                  ? newRow?.distributorDetails?.GST
+                  : newRow?.masterDistributorDetails?.GST
             ) || 0}
           </Typography>
           <Typography variant="body2">
@@ -764,8 +769,8 @@ function TransactionRow({ row }: childProps) {
               user?.role == "agent"
                 ? newRow?.agentDetails?.TDSAmount
                 : user?.role == "distributor"
-                ? newRow?.distributorDetails?.TDSAmount
-                : newRow?.masterDistributorDetails?.TDSAmount
+                  ? newRow?.distributorDetails?.TDSAmount
+                  : newRow?.masterDistributorDetails?.TDSAmount
             ) || 0}
           </Typography>
         </StyledTableCell>
@@ -804,7 +809,7 @@ function TransactionRow({ row }: childProps) {
                   color="primary"
                   aria-label="check transaction status"
                 >
-                  <img src={autorenew} alt="Receipt Icon" />
+                  <img src={autorenew} alt="Check Status" />
                 </IconButton>
               </Tooltip>
             )}
