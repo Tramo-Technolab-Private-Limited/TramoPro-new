@@ -89,6 +89,7 @@ export default function Header({ onOpenNav }: Props) {
           height: 1,
           px: { lg: 5 },
         }}
+        variant="dense"
       >
         {renderContent}
       </Toolbar>

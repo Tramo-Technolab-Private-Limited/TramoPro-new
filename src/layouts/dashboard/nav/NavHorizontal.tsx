@@ -38,6 +38,7 @@ function NavHorizontal() {
             color: "#052542",
           }),
         }}
+        variant="dense"
       >
         <NavSectionHorizontal
           data={user?.role == "agent" ? agentNavConfig : distributorNavConfig}

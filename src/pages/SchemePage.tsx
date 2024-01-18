@@ -28,6 +28,7 @@ import ViewMatmTable from "../sections/ViewScheme/ViewMatmTable";
 import { useSnackbar } from "notistack";
 import ApiDataLoading from "../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
+import Scrollbar from "src/components/scrollbar/Scrollbar";
 // ----------------------------------------------------------------------
 
 export default function ViewAllScheme() {
@@ -120,26 +121,26 @@ export default function ViewAllScheme() {
           sx={{
             borderBottom: 1,
             borderColor: "divider",
-            marginBottom: "20px",
+            mb: 1,
             fontSize: "20px",
           }}
         >
           <Tabs
             value={superCurrentTab}
             aria-label="basic tabs example"
-            sx={{ background: "#F4F6F8", padding: "0 20px", height: "48px" }}
+            sx={{ background: "#F4F6F8", padding: "0 10px", height: "48px" }}
             onChange={(event, newValue) => setSuperCurrentTab(newValue)}
           >
             {categoryList.map((tab: any) => (
               <Tab
-                style={{ fontSize: "20px" }}
+                style={{ fontSize: "16px" }}
                 key={tab._id}
                 disabled={
                   user?.role == "m_distributor" && !mdSchemeId ? true : false
                 }
-                sx={{ mx: 3 }}
+                sx={{ mx: 2 }}
                 label={
-                  <h5 style={{ marginBlockStart: "10px" }}>
+                  <h5 style={{ marginBlockStart: "16px" }}>
                     {tab.category_name}
                   </h5>
                 }
@@ -184,29 +185,31 @@ export default function ViewAllScheme() {
         </Stack>
       )}
       {user?.role == "m_distributor" && !mdSchemeId ? null : (
-        <Stack>
-          {loading ? (
-            <ApiDataLoading />
-          ) : (
-            <Grid item xs={12} md={6} lg={8}>
-              {superCurrentTab.toLowerCase() == "aeps" ? (
-                <ViewAepsTable comData={com} />
-              ) : superCurrentTab.toLowerCase() == "recharges" ? (
-                <ViewRechargeTable comData={com} />
-              ) : superCurrentTab.toLowerCase() == "money transfer" ? (
-                <ViewMoneyTransferTable comData={com} />
-              ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
-                <ViewAadharPayTable comData={com} />
-              ) : superCurrentTab.toLowerCase() == "dmt1" ? (
-                <ViewDmt1Table comData={com} />
-              ) : superCurrentTab.toLowerCase() == "dmt2" ? (
-                <ViewDmt2Table comData={com} />
-              ) : superCurrentTab.toLowerCase() == "matm" ? (
-                <ViewMatmTable comData={com} />
-              ) : null}
-            </Grid>
-          )}
-        </Stack>
+        <Scrollbar sx={{ maxHeight: window.innerHeight - 220 }}>
+          <Stack>
+            {loading ? (
+              <ApiDataLoading />
+            ) : (
+              <Grid item xs={12} md={6} lg={8}>
+                {superCurrentTab.toLowerCase() == "aeps" ? (
+                  <ViewAepsTable comData={com} />
+                ) : superCurrentTab.toLowerCase() == "recharges" ? (
+                  <ViewRechargeTable comData={com} />
+                ) : superCurrentTab.toLowerCase() == "money transfer" ? (
+                  <ViewMoneyTransferTable comData={com} />
+                ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
+                  <ViewAadharPayTable comData={com} />
+                ) : superCurrentTab.toLowerCase() == "dmt1" ? (
+                  <ViewDmt1Table comData={com} />
+                ) : superCurrentTab.toLowerCase() == "dmt2" ? (
+                  <ViewDmt2Table comData={com} />
+                ) : superCurrentTab.toLowerCase() == "matm" ? (
+                  <ViewMatmTable comData={com} />
+                ) : null}
+              </Grid>
+            )}
+          </Stack>
+        </Scrollbar>
       )}
     </>
   );

@@ -8,6 +8,7 @@ import {
   Typography,
   Modal,
   FormHelperText,
+  Grid,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -300,172 +301,248 @@ function Bbps_One() {
     <>
       <Card sx={{ p: 2 }}>
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-          <Stack flexDirection={"row"} gap={1} my={2}>
-            {categoryListOne?.map((item: any) => {
-              return (
-                <Button
-                  key={item._id}
-                  sx={{ whiteSpace: "nowrap", width: "fit-content" }}
-                  size="small"
-                  disabled={isBillFetch}
-                  variant={
-                    watch("category.cateId") === item._id
-                      ? "contained"
-                      : "outlined"
-                  }
-                  onClick={() => {
-                    handleToReset();
-                    setValue("category.cateName", item?.sub_category_name);
-                    setValue("category.cateId", item?._id);
-                  }}
-                >
-                  {item.sub_category_name}
-                </Button>
-              );
-            })}
-            <Stack my={0.4}>
-              <Label
-                variant="soft"
-                color={"primary"}
-                onClick={(e) => !isBillFetch && handleOpenPopover(e)}
-                sx={{ cursor: "pointer" }}
-              >
-                +
-                {categoryListOne?.length > (isMobile ? 6 : 1)
-                  ? categoryListTwo?.length - 1
-                  : categoryListTwo?.length}{" "}
-                more
-              </Label>
-            </Stack>
-            <MenuPopover
-              open={openPopover}
-              onClose={handleClosePopover}
-              arrow="left-top"
-              sx={{ width: 200 }}
-            >
-              <Scrollbar sx={{ height: { xs: 400, sm: "auto" } }}>
-                {categoryListTwo?.map((item: any) => {
-                  return (
-                    <MenuItem
-                      key={item._id}
-                      onClick={() => handleTabChange(item)}
-                      sx={{ whiteSpace: "nowrap" }}
-                    >
-                      {item.sub_category_name}{" "}
-                    </MenuItem>
-                  );
-                })}
-              </Scrollbar>
-            </MenuPopover>
-          </Stack>
-          <Box
+          <Grid
             rowGap={3}
             columnGap={2}
             display="grid"
-            gridTemplateColumns={{
-              xs: "repeat(1, 1fr)",
-              sm: "repeat(1, 0.5fr)",
-            }}
+            gridTemplateColumns={
+              !isBillFetch
+                ? {
+                    xs: "repeat(1, 1fr)",
+                    sm: "repeat(2, 1fr)",
+                  }
+                : {
+                    xs: "repeat(1, 1fr)",
+                    sm: "repeat(1, 0.5fr)",
+                  }
+            }
           >
-            <RHFAutocomplete
-              name="location"
-              onChange={(event, newValue) => setValue("location", newValue)}
-              options={locationList}
-              getOptionLabel={(option: any) => option?.location}
-              disabled={isBillFetch}
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                  {...props}
-                >
-                  {option?.location}
-                </Box>
-              )}
-              renderInput={(params) => (
-                <RHFTextField
-                  name="location.location"
-                  label="Location"
-                  {...params}
-                />
-              )}
-            />
-            {productList.length ? (
-              <RHFAutocomplete
-                name="operator"
-                onChange={(event, newValue) => {
-                  setValue("operator", newValue);
-                  getParams(newValue?._id);
-                }}
-                options={productList}
-                getOptionLabel={(option: any) => option?.productName}
-                disabled={isBillFetch}
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                    {...props}
-                  >
-                    {option?.productName}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <RHFTextField
-                    name="operator.productName"
-                    label="Product Name"
-                    {...params}
-                  />
-                )}
-              />
-            ) : (
-              watch("location.location") && (
-                <Typography variant="subtitle1">
-                  Product Not available
-                </Typography>
-              )
-            )}
-            <Stack rowGap={3} columnGap={2} display="grid">
-              {paramList?.map((item: any, index: number) => {
-                return (
-                  <Stack
-                    flexDirection={"row"}
-                    alignItems={"start"}
-                    gap={1}
-                    key={item.param_id}
-                  >
-                    <RHFTextField
-                      name={`bbpsParams.${index}.${item.param_label}`}
-                      error={
-                        !new RegExp(item.regex).test(
-                          watch(`bbpsParams.${index}`) &&
-                            Object.values(watch(`bbpsParams.${index}`))[0] + ""
-                        )
-                      }
+            <Stack>
+              <Stack flexDirection={"row"} gap={1} my={2}>
+                {categoryListOne?.map((item: any) => {
+                  return (
+                    <Button
+                      key={item._id}
+                      sx={{ whiteSpace: "nowrap", width: "fit-content" }}
+                      size="small"
                       disabled={isBillFetch}
-                      id="outlined-error-helper-text"
-                      type={
-                        item.param_type === "AlphaNumeric" ? "text" : "number"
+                      variant={
+                        watch("category.cateId") === item._id
+                          ? "contained"
+                          : "outlined"
                       }
-                      helperText={item.error_message}
-                      label={item.param_label}
-                      placeholder={item.param_label}
-                      inputProps={{ pattern: item.regex }}
+                      onClick={() => {
+                        handleToReset();
+                        setValue("category.cateName", item?.sub_category_name);
+                        setValue("category.cateId", item?._id);
+                      }}
+                    >
+                      {item.sub_category_name}
+                    </Button>
+                  );
+                })}
+                <Stack my={0.4}>
+                  <Label
+                    variant="soft"
+                    color={"primary"}
+                    onClick={(e) => !isBillFetch && handleOpenPopover(e)}
+                    sx={{ cursor: "pointer" }}
+                  >
+                    +
+                    {categoryListOne?.length > (isMobile ? 6 : 1)
+                      ? categoryListTwo?.length - 1
+                      : categoryListTwo?.length}{" "}
+                    more
+                  </Label>
+                </Stack>
+                <MenuPopover
+                  open={openPopover}
+                  onClose={handleClosePopover}
+                  arrow="left-top"
+                  sx={{ width: 200 }}
+                >
+                  <Scrollbar sx={{ height: { xs: 400, sm: "auto" } }}>
+                    {categoryListTwo?.map((item: any) => {
+                      return (
+                        <MenuItem
+                          key={item._id}
+                          onClick={() => handleTabChange(item)}
+                          sx={{ whiteSpace: "nowrap" }}
+                        >
+                          {item.sub_category_name}{" "}
+                        </MenuItem>
+                      );
+                    })}
+                  </Scrollbar>
+                </MenuPopover>
+              </Stack>
+              <Box
+                rowGap={3}
+                columnGap={2}
+                display="grid"
+                gridTemplateColumns={{
+                  xs: "repeat(1, 1fr)",
+                  sm: "repeat(1, 0.5fr)",
+                }}
+              >
+                <RHFAutocomplete
+                  name="location"
+                  onChange={(event, newValue) => setValue("location", newValue)}
+                  options={locationList}
+                  getOptionLabel={(option: any) => option?.location}
+                  disabled={isBillFetch}
+                  renderOption={(props, option) => (
+                    <Box
+                      component="li"
+                      sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                      {...props}
+                    >
+                      {option?.location}
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <RHFTextField
+                      name="location.location"
+                      label="Location"
+                      {...params}
                     />
-                    {paramList.length - 1 == index && (
-                      <LoadingButton
-                        type="submit"
-                        variant="contained"
-                        loading={isSubmitting}
-                        disabled={isBillFetch}
+                  )}
+                />
+                {productList.length ? (
+                  <RHFAutocomplete
+                    name="operator"
+                    onChange={(event, newValue) => {
+                      setValue("operator", newValue);
+                      getParams(newValue?._id);
+                    }}
+                    options={productList}
+                    getOptionLabel={(option: any) => option?.productName}
+                    disabled={isBillFetch}
+                    renderOption={(props, option) => (
+                      <Box
+                        component="li"
+                        sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                        {...props}
                       >
-                        Fetch
-                      </LoadingButton>
+                        {option?.productName}
+                      </Box>
                     )}
-                  </Stack>
-                );
-              })}
+                    renderInput={(params) => (
+                      <RHFTextField
+                        name="operator.productName"
+                        label="Product Name"
+                        {...params}
+                      />
+                    )}
+                  />
+                ) : (
+                  watch("location.location") && (
+                    <Typography variant="subtitle1">
+                      Product Not available
+                    </Typography>
+                  )
+                )}
+                <Stack rowGap={3} columnGap={2} display="grid">
+                  {paramList?.map((item: any, index: number) => {
+                    return (
+                      <Stack
+                        flexDirection={"row"}
+                        alignItems={"start"}
+                        gap={1}
+                        key={item.param_id}
+                      >
+                        <RHFTextField
+                          name={`bbpsParams.${index}.${item.param_label}`}
+                          error={
+                            !new RegExp(item.regex).test(
+                              watch(`bbpsParams.${index}`) &&
+                                Object.values(watch(`bbpsParams.${index}`))[0] +
+                                  ""
+                            )
+                          }
+                          disabled={isBillFetch}
+                          id="outlined-error-helper-text"
+                          type={
+                            item.param_type === "AlphaNumeric"
+                              ? "text"
+                              : "number"
+                          }
+                          helperText={item.error_message}
+                          label={item.param_label}
+                          placeholder={item.param_label}
+                          inputProps={{ pattern: item.regex }}
+                        />
+                        {paramList.length - 1 == index && (
+                          <LoadingButton
+                            type="submit"
+                            variant="contained"
+                            loading={isSubmitting}
+                            disabled={isBillFetch}
+                          >
+                            Fetch
+                          </LoadingButton>
+                        )}
+                      </Stack>
+                    );
+                  })}
+                </Stack>
+              </Box>
             </Stack>
-          </Box>
+            {isBillFetch && (
+              <Stack
+                flexDirection={"row"}
+                justifyContent={"space-between"}
+                width={"50%"}
+              >
+                <Stack sx={{ display: "flex", flexDirection: "column" }}>
+                  <Typography variant="subtitle1" align="left">
+                    Bill date
+                  </Typography>
+                  <Typography variant="subtitle1" align="left">
+                    Bill Number
+                  </Typography>
+                  <Typography variant="subtitle1" align="left">
+                    Customer Name
+                  </Typography>
+                  <Typography variant="subtitle1" align="left">
+                    Due Date
+                  </Typography>
+                  <Typography variant="subtitle1" align="left">
+                    BillPeriod
+                  </Typography>
+                  <Typography variant="subtitle1" align="left">
+                    Due Amount
+                  </Typography>
+                </Stack>
+                <Stack
+                  sx={{
+                    "&:last-child td, &:last-child th": { border: 0 },
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <Typography variant="body1" align="right">
+                    {fetchDetail?.BillDate}
+                  </Typography>
+                  <Typography variant="body1" align="right">
+                    {fetchDetail?.BillNumber}
+                  </Typography>
+                  <Typography variant="body1" align="right">
+                    {fetchDetail?.CustomerName}
+                  </Typography>
+                  <Typography variant="body1" align="right">
+                    {fetchDetail?.DueDate}
+                  </Typography>
+                  <Typography variant="body1" align="right">
+                    {fetchDetail?.BillPeriod}
+                  </Typography>
+                  <Typography variant="body1" align="right">
+                    Rs. {fetchDetail?.DueAmount}
+                  </Typography>
+                </Stack>
+              </Stack>
+            )}
+          </Grid>
         </FormProvider>
         {!isBillFetchMendatory && (
           <Box
@@ -485,61 +562,6 @@ function Bbps_One() {
               handleToReset={handleToReset}
             />
           </Box>
-        )}
-
-        {isBillFetch && (
-          <Stack
-            flexDirection={"row"}
-            justifyContent={"space-between"}
-            width={"50%"}
-          >
-            <Stack sx={{ display: "flex", flexDirection: "column" }}>
-              <Typography variant="subtitle1" align="left">
-                Bill date
-              </Typography>
-              <Typography variant="subtitle1" align="left">
-                Bill Number
-              </Typography>
-              <Typography variant="subtitle1" align="left">
-                Customer Name
-              </Typography>
-              <Typography variant="subtitle1" align="left">
-                Due Date
-              </Typography>
-              <Typography variant="subtitle1" align="left">
-                BillPeriod
-              </Typography>
-              <Typography variant="subtitle1" align="left">
-                Due Amount
-              </Typography>
-            </Stack>
-            <Stack
-              sx={{
-                "&:last-child td, &:last-child th": { border: 0 },
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Typography variant="body1" align="right">
-                {fetchDetail?.BillDate}
-              </Typography>
-              <Typography variant="body1" align="right">
-                {fetchDetail?.BillNumber}
-              </Typography>
-              <Typography variant="body1" align="right">
-                {fetchDetail?.CustomerName}
-              </Typography>
-              <Typography variant="body1" align="right">
-                {fetchDetail?.DueDate}
-              </Typography>
-              <Typography variant="body1" align="right">
-                {fetchDetail?.BillPeriod}
-              </Typography>
-              <Typography variant="body1" align="right">
-                Rs. {fetchDetail?.DueAmount}
-              </Typography>
-            </Stack>
-          </Stack>
         )}
       </Card>
     </>
