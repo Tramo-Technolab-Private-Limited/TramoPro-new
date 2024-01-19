@@ -40,6 +40,7 @@ import DMTpay from "./DMTpay";
 import ApiDataLoading from "../../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
+import useResponsive from "src/hooks/useResponsive";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -122,7 +123,7 @@ const Reducer = (state: any, action: any) => {
 export default function DMTbeneficiary() {
   const { user, UpdateUserDetail } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
-  const theme = useTheme();
+  const isMobile = useResponsive("up", "sm");
   const remitterContext: any = useContext(RemitterContext);
 
   const [remitterVerify, remitterVerifyDispatch] = useReducer(
@@ -321,7 +322,7 @@ export default function DMTbeneficiary() {
   }
   return (
     <>
-      <Grid sx={{ maxHeight: window.innerHeight - 220 }}>
+      <Grid sx={{ maxHeight: window.innerHeight - 210 }}>
         {getBene.isLoading ? (
           <ApiDataLoading />
         ) : (
@@ -335,7 +336,13 @@ export default function DMTbeneficiary() {
               </Button>
             </Stack>
             <TableContainer component={Paper}>
-              <Scrollbar sx={{ maxHeight: window.innerHeight - 250 }}>
+              <Scrollbar
+                sx={
+                  isMobile
+                    ? { maxHeight: window.innerHeight - 250 }
+                    : { maxHeight: window.innerHeight - 530 }
+                }
+              >
                 <Table
                   size="small"
                   stickyHeader
