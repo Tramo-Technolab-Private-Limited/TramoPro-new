@@ -215,47 +215,93 @@ function MyFundDeposits() {
   };
 
   const onSubmit = async (data: FormValuesProps) => {
-    setVerifyLoading(true);
-    let token = localStorage.getItem("token");
-    let body = {
-      bankId: selectedBankID,
-      modeId: selectedModeId,
-      // amount: allAmount,
-      amount: data.amount,
-      date_of_deposit: formattedDate,
-      transactional_details: {
-        branch: data.branch,
-        trxId: data.trxID,
-        mobile: data.mobile,
-      },
-      request_to: "ADMIN",
-      transactionSlip: docUrl,
-    };
+    if (docUrl !== "") {
+      setVerifyLoading(true);
+      let token = localStorage.getItem("token");
+      let body = {
+        bankId: selectedBankID,
+        modeId: selectedModeId,
 
-    Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            setRequestRaise(Response.data.Id);
+        amount: data.amount,
+        date_of_deposit: formattedDate,
+        transactional_details: {
+          branch: data.branch,
+          trxId: data.trxID,
+          mobile: data.mobile,
+        },
+        request_to: "ADMIN",
+        transactionSlip: docUrl,
+      };
 
-            setVerifyLoading(false);
-            reset(defaultValues);
-            setSelectedItem("");
-            setMaxAmount("");
-            setMinAmount("");
-            setSelectedModes([]);
-            setUploadFile("");
-            // setAllAmount();
+      Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              setRequestRaise(Response.data.Id);
 
-            enqueueSnackbar(Response.data.message);
-          } else {
-            enqueueSnackbar(Response.data.message);
-            setVerifyLoading(false);
+              setVerifyLoading(false);
+              reset(defaultValues);
+              setSelectedItem("");
+              setMaxAmount("");
+              setMinAmount("");
+              setSelectedModes([]);
+              setUploadFile("");
+              setDocUrl("");
+              enqueueSnackbar(Response.data.message);
+            } else {
+              enqueueSnackbar(Response.data.message);
+              setVerifyLoading(false);
+            }
           }
         }
-      }
-    );
+      );
+    } else {
+      enqueueSnackbar("Please upload Trasaction slip");
+    }
   };
+
+  // const onSubmit = async (data: FormValuesProps) => {
+  //   setVerifyLoading(true);
+  //   let token = localStorage.getItem("token");
+  //   let body = {
+  //     bankId: selectedBankID,
+  //     modeId: selectedModeId,
+  //     // amount: allAmount,
+  //     amount: data.amount,
+  //     date_of_deposit: formattedDate,
+  //     transactional_details: {
+  //       branch: data.branch,
+  //       trxId: data.trxID,
+  //       mobile: data.mobile,
+  //     },
+  //     request_to: "ADMIN",
+  //     transactionSlip: docUrl,
+  //   };
+
+  //   Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
+  //     (Response: any) => {
+  //       if (Response.status == 200) {
+  //         if (Response.data.code == 200) {
+  //           setRequestRaise(Response.data.Id);
+
+  //           setVerifyLoading(false);
+  //           reset(defaultValues);
+  //           setSelectedItem("");
+  //           setMaxAmount("");
+  //           setMinAmount("");
+  //           setSelectedModes([]);
+  //           setUploadFile("");
+  //           // setAllAmount();
+
+  //           enqueueSnackbar(Response.data.message);
+  //         } else {
+  //           enqueueSnackbar(Response.data.message);
+  //           setVerifyLoading(false);
+  //         }
+  //       }
+  //     }
+  //   );
+  // };
 
   return (
     <>
