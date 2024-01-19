@@ -141,7 +141,10 @@ export default function GovernanceForm(props: any) {
     BusinessName: Yup.string().required("Business Name is required"),
     address: Yup.string().required("Address is required"),
     stateJurisdiction: Yup.string().required("State is required"),
-    ShopName: Yup.string().required("State is required"),
+    ShopName:
+      radioVal == "Individual" && !user?.isGSTVerified
+        ? Yup.string().required("State is required")
+        : Yup.string(),
     panNumber:
       radioVal !== "Individual"
         ? Yup.string()
