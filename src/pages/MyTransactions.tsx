@@ -66,6 +66,7 @@ type FormValuesProps = {
   status: string;
   clientRefId: string;
   category: string;
+  product: string;
 };
 
 export default function MyTransactions() {
@@ -78,6 +79,9 @@ export default function MyTransactions() {
   const [categoryList, setCategoryList] = useState([]);
   const [sdata, setSdata] = useState([]);
   const [pageSize, setPageSize] = useState<any>(20);
+  const [currentTab, setCurrentTab] = useState("all");
+  const [ProductList, setProductList] = useState([]);
+  console.log("ProductName==========================>", ProductList);
 
   const txnSchema = Yup.object().shape({
     status: Yup.string(),
@@ -88,6 +92,7 @@ export default function MyTransactions() {
     category: "",
     status: "",
     clientRefId: "",
+    product: "",
   };
 
   const methods = useForm<FormValuesProps>({
@@ -108,6 +113,8 @@ export default function MyTransactions() {
     getTransaction();
   }, [currentPage]);
 
+  useEffect(() => setCurrentPage(1), [currentTab]);
+
   const {
     startDate,
     endDate,
@@ -120,6 +127,21 @@ export default function MyTransactions() {
     isError,
     shortLabel,
   } = useDateRangePicker(new Date(), new Date());
+
+  const getProductlist = (val: string) => {
+    let token = localStorage.getItem("token");
+    Api(`product/get_ProductList/${val}`, "GET", "", token).then(
+      (Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            setProductList(Response.data.data);
+          } else {
+            console.log("======getUser=======>" + Response);
+          }
+        }
+      }
+    );
+  };
 
   const getCategoryList = () => {
     let token = localStorage.getItem("token");
@@ -144,6 +166,7 @@ export default function MyTransactions() {
       status: getValues("status"),
       transactionType: "",
       categoryId: getValues("category"),
+      productId: getValues("product") || "",
     };
 
     Api(`transaction/transactionByUser`, "POST", body, token).then(
@@ -153,6 +176,7 @@ export default function MyTransactions() {
           if (Response.data.code == 200) {
             setSdata(Response.data.data.data);
             setPageCount(Response.data.data.totalNumberOfRecords);
+            setCurrentTab("");
             enqueueSnackbar(Response.data.message);
           } else {
             enqueueSnackbar(Response.data.message);
@@ -167,9 +191,9 @@ export default function MyTransactions() {
   };
 
   const filterTransaction = async (data: FormValuesProps) => {
+    setCurrentPage(1);
     try {
       setSdata([]);
-      setCurrentPage(1);
       setLoading(true);
       let token = localStorage.getItem("token");
       let body = {
@@ -181,6 +205,7 @@ export default function MyTransactions() {
         status: data.status,
         transactionType: "",
         categoryId: data.category,
+        productId: data.product,
       };
       await Api(`transaction/transactionByUser`, "POST", body, token).then(
         (Response: any) => {
@@ -278,7 +303,6 @@ export default function MyTransactions() {
             if (Response.data.data.data.length) {
               const Dataapi = Response.data.data.data;
               console.log("Dataapi", Dataapi);
-
               const formattedData = Response.data.data.data.map(
                 (item: any) => ({
                   createdAt: new Date(item?.createdAt).toLocaleString(),
@@ -290,36 +314,36 @@ export default function MyTransactions() {
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.id?.firstName
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.id?.firstName
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.id?.firstName
-                          : "",
+                      ? item?.distributorDetails?.id?.firstName
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.id?.firstName
+                      : "",
 
                   "Opening Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.oldMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.oldMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.oldMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.oldMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.oldMainWalletBalance
+                      : "",
 
                   "Closing Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.newMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.newMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.newMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.newMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.newMainWalletBalance
+                      : "",
                   " Commission Amount":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.commissionAmount
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.commissionAmount
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.commissionAmount
-                          : "",
+                      ? item?.distributorDetails?.commissionAmount
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.commissionAmount
+                      : "",
                   amount: item?.amount,
                   credit: item?.credit,
                   debit: item?.debit,
@@ -392,10 +416,31 @@ export default function MyTransactions() {
                   sx: { textTransform: "capitalize" },
                 }}
               >
-                <MenuItem value="">None</MenuItem>
+                <MenuItem value="">All</MenuItem>
                 {categoryList.map((item: any) => {
                   return (
-                    <MenuItem value={item._id}>{item?.category_name}</MenuItem>
+                    <MenuItem
+                      key={item._id}
+                      value={item._id}
+                      onClick={() => getProductlist(item._id)}
+                    >
+                      {item?.category_name}
+                    </MenuItem>
+                  );
+                })}
+              </RHFSelect>
+              <RHFSelect
+                name="product"
+                label="Product"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
+                }}
+              >
+                <MenuItem value="">All</MenuItem>
+                {ProductList.map((item: any) => {
+                  return (
+                    <MenuItem value={item._id}>{item?.productName}</MenuItem>
                   );
                 })}
               </RHFSelect>
@@ -477,8 +522,8 @@ export default function MyTransactions() {
                       user?.role == "m_distributor"
                         ? tableLabels
                         : user?.role == "distributor"
-                          ? tableLabels1
-                          : tableLabels2
+                        ? tableLabels1
+                        : tableLabels2
                     }
                   />
 
@@ -529,16 +574,16 @@ function TransactionRow({ row }: childProps) {
   const CheckTransactionStatus = (row: any) => {
     setLoading(true);
     let token = localStorage.getItem("token");
-    let rowFor = row
+    let rowFor = row;
     Api(
       rowFor.categoryName.toLowerCase() == "money transfer"
         ? `moneyTransfer/checkStatus/` + rowFor._id
         : rowFor.categoryName.toLowerCase() == "recharges"
-          ? `agents/v1/checkStatus/` + rowFor._id
-          : rowFor.categoryName.toLowerCase() == "dmt2"
-            ? `dmt2/transaction/status/` + rowFor._id
-            : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
-            `settlement/checkStatus/` + rowFor._id,
+        ? `agents/v1/checkStatus/` + rowFor._id
+        : rowFor.categoryName.toLowerCase() == "dmt2"
+        ? `dmt2/transaction/status/` + rowFor._id
+        : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
+          `settlement/checkStatus/` + rowFor._id,
       "GET",
       "",
       token
@@ -553,7 +598,6 @@ function TransactionRow({ row }: childProps) {
         setLoading(false);
       } else {
         setLoading(false);
-
       }
     });
   };
@@ -713,8 +757,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.oldMainWalletBalance
-                  : newRow?.masterDistributorDetails?.oldMainWalletBalance
+                ? newRow?.distributorDetails?.oldMainWalletBalance
+                : newRow?.masterDistributorDetails?.oldMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -739,8 +783,8 @@ function TransactionRow({ row }: childProps) {
                 user?.role === "agent"
                   ? newRow?.agentDetails?.creditedAmount
                   : user?.role === "distributor"
-                    ? newRow?.distributorDetails?.creditedAmount
-                    : newRow?.masterDistributorDetails?.creditedAmount
+                  ? newRow?.distributorDetails?.creditedAmount
+                  : newRow?.masterDistributorDetails?.creditedAmount
               ) || 0}
             </Typography>
           </Stack>
@@ -753,8 +797,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.newMainWalletBalance
-                  : newRow?.masterDistributorDetails?.newMainWalletBalance
+                ? newRow?.distributorDetails?.newMainWalletBalance
+                : newRow?.masterDistributorDetails?.newMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -767,8 +811,8 @@ function TransactionRow({ row }: childProps) {
               user?.role == "agent"
                 ? newRow?.agentDetails?.GST
                 : user?.role == "distributor"
-                  ? newRow?.distributorDetails?.GST
-                  : newRow?.masterDistributorDetails?.GST
+                ? newRow?.distributorDetails?.GST
+                : newRow?.masterDistributorDetails?.GST
             ) || 0}
           </Typography>
           <Typography variant="body2">
@@ -777,8 +821,8 @@ function TransactionRow({ row }: childProps) {
               user?.role == "agent"
                 ? newRow?.agentDetails?.TDSAmount
                 : user?.role == "distributor"
-                  ? newRow?.distributorDetails?.TDSAmount
-                  : newRow?.masterDistributorDetails?.TDSAmount
+                ? newRow?.distributorDetails?.TDSAmount
+                : newRow?.masterDistributorDetails?.TDSAmount
             ) || 0}
           </Typography>
         </StyledTableCell>
