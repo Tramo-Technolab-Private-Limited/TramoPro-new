@@ -260,6 +260,49 @@ function MyFundDeposits() {
     }
   };
 
+  // const onSubmit = async (data: FormValuesProps) => {
+  //   setVerifyLoading(true);
+  //   let token = localStorage.getItem("token");
+  //   let body = {
+  //     bankId: selectedBankID,
+  //     modeId: selectedModeId,
+  //     // amount: allAmount,
+  //     amount: data.amount,
+  //     date_of_deposit: formattedDate,
+  //     transactional_details: {
+  //       branch: data.branch,
+  //       trxId: data.trxID,
+  //       mobile: data.mobile,
+  //     },
+  //     request_to: "ADMIN",
+  //     transactionSlip: docUrl,
+  //   };
+
+  //   Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
+  //     (Response: any) => {
+  //       if (Response.status == 200) {
+  //         if (Response.data.code == 200) {
+  //           setRequestRaise(Response.data.Id);
+
+  //           setVerifyLoading(false);
+  //           reset(defaultValues);
+  //           setSelectedItem("");
+  //           setMaxAmount("");
+  //           setMinAmount("");
+  //           setSelectedModes([]);
+  //           setUploadFile("");
+  //           // setAllAmount();
+
+  //           enqueueSnackbar(Response.data.message);
+  //         } else {
+  //           enqueueSnackbar(Response.data.message);
+  //           setVerifyLoading(false);
+  //         }
+  //       }
+  //     }
+  //   );
+  // };
+
   return (
     <>
       <Scrollbar sx={{ maxHeight: window.innerHeight - 100, p: 2 }}>
