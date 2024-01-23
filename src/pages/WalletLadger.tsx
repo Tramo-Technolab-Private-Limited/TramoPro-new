@@ -38,6 +38,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { sentenceCase } from "change-case";
+import { green, red } from "@mui/material/colors";
 
 // ----------------------------------------------------------------------
 
@@ -147,13 +148,13 @@ export default function WalletLadger() {
 
   const ExportData = () => {
     let token = localStorage.getItem("token");
-  
+
     // Check if startDate and endDate are not empty
     if (!startDate || !endDate) {
       console.log("Start date and end date are required for export.");
       return;
     }
-  
+
     let body = {
       pageInitData: {
         pageSize: "",
@@ -162,21 +163,21 @@ export default function WalletLadger() {
       startDate: startDate,
       endDate: endDate,
     };
-  
+
     Api(`agent/walletLedger`, "POST", body, token).then((Response: any) => {
       console.log("======walletLedger==response=====>" + Response);
       if (Response.status === 200) {
         if (Response.data.code === 200) {
           if (Response.data.data.data.length) {
             const Dataapi = Response.data.data.data;
-  
+
             console.log(
               "Response of the ==============walletLedger===========>",
               Response.data?.data?.data
             );
-  
+
             // Rest of your code for formatting and exporting data...
-  
+
             console.log(
               "======getUser===data.data ===Transaction====>",
               Response
@@ -190,7 +191,6 @@ export default function WalletLadger() {
       }
     });
   };
-  
 
   return (
     <>
@@ -411,23 +411,35 @@ const LadgerRow = ({ row }: any) => {
           </Stack>
         </StyledTableCell>
         <StyledTableCell>
-        <Typography variant="subtitle2">Charge : </Typography>
-        <Typography variant="subtitle2">
-              {" "}
-              {row?.transaction?.debit}
+          <Typography variant="subtitle2"  sx={{color:'red'}}>
+            {" "}
+            Charge :{row?.transaction?.debit}
+          </Typography>
+          {user?.role === "agent" && (
+            <Typography variant="subtitle2" sx={{color:'green'}}>
+           Commission : {row?.transaction?.agentDetails?.commissionAmount}
             </Typography>
-            <Typography variant="subtitle2">Commission : </Typography>
-        <Typography variant="subtitle2">
-              {" "}
-              {row?.transaction?.commissionAmount}
+          )}
+
+          {user?.role === "distributor" && (
+            <Typography variant="subtitle2">
+          Commission :  {row?.transaction?.distributorDetails?.commissionAmount}
             </Typography>
+          )}
+
+          {user?.role === "masterdistributor" && (
+            <Typography variant="subtitle2">
+             {" "}
+             Commission : {row?.transaction?.masterDistributorDetails?.commissionAmount}
+            </Typography>
+          )}
         </StyledTableCell>
 
         <StyledTableCell>
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {row?.from?.newMainWalletBalance.toFixed(2)|| "-"}
+              {row?.from?.newMainWalletBalance.toFixed(2) || "-"}
             </Typography>
           </Stack>
         </StyledTableCell>
@@ -465,7 +477,8 @@ const LadgerRow = ({ row }: any) => {
             variant="soft"
             color={
               (row.transaction.status === "failed" && "error") ||
-              ((row.transaction.status === "pending" || row.transaction.status === "in_process") &&
+              ((row.transaction.status === "pending" ||
+                row.transaction.status === "in_process") &&
                 "warning") ||
               "success"
             }
