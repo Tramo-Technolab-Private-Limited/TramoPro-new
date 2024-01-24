@@ -463,8 +463,9 @@ const LadgerRow = ({ row }: any) => {
                     }
                     sx={{ textTransform: "capitalize" }}
                   >
-                    {row?.to?.walletType} = {row?.to?.amount}
+                    {row?.to?.walletType}
                   </Label>
+                  :{" " + row?.to?.amount}
                 </Typography>
               </>
             ) : (
@@ -478,8 +479,9 @@ const LadgerRow = ({ row }: any) => {
                   }
                   sx={{ textTransform: "capitalize" }}
                 >
-                  {row?.from?.walletType}= {row?.from?.amount}
+                  {row?.from?.walletType}
                 </Label>
+                :{row?.from?.amount}
               </>
             )}
           </Typography>
