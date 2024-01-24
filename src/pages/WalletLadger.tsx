@@ -74,8 +74,7 @@ export default function WalletLadger() {
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
     { id: "Charge/Commission", label: "Charge/Commission" },
-    { id: "main", label: "Main Balance " },
-    { id: "AEPS", label: "AEPS Wallet Balance " },
+    { id: "walletType", label: "WalletType " },
     { id: "Transcation ", label: "Transcation ID " },
     { id: "statue", label: "Status " },
   ];
@@ -85,8 +84,7 @@ export default function WalletLadger() {
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
     { id: "Charge/Commission", label: "Charge/Commission" },
-    { id: "main", label: "Main Balance " },
-    { id: "AEPS", label: "AEPS Wallet Balance " },
+    { id: "walletType", label: "WalletType " },
     { id: "Transcation ", label: "Transcation ID " },
     { id: "statue", label: "Status " },
 
@@ -98,8 +96,7 @@ export default function WalletLadger() {
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
     { id: "Charge/Commission", label: "Charge/Commission" },
-    { id: "main", label: "Main Balance " },
-    { id: "AEPS", label: "AEPS Wallet Balance " },
+    { id: "walletType", label: "WalletType " },
     { id: "Transcation ", label: "Transcation ID " },
     { id: "statue", label: "Status " },
   ];
@@ -176,8 +173,6 @@ export default function WalletLadger() {
               "Response of the ==============walletLedger===========>",
               Response.data?.data?.data
             );
-
-            // Rest of your code for formatting and exporting data...
 
             console.log(
               "======getUser===data.data ===Transaction====>",
@@ -414,52 +409,74 @@ const LadgerRow = ({ row }: any) => {
         </StyledTableCell>
         <StyledTableCell>
           <Typography variant="subtitle2" color={"error"}>
-            -{" "}
-            {fCurrency(row?.transaction?.debit || "0")}
+            - {fCurrency(row?.transaction?.debit || "0")}
           </Typography>
           {user?.role === "agent" && (
-            <Typography variant="subtitle2" sx={{color:'success.dark'}}>
-             {" "}
-              +{fCurrency(row?.transaction?.agentDetails?.commissionAmount || "0")}
+            <Typography variant="subtitle2" sx={{ color: "success.dark" }}>
+              {" "}
+              +
+              {fCurrency(
+                row?.transaction?.agentDetails?.commissionAmount || "0"
+              )}
             </Typography>
           )}
 
           {user?.role === "distributor" && (
             <Typography variant="subtitle2" color={"success.dark"}>
               {" "}
-              +{fCurrency(
+              +
+              {fCurrency(
                 row?.transaction?.distributorDetails?.commissionAmount || "0"
               )}
             </Typography>
           )}
 
           {user?.role === "masterdistributor" && (
-            <Typography variant="subtitle2" color={"success.dark"} >
+            <Typography variant="subtitle2" color={"success.dark"}>
               {" "}
-              {" "}
-              +{fCurrency(
-                row?.transaction?.masterDistributorDetails?.commissionAmount || "0"
+              +
+              {fCurrency(
+                row?.transaction?.masterDistributorDetails?.commissionAmount ||
+                  "0"
               )}
             </Typography>
           )}
         </StyledTableCell>
 
         <StyledTableCell>
-          <Stack direction="row" gap={0.5}>
-            <Typography variant="subtitle2">
-              {" "}
-              {fCurrency(row?.from?.newMainWalletBalance || "0")}
-            </Typography>
-          </Stack>
-        </StyledTableCell>
-
-        <StyledTableCell>
-          <Stack direction="row" gap={0.5}>
-            <Typography variant="subtitle2">
-              {" "}
-              {fCurrency(row?.from?.newAepsWalletBalance || "0")}
-            </Typography>
-          </Stack>
+          <Typography variant="body1" sx={{ color: "text.secondary" }}>
+            {user?._id === row?.to?.id?._id ? (
+              <>
+                <Typography color={"error"}>
+                  <Label
+                    variant="soft"
+                    color={
+                      (row?.to?.walletType === "MAIN" && "error") ||
+                      (row?.to?.walletType === "AEPS" && "warning") ||
+                      "success"
+                    }
+                    sx={{ textTransform: "capitalize" }}
+                  >
+                    {row?.to?.walletType} = {row?.to?.amount}
+                  </Label>
+                </Typography>
+              </>
+            ) : (
+              <>
+                <Label
+                  variant="soft"
+                  color={
+                    (row?.from?.walletType === "MAIN" && "error") ||
+                    (row?.from?.walletType === "AEPS" && "warning") ||
+                    "success"
+                  }
+                  sx={{ textTransform: "capitalize" }}
+                >
+                  {row?.from?.walletType} = {row?.from?.amount}
+                </Label>
+              </>
+            )}
+          </Typography>
         </StyledTableCell>
 
         {row?.transaction?.clientRefId ? (
@@ -568,7 +585,10 @@ const LadgerRow = ({ row }: any) => {
                               Opening:
                             </Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.agentDetails?.oldMainWalletBalance|| "-")}
+                              {fCurrency(
+                                ToFromData?.transaction?.agentDetails
+                                  ?.oldMainWalletBalance || "-"
+                              )}
                             </Typography>
                           </Stack>
 
@@ -577,7 +597,10 @@ const LadgerRow = ({ row }: any) => {
                               Closing:
                             </Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.agentDetails?.newMainWalletBalance)}
+                              {fCurrency(
+                                ToFromData?.transaction?.agentDetails
+                                  ?.newMainWalletBalance
+                              )}
                             </Typography>
                           </Stack>
                         </TableCell>
@@ -604,7 +627,9 @@ const LadgerRow = ({ row }: any) => {
                           <Stack gap={0.5} direction="row">
                             <Typography variant="subtitle2">TDS:</Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.agentDetails?.TDSAmount)}
+                              {fCurrency(
+                                ToFromData?.transaction?.agentDetails?.TDSAmount
+                              )}
                             </Typography>
                           </Stack>
                         </TableCell>
@@ -617,7 +642,10 @@ const LadgerRow = ({ row }: any) => {
                               Opening:
                             </Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.distributorDetails?.oldMainWalletBalance|| "-")}
+                              {fCurrency(
+                                ToFromData?.transaction?.distributorDetails
+                                  ?.oldMainWalletBalance || "-"
+                              )}
                             </Typography>
                           </Stack>
 
@@ -626,7 +654,10 @@ const LadgerRow = ({ row }: any) => {
                               Closing:
                             </Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.distributorDetails?.newMainWalletBalance)}
+                              {fCurrency(
+                                ToFromData?.transaction?.distributorDetails
+                                  ?.newMainWalletBalance
+                              )}
                             </Typography>
                           </Stack>
                         </TableCell>
@@ -669,7 +700,11 @@ const LadgerRow = ({ row }: any) => {
                               Opening:
                             </Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.masterDistributorDetails?.oldMainWalletBalance|| "-")}
+                              {fCurrency(
+                                ToFromData?.transaction
+                                  ?.masterDistributorDetails
+                                  ?.oldMainWalletBalance || "-"
+                              )}
                             </Typography>
                           </Stack>
 
@@ -678,7 +713,11 @@ const LadgerRow = ({ row }: any) => {
                               Closing:
                             </Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.masterDistributorDetails?.newMainWalletBalance)}
+                              {fCurrency(
+                                ToFromData?.transaction
+                                  ?.masterDistributorDetails
+                                  ?.newMainWalletBalance
+                              )}
                             </Typography>
                           </Stack>
                         </TableCell>
@@ -687,21 +726,31 @@ const LadgerRow = ({ row }: any) => {
                           <Stack gap={0.5} direction="row">
                             <Typography variant="subtitle2">Comm:</Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.masterDistributorDetails?.commissionAmount|| "-")}
+                              {fCurrency(
+                                ToFromData?.transaction
+                                  ?.masterDistributorDetails
+                                  ?.commissionAmount || "-"
+                              )}
                             </Typography>
                           </Stack>
 
                           <Stack gap={0.5} direction="row">
                             <Typography variant="subtitle2">Credit:</Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.masterDistributorDetails?.creditedAmount)}
+                              {fCurrency(
+                                ToFromData?.transaction
+                                  ?.masterDistributorDetails?.creditedAmount
+                              )}
                             </Typography>
                           </Stack>
 
                           <Stack gap={0.5} direction="row">
                             <Typography variant="subtitle2">TDS:</Typography>
                             <Typography variant="body2">
-                              {fCurrency(ToFromData?.transaction?.masterDistributorDetails?.TDSAmount)}
+                              {fCurrency(
+                                ToFromData?.transaction
+                                  ?.masterDistributorDetails?.TDSAmount
+                              )}
                             </Typography>
                           </Stack>
                         </TableCell>

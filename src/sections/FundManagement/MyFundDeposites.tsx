@@ -47,6 +47,7 @@ import Image from "src/components/image/Image";
 import neodeposit from "../../assets/icons/neodeposit.svg";
 import { convertToWords } from "src/components/customFunctions/ToWords";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
+import TrasactionModal from "src/components/customFunctions/TrasactionModal";
 
 type FormValuesProps = {
   rupee: string;
@@ -522,6 +523,8 @@ function MyFundDeposits() {
           <AllRequests requestRaise={requestRaise} banklist={dataB} />
         </Stack>
       </Grid> */}
+
+      {requestRaise && <TrasactionModal TrasactionCode={requestRaise} />}
     </>
   );
 }
