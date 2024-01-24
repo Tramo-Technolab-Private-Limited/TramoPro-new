@@ -189,7 +189,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         localStorage.setItem("long", coords.longitude);
       },
       (error) => {
-        setLocation(true);
+        setLocation(false);
       }
     );
     fetch("https://api.ipify.org?format=json")
