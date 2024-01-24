@@ -26,12 +26,6 @@ import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
 import { Api } from "src/webservices";
 import { Icon } from "@iconify/react";
-// import { useSnackbar } from "../../components/snackbar";
-// import { useSelector } from "react-redux";
-// import { dispatch } from "src/redux/store";
-// import { user?InRedux } from "src/redux/slices/user?";
-// import ApiDataLoading from "src/components/ApiDataLoading";
-// import Image from "../../../assets/images/illustration_dashboard.png";
 import Image from "src/components/image/Image";
 import GSTImage from "src/assets/Onboarding/GSTImage.png";
 import NotGSTImage from "src/assets/Onboarding/NotGSTImage.png";
@@ -141,7 +135,10 @@ export default function GovernanceForm(props: any) {
     BusinessName: Yup.string().required("Business Name is required"),
     address: Yup.string().required("Address is required"),
     stateJurisdiction: Yup.string().required("State is required"),
-    ShopName: Yup.string().required("State is required"),
+    ShopName:
+      radioVal == "Individual" && !user?.isGSTVerified
+        ? Yup.string().required("State is required")
+        : Yup.string(),
     panNumber:
       radioVal !== "Individual"
         ? Yup.string()

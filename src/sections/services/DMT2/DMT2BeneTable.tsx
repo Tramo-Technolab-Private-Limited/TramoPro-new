@@ -40,6 +40,7 @@ import DMT2pay from "./DMT2pay";
 import ApiDataLoading from "../../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
+import useResponsive from "src/hooks/useResponsive";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -125,7 +126,7 @@ export default function DMT2BeneTable() {
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail } = useAuthContext();
   const remitterContext: any = useContext(RemitterContext);
-
+  const isMobile = useResponsive("up", "sm");
   const [remitterVerify, remitterVerifyDispatch] = useReducer(
     Reducer,
     initialRemitterVerify
@@ -355,7 +356,13 @@ export default function DMT2BeneTable() {
               </LoadingButton>
             </Stack>
             <TableContainer component={Paper}>
-              <Scrollbar sx={{ maxHeight: window.innerHeight - 250 }}>
+              <Scrollbar
+                sx={
+                  isMobile
+                    ? { maxHeight: window.innerHeight - 250 }
+                    : { maxHeight: window.innerHeight - 530 }
+                }
+              >
                 <Table
                   stickyHeader
                   size="small"
