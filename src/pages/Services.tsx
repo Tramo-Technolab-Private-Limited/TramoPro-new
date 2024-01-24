@@ -14,6 +14,7 @@ import {
   Recharges,
 } from "../sections/services";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
+import ServiceUnderUpdate from "./ServiceUnderUpdate";
 
 // ----------------------------------------------------------------------
 
@@ -95,7 +96,8 @@ export default function Services(props: any) {
                   <CategoryContext.Provider value={tab} key={tab.category_name}>
                     <Box sx={{ m: 1 }}>
                       {superCurrentTab.toLowerCase() == "recharges" ? (
-                        <Recharges />
+                        // <Recharges />
+                        <ServiceUnderUpdate />
                       ) : superCurrentTab.toLowerCase() == "money transfer" ? (
                         <DMT />
                       ) : superCurrentTab.toLowerCase() == "aeps" ? (
@@ -103,9 +105,11 @@ export default function Services(props: any) {
                       ) : superCurrentTab.toLowerCase() == "indo nepal" ? (
                         <IndoNepal supCategory={tab} />
                       ) : superCurrentTab.toLowerCase() == "bill payment" ? (
-                        <BillPayment />
+                        // <BillPayment />
+                        <ServiceUnderUpdate />
                       ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
-                        <AadharPay supCategory={tab} />
+                        // <AadharPay supCategory={tab} />
+                        <ServiceUnderUpdate />
                       ) : superCurrentTab.toLowerCase() == "matm" ? (
                         <MATM supCategory={tab} />
                       ) : superCurrentTab.toLowerCase() == "dmt1" ? (
