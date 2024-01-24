@@ -39,6 +39,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { sentenceCase } from "change-case";
 import { green, red } from "@mui/material/colors";
+import { fCurrency } from "src/utils/formatNumber";
 
 // ----------------------------------------------------------------------
 
@@ -406,31 +407,31 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {row?.from?.amount || "-"}
+              {fCurrency(row?.from?.amount || "-")}
             </Typography>
           </Stack>
         </StyledTableCell>
         <StyledTableCell>
           <Typography variant="subtitle2"  sx={{color:'red'}}>
             {" "}
-            Charge :{row?.transaction?.debit}
+            Charge :{fCurrency(row?.transaction?.debit)}
           </Typography>
           {user?.role === "agent" && (
             <Typography variant="subtitle2" sx={{color:'green'}}>
-           Commission : {row?.transaction?.agentDetails?.commissionAmount}
+           Commission : {fCurrency(row?.transaction?.agentDetails?.commissionAmount)}
             </Typography>
           )}
 
           {user?.role === "distributor" && (
             <Typography variant="subtitle2">
-          Commission :  {row?.transaction?.distributorDetails?.commissionAmount}
+          Commission :  {fCurrency(row?.transaction?.distributorDetails?.commissionAmount)}
             </Typography>
           )}
 
           {user?.role === "masterdistributor" && (
             <Typography variant="subtitle2">
              {" "}
-             Commission : {row?.transaction?.masterDistributorDetails?.commissionAmount}
+             Commission : {fCurrency(row?.transaction?.masterDistributorDetails?.commissionAmount)}
             </Typography>
           )}
         </StyledTableCell>
@@ -439,7 +440,7 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {row?.from?.newMainWalletBalance|| "-"}
+              {fCurrency(row?.from?.newMainWalletBalance|| "-")}
             </Typography>
           </Stack>
         </StyledTableCell>
@@ -448,7 +449,7 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {row?.from?.newAepsWalletBalance|| "-"}
+              {fCurrency(row?.from?.newAepsWalletBalance|| "-")}
             </Typography>
           </Stack>
         </StyledTableCell>
@@ -457,13 +458,18 @@ const LadgerRow = ({ row }: any) => {
           <StyledTableCell onClick={() => openEditModal(row)}>
             <Typography
               variant="body1"
-              sx={{ color: "blue", textDecoration: "underline" }}
+              sx={{ color: "blue", textDecoration: "underline",cursor:'pointer' }}
             >
               {row?.transaction?.clientRefId || "-"}
             </Typography>
           </StyledTableCell>
         ) : (
-          "No Trasaction"
+          <Typography
+          variant="body1"
+          sx={{m:4}}
+        >
+          No Trasaction
+          </Typography>
         )}
 
         <StyledTableCell
