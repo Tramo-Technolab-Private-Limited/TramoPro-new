@@ -274,6 +274,7 @@ export default function AEPS(props: any) {
       longitude: localStorage.getItem("long"),
       requestRemarks: remark,
       nationalBankIdentificationNumber: getValues("bank.iinno"),
+      bankName: getValues("bank.bankName"),
       adhaarNumber: getValues("aadharNumber"),
       productId: productId,
       categoryId: props.supCategory._id,
@@ -333,6 +334,7 @@ export default function AEPS(props: any) {
       requestRemarks: remark,
       contact_no: getValues("mobileNumber"),
       nationalBankIdentificationNumber: getValues("bank.iinno"),
+      bankName: getValues("bank.bankName"),
       adhaarNumber: getValues("aadharNumber"),
       amount: Number(getValues("amount")),
       productId: productId,
@@ -400,6 +402,7 @@ export default function AEPS(props: any) {
       longitude: localStorage.getItem("long"),
       requestRemarks: remark,
       nationalBankIdentificationNumber: getValues("bank.iinno"),
+      bankName: getValues("bank.bankName"),
       adhaarNumber: getValues("aadharNumber"),
       productId: productId,
       categoryId: props.supCategory._id,
@@ -430,7 +433,6 @@ export default function AEPS(props: any) {
     };
     Api("aeps/get_mini_statement", "POST", body, token).then(
       (Response: any) => {
-        console.log("==============>>>fatch beneficiary Response", Response);
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             if (Response.data.data.status == false) {
@@ -449,7 +451,7 @@ export default function AEPS(props: any) {
         } else {
           handleCloseLoading();
           handleOpenError();
-          setFailedMessage("Internal Server Error");
+          setFailedMessage("Failed");
         }
       }
     );
