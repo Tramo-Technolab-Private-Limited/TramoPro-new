@@ -439,7 +439,7 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {row?.from?.newMainWalletBalance.toFixed(2) || "-"}
+              {row?.from?.newMainWalletBalance|| "-"}
             </Typography>
           </Stack>
         </StyledTableCell>
@@ -448,7 +448,7 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {row?.from?.newAepsWalletBalance.toFixed(2) || "-"}
+              {row?.from?.newAepsWalletBalance|| "-"}
             </Typography>
           </Stack>
         </StyledTableCell>
