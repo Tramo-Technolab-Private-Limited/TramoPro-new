@@ -299,8 +299,10 @@ function Bbps_One() {
 
   return (
     <>
-      <Scrollbar sx={{ maxHeight: window.innerHeight - 270 }}>
-        <Card sx={{ p: 2 }}>
+      <Scrollbar
+        sx={{ maxHeight: window.innerHeight - (isMobile ? 270 : 180) }}
+      >
+        <Card>
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Grid
               rowGap={3}
@@ -380,49 +382,15 @@ function Bbps_One() {
                     </Scrollbar>
                   </MenuPopover>
                 </Stack>
-                <Box
-                  rowGap={3}
-                  columnGap={2}
-                  display="grid"
-                  gridTemplateColumns={{
-                    xs: "repeat(1, 1fr)",
-                    sm: "repeat(1, 0.5fr)",
-                  }}
-                >
-                  <RHFAutocomplete
-                    name="location"
-                    onChange={(event, newValue) =>
-                      setValue("location", newValue)
-                    }
-                    options={locationList}
-                    getOptionLabel={(option: any) => option?.location}
-                    disabled={isBillFetch}
-                    renderOption={(props, option) => (
-                      <Box
-                        component="li"
-                        sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                        {...props}
-                      >
-                        {option?.location}
-                      </Box>
-                    )}
-                    renderInput={(params) => (
-                      <RHFTextField
-                        name="location.location"
-                        label="Location"
-                        {...params}
-                      />
-                    )}
-                  />
-                  {productList.length ? (
+                <Stack flexDirection={isMobile ? "row" : "column"} gap={2}>
+                  <Stack width={isMobile ? "50%" : "100%"} gap={2}>
                     <RHFAutocomplete
-                      name="operator"
-                      onChange={(event, newValue) => {
-                        setValue("operator", newValue);
-                        getParams(newValue?._id);
-                      }}
-                      options={productList}
-                      getOptionLabel={(option: any) => option?.productName}
+                      name="location"
+                      onChange={(event, newValue) =>
+                        setValue("location", newValue)
+                      }
+                      options={locationList}
+                      getOptionLabel={(option: any) => option?.location}
                       disabled={isBillFetch}
                       renderOption={(props, option) => (
                         <Box
@@ -430,125 +398,176 @@ function Bbps_One() {
                           sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
                           {...props}
                         >
-                          {option?.productName}
+                          {option?.location}
                         </Box>
                       )}
                       renderInput={(params) => (
                         <RHFTextField
-                          name="operator.productName"
-                          label="Product Name"
+                          name="location.location"
+                          label="Location"
                           {...params}
                         />
                       )}
                     />
-                  ) : (
-                    watch("location.location") && (
-                      <Typography variant="subtitle1">
-                        Product Not available
-                      </Typography>
-                    )
-                  )}
-                  <Stack rowGap={3} columnGap={2} display="grid">
-                    {paramList?.map((item: any, index: number) => {
-                      return (
-                        <Stack
-                          flexDirection={"row"}
-                          alignItems={"start"}
-                          gap={1}
-                          key={item.param_id}
-                        >
+                    {productList.length ? (
+                      <RHFAutocomplete
+                        name="operator"
+                        onChange={(event, newValue) => {
+                          setValue("operator", newValue);
+                          getParams(newValue?._id);
+                        }}
+                        options={productList}
+                        getOptionLabel={(option: any) => option?.productName}
+                        disabled={isBillFetch}
+                        renderOption={(props, option) => (
+                          <Box
+                            component="li"
+                            sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                            {...props}
+                          >
+                            {option?.productName}
+                          </Box>
+                        )}
+                        renderInput={(params) => (
                           <RHFTextField
-                            name={`bbpsParams.${index}.${item.param_label}`}
-                            error={
-                              !new RegExp(item.regex).test(
-                                watch(`bbpsParams.${index}`) &&
-                                  Object.values(
-                                    watch(`bbpsParams.${index}`)
-                                  )[0] + ""
-                              )
-                            }
-                            disabled={isBillFetch}
-                            id="outlined-error-helper-text"
-                            type={
-                              item.param_type === "AlphaNumeric"
-                                ? "text"
-                                : "number"
-                            }
-                            helperText={item.error_message}
-                            label={item.param_label}
-                            placeholder={item.param_label}
-                            inputProps={{ pattern: item.regex }}
+                            name="operator.productName"
+                            label="Product Name"
+                            {...params}
                           />
-                          {paramList.length - 1 == index && (
-                            <LoadingButton
-                              type="submit"
-                              variant="contained"
-                              loading={isSubmitting}
+                        )}
+                      />
+                    ) : (
+                      watch("location.location") && (
+                        <Typography variant="subtitle1">
+                          Product Not available
+                        </Typography>
+                      )
+                    )}
+                    <Stack rowGap={3} columnGap={2} display="grid">
+                      {paramList?.map((item: any, index: number) => {
+                        return (
+                          <Stack
+                            flexDirection={"row"}
+                            alignItems={"start"}
+                            gap={1}
+                            key={item.param_id}
+                          >
+                            <RHFTextField
+                              name={`bbpsParams.${index}.${item.param_label}`}
+                              error={
+                                !new RegExp(item.regex).test(
+                                  watch(`bbpsParams.${index}`) &&
+                                    Object.values(
+                                      watch(`bbpsParams.${index}`)
+                                    )[0] + ""
+                                )
+                              }
                               disabled={isBillFetch}
-                            >
-                              Fetch
-                            </LoadingButton>
-                          )}
-                        </Stack>
-                      );
-                    })}
+                              id="outlined-error-helper-text"
+                              type={
+                                item.param_type === "AlphaNumeric"
+                                  ? "text"
+                                  : "number"
+                              }
+                              helperText={item.error_message}
+                              label={item.param_label}
+                              placeholder={item.param_label}
+                              inputProps={{ pattern: item.regex }}
+                            />
+                            {paramList.length - 1 == index && (
+                              <LoadingButton
+                                type="submit"
+                                variant="contained"
+                                loading={isSubmitting}
+                                disabled={isBillFetch}
+                              >
+                                Fetch
+                              </LoadingButton>
+                            )}
+                          </Stack>
+                        );
+                      })}
+                    </Stack>
                   </Stack>
-                </Box>
-              </Stack>
-              {isBillFetch && (
-                <Stack
-                  flexDirection={"row"}
-                  justifyContent={"space-between"}
-                  width={"50%"}
-                >
-                  <Stack sx={{ display: "flex", flexDirection: "column" }}>
-                    <Typography variant="subtitle1" align="left">
-                      Bill date
-                    </Typography>
-                    <Typography variant="subtitle1" align="left">
-                      Bill Number
-                    </Typography>
-                    <Typography variant="subtitle1" align="left">
-                      Customer Name
-                    </Typography>
-                    <Typography variant="subtitle1" align="left">
-                      Due Date
-                    </Typography>
-                    <Typography variant="subtitle1" align="left">
-                      BillPeriod
-                    </Typography>
-                    <Typography variant="subtitle1" align="left">
-                      Due Amount
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    sx={{
-                      "&:last-child td, &:last-child th": { border: 0 },
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
-                  >
-                    <Typography variant="body1" align="right">
-                      {fetchDetail?.BillDate}
-                    </Typography>
-                    <Typography variant="body1" align="right">
-                      {fetchDetail?.BillNumber}
-                    </Typography>
-                    <Typography variant="body1" align="right">
-                      {fetchDetail?.CustomerName}
-                    </Typography>
-                    <Typography variant="body1" align="right">
-                      {fetchDetail?.DueDate}
-                    </Typography>
-                    <Typography variant="body1" align="right">
-                      {fetchDetail?.BillPeriod}
-                    </Typography>
-                    <Typography variant="body1" align="right">
-                      Rs. {fetchDetail?.DueAmount}
-                    </Typography>
-                  </Stack>
+                  {isBillFetch && (
+                    <Stack sx={{ width: isMobile ? "50%" : "100%" }}>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                      >
+                        <Typography variant="subtitle1" align="left">
+                          Bill date
+                        </Typography>
+                        <Typography variant="body1" align="right">
+                          {fetchDetail?.BillDate}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                      >
+                        <Typography variant="subtitle1" align="left">
+                          Bill Number
+                        </Typography>
+                        <Typography variant="body1" align="right">
+                          {fetchDetail?.BillNumber}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                      >
+                        <Typography variant="subtitle1" align="left">
+                          Customer Name
+                        </Typography>
+                        <Typography variant="body1" align="right">
+                          {fetchDetail?.CustomerName}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                      >
+                        <Typography variant="subtitle1" align="left">
+                          Due Date
+                        </Typography>
+                        <Typography variant="body1" align="right">
+                          {fetchDetail?.DueDate}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                      >
+                        <Typography variant="subtitle1" align="left">
+                          BillPeriod
+                        </Typography>
+                        <Typography variant="body1" align="right">
+                          {fetchDetail?.BillPeriod}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                      >
+                        <Typography variant="subtitle1" align="left">
+                          Due Amount
+                        </Typography>
+                        <Typography variant="body1" align="right">
+                          Rs. {fetchDetail?.DueAmount}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                          display: "flex",
+                          flexDirection: "column",
+                        }}
+                      ></Stack>
+                    </Stack>
+                  )}
                 </Stack>
-              )}
+              </Stack>
             </Grid>
           </FormProvider>
           {!isBillFetchMendatory && (

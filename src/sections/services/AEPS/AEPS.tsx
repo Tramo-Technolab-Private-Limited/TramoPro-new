@@ -24,6 +24,8 @@ import {
   TableCell,
   TableContainer,
   useTheme,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { TableHeadCustom } from "../../../components/table";
 import { Api } from "src/webservices";
@@ -42,6 +44,9 @@ import fingerScan from "../../../components/JsonAnimations/fingerprint-scan.json
 import { useAuthContext } from "src/auth/useAuthContext";
 import { Link } from "react-router-dom";
 import WithdrawAttendance from "./WithdrawAttendance";
+import DownloadIcon from "src/assets/icons/DownloadIcon";
+import MenuPopover from "src/components/menu-popover/MenuPopover";
+import Iconify from "src/components/iconify/Iconify";
 
 // ----------------------------------------------------------------------
 
@@ -128,6 +133,14 @@ export default function AEPS(props: any) {
   const [openAttendance, setOpenAttendance] = React.useState(false);
   const handleOpenAttendance = () => setOpenAttendance(true);
   const handleCloseAttendance = () => setOpenAttendance(false);
+
+  const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
+  const handleOpenPopover = (event: React.MouseEvent<HTMLElement>) => {
+    setOpenPopover(event.currentTarget);
+  };
+  const handleClosePopover = () => {
+    setOpenPopover(null);
+  };
 
   const AEPSSchema = Yup.object().shape({
     bank: Yup.object().shape({
@@ -653,183 +666,215 @@ export default function AEPS(props: any) {
         <title>AEPS | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
 
-      <Typography variant="h4"></Typography>
       {!user?.fingPayAPESRegistrationStatus || !user?.fingPayAEPSKycStatus ? (
         <RegistrationAeps />
-      ) : new Date(user?.presenceAt).toLocaleDateString() !==
+      ) : new Date(user?.presenceAt).toLocaleDateString() !=
         new Date().toLocaleDateString() ? (
         <AttendenceAeps attendance={"AEPS"} />
       ) : (
-        <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-          <>
-            <Stack>
-              <Box
-                columnGap={2}
-                display="grid"
-                gridTemplateColumns={{
-                  xs: "repeat(1, 1fr)",
-                  md: "repeat(2, 1fr)",
-                }}
-              >
-                <Box maxWidth={"fit-content"}>
-                  <Tabs
-                    value={CurrentTab}
-                    sx={{ background: "#F4F6F8", mb: 2 }}
-                    onChange={(event, newValue) => {
-                      setCurrentTab(newValue);
-                      reset(defaultValues);
-                    }}
-                  >
-                    {paymentType.map((tab: any) => (
-                      <Tab
-                        key={tab._id}
-                        sx={{ mx: 3 }}
-                        label={tab.productName}
-                        value={tab.productName}
-                        onClick={() => setProductId(tab._id)}
-                      />
-                    ))}
-                  </Tabs>
-                  {CurrentTab.match(/with/i) && !attend ? (
-                    <Stack my={1}>
-                      <Typography variant="body2">
-                        <strong>Note :</strong> It is mandatory to mark agent
-                        attendance before any AEPS withdrawal.
-                      </Typography>
-                      <Typography variant="body2">
-                        Please mark the attendance before customer withdrawal.
-                      </Typography>
-                      <Stack alignItems={"flex-end"} my={1}>
-                        <Button
-                          onClick={handleOpenAttendance}
-                          variant="contained"
-                        >
-                          Mark your attendance
-                        </Button>
-                      </Stack>
-                    </Stack>
-                  ) : (
-                    <>
-                      {attend && (
-                        <Typography variant="subtitle2" textAlign={"end"}>
-                          Withdrawal Attendance Timeout:{" "}
-                          <span
-                            style={{
-                              color:
-                                Math.floor(localAttendance) < 60
-                                  ? "red"
-                                  : "green",
-                            }}
-                          >
-                            {Math.floor(localAttendance / 60)} Minutes{" "}
-                            {Math.floor(localAttendance % 60)} Seconds
-                          </span>
+        <Stack flexDirection={"row"} justifyContent={"space-between"}>
+          <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+            <>
+              <Stack>
+                <Box
+                  columnGap={2}
+                  display="grid"
+                  gridTemplateColumns={{
+                    xs: "repeat(1, 1fr)",
+                    md: "repeat(2, 1fr)",
+                  }}
+                >
+                  <Box maxWidth={"fit-content"}>
+                    <Tabs
+                      value={CurrentTab}
+                      sx={{ background: "#F4F6F8", mb: 2 }}
+                      onChange={(event, newValue) => {
+                        setCurrentTab(newValue);
+                        reset(defaultValues);
+                      }}
+                    >
+                      {paymentType.map((tab: any) => (
+                        <Tab
+                          key={tab._id}
+                          sx={{ mx: 3 }}
+                          label={tab.productName}
+                          value={tab.productName}
+                          onClick={() => setProductId(tab._id)}
+                        />
+                      ))}
+                    </Tabs>
+                    {CurrentTab.match(/with/i) && !attend ? (
+                      <Stack my={1}>
+                        <Typography variant="body2">
+                          <strong>Note :</strong> It is mandatory to mark agent
+                          attendance before any AEPS withdrawal.
                         </Typography>
-                      )}
-                      <Grid rowGap={2} display="grid">
-                        <RHFSelect
-                          name="deviceName"
-                          label="Select Device"
-                          placeholder="Select Device"
-                          SelectProps={{
-                            native: false,
-                            sx: { textTransform: "capitalize" },
-                          }}
-                          fullWidth
-                        >
-                          <MenuItem value={"MORPHO"}>MORPHO</MenuItem>
-                          <MenuItem value={"STARTEK"}>STARTEK</MenuItem>
-                          <MenuItem value={"MANTRA"}>MANTRA</MenuItem>
-                          <MenuItem value={"SECUGEN"}>SECUGEN</MenuItem>
-                        </RHFSelect>
-                        <RHFAutocomplete
-                          name="bank"
-                          value={watch("bank")}
-                          onChange={(event, newValue) => {
-                            setValue("bank", newValue);
-                          }}
-                          options={bankList.map((option: any) => option)}
-                          getOptionLabel={(option: any) => option.bankName}
-                          renderOption={(props, option) => (
-                            <Box
-                              component="li"
-                              sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                              {...props}
-                            >
-                              {option.bankName}
-                            </Box>
-                          )}
-                          renderInput={(params) => (
-                            <RHFTextField
-                              name="bank.bankName"
-                              label="Bank Name"
-                              {...params}
-                            />
-                          )}
-                        />
-                        <RHFTextField
-                          name="aadharNumber"
-                          label="Customer AadharCard No."
-                          type="text"
-                        />
-                        {CurrentTab.toLowerCase() == "withdraw" && (
-                          <>
-                            <RHFTextField
-                              name="mobileNumber"
-                              type="number"
-                              label="Mobile Number"
-                            />
-                            <RHFTextField
-                              type="number"
-                              name="amount"
-                              label="Amount"
-                              placeholder="Amount"
-                              InputProps={{
-                                startAdornment: (
-                                  <InputAdornment position="start">
-                                    ₹
-                                  </InputAdornment>
-                                ),
+                        <Typography variant="body2">
+                          Please mark the attendance before customer withdrawal.
+                        </Typography>
+                        <Stack alignItems={"flex-end"} my={1}>
+                          <Button
+                            onClick={handleOpenAttendance}
+                            variant="contained"
+                          >
+                            Mark your attendance
+                          </Button>
+                        </Stack>
+                      </Stack>
+                    ) : (
+                      <>
+                        {attend && (
+                          <Typography variant="subtitle2" textAlign={"end"}>
+                            Withdrawal Attendance Timeout:{" "}
+                            <span
+                              style={{
+                                color:
+                                  Math.floor(localAttendance) < 60
+                                    ? "red"
+                                    : "green",
                               }}
-                            />
-                          </>
+                            >
+                              {Math.floor(localAttendance / 60)} Minutes{" "}
+                              {Math.floor(localAttendance % 60)} Seconds
+                            </span>
+                          </Typography>
                         )}
-                      </Grid>
-                    </>
-                  )}
+                        <Grid rowGap={2} display="grid">
+                          <RHFSelect
+                            name="deviceName"
+                            label="Select Device"
+                            placeholder="Select Device"
+                            SelectProps={{
+                              native: false,
+                              sx: { textTransform: "capitalize" },
+                            }}
+                            fullWidth
+                          >
+                            <MenuItem value={"MORPHO"}>MORPHO</MenuItem>
+                            <MenuItem value={"STARTEK"}>STARTEK</MenuItem>
+                            <MenuItem value={"MANTRA"}>MANTRA</MenuItem>
+                            <MenuItem value={"SECUGEN"}>SECUGEN</MenuItem>
+                          </RHFSelect>
+                          <RHFAutocomplete
+                            name="bank"
+                            value={watch("bank")}
+                            onChange={(event, newValue) => {
+                              setValue("bank", newValue);
+                            }}
+                            options={bankList.map((option: any) => option)}
+                            getOptionLabel={(option: any) => option.bankName}
+                            renderOption={(props, option) => (
+                              <Box
+                                component="li"
+                                sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                                {...props}
+                              >
+                                {option.bankName}
+                              </Box>
+                            )}
+                            renderInput={(params) => (
+                              <RHFTextField
+                                name="bank.bankName"
+                                label="Bank Name"
+                                {...params}
+                              />
+                            )}
+                          />
+                          <RHFTextField
+                            name="aadharNumber"
+                            label="Customer AadharCard No."
+                            type="text"
+                          />
+                          {CurrentTab.toLowerCase() == "withdraw" && (
+                            <>
+                              <RHFTextField
+                                name="mobileNumber"
+                                type="number"
+                                label="Mobile Number"
+                              />
+                              <RHFTextField
+                                type="number"
+                                name="amount"
+                                label="Amount"
+                                placeholder="Amount"
+                                InputProps={{
+                                  startAdornment: (
+                                    <InputAdornment position="start">
+                                      ₹
+                                    </InputAdornment>
+                                  ),
+                                }}
+                              />
+                            </>
+                          )}
+                        </Grid>
+                      </>
+                    )}
+                  </Box>
                 </Box>
-              </Box>
-            </Stack>
-            {CurrentTab.match(/with/i) && attend && (
-              <Stack flexDirection={"row"} gap={1} my={2}>
-                <LoadingButton variant="contained" type="submit">
-                  Continue to Finger print
-                </LoadingButton>
-                <LoadingButton
-                  variant="contained"
-                  component="span"
-                  onClick={() => reset(defaultValues)}
-                >
-                  Reset
-                </LoadingButton>
               </Stack>
-            )}
-            {!CurrentTab.match(/with/i) && (
-              <Stack flexDirection={"row"} gap={1} my={2}>
-                <LoadingButton variant="contained" type="submit">
-                  Continue to Finger print
-                </LoadingButton>
-                <LoadingButton
-                  variant="contained"
-                  component="span"
-                  onClick={() => reset(defaultValues)}
-                >
-                  Reset
-                </LoadingButton>
-              </Stack>
-            )}
-          </>
-        </FormProvider>
+              {CurrentTab.match(/with/i) && attend && (
+                <Stack flexDirection={"row"} gap={1} my={2}>
+                  <LoadingButton variant="contained" type="submit">
+                    Continue to Finger print
+                  </LoadingButton>
+                  <LoadingButton
+                    variant="contained"
+                    component="span"
+                    onClick={() => reset(defaultValues)}
+                  >
+                    Reset
+                  </LoadingButton>
+                </Stack>
+              )}
+              {!CurrentTab.match(/with/i) && (
+                <Stack flexDirection={"row"} gap={1} my={2}>
+                  <LoadingButton variant="contained" type="submit">
+                    Continue to Finger print
+                  </LoadingButton>
+                  <LoadingButton
+                    variant="contained"
+                    component="span"
+                    onClick={() => reset(defaultValues)}
+                  >
+                    Reset
+                  </LoadingButton>
+                </Stack>
+              )}
+            </>
+          </FormProvider>
+          <Stack>
+            <Tooltip title="Download Driver" placement="top">
+              <IconButton onClick={handleOpenPopover}>
+                <DownloadIcon />
+              </IconButton>
+            </Tooltip>
+          </Stack>
+          <MenuPopover
+            open={openPopover}
+            onClose={handleClosePopover}
+            arrow="right-top"
+            sx={{ width: 140 }}
+          >
+            <MenuItem onClick={handleClosePopover}>
+              <Iconify icon="line-md:download-loop" />
+              MORPHO
+            </MenuItem>
+
+            <MenuItem onClick={handleClosePopover}>
+              <Iconify icon="line-md:download-loop" />
+              MANTRA
+            </MenuItem>
+            <MenuItem onClick={handleClosePopover}>
+              <Iconify icon="line-md:download-loop" />
+              STARTEK
+            </MenuItem>
+            <MenuItem onClick={handleClosePopover}>
+              <Iconify icon="line-md:download-loop" />
+              SECUGEN
+            </MenuItem>
+          </MenuPopover>
+        </Stack>
       )}
       {/* confirm payment detail modal */}
       <Modal
