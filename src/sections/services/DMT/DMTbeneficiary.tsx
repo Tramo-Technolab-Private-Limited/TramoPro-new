@@ -142,6 +142,8 @@ export default function DMTbeneficiary() {
     reset(defaultValues);
   };
 
+  const [isOpen, setIsOpen] = useState(false);
+
   const [payoutData, setPayoutData] = React.useState({
     bankName: "",
     accountNumber: "",
@@ -375,7 +377,7 @@ export default function DMTbeneficiary() {
                         callback={setPayoutData}
                         remitterNumber={remitterContext.remitterMobile}
                         deleteBene={deleteBene}
-                        selected={payoutData._id}
+                        pay={() => setIsOpen(true)}
                       />
                     ))}
                   </TableBody>
@@ -385,13 +387,12 @@ export default function DMTbeneficiary() {
           </Paper>
         )}
       </Grid>
-      {payoutData._id && (
-        <DMTpay
-          clearPayout={() => setPayoutData({ ...payoutData, _id: "" })}
-          remitter={remitterContext}
-          beneficiary={payoutData}
-        />
-      )}
+      <DMTpay
+        isOpen={isOpen}
+        handleTxnClose={() => setIsOpen(false)}
+        remitter={remitterContext}
+        beneficiary={payoutData}
+      />
 
       {/* modal for add beneficiary */}
       <Modal
@@ -548,236 +549,225 @@ export default function DMTbeneficiary() {
 
 // ----------------------------------------------------------------------
 
-function BeneList({
-  row,
-  callback,
-  remitterNumber,
-  deleteBene,
-  selected,
-}: any) {
-  const { user, UpdateUserDetail } = useAuthContext();
-  const { enqueueSnackbar } = useSnackbar();
-  const theme = useTheme();
-  const [isLoading, setIsLoading] = useState(false);
-  const [cell, setCell] = useState(row);
-  const [deleteOtp, setDeleteOtp] = useState("");
-  const [varifyStatus, setVarifyStatus] = useState(true);
-  const [count, setCount] = useState(0);
-  const [toPay, setToPay] = useState("");
+const BeneList = React.memo(
+  ({ row, callback, remitterNumber, deleteBene, pay }: any) => {
+    const { user, UpdateUserDetail } = useAuthContext();
+    const { enqueueSnackbar } = useSnackbar();
+    const theme = useTheme();
+    const [isLoading, setIsLoading] = useState(false);
+    const [cell, setCell] = useState(row);
+    const [deleteOtp, setDeleteOtp] = useState("");
+    const [varifyStatus, setVarifyStatus] = useState(true);
+    const [count, setCount] = useState(0);
+    const [toPay, setToPay] = useState("");
 
-  const [open2, setModalEdit2] = React.useState(false);
-  const openEditModal2 = (val: any) => {
-    setModalEdit2(true);
-    deleteBeneficiary(remitterNumber);
-  };
-  const handleClose2 = () => {
-    setModalEdit2(false);
-    setDeleteOtp("");
-  };
-
-  const verifyBene = (val: string) => {
-    setVarifyStatus(false);
-    let token = localStorage.getItem("token");
-    let body = {
-      beneficiaryId: val,
+    const [open2, setModalEdit2] = React.useState(false);
+    const openEditModal2 = (val: any) => {
+      setModalEdit2(true);
+      deleteBeneficiary(remitterNumber);
     };
-    Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
-      (Response: any) => {
+    const handleClose2 = () => {
+      setModalEdit2(false);
+      setDeleteOtp("");
+    };
+
+    const verifyBene = (val: string) => {
+      setVarifyStatus(false);
+      let token = localStorage.getItem("token");
+      let body = {
+        beneficiaryId: val,
+      };
+      Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              setCell({
+                ...cell,
+                isVerified: true,
+                beneName: Response.data.name,
+              });
+              UpdateUserDetail({
+                main_wallet_amount: user?.main_wallet_amount - 3,
+              });
+            } else {
+              enqueueSnackbar(Response.data.message);
+            }
+            setVarifyStatus(true);
+          } else {
+            enqueueSnackbar("Internal server error");
+            setVarifyStatus(true);
+          }
+        }
+      );
+    };
+
+    const deleteBeneficiary = (val: string) => {
+      let token = localStorage.getItem("token");
+      Api(
+        "moneyTransfer/beneficiary/delete/sendOtp/" + val,
+        "GET",
+        "",
+        token
+      ).then((Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             enqueueSnackbar(Response.data.message);
-            setCell({
-              ...cell,
-              isVerified: true,
-              beneName: Response.data.name,
-            });
-            UpdateUserDetail({
-              main_wallet_amount: user?.main_wallet_amount - 3,
-            });
           } else {
             enqueueSnackbar(Response.data.message);
           }
-          setVarifyStatus(true);
-        } else {
-          enqueueSnackbar("Internal server error");
-          setVarifyStatus(true);
         }
-      }
-    );
-  };
-
-  const deleteBeneficiary = (val: string) => {
-    let token = localStorage.getItem("token");
-    Api(
-      "moneyTransfer/beneficiary/delete/sendOtp/" + val,
-      "GET",
-      "",
-      token
-    ).then((Response: any) => {
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.message);
-        } else {
-          enqueueSnackbar(Response.data.message);
-        }
-      }
-    });
-  };
-  const confirmDeleteBene = () => {
-    setIsLoading(true);
-    let token = localStorage.getItem("token");
-    let body = {
-      remitterMobile: remitterNumber,
-      beneficiaryId: row._id,
-      otp: deleteOtp,
+      });
     };
-    Api("moneyTransfer/beneficiary/delete", "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            handleClose2();
-            setDeleteOtp("");
-            deleteBene(row._id);
+    const confirmDeleteBene = () => {
+      setIsLoading(true);
+      let token = localStorage.getItem("token");
+      let body = {
+        remitterMobile: remitterNumber,
+        beneficiaryId: row._id,
+        otp: deleteOtp,
+      };
+      Api("moneyTransfer/beneficiary/delete", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              handleClose2();
+              setDeleteOtp("");
+              deleteBene(row._id);
+            } else {
+              enqueueSnackbar(Response.data.message);
+            }
+            setIsLoading(false);
           } else {
-            enqueueSnackbar(Response.data.message);
+            setIsLoading(false);
           }
-          setIsLoading(false);
-        } else {
-          setIsLoading(false);
         }
-      }
-    );
-  };
+      );
+    };
 
-  useEffect(() => {
-    if (count > 0) {
-      const timer = setInterval(() => {
-        setCount((prevCount) => prevCount - 1);
-      }, 1000);
-      return () => clearInterval(timer);
+    useEffect(() => {
+      if (count > 0) {
+        const timer = setInterval(() => {
+          setCount((prevCount) => prevCount - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+      }
+    }, [count]);
+
+    function ResendOtp() {
+      deleteBeneficiary(remitterNumber);
+      setCount(30);
     }
-  }, [count]);
 
-  function ResendOtp() {
-    deleteBeneficiary(remitterNumber);
-    setCount(30);
-  }
+    return (
+      <>
+        <TableRow hover key={cell._id}>
+          <TableCell>{cell.beneName}</TableCell>
+          <TableCell>{cell.bankName}</TableCell>
+          <TableCell>{cell.accountNumber}</TableCell>
+          <TableCell>{cell.ifsc}</TableCell>
 
-  return (
-    <>
-      <TableRow
-        hover
-        key={cell._id}
-        sx={
-          cell._id == selected
-            ? { backgroundColor: theme.palette.primary.main + "1a" }
-            : { backgroundColor: "white" }
-        }
-      >
-        <TableCell>{cell.beneName}</TableCell>
-        <TableCell>{cell.bankName}</TableCell>
-        <TableCell>{cell.accountNumber}</TableCell>
-        <TableCell>{cell.ifsc}</TableCell>
-
-        <TableCell>
-          {!cell.isVerified ? (
-            <LoadingButton
-              sx={{ display: "flex", alignItems: "center", width: "105px" }}
-              variant="contained"
-              color="warning"
-              loading={!varifyStatus}
-              onClick={() => verifyBene(cell._id)}
-            >
-              Verify Now
-            </LoadingButton>
-          ) : (
-            <TableCell style={{ color: "#00AB55" }}>
-              <Icon icon="material-symbols:verified" /> Verified
-            </TableCell>
-          )}
-        </TableCell>
-        <TableCell>
-          <Stack justifyContent={"center"} flexDirection={"row"}>
-            <Button
-              variant="contained"
-              onClick={() => {
-                callback(cell);
-                setToPay(cell._id);
-              }}
-            >
-              Pay
-            </Button>
-          </Stack>
-        </TableCell>
-      </TableRow>
-      <Modal
-        open={open2}
-        onClose={handleClose2}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Grid
-          item
-          xs={12}
-          md={8}
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <Card sx={{ p: 3 }}>
-            <Stack>
-              <TextField
-                type="number"
-                name="deleteotp"
-                label="OTP"
-                value={deleteOtp}
-                onChange={(e) => setDeleteOtp(e.target.value)}
-              />
-            </Stack>
-            {count === 0 ? (
-              <Typography
-                variant="subtitle2"
-                onClick={ResendOtp}
-                sx={{
-                  width: "fit-content",
-                  mt: 2,
-                  cursor: "pointer",
-                  color: theme.palette.primary.main,
+          <TableCell>
+            {!cell.isVerified ? (
+              <LoadingButton
+                sx={{ display: "flex", alignItems: "center", width: "105px" }}
+                variant="contained"
+                color="warning"
+                loading={!varifyStatus}
+                onClick={() => verifyBene(cell._id)}
+              >
+                Verify Now
+              </LoadingButton>
+            ) : (
+              <TableCell style={{ color: "#00AB55" }}>
+                <Icon icon="material-symbols:verified" /> Verified
+              </TableCell>
+            )}
+          </TableCell>
+          <TableCell>
+            <Stack justifyContent={"center"} flexDirection={"row"}>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  callback(cell);
+                  setToPay(cell._id);
+                  pay();
                 }}
               >
-                Resend OTP
-              </Typography>
-            ) : (
-              <Typography
-                variant="subtitle2"
-                sx={{ width: "fit-content", mt: 2 }}
-              >
-                Wait {count} sec to resend OTP
-              </Typography>
-            )}
+                Pay
+              </Button>
+            </Stack>
+          </TableCell>
+        </TableRow>
+        <Modal
+          open={open2}
+          onClose={handleClose2}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Grid
+            item
+            xs={12}
+            md={8}
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
+            <Card sx={{ p: 3 }}>
+              <Stack>
+                <TextField
+                  type="number"
+                  name="deleteotp"
+                  label="OTP"
+                  value={deleteOtp}
+                  onChange={(e) => setDeleteOtp(e.target.value)}
+                />
+              </Stack>
+              {count === 0 ? (
+                <Typography
+                  variant="subtitle2"
+                  onClick={ResendOtp}
+                  sx={{
+                    width: "fit-content",
+                    mt: 2,
+                    cursor: "pointer",
+                    color: theme.palette.primary.main,
+                  }}
+                >
+                  Resend OTP
+                </Typography>
+              ) : (
+                <Typography
+                  variant="subtitle2"
+                  sx={{ width: "fit-content", mt: 2 }}
+                >
+                  Wait {count} sec to resend OTP
+                </Typography>
+              )}
 
-            <LoadingButton
-              variant="contained"
-              sx={{ mt: 2 }}
-              onClick={confirmDeleteBene}
-              loading={isLoading}
-            >
-              Delete Beneficiary
-            </LoadingButton>
-            <Button
-              variant="contained"
-              onClick={handleClose2}
-              sx={{ mt: 2, ml: 1 }}
-            >
-              Close
-            </Button>
-          </Card>
-        </Grid>
-      </Modal>
-    </>
-  );
-}
+              <LoadingButton
+                variant="contained"
+                sx={{ mt: 2 }}
+                onClick={confirmDeleteBene}
+                loading={isLoading}
+              >
+                Delete Beneficiary
+              </LoadingButton>
+              <Button
+                variant="contained"
+                onClick={handleClose2}
+                sx={{ mt: 2, ml: 1 }}
+              >
+                Close
+              </Button>
+            </Card>
+          </Grid>
+        </Modal>
+      </>
+    );
+  }
+);
