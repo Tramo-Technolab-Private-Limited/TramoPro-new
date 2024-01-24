@@ -12,75 +12,94 @@ import IN_PROCESSImgae from "../../assets/transactionIcons/in_process.svg";
 import Image from "src/components/image/Image";
 import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-export default function TrasactionModal(props: any) {
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 600,
-    height: 200,
-    bgcolor: "background.paper",
-    border: "2px ",
-    borderRadius: 2,
-    boxShadow: 24,
-    p: 2,
-    overflow: "auto",
-  };
+import { Stack } from "@mui/material";
+import { Icon } from "@iconify/react";
+import { sentenceCase } from "change-case";
 
-  const [open, setOpen] = React.useState(true);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+const style = {
+  position: "absolute" as "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: { xs: "100%", sm: 400 },
+  bgcolor: "background.paper",
+  border: "2px ",
+  borderRadius: 2,
+  boxShadow: 24,
+  p: 2,
+};
 
-  return (
-    <>
-      Hi
+export default function TransactionModal({
+  transactionDetail,
+  errorMsg,
+  isTxnOpen,
+  handleTxnModal,
+}: any) {
+  console.log("transactionDetail", transactionDetail, errorMsg);
+  if (errorMsg) {
+    return (
       <Modal
-        open={open}
+        open={isTxnOpen}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
         <Box sx={style}>
-          <Typography
-            id="transition-modal-title"
-            variant="h6"
-            component="h2"
-            sx={{ marginBottom: 2 }}
-          >
-            Trasaction
-            {/* {props.TransactionData.status == "success" ? (
-              <Image src={SuccessImage} alt="" sx={{ width: 30, height: 30 }} />
-            ) : props.TransactionData.status == "pending" ? (
-              <Image
-                src={PenddingImage}
-                alt=""
-                sx={{ width: 30, height: 30 }}
-              />
-            ) : props.TransactionData.status == "failed" ? (
-              <Image src={FailedImage} alt="" sx={{ width: 30, height: 30 }} />
-            ) : props.TransactionData.status == "hold" ? (
-              <Image src={HoldImage} alt="" sx={{ width: 30, height: 30 }} />
-            ) : props.TransactionData.status == "in_process" ? (
-              <Image
-                src={IN_PROCESSImgae}
-                alt=""
-                sx={{ width: 30, height: 30 }}
-              />
-            ) : props.TransactionData.status == "initiated" ? (
-              <Image
-                src={IntiatedImage}
-                alt=""
-                sx={{ width: 30, height: 30 }}
-              />
-            ) : (
-              ""
-            )} */}
+          <Stack flexDirection={"row"} justifyContent={"center"}>
+            <Image src={FailedImage} alt={"Failed"} />
+          </Stack>
+          <Typography variant="h4" textAlign={"center"}>
+            Transaction Failed
           </Typography>
-          <Button onClick={handleClose} variant="contained">
+          <Typography
+            variant="h4"
+            textAlign={"center"}
+            color={"#9e9e9ef0"}
+            my={1}
+          >
+            {errorMsg}
+          </Typography>
+          <Button onClick={handleTxnModal} variant="contained">
             Close
           </Button>
         </Box>
       </Modal>
-    </>
+    );
+  }
+
+  return (
+    <Modal
+      open={isTxnOpen}
+      aria-labelledby="modal-modal-title"
+      aria-describedby="modal-modal-description"
+    >
+      <Box sx={style}>
+        <Stack flexDirection={"row"} justifyContent={"center"}>
+          <Image
+            src={
+              transactionDetail?.status == "success"
+                ? SuccessImage
+                : transactionDetail?.status == "pending"
+                ? PenddingImage
+                : transactionDetail?.status == "hold"
+                ? HoldImage
+                : transactionDetail?.status == "in_process"
+                ? IN_PROCESSImgae
+                : IntiatedImage
+            }
+            alt={`${transactionDetail?.status}`}
+          />
+        </Stack>
+        <Typography
+          id="transition-modal-title"
+          variant="h4"
+          sx={{ marginBottom: 2, textAlign: "center" }}
+        >
+          {`Trasaction ${sentenceCase(transactionDetail?.status)}`}
+        </Typography>
+        <Button onClick={handleTxnModal} variant="contained">
+          Close
+        </Button>
+      </Box>
+    </Modal>
   );
 }

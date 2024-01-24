@@ -29,6 +29,7 @@ import { convertToWords } from "src/components/customFunctions/ToWords";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
+import TransactionModal from "src/components/customFunctions/TrasactionModal";
 
 // ----------------------------------------------------------------------
 
@@ -44,40 +45,29 @@ type FormValuesProps = {
 
 //--------------------------------------------------------------------
 
-export default function DMTpay({ clearPayout, remitter, beneficiary }: any) {
+export default function DMTpay({
+  remitter,
+  beneficiary,
+  isOpen,
+  handleTxnClose,
+}: any) {
   const { availableLimitForMoneyTransfer } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const { UpdateUserDetail } = useAuthContext();
-  const [isLoading, setIsLoading] = useState(false);
+  const { UpdateUserDetail, initialize } = useAuthContext();
   const [mode, setMode] = useState("");
-  const [txn, setTxn] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
-  const [checkNPIN, setCheckNPIN] = useState(false);
-  const [confirm, setConfirm] = useState(false);
+
+  const [isTxnOpen, setIsTxnOpen] = useState(false);
   const [transactionDetail, setTransactionDetail] = useState({
-    amount: "",
-    clientRefId: "",
-    createdAt: "",
     status: "",
   });
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
-    setConfirm(false);
-    setCheckNPIN(false);
-    setTxn(true);
     reset(defaultValues);
   };
-  const [open1, setOpen1] = useState(false);
-  const handleOpen1 = () => setOpen1(true);
-  const handleClose1 = () => {
-    setOpen1(false);
-  };
-  useEffect(() => {
-    beneficiary._id && handleOpen1();
-  }, [beneficiary._id]);
 
   const style = {
     position: "absolute" as "absolute",
@@ -132,8 +122,7 @@ export default function DMTpay({ clearPayout, remitter, beneficiary }: any) {
     formState: { errors, isSubmitting, isValid },
   } = methods;
 
-  const transaction = (data: FormValuesProps) => {
-    setIsLoading(true);
+  const transaction = async (data: FormValuesProps) => {
     let token = localStorage.getItem("token");
     let body = {
       beneficiaryId: beneficiary._id,
@@ -145,54 +134,37 @@ export default function DMTpay({ clearPayout, remitter, beneficiary }: any) {
       nPin:
         data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
     };
-    {
-      if (body.nPin) {
-        setCheckNPIN(true);
-        setIsLoading(false);
-      }
-    }
-    {
-      body.nPin &&
-        Api("moneytransfer/transaction", "POST", body, token).then(
-          (Response: any) => {
-            console.log(
-              "==============>>> register beneficiary Response",
-              Response
-            );
-            if (Response.status == 200) {
-              if (Response.data.code == 200) {
-                enqueueSnackbar(Response.data.message);
-                setTransactionDetail(Response.data.data);
-                setErrorMsg("");
-                TextToSpeak(Response.data.message);
-                setTxn(false);
-                UpdateUserDetail({
-                  main_wallet_amount:
-                    Response?.data?.data?.agentDetails?.newMainWalletBalance,
-                });
-              } else {
-                enqueueSnackbar(Response.data.message, { variant: "error" });
-                setErrorMsg(Response.data.message);
-              }
-              clearPayout();
-              setIsLoading(false);
-            } else {
-              setIsLoading(false);
-              setCheckNPIN(false);
-              clearPayout();
-              enqueueSnackbar(Response, { variant: "error" });
-            }
+    await Api("moneytransfer/transaction", "POST", body, token).then(
+      (Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.message);
+            setTransactionDetail(Response.data.data);
+            TextToSpeak(Response.data.message);
+            UpdateUserDetail({
+              main_wallet_amount:
+                Response?.data?.data?.agentDetails?.newMainWalletBalance,
+            });
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "error" });
+            setErrorMsg(Response.data.message);
           }
-        );
-    }
+          handleClose();
+          setIsTxnOpen(true);
+        } else {
+          enqueueSnackbar(Response, { variant: "error" });
+        }
+      }
+    );
   };
 
   const onsubmit = () => {};
 
   return (
     <>
+      {/* transactional user confirm */}
       <Modal
-        open={open1}
+        open={isOpen}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -266,7 +238,7 @@ export default function DMTpay({ clearPayout, remitter, beneficiary }: any) {
               <Stack flexDirection={"row"} gap={1}>
                 <Button
                   onClick={() => {
-                    handleClose1();
+                    handleTxnClose();
                     handleOpen();
                   }}
                   variant="contained"
@@ -283,8 +255,7 @@ export default function DMTpay({ clearPayout, remitter, beneficiary }: any) {
                 </Button>
                 <Button
                   onClick={() => {
-                    handleClose1();
-                    clearPayout();
+                    handleTxnClose();
                   }}
                   variant="contained"
                   sx={{ mt: 1 }}
@@ -296,278 +267,102 @@ export default function DMTpay({ clearPayout, remitter, beneficiary }: any) {
           </FormProvider>
         </Box>
       </Modal>
+
       <Modal
         open={open}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
-        {checkNPIN ? (
-          txn ? (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              width={"fit-content"}
+        <Box
+          sx={style}
+          style={{ borderRadius: "20px" }}
+          width={{ xs: "100%", sm: 450 }}
+          minWidth={350}
+        >
+          <Typography variant="h4" textAlign={"center"}>
+            Confirm Details
+          </Typography>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Beneficiary Name</Typography>
+            <Typography variant="body1">{beneName}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Bank Name</Typography>
+            <Typography variant="body1">{bankName}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Account Number</Typography>
+            <Typography variant="body1">{accountNumber}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">IFSC code</Typography>
+            <Typography variant="body1">{ifsc}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Mobile Number</Typography>
+            <Typography variant="body1">{mobileNumber || "-"}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Transaction Amount</Typography>
+            <Typography variant="body1">₹{getValues("payAmount")}</Typography>
+          </Stack>
+          <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
+            <Stack
+              alignItems={"center"}
+              justifyContent={"space-between"}
+              mt={2}
+              gap={2}
             >
-              <Icon
-                icon="eos-icons:bubble-loading"
-                color="red"
-                fontSize={300}
-                style={{ padding: 25 }}
+              <Typography variant="h4">Confirm NPIN</Typography>
+              <RHFCodes
+                keyName="otp"
+                type="password"
+                inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
               />
-            </Box>
-          ) : errorMsg ? (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              width={{ xs: "100%", sm: 400 }}
-            >
-              <Stack flexDirection={"column"} alignItems={"center"}>
-                <Typography variant="h3">Transaction Failed</Typography>
-                <Icon
-                  icon="heroicons:exclaimation-circle"
-                  color="red"
-                  fontSize={70}
-                />
-              </Stack>
-              <Stack
-                flexDirection={"row"}
-                justifyContent={"space-between"}
-                mt={2}
-              >
-                <Typography
-                  variant="h4"
-                  textAlign={"center"}
-                  color={"#9e9e9ef0"}
-                >
-                  {errorMsg}
-                </Typography>
-              </Stack>
-              <Stack flexDirection={"row"} justifyContent={"center"}>
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    handleClose();
-                    clearPayout();
-                  }}
-                  sx={{ mt: 2 }}
-                >
-                  Close
-                </Button>
-              </Stack>
-            </Box>
-          ) : (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              p={2}
-              width={{ xs: "100%", sm: 450 }}
-            >
-              <Stack
-                sx={{ border: "1.5px dashed #000000" }}
-                p={3}
-                borderRadius={2}
-              >
-                <Stack flexDirection={"column"} alignItems={"center"}>
-                  <Typography variant="h6">
-                    Transaction {transactionDetail.status}
-                  </Typography>
-                  {transactionDetail.status.toLowerCase() == "success" ? (
-                    <Icon
-                      icon="icon-park-outline:success"
-                      color="#4BB543"
-                      fontSize={70}
-                    />
-                  ) : transactionDetail.status.toLowerCase() == "failed" ? (
-                    <Icon
-                      icon="heroicons:exclaimation-circle"
-                      color="red"
-                      fontSize={70}
-                    />
-                  ) : (
-                    <Icon
-                      icon="streamline:interface-page-controller-loading-1-progress-loading-load-wait-waiting"
-                      color="orange"
-                      fontSize={70}
-                    />
-                  )}
-                </Stack>
-                <Stack
-                  flexDirection={"row"}
-                  justifyContent={"space-between"}
-                  mt={2}
-                >
-                  <Typography variant="subtitle1">Amount</Typography>
-                  <Typography variant="body1">
-                    {transactionDetail.amount && "₹"}{" "}
-                    {transactionDetail.amount || "NA"}
-                  </Typography>
-                </Stack>
-                <Stack
-                  flexDirection={"row"}
-                  justifyContent={"space-between"}
-                  mt={2}
-                >
-                  <Typography variant="subtitle1">Transaction Id</Typography>
-                  <Typography variant="body1">
-                    {transactionDetail.clientRefId || "NA"}
-                  </Typography>
-                </Stack>
-                <Stack
-                  flexDirection={"row"}
-                  justifyContent={"space-between"}
-                  mt={2}
-                >
-                  <Typography variant="subtitle1">Date</Typography>
-                  <Typography variant="body1">
-                    {fDateTime(transactionDetail.createdAt) || "NA"}
-                  </Typography>
-                </Stack>
-              </Stack>
-              <Stack flexDirection={"row"} gap={1} mt={1}>
-                {/* <Button variant="contained" onClick={handleClose} size="small">
-                  Download Receipt
-                </Button> */}
-                <Button
-                  variant="contained"
-                  onClick={() => {
-                    handleClose();
-                    clearPayout();
-                  }}
-                  size="small"
-                >
-                  Close
-                </Button>
-              </Stack>
-            </Box>
-          )
-        ) : (
-          <Box
-            sx={style}
-            style={{ borderRadius: "20px" }}
-            width={{ xs: "100%", sm: 450 }}
-            minWidth={350}
-          >
-            <Typography variant="h4" textAlign={"center"}>
-              Confirm Details
-            </Typography>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Beneficiary Name</Typography>
-              <Typography variant="body1">{beneName}</Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Bank Name</Typography>
-              <Typography variant="body1">{bankName}</Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Account Number</Typography>
-              <Typography variant="body1">{accountNumber}</Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">IFSC code</Typography>
-              <Typography variant="body1">{ifsc}</Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Mobile Number</Typography>
-              <Typography variant="body1">{mobileNumber || "-"}</Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Transaction Amount</Typography>
-              <Typography variant="body1">₹{getValues("payAmount")}</Typography>
-            </Stack>
-            {confirm && (
-              <FormProvider
-                methods={methods}
-                onSubmit={handleSubmit(transaction)}
-              >
-                <Stack
-                  alignItems={"center"}
-                  justifyContent={"space-between"}
-                  mt={2}
-                  gap={2}
-                >
-                  <Typography variant="h4">Confirm NPIN</Typography>
-                  <RHFCodes
-                    keyName="otp"
-                    type="password"
-                    inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                  />
 
-                  {(!!errors.otp1 ||
-                    !!errors.otp2 ||
-                    !!errors.otp3 ||
-                    !!errors.otp4 ||
-                    !!errors.otp5 ||
-                    !!errors.otp6) && (
-                    <FormHelperText error sx={{ px: 2 }}>
-                      Code is required
-                    </FormHelperText>
-                  )}
-                  <Stack flexDirection={"row"} gap={1} mt={2}>
-                    <LoadingButton
-                      variant="contained"
-                      type="submit"
-                      loading={isLoading}
-                    >
-                      Yes, Continue
-                    </LoadingButton>
-                    <Button
-                      variant="contained"
-                      color="warning"
-                      onClick={() => {
-                        handleClose();
-                        clearPayout();
-                      }}
-                    >
-                      Close
-                    </Button>
-                  </Stack>
-                </Stack>
-              </FormProvider>
-            )}
-            {!confirm && (
+              {(!!errors.otp1 ||
+                !!errors.otp2 ||
+                !!errors.otp3 ||
+                !!errors.otp4 ||
+                !!errors.otp5 ||
+                !!errors.otp6) && (
+                <FormHelperText error sx={{ px: 2 }}>
+                  Code is required
+                </FormHelperText>
+              )}
               <Stack flexDirection={"row"} gap={1} mt={2}>
-                <Button variant="contained" onClick={() => setConfirm(true)}>
-                  Confirm
-                </Button>
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  loading={isSubmitting}
+                >
+                  Continue
+                </LoadingButton>
                 <Button
                   variant="contained"
                   color="warning"
                   onClick={() => {
                     handleClose();
-                    clearPayout();
                   }}
                 >
                   Close
                 </Button>
               </Stack>
-            )}
-          </Box>
-        )}
+            </Stack>
+          </FormProvider>
+        </Box>
       </Modal>
+
+      <TransactionModal
+        isTxnOpen={isTxnOpen}
+        handleTxnModal={() => {
+          setIsTxnOpen(false);
+          setErrorMsg("");
+          setMode("");
+        }}
+        errorMsg={errorMsg}
+        transactionDetail={transactionDetail}
+      />
     </>
   );
 }
