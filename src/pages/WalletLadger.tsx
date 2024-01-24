@@ -403,43 +403,49 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {fCurrency(row?.from?.amount || "0")}
+              {fCurrency(row?.from?.amount)}
             </Typography>
           </Stack>
         </StyledTableCell>
         <StyledTableCell>
-          <Typography variant="subtitle2" color={"error"}>
-            - {fCurrency(row?.transaction?.debit || "0")}
-          </Typography>
-          {user?.role === "agent" && (
-            <Typography variant="subtitle2" sx={{ color: "success.dark" }}>
-              {" "}
-              +
-              {fCurrency(
-                row?.transaction?.agentDetails?.commissionAmount || "0"
-              )}
+          {row?.transaction?.debit ? (
+            <Typography variant="subtitle2" color={"error"}>
+              -{fCurrency(row?.transaction?.debit)}
             </Typography>
-          )}
+          ) : (
+            <>
+              {user?.role === "agent" && (
+                <Typography variant="subtitle2" sx={{ color: "success.dark" }}>
+                  {" "}
+                  +{" "}
+                  {fCurrency(
+                    row?.transaction?.agentDetails?.commissionAmount || "0"
+                  )}
+                </Typography>
+              )}
 
-          {user?.role === "distributor" && (
-            <Typography variant="subtitle2" color={"success.dark"}>
-              {" "}
-              +
-              {fCurrency(
-                row?.transaction?.distributorDetails?.commissionAmount || "0"
+              {user?.role === "distributor" && (
+                <Typography variant="subtitle2" color={"success.dark"}>
+                  {" "}
+                  +{" "}
+                  {fCurrency(
+                    row?.transaction?.distributorDetails?.commissionAmount ||
+                      "0"
+                  )}
+                </Typography>
               )}
-            </Typography>
-          )}
 
-          {user?.role === "masterdistributor" && (
-            <Typography variant="subtitle2" color={"success.dark"}>
-              {" "}
-              +
-              {fCurrency(
-                row?.transaction?.masterDistributorDetails?.commissionAmount ||
-                  "0"
+              {user?.role === "masterdistributor" && (
+                <Typography variant="subtitle2" color={"success.dark"}>
+                  {" "}
+                  +
+                  {fCurrency(
+                    row?.transaction?.masterDistributorDetails
+                      ?.commissionAmount || "0"
+                  )}
+                </Typography>
               )}
-            </Typography>
+            </>
           )}
         </StyledTableCell>
 
@@ -472,7 +478,7 @@ const LadgerRow = ({ row }: any) => {
                   }
                   sx={{ textTransform: "capitalize" }}
                 >
-                  {row?.from?.walletType} = {row?.from?.amount}
+                  {row?.from?.walletType}= {row?.from?.amount}
                 </Label>
               </>
             )}
