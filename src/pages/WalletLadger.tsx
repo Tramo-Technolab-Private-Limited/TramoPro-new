@@ -242,6 +242,7 @@ export default function WalletLadger() {
                   sx={{ minWidth: 720 }}
                   aria-label="customized table"
                   stickyHeader
+                  size="small"
                 >
                   <TableHeadCustom
                     headLabel={
@@ -407,37 +408,37 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {fCurrency(row?.from?.amount || "-")}
+              {fCurrency(row?.from?.amount || "0")}
             </Typography>
           </Stack>
         </StyledTableCell>
         <StyledTableCell>
-          <Typography variant="subtitle2" sx={{ color: "red" }}>
-            {" "}
-            Charge :{fCurrency(row?.transaction?.debit)}
+          <Typography variant="subtitle2" color={"error"}>
+            -{" "}
+            {fCurrency(row?.transaction?.debit || "0")}
           </Typography>
           {user?.role === "agent" && (
-            <Typography variant="subtitle2" sx={{ color: "green" }}>
-              Commission :{" "}
-              {fCurrency(row?.transaction?.agentDetails?.commissionAmount)}
+            <Typography variant="subtitle2" sx={{color:'success.dark'}}>
+             {" "}
+              +{fCurrency(row?.transaction?.agentDetails?.commissionAmount || "0")}
             </Typography>
           )}
 
           {user?.role === "distributor" && (
-            <Typography variant="subtitle2">
-              Commission :{" "}
-              {fCurrency(
-                row?.transaction?.distributorDetails?.commissionAmount
+            <Typography variant="subtitle2" color={"success.dark"}>
+              {" "}
+              +{fCurrency(
+                row?.transaction?.distributorDetails?.commissionAmount || "0"
               )}
             </Typography>
           )}
 
           {user?.role === "masterdistributor" && (
-            <Typography variant="subtitle2">
+            <Typography variant="subtitle2" color={"success.dark"} >
               {" "}
-              Commission :{" "}
-              {fCurrency(
-                row?.transaction?.masterDistributorDetails?.commissionAmount
+              {" "}
+              +{fCurrency(
+                row?.transaction?.masterDistributorDetails?.commissionAmount || "0"
               )}
             </Typography>
           )}
@@ -447,7 +448,7 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {fCurrency(row?.from?.newMainWalletBalance || "-")}
+              {fCurrency(row?.from?.newMainWalletBalance || "0")}
             </Typography>
           </Stack>
         </StyledTableCell>
@@ -456,7 +457,7 @@ const LadgerRow = ({ row }: any) => {
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
               {" "}
-              {fCurrency(row?.from?.newAepsWalletBalance || "-")}
+              {fCurrency(row?.from?.newAepsWalletBalance || "0")}
             </Typography>
           </Stack>
         </StyledTableCell>
