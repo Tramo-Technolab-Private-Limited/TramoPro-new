@@ -322,7 +322,7 @@ export default function DMTbeneficiary() {
   }
   return (
     <>
-      <Grid sx={{ maxHeight: window.innerHeight - 210 }}>
+      <Grid sx={{ maxHeight: window.innerHeight - 170 }}>
         {getBene.isLoading ? (
           <ApiDataLoading />
         ) : (
@@ -340,7 +340,7 @@ export default function DMTbeneficiary() {
                 sx={
                   isMobile
                     ? { maxHeight: window.innerHeight - 250 }
-                    : { maxHeight: window.innerHeight - 530 }
+                    : { maxHeight: window.innerHeight - 440 }
                 }
               >
                 <Table

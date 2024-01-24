@@ -336,7 +336,7 @@ export default function DMT2BeneTable() {
   }
   return (
     <>
-      <Grid sx={{ maxHeight: window.innerHeight - 250 }}>
+      <Grid sx={{ maxHeight: window.innerHeight - 170 }}>
         {getBene.isLoading ? (
           <ApiDataLoading />
         ) : (
@@ -360,7 +360,7 @@ export default function DMT2BeneTable() {
                 sx={
                   isMobile
                     ? { maxHeight: window.innerHeight - 250 }
-                    : { maxHeight: window.innerHeight - 530 }
+                    : { maxHeight: window.innerHeight - 440 }
                 }
               >
                 <Table
@@ -736,16 +736,16 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
     <>
       <TableRow hover key={cell.bene_id} sx={{ cursor: "pointer" }}>
         <TableCell>
-          <Typography variant="subtitle2">{cell.beneName}</Typography>
+          <Typography>{cell.beneName}</Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="subtitle2">{cell.accountNumber}</Typography>
+          <Typography>{cell.accountNumber}</Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="subtitle2">{cell.ifsc}</Typography>
+          <Typography>{cell.ifsc}</Typography>
         </TableCell>
         <TableCell>
-          <Typography variant="subtitle2">{cell.mobileNumber}</Typography>
+          <Typography>{cell.mobileNumber}</Typography>
         </TableCell>
         <TableCell>
           {!cell.isVerified ? (
@@ -814,7 +814,6 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
             </Stack>
             {count === 0 ? (
               <Typography
-                variant="subtitle2"
                 onClick={ResendOtp}
                 sx={{
                   width: "fit-content",

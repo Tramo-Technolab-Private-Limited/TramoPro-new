@@ -10,7 +10,7 @@ export default function CustomPagination({ Count, pageSize, ...other }: any) {
         margin: "auto",
         left: "50%",
         transform: "translate(-50%)",
-        bottom: 15,
+        bottom: 5,
         bgcolor: "white",
       }}
     >
