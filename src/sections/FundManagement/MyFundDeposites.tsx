@@ -112,8 +112,6 @@ function MyFundDeposits() {
   const handleSelectChange = (event: any) => {
     setSelectedItem(event.target.value);
 
-    console.log("ids>>================>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", event);
-
     setSelectedBankID(event.target.value._id);
     let token = localStorage.getItem("token");
     Api(

@@ -74,34 +74,34 @@ export default function LoginLayout({ children, illustration, title }: Props) {
             src={"/assets/icons/marqueeimages/recharge.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
           />
-          <SvgColor
+          {/* <SvgColor
             src={"/assets/icons/marqueeimages/dmt.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
           />
           <SvgColor
             src={"/assets/icons/marqueeimages/dmt1.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
-          />
-          <SvgColor
+          /> */}
+          {/* <SvgColor
             src={"/assets/icons/marqueeimages/dmt2.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
-          />
+          /> */}
           <SvgColor
             src={"/assets/icons/marqueeimages/billpayment.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
           />
-          <SvgColor
+          {/* <SvgColor
             src={"/assets/icons/marqueeimages/indonepal.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
-          />
+          /> */}
           <SvgColor
             src={"/assets/icons/marqueeimages/matm.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
           />
-          <SvgColor
+          {/* <SvgColor
             src={"/assets/icons/marqueeimages/aeps.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
-          />
+          /> */}
           <SvgColor
             src={"/assets/icons/marqueeimages/aadhaarpay.svg"}
             sx={{ width: 120, height: 70, bgcolor: theme.palette.primary.main }}
