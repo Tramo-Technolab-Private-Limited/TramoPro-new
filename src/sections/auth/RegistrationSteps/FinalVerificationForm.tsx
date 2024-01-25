@@ -289,7 +289,7 @@ function PersonalIdentification(props: any) {
     width: 1,
   });
 
-  const Item = styled(Paper)(({ theme }) => ({
+  const Item: any = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
     ...theme.typography.body2,
     padding: theme.spacing(2),

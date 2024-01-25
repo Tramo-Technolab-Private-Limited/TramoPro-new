@@ -311,7 +311,6 @@ export default function (props: any) {
     formData.append("directoryName", "others");
     UploadFile(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
-        // console.log("=====token===aadharFront===", token)
         console.log(
           "=====uploadAadharfrontResponse========>" + JSON.stringify(Response)
         );
