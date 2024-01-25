@@ -8,6 +8,8 @@ import {
   Button,
   tableCellClasses,
   styled,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
@@ -40,8 +42,31 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { sentenceCase } from "change-case";
 import { green, red } from "@mui/material/colors";
 import { fCurrency } from "src/utils/formatNumber";
+import { LoadingButton } from "@mui/lab";
+// form
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import FormProvider, {
+  RHFSelect,
+  RHFTextField,
+} from "src/components/hook-form";
+import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 
 // ----------------------------------------------------------------------
+
+type FormValuesProps = {
+  searchBy: string;
+  usersearchby: string;
+  User: string;
+  agentId: string;
+  distributorId: string;
+  masterDistributorId: string;
+  partnerId: string;
+  date: string;
+  clientRefId: string;
+  walletType: string;
+};
 
 type RowProps = {
   id: string;
@@ -112,7 +137,34 @@ export default function WalletLadger() {
     isSelected: isSelectedValuePicker,
     isError,
     shortLabel,
-  } = useDateRangePicker(new Date(), new Date());
+  } = useDateRangePicker(null, null);
+
+  // Form Controller
+  const FilterSchema = Yup.object().shape({});
+  const defaultValues = {
+    searchBy: "",
+    usersearchby: "",
+    User: "",
+    agentId: "",
+    distributorId: "",
+    masterDistributorId: "",
+    partnerId: "",
+    date: "",
+    clientRefId: "",
+    walletType: "",
+  };
+  const methods = useForm<FormValuesProps>({
+    resolver: yupResolver(FilterSchema),
+    defaultValues,
+  });
+  const {
+    reset,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = methods;
 
   useEffect(() => {
     getTransactional();
@@ -127,6 +179,9 @@ export default function WalletLadger() {
         pageSize: pageSize,
         currentPage: currentPage,
       },
+      clientRefId: getValues("clientRefId") || "",
+      startDate: startDate || "",
+      endDate: endDate || "",
     };
     Api(`agent/walletLedger`, "POST", body, token).then((Response: any) => {
       console.log("======Transaction==response=====>" + Response);
@@ -144,50 +199,6 @@ export default function WalletLadger() {
     });
   };
 
-  const ExportData = () => {
-    let token = localStorage.getItem("token");
-
-    // Check if startDate and endDate are not empty
-    if (!startDate || !endDate) {
-      console.log("Start date and end date are required for export.");
-      return;
-    }
-
-    let body = {
-      pageInitData: {
-        pageSize: "",
-        currentPage: "",
-      },
-      startDate: startDate,
-      endDate: endDate,
-    };
-
-    Api(`agent/walletLedger`, "POST", body, token).then((Response: any) => {
-      console.log("======walletLedger==response=====>" + Response);
-      if (Response.status === 200) {
-        if (Response.data.code === 200) {
-          if (Response.data.data.data.length) {
-            const Dataapi = Response.data.data.data;
-
-            console.log(
-              "Response of the ==============walletLedger===========>",
-              Response.data?.data?.data
-            );
-
-            console.log(
-              "======getUser===data.data ===Transaction====>",
-              Response
-            );
-          } else {
-            enqueueSnackbar("Data Not Found ");
-          }
-        } else {
-          console.log("======Transaction=======>" + Response);
-        }
-      }
-    });
-  };
-
   return (
     <>
       <Helmet>
@@ -195,23 +206,27 @@ export default function WalletLadger() {
       </Helmet>
 
       <Stack sx={{ maxHeight: window.innerHeight - 220 }}>
-        <Stack flexDirection={"row"} justifyContent={"end"}>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            style={{ padding: "0 25px", marginBottom: "10px" }}
-          >
-            <FileFilterButton
-              isSelected={!!isSelectedValuePicker}
-              startIcon={<Iconify icon="eva:calendar-fill" />}
-              onClick={onOpenPicker}
-            >
-              {`${fDate(startDate)} - ${fDate(endDate)}`}
-            </FileFilterButton>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <FormProvider
+          methods={methods}
+          onSubmit={handleSubmit(getTransactional)}
+        >
+          <Stack flexDirection={"row"} m={1} gap={1}>
+            <RHFTextField
+              name="clientRefId"
+              placeholder={"Client Ref Id"}
+              sx={{ width: 300 }}
+            />
+            <Stack flexDirection={"row"} gap={1}>
+              <FileFilterButton
+                isSelected={!!isSelectedValuePicker}
+                startIcon={<Iconify icon="eva:calendar-fill" />}
+                onClick={onOpenPicker}
+              >
+                {isSelectedValuePicker ? shortLabel : "Select Date"}
+              </FileFilterButton>
               <DateRangePicker
                 variant="input"
-                title="Select Date Range"
+                title="Choose Maximum 31 Days"
                 startDate={startDate}
                 endDate={endDate}
                 onChangeStartDate={onChangeStartDate}
@@ -220,13 +235,30 @@ export default function WalletLadger() {
                 onClose={onClosePicker}
                 isSelected={isSelectedValuePicker}
                 isError={isError}
+                // additionalFunction={ExportData}
               />
-            </LocalizationProvider>
-            <Button variant="contained" onClick={ExportData}>
+            </Stack>
+            <LoadingButton
+              variant="contained"
+              type="submit"
+              loading={isSubmitting}
+            >
               Search
-            </Button>
+            </LoadingButton>
+            <LoadingButton
+              variant="contained"
+              onClick={() => {
+                reset(defaultValues);
+                getTransactional();
+                onChangeEndDate(null);
+                onChangeStartDate(null);
+              }}
+            >
+              Clear
+            </LoadingButton>
           </Stack>
-        </Stack>
+        </FormProvider>
+
         {sendLoding ? (
           <ApiDataLoading />
         ) : (
@@ -276,6 +308,8 @@ export default function WalletLadger() {
 
 const LadgerRow = ({ row }: any) => {
   const { user } = useAuthContext();
+  const { copy } = useCopyToClipboard();
+  const { enqueueSnackbar } = useSnackbar();
 
   const tableLabelsTO = [
     { id: "productName", label: "Product/TransactionType " },
@@ -350,6 +384,13 @@ const LadgerRow = ({ row }: any) => {
       border: 0,
     },
   }));
+
+  const onCopy = (text: string) => {
+    if (text) {
+      enqueueSnackbar("Copied!");
+      copy(text);
+    }
+  };
 
   return (
     <>
@@ -488,17 +529,28 @@ const LadgerRow = ({ row }: any) => {
         </StyledTableCell>
 
         {row?.transaction?.clientRefId ? (
-          <StyledTableCell onClick={() => openEditModal(row)}>
-            <Typography
-              variant="body1"
-              sx={{
-                color: "blue",
-                textDecoration: "underline",
-                cursor: "pointer",
-              }}
-            >
-              {row?.transaction?.clientRefId || "-"}
-            </Typography>
+          <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
+            <Stack flexDirection={"row"} gap={1} alignItems={"center"}>
+              <Typography
+                onClick={() => openEditModal(row)}
+                variant="body1"
+                sx={{
+                  color: "blue",
+                  textDecoration: "underline",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {row?.transaction?.clientRefId || "-"}{" "}
+              </Typography>
+              <Tooltip title="Copy" placement="top">
+                <IconButton
+                  onClick={() => onCopy(row?.transaction?.clientRefId)}
+                >
+                  <Iconify icon="eva:copy-fill" width={20} />
+                </IconButton>
+              </Tooltip>
+            </Stack>
           </StyledTableCell>
         ) : (
           <Typography variant="body1" sx={{ m: 4 }}>
