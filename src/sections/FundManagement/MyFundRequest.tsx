@@ -283,12 +283,12 @@ export default function (props: any) {
                 <MenuItem value="auto collect">Rejected</MenuItem>
               </RHFSelect>
 
-              <RHFTextField
+              {/* <RHFTextField
                 name="utrNumber"
                 label=" UTR"
                 placeholder="UTR"
                 size="small"
-              />
+              /> */}
               <RHFTextField
                 name="amount"
                 label="amount"
