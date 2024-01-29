@@ -24,6 +24,7 @@ import {
   Modal,
   TableContainer,
   Avatar,
+  MenuItem,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
@@ -44,8 +45,24 @@ import ReactToPrint from "react-to-print";
 import ApiDataLoading from "../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDate, fDateTime } from "src/utils/formatTime";
-import * as XLSX from 'xlsx';
+import * as XLSX from "xlsx";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import FormProvider, {
+  RHFSelect,
+  RHFTextField,
+} from "../../components/hook-form";
+import { LoadingButton } from "@mui/lab";
+import { Watch } from "@mui/icons-material";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 // ----------------------------------------------------------------------
+type FormValuesProps = {
+  status: string;
+  clientRefId: string;
+  startDate: string;
+  endDate: string;
+};
 
 export default function FundFlow() {
   const { user } = useAuthContext();
@@ -54,19 +71,41 @@ export default function FundFlow() {
   const [superCurrentTab, setSuperCurrentTab] = useState(1);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [pageCount, setPageCount] = useState<any>(0);
-
-  const [refId, setRefId] = useState("");
   const [sdata, setSdata] = useState([]);
-  const [pageSize, setPageSize] = useState<any>(20);
+  const [pageSize, setPageSize] = useState<any>(10);
 
-  const handlePageChange = (event: any, value: any) => {
-    setCurrentPage(value);
-    getTransaction(value);
+
+  const txnSchema = Yup.object().shape({
+    status: Yup.string(),
+    clientRefId: Yup.string(),
+  });
+
+  const defaultValues = {
+    category: "",
+    status: "",
+    clientRefId:"",
+    startDate: "",
+    endDate: "",
   };
+  console.log("defaultValues===============>",defaultValues)
+
+  const methods = useForm<FormValuesProps>({
+    resolver: yupResolver(txnSchema),
+    defaultValues,
+  });
+
+  const {
+    reset,
+    getValues,
+    handleSubmit,
+    formState: { errors, isSubmitting, isSubmitSuccessful },
+  } = methods;
 
   useEffect(() => {
     getTransaction();
-  }, []);
+  }, [currentPage]);
+
+  useEffect(() => setCurrentPage(1), [superCurrentTab]);
 
   const {
     startDate,
@@ -81,17 +120,19 @@ export default function FundFlow() {
     shortLabel,
   } = useDateRangePicker(new Date(), new Date());
 
-  const getTransaction = (page: number = 1) => {
+  const getTransaction = () => {
     setLoading(true);
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
         pageSize: pageSize,
-        currentPage: page,
+        currentPage: currentPage,
       },
-      clientRefId: "",
-      status: "",
+      clientRefId: getValues("clientRefId"),
+      status: getValues("status"),
       transactionType: "",
+      startDate:getValues("startDate"),
+      endDate: getValues("endDate"),
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
@@ -113,19 +154,20 @@ export default function FundFlow() {
     );
   };
 
-  const filterTransaction = (status: string, refId: string) => {
+  const filterTransaction = (data: FormValuesProps) => {
+    setCurrentPage(1);
     setLoading(true);
-    setSdata([]);
-    if (refId) setSuperCurrentTab(0);
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
         pageSize: pageSize,
         currentPage: currentPage,
       },
-      clientRefId: refId,
-      status: status == "all" ? "" : status,
+      clientRefId: data.clientRefId,
+      status: data.status,
       transactionType: "",
+      startDate: startDate,
+      endDate: endDate,
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
@@ -186,133 +228,79 @@ export default function FundFlow() {
 
   const TabLabel = [{ id: 1, label: "all" }];
 
-  const ExportData = () => {
-    let token = localStorage.getItem("token");
-
-    let body = {
-      pageInitData: {
-        pageSize: "",
-        currentPage: "",
-      },
-      clientRefId: "",
-      status: "",
-      transactionType: "",
-      startDate: startDate,
-      endDate: endDate,
-    };
-
-    Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
-      (Response: any) => {
-        console.log("======Transaction==response=====>" + Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            if (Response.data.data.data.length) {
-              const Dataapi = Response.data.data.data;
-              console.log("Dataapi", Dataapi);
-
-              const formattedData = Response.data.data.data.map(
-                (item: any) => ({
-                  createdAt: new Date(item?.createdAt).toLocaleString(),
-                  client_ref_Id: item?.client_ref_Id,
-                  transactionType: item?.transactionType,
-                  productName: item?.productName,
-                  categoryName: item?.categoryName,
-          
-                  " Commission Amount":
-                    user?._id === item?.agentDetails?.id?._id
-                      ? item?.agentDetails?.commissionAmount
-                      : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.commissionAmount
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.commissionAmount
-                      : "",
-                  amount: item?.amount,
-                  TDS: item?.TDS,
-                  GST: item?.GST,
-                  status: item?.status,
-                  operator: item?.key1,
-                  mobileNumber: item?.mobileNumber,
-                })
-              );
-
-              const ws = XLSX.utils.json_to_sheet(formattedData);
-              const wb = XLSX.utils.book_new();
-              XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-
-              const currentDate = fDateTime(new Date());
-              XLSX.writeFile(wb, `Transaction${currentDate}.xlsx`);
-
-              console.log(
-                "======getUser===data.data ===Transaction====>",
-                Response
-              );
-            } else {
-              enqueueSnackbar("Data Not Found ");
-            }
-          } else {
-            console.log("======Transaction=======>" + Response);
-          }
-        }
-      }
-    );
-  };
-
   return (
     <>
       <Helmet>
         <title> Transactions | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
-      <Box sx={{ width: "100%" }}>
-        <Box
-          sx={{
-            borderBottom: 1,
-            borderColor: "divider",
-            marginBottom: "20px",
-            fontSize: "20px",
-          }}
+      <Stack>
+        <FormProvider
+          methods={methods}
+          onSubmit={handleSubmit(filterTransaction)}
         >
-          {/* <Tabs
-            value={superCurrentTab}
-            variant="scrollable"
-            scrollButtons={false}
-            sx={{ background: "#F4F6F8" }}
-            onChange={(event, newValue) => setSuperCurrentTab(newValue)}
-          >
-            {TabLabel.map((tab: any) => (
-              <Tab
-                key={tab.id}
-                sx={{ mx: 2, fontSize: { xs: 12, sm: 16 } }}
-                label={tab.label}
-                iconPosition="top"
-                value={tab.id}
-                onClick={() => {
-                  filterTransaction(tab.label, "");
+          <Stack flexDirection={"row"} justifyContent={"end"}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              style={{ padding: "0 25px", marginBottom: "10px" }}
+            >
+              <RHFSelect
+                name="status"
+                label="Status"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
                 }}
-              />
-            ))}
-          </Tabs> */}
-        </Box>
-      </Box>
-      <Stack flexDirection={"row"} justifyContent={"end"}>
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          style={{ padding: "0 25px", marginBottom: "10px" }}
-        >
-          <TextField
-            id="outlined-password-input"
-            label="Search By Ref Id"
-            size="small"
-            type="text"
-            onChange={(e) => setRefId(e.target.value)}
-          />
-          <Button
-            variant="contained"
-            onClick={() => filterTransaction("", refId)}
-          >
-            Search
-          </Button>
-              <FileFilterButton
+              >
+                <MenuItem value="">None</MenuItem>
+                <MenuItem value="success">Success</MenuItem>
+                <MenuItem value="failed">Failed</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="in_process">In process</MenuItem>
+                <MenuItem value="hold">Hold</MenuItem>
+                <MenuItem value="initiated">Initiated</MenuItem>
+              </RHFSelect>
+              <RHFTextField name="clientRefId" label="Client Ref Id" />
+              <Stack>
+                <FileFilterButton
+                  isSelected={!!isSelectedValuePicker}
+                  startIcon={<Iconify icon="eva:calendar-fill" />}
+                  onClick={onOpenPicker}
+                >
+                  {isSelectedValuePicker ? shortLabel : "Select Date"}
+                </FileFilterButton>
+                <DateRangePicker
+                  variant="input"
+                  title="Select Date Range to Search"
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChangeStartDate={onChangeStartDate}
+                  onChangeEndDate={onChangeEndDate}
+                  open={openPicker}
+                  onClose={onClosePicker}
+                  isSelected={isSelectedValuePicker}
+                  isError={isError}
+                  // additionalFunction={ExportData}
+                />
+              </Stack>
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  loading={isSubmitting}
+                >
+                  Search
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => {
+                    reset(defaultValues);
+                    getTransaction();
+                  }}
+                >
+                  Clear
+                </LoadingButton>
+              </Stack>
+              {/* <FileFilterButton
               isSelected={!!isSelectedValuePicker}
               startIcon={<Iconify icon="eva:calendar-fill" />}
               onClick={onOpenPicker}
@@ -333,8 +321,9 @@ export default function FundFlow() {
             />
           <Button variant="contained" onClick={ExportData}>
             Export
-          </Button>
-        </Stack>
+          </Button> */}
+            </Stack>
+        </FormProvider>
       </Stack>
       <Grid item xs={12} md={6} lg={8}>
         {Loading ? (
@@ -364,29 +353,17 @@ export default function FundFlow() {
                 </TableBody>
               </Table>
             </Scrollbar>
-            <Stack
-              sx={{
-                position: "fixed",
-                bottom: 25,
-                left: "50%",
-                transform: "translate(-50%)",
-                bgcolor: "white",
-              }}
-            >
-              <Pagination
-                count={
-                  Math.floor(pageCount / pageSize) +
-                  (pageCount % pageSize === 0 ? 0 : 1)
-                }
+            <CustomPagination
+                pageSize={pageSize}
+                onChange={(
+                  event: React.ChangeEvent<unknown>,
+                  value: number
+                ) => {
+                  setCurrentPage(value);
+                }}
                 page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                variant="outlined"
-                shape="rounded"
-                showFirstButton
-                showLastButton
+                Count={pageCount}
               />
-            </Stack>
           </>
         )}
       </Grid>
