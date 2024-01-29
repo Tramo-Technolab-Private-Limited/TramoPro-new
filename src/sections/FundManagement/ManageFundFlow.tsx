@@ -74,7 +74,10 @@ export default function ManageFundFlow() {
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+    reset(defaultValues);
+  };
 
   const FilterSchema = Yup.object().shape({
     // transactionType: Yup.string().required('Transaction Type is required'),
@@ -159,7 +162,7 @@ export default function ManageFundFlow() {
   const searchUsers = () => {
     let token = localStorage.getItem("token");
     Api(
-      agentDetail.role == "m_distributor"
+      user?.role == "m_distributor"
         ? `agent/get_All_Distributor`
         : `agent/get_All_Agents`,
       "GET",
@@ -233,16 +236,13 @@ export default function ManageFundFlow() {
               enqueueSnackbar(Response.data.message);
               getValues("transactionType") === "debit"
                 ? UpdateUserDetail({
-                    main_wallet_amount:
-                      agentDetail.main_wallet_amount - +body.amount,
+                    main_wallet_amount: user?.main_wallet_amount + +body.amount,
                   })
                 : UpdateUserDetail({
-                    main_wallet_amount:
-                      agentDetail.main_wallet_amount - +body.amount,
+                    main_wallet_amount: user?.main_wallet_amount - +body.amount,
                   });
-              handleOpen();
               setTxnResponse(Response.data.data);
-              reset(defaultValues);
+              handleOpen();
             } else {
               enqueueSnackbar(Response.data.message, { variant: "error" });
             }
@@ -379,7 +379,7 @@ export default function ManageFundFlow() {
       </Grid>
       <Modal
         open={open}
-        onClose={handleClose}
+        // onClose={handleClose}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
       >
@@ -429,7 +429,9 @@ export default function ManageFundFlow() {
                 alignItems={"center"}
               >
                 <Typography variant="h4">From</Typography>
-                <Typography variant="body1">{txnresponse.fromName}</Typography>
+                <Typography variant="body1">{`${watch(
+                  "from.firstName"
+                )} ${watch("from.lastName")}`}</Typography>
               </Stack>
               <Stack
                 flexDirection={"row"}
@@ -437,7 +439,9 @@ export default function ManageFundFlow() {
                 alignItems={"center"}
               >
                 <Typography variant="h4">To</Typography>
-                <Typography variant="body1">{txnresponse.toName}</Typography>
+                <Typography variant="body1">{`${watch("to.firstName")} ${watch(
+                  "to.lastName"
+                )}`}</Typography>
               </Stack>
               <Stack
                 flexDirection={"row"}
@@ -463,7 +467,7 @@ export default function ManageFundFlow() {
                 alignItems={"center"}
               >
                 <Typography variant="h4">Amount</Typography>
-                <Typography variant="body1">{txnresponse.amount}</Typography>
+                <Typography variant="body1">{`${watch("amount")}`}</Typography>
               </Stack>
               <Stack justifyContent={"center"} alignItems={"center"}>
                 <Typography variant="body1" fontStyle={"italic"}>
