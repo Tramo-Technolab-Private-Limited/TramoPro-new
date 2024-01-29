@@ -110,7 +110,7 @@ export default function (props: any) {
     isSelected: isSelectedValuePicker,
     isError,
     shortLabel,
-  } = useDateRangePicker(new Date(), new Date());
+  } = useDateRangePicker(null, null);
 
   useEffect(() => {
     getFundReq();
@@ -194,7 +194,23 @@ export default function (props: any) {
     },
   }));
 
+  const formattedStart = startDate
+    ? new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        day: "2-digit",
+        month: "2-digit",
+      }).format(startDate)
+    : "";
+  const formattedEndDate = endDate
+    ? new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        day: "2-digit",
+        month: "2-digit",
+      }).format(endDate)
+    : "";
+
   const SearchData = (data: FormValuesProps) => {
+    setSdata([]);
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
@@ -205,27 +221,24 @@ export default function (props: any) {
       bankId: "",
       status: data.status,
       modeName: data.Paymentmode,
-      mobileNumber: "",
+      mobileNumber: data.phoneNumber,
       amount: data.amount,
-      startDate: fDate(startDate),
-      endDate: fDate(endDate),
+      startDate: formattedStart,
+      endDate: formattedEndDate,
       type: "",
     };
     Api(`agent/fundManagement/getRaisedRequests`, "POST", body, token).then(
       (Response: any) => {
         console.log("======Transaction==response=====>" + Response);
         if (Response.status == 200) {
-          console.log(
-            "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
-            Response
-          );
-
-          // if (Response.data.code == 200) {
-          //   setSdata(Response.data.data.data);
-          //   enqueueSnackbar(Response.data.message);
-          // } else {
-          //   console.log("======Transaction=======>" + Response);
-          // }
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.message);
+            setPageCount(Response.data.count);
+            setSdata(Response.data.data);
+          } else {
+            console.log("======getRaisedRequests=======>" + Response);
+            enqueueSnackbar(Response.data.message);
+          }
           setIsLoading(false);
         } else {
           setIsLoading(false);
@@ -234,7 +247,9 @@ export default function (props: any) {
     );
   };
   const handdleClear = () => {
-    reset();
+    onChangeEndDate(null);
+    onChangeStartDate(null);
+    reset(defaultValues);
   };
 
   return (
@@ -249,7 +264,31 @@ export default function (props: any) {
       ) : (
         <Grid item xs={16} md={12} lg={12}>
           <FormProvider methods={methods} onSubmit={handleSubmit(SearchData)}>
-            <Stack direction="row" gap={2} mt={2}>
+            <Stack direction="row" gap={2} mt={2} mb={2}>
+              <Stack>
+                <Stack flexDirection={"row"} gap={1}>
+                  <FileFilterButton
+                    isSelected={!!isSelectedValuePicker}
+                    startIcon={<Iconify icon="eva:calendar-fill" />}
+                    onClick={onOpenPicker}
+                  >
+                    {isSelectedValuePicker ? shortLabel : "Select Date"}
+                  </FileFilterButton>
+                  <DateRangePicker
+                    variant="input"
+                    title="Choose Maximum 31 Days"
+                    startDate={startDate}
+                    endDate={endDate}
+                    onChangeStartDate={onChangeStartDate}
+                    onChangeEndDate={onChangeEndDate}
+                    open={openPicker}
+                    onClose={onClosePicker}
+                    isSelected={isSelectedValuePicker}
+                    isError={isError}
+                    // additionalFunction={ExportData}
+                  />
+                </Stack>
+              </Stack>
               <RHFSelect
                 name="Paymentmode"
                 label="Mode Of Payment"
@@ -260,7 +299,7 @@ export default function (props: any) {
               >
                 <MenuItem value="NEFT">NEFT</MenuItem>
                 <MenuItem value="RTGS">RTGS</MenuItem>
-                <MenuItem value="hold">IMPS</MenuItem>
+                <MenuItem value="IMPS">IMPS</MenuItem>
                 <MenuItem value="Cash deposit at CDM">
                   Cash deposit at CDM
                 </MenuItem>
@@ -310,29 +349,6 @@ export default function (props: any) {
                 size="small"
               />
 
-              {/* <Stack>
-                <FileFilterButton
-                  isSelected={!!isSelectedValuePicker}
-                  startIcon={<Iconify icon="eva:calendar-fill" />}
-                  onClick={onOpenPicker}
-                >
-                  {`${fDate(startDate)} - ${fDate(endDate)}`}
-                </FileFilterButton>
-
-                <DateRangePicker
-                  variant="input"
-                  title="Select Date Range"
-                  startDate={startDate}
-                  endDate={endDate}
-                  onChangeStartDate={onChangeStartDate}
-                  onChangeEndDate={onChangeEndDate}
-                  open={openPicker}
-                  onClose={onClosePicker}
-                  isSelected={isSelectedValuePicker}
-                  isError={isError}
-                />
-              </Stack> */}
-
               <Button variant="contained" type="submit">
                 Search
               </Button>
@@ -366,6 +382,11 @@ export default function (props: any) {
 
                     <StyledTableCell>
                       <Typography variant="body1">Rs. {row?.amount}</Typography>
+                    </StyledTableCell>
+                    <StyledTableCell>
+                      <Typography variant="body1">
+                        {row?.modeId?.transfer_mode_name}
+                      </Typography>
                     </StyledTableCell>
 
                     <StyledTableCell>
