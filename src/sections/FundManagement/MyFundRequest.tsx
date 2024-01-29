@@ -54,7 +54,7 @@ export default function (props: any) {
     { id: "Commission", label: "Commission" },
     { id: " deposit_type", label: " Deposit Type" },
     { id: "mobile", label: "Mobile" },
-    { id: " branch", label: " Branchjjjj" },
+    { id: " branch", label: " Branch" },
     { id: " status", label: " Status" },
   ];
 
@@ -63,7 +63,6 @@ export default function (props: any) {
     phoneNumber: string;
     utrNumber: string;
     amount: string;
-
     status: string;
     Paymentmode: string;
     request_type: string;
@@ -76,14 +75,12 @@ export default function (props: any) {
 
   const defaultValues = {
     phoneNumber: "",
-    utrNumber: "",
-    amount: "",
 
+    amount: "",
     Paymentmode: "",
     status: "",
     request_type: "",
     fundRequestId: "",
-
     startDate: "",
     endDate: "",
   };
@@ -197,7 +194,45 @@ export default function (props: any) {
     },
   }));
 
-  const SearchData = (data: FormValuesProps) => {};
+  const SearchData = (data: FormValuesProps) => {
+    let token = localStorage.getItem("token");
+    let body = {
+      pageInitData: {
+        pageSize: 20,
+        currentPage: currentPage,
+      },
+      bankName: "",
+      bankId: "",
+      status: data.status,
+      modeName: data.Paymentmode,
+      mobileNumber: "",
+      amount: data.amount,
+      startDate: fDate(startDate),
+      endDate: fDate(endDate),
+      type: "",
+    };
+    Api(`agent/fundManagement/getRaisedRequests`, "POST", body, token).then(
+      (Response: any) => {
+        console.log("======Transaction==response=====>" + Response);
+        if (Response.status == 200) {
+          console.log(
+            "zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",
+            Response
+          );
+
+          // if (Response.data.code == 200) {
+          //   setSdata(Response.data.data.data);
+          //   enqueueSnackbar(Response.data.message);
+          // } else {
+          //   console.log("======Transaction=======>" + Response);
+          // }
+          setIsLoading(false);
+        } else {
+          setIsLoading(false);
+        }
+      }
+    );
+  };
   const handdleClear = () => {
     reset();
   };
@@ -215,29 +250,6 @@ export default function (props: any) {
         <Grid item xs={16} md={12} lg={12}>
           <FormProvider methods={methods} onSubmit={handleSubmit(SearchData)}>
             <Stack direction="row" gap={2} mt={2}>
-              {/* <Stack>
-                <FileFilterButton
-                  isSelected={!!isSelectedValuePicker}
-                  startIcon={<Iconify icon="eva:calendar-fill" />}
-                  onClick={onOpenPicker}
-                >
-                  {`${fDate(startDate)} - ${fDate(endDate)}`}
-                </FileFilterButton>
-
-                <DateRangePicker
-                  variant="input"
-                  title="Select Date Range"
-                  startDate={startDate}
-                  endDate={endDate}
-                  onChangeStartDate={onChangeStartDate}
-                  onChangeEndDate={onChangeEndDate}
-                  open={openPicker}
-                  onClose={onClosePicker}
-                  isSelected={isSelectedValuePicker}
-                  isError={isError}
-                />
-              </Stack> */}
-
               <RHFSelect
                 name="Paymentmode"
                 label="Mode Of Payment"
@@ -278,23 +290,48 @@ export default function (props: any) {
                   sx: { textTransform: "capitalize" },
                 }}
               >
-                <MenuItem value="mannual">Approved</MenuItem>
-                <MenuItem value="auto collect">Pendding</MenuItem>
-                <MenuItem value="auto collect">Rejected</MenuItem>
+                <MenuItem value="Approved">Approved</MenuItem>
+                <MenuItem value="Pendding">Pendding</MenuItem>
+                <MenuItem value="Rejected">Rejected</MenuItem>
               </RHFSelect>
 
-              {/* <RHFTextField
-                name="utrNumber"
-                label=" UTR"
-                placeholder="UTR"
-                size="small"
-              /> */}
+              {
+                <RHFTextField
+                  name="phoneNumber"
+                  label=" Mobile"
+                  placeholder="Mobile"
+                  size="small"
+                />
+              }
               <RHFTextField
                 name="amount"
                 label="amount"
                 placeholder="amount"
                 size="small"
               />
+
+              {/* <Stack>
+                <FileFilterButton
+                  isSelected={!!isSelectedValuePicker}
+                  startIcon={<Iconify icon="eva:calendar-fill" />}
+                  onClick={onOpenPicker}
+                >
+                  {`${fDate(startDate)} - ${fDate(endDate)}`}
+                </FileFilterButton>
+
+                <DateRangePicker
+                  variant="input"
+                  title="Select Date Range"
+                  startDate={startDate}
+                  endDate={endDate}
+                  onChangeStartDate={onChangeStartDate}
+                  onChangeEndDate={onChangeEndDate}
+                  open={openPicker}
+                  onClose={onClosePicker}
+                  isSelected={isSelectedValuePicker}
+                  isError={isError}
+                />
+              </Stack> */}
 
               <Button variant="contained" type="submit">
                 Search
@@ -399,6 +436,8 @@ export default function (props: any) {
             page={currentPage}
             Count={pageCount}
           />
+
+          {/* <CustomPagination /> */}
         </Grid>
       )}
     </>
