@@ -1,51 +1,33 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 // @mui
 import {
   Stack,
   Grid,
-  Pagination,
-  TextField,
-  Tabs,
-  Tab,
-  Button,
-  Box,
   Table,
   TableRow,
   TableBody,
   TableCell,
-  CircularProgress,
   Typography,
-  IconButton,
-  Icon,
-  TableHead,
-  useTheme,
-  Tooltip,
-  Modal,
-  TableContainer,
   Avatar,
   MenuItem,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
 import React from "react";
 import { Api } from "src/webservices";
 import Scrollbar from "src/components/scrollbar";
-import { TableHeadCustom } from "src/components/table";
-import receipt_long from "../../assets/icons/receipt_long.svg";
-import Group from "../../assets/icons/Group.svg";
-import autorenew from "../../assets/icons/autorenew.svg";
-import LogoMain from "../../assets/icons/tramoTrmao-Final-Logo.svg";
+import { TableHeadCustom, TableNoData } from "src/components/table";
 import DateRangePicker, {
   useDateRangePicker,
 } from "src/components/date-range-picker";
 import FileFilterButton from "./FileFilterButton";
 import Iconify from "src/components/iconify/Iconify";
-import ReactToPrint from "react-to-print";
 import ApiDataLoading from "../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDate, fDateTime } from "src/utils/formatTime";
-import * as XLSX from "xlsx";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -54,8 +36,10 @@ import FormProvider, {
   RHFTextField,
 } from "../../components/hook-form";
 import { LoadingButton } from "@mui/lab";
-import { Watch } from "@mui/icons-material";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
+import { sentenceCase } from "change-case";
+import Label from "src/components/label/Label";
+import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 // ----------------------------------------------------------------------
 type FormValuesProps = {
   status: string;
@@ -65,7 +49,6 @@ type FormValuesProps = {
 };
 
 export default function FundFlow() {
-  const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [Loading, setLoading] = useState(false);
   const [superCurrentTab, setSuperCurrentTab] = useState(1);
@@ -73,7 +56,6 @@ export default function FundFlow() {
   const [pageCount, setPageCount] = useState<any>(0);
   const [sdata, setSdata] = useState([]);
   const [pageSize, setPageSize] = useState<any>(10);
-
 
   const txnSchema = Yup.object().shape({
     status: Yup.string(),
@@ -83,11 +65,11 @@ export default function FundFlow() {
   const defaultValues = {
     category: "",
     status: "",
-    clientRefId:"",
+    clientRefId: "",
     startDate: "",
     endDate: "",
   };
-  console.log("defaultValues===============>",defaultValues)
+  console.log("defaultValues===============>", defaultValues);
 
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(txnSchema),
@@ -98,7 +80,7 @@ export default function FundFlow() {
     reset,
     getValues,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { isSubmitting },
   } = methods;
 
   useEffect(() => {
@@ -118,7 +100,7 @@ export default function FundFlow() {
     isSelected: isSelectedValuePicker,
     isError,
     shortLabel,
-  } = useDateRangePicker(new Date(), new Date());
+  } = useDateRangePicker(null, null);
 
   const getTransaction = () => {
     setLoading(true);
@@ -131,7 +113,7 @@ export default function FundFlow() {
       clientRefId: getValues("clientRefId"),
       status: getValues("status"),
       transactionType: "",
-      startDate:getValues("startDate"),
+      startDate: getValues("startDate"),
       endDate: getValues("endDate"),
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
@@ -191,42 +173,13 @@ export default function FundFlow() {
 
   const tableLabels = [
     { id: "Date&Time", label: "Date & Time" },
+    { id: "TransactionType", label: "Transaction Type" },
     { id: "Client Ref Id", label: "Client Ref Id" },
-    { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator" },
-    { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "Operator Txn ID" },
-    { id: "Transaction Type", label: "Transaction" },
-    { id: "Commission", label: "Commission" },
-    { id: "GST/TDS", label: "GST/TDS" },
+    { id: "From", label: "From" },
+    { id: "to", label: "To" },
+    { id: "amount", label: "Amount" },
     { id: "status", label: "Status" },
   ];
-  const tableLabels1 = [
-    { id: "Date&Time", label: "Date & Time" },
-    { id: "Client Ref Id", label: "Client Ref Id" },
-    { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator" },
-    { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "Operator Txn ID" },
-    { id: "Transaction Type", label: "Transaction" },
-    { id: "Commission", label: "Commission" },
-    { id: "GST/TDS", label: "GST/TDS" },
-    { id: "status", label: "Status" },
-  ];
-  const tableLabels2 = [
-    { id: "Date&Time", label: "Date & Time" },
-    { id: "Client Ref Id", label: "Client Ref Id" },
-    { id: "Product", label: "Product" },
-    { id: "Operator", label: "Operator" },
-    { id: "Mobile Number", label: "Mobile Number" },
-    { id: "Operator Txn ID", label: "Operator Txn ID" },
-    { id: "Transaction Type", label: "Transaction" },
-    { id: "Commission", label: "Commission" },
-    { id: "GST/TDS", label: "GST/TDS" },
-    { id: "status", label: "Status" },
-  ];
-
-  const TabLabel = [{ id: 1, label: "all" }];
 
   return (
     <>
@@ -283,46 +236,26 @@ export default function FundFlow() {
                   // additionalFunction={ExportData}
                 />
               </Stack>
-                <LoadingButton
-                  variant="contained"
-                  type="submit"
-                  loading={isSubmitting}
-                >
-                  Search
-                </LoadingButton>
-                <LoadingButton
-                  variant="contained"
-                  onClick={() => {
-                    reset(defaultValues);
-                    getTransaction();
-                  }}
-                >
-                  Clear
-                </LoadingButton>
-              </Stack>
-              {/* <FileFilterButton
-              isSelected={!!isSelectedValuePicker}
-              startIcon={<Iconify icon="eva:calendar-fill" />}
-              onClick={onOpenPicker}
-            >
-              {`${fDate(startDate)} - ${fDate(endDate)}`}
-            </FileFilterButton>
-            <DateRangePicker
-              variant="input"
-              title="Select Date Range"
-              startDate={startDate}
-              endDate={endDate}
-              onChangeStartDate={onChangeStartDate}
-              onChangeEndDate={onChangeEndDate}
-              open={openPicker}
-              onClose={onClosePicker}
-              isSelected={isSelectedValuePicker}
-              isError={isError}
-            />
-          <Button variant="contained" onClick={ExportData}>
-            Export
-          </Button> */}
+              <LoadingButton
+                variant="contained"
+                type="submit"
+                loading={isSubmitting}
+              >
+                Search
+              </LoadingButton>
+              <LoadingButton
+                variant="contained"
+                onClick={() => {
+                  reset(defaultValues);
+                  onChangeEndDate(null);
+                  onChangeStartDate(null);
+                  getTransaction();
+                }}
+              >
+                Clear
+              </LoadingButton>
             </Stack>
+          </Stack>
         </FormProvider>
       </Stack>
       <Grid item xs={12} md={6} lg={8}>
@@ -336,34 +269,25 @@ export default function FundFlow() {
                 stickyHeader
                 aria-label="sticky table"
               >
-                <TableHeadCustom
-                  headLabel={
-                    user?.role == "m_distributor"
-                      ? tableLabels
-                      : user?.role == "distributor"
-                      ? tableLabels1
-                      : tableLabels2
-                  }
-                />
+                <TableHeadCustom headLabel={tableLabels} />
 
                 <TableBody>
                   {sdata.map((row: any) => (
                     <TransactionRow key={row._id} row={row} />
                   ))}
                 </TableBody>
+
+                <TableNoData isNotFound={!sdata.length} />
               </Table>
             </Scrollbar>
             <CustomPagination
-                pageSize={pageSize}
-                onChange={(
-                  event: React.ChangeEvent<unknown>,
-                  value: number
-                ) => {
-                  setCurrentPage(value);
-                }}
-                page={currentPage}
-                Count={pageCount}
-              />
+              pageSize={pageSize}
+              onChange={(event: React.ChangeEvent<unknown>, value: number) => {
+                setCurrentPage(value);
+              }}
+              page={currentPage}
+              Count={pageCount}
+            />
           </>
         )}
       </Grid>
@@ -375,69 +299,68 @@ type childProps = {
   row: any;
 };
 
-function TransactionRow({ row }: childProps) {
-  const theme = useTheme();
+const TransactionRow = React.memo(({ row }: childProps) => {
   const { user } = useAuthContext();
-  const componentRef = useRef<any>();
+  const { copy } = useCopyToClipboard();
   const { enqueueSnackbar } = useSnackbar();
   const [newRow, setNewRow] = useState(row);
-  const [loading, setLoading] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const openModal = () => setModalOpen(true);
-  const closeModal = () => setModalOpen(false);
 
-  const CheckTransactionStatus = (row: any) => {
-    setLoading(true);
-    let token = localStorage.getItem("token");
-    let rowFor = row.categoryName.toLowerCase();
-    Api(
-      rowFor.toLowerCase() == "money transfer"
-        ? `moneyTransfer/checkStatus/` + row._id
-        : rowFor.toLowerCase() == "recharge"
-        ? `agents/v1/checkStatus/` + row._id
-        : rowFor.toLowerCase() == "dmt2" &&
-          `dmt2/transaction/status/` + row._id,
-      "GET",
-      "",
-      token
-    ).then((Response: any) => {
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.message);
-          setNewRow({ ...newRow, status: Response.data.data.status });
-        } else {
-          enqueueSnackbar(Response.data.message, { variant: "error" });
-        }
-        setLoading(false);
-      }
-    });
+  const onCopy = (text: string) => {
+    if (text) {
+      enqueueSnackbar("Copied!");
+      copy(text);
+    }
   };
 
   return (
     <>
       <TableRow hover key={newRow._id}>
         {/* Date & Time */}
+        <TableCell sx={{ whiteSpace: "nowrap" }}>
+          {fDateTime(newRow?.createdAt)}
+        </TableCell>
+        {/* transaction Type */}
+        <TableCell>
+          <Typography variant="body2">{newRow?.transactionType} </Typography>
+        </TableCell>
+        {/* client ref id */}
         <TableCell>
           <Typography variant="body2">
-            {fDateTime(newRow?.createdAt)}
+            {newRow?.clientRefId}{" "}
+            <Tooltip title="Copy" placement="top">
+              <IconButton onClick={() => onCopy(newRow?.clientRefId)}>
+                <Iconify icon="eva:copy-fill" width={20} />
+              </IconButton>
+            </Tooltip>
           </Typography>
         </TableCell>
-
+        {/* From */}
         <TableCell>
-          <Typography variant="body2">{newRow?.transactionType}</Typography>
-          <Typography variant="body2">{newRow?.clientRefId}</Typography>
-        </TableCell>
-
-        {/* Agent Detail */}
-        {user?.role === "distributor" && (
-          <TableCell>
+          {newRow?.walletLedgerData?.from?.id ==
+          newRow?.adminDetails.id?._id ? (
+            <Stack flexDirection={"row"} gap={1}>
+              <Avatar
+                alt={newRow?.adminDetails?.id?.email}
+                src={newRow?.adminDetails?.id?.selfie}
+              />
+              <Stack>
+                <Typography variant="body2" noWrap>
+                  Admin
+                </Typography>
+                <Typography variant="body2" noWrap>
+                  {newRow?.adminDetails?.id?.email}
+                </Typography>
+              </Stack>
+            </Stack>
+          ) : newRow?.walletLedgerData?.from?.id ==
+            newRow.agentDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
               <Avatar
                 alt={newRow?.agentDetails?.id?.firstName}
                 src={newRow?.agentDetails?.id?.selfie}
               />
               <Stack>
-                <Typography variant="body2">
+                <Typography variant="body2" noWrap>
                   {newRow?.agentDetails?.id?.firstName}{" "}
                   {newRow?.agentDetails?.id?.lastName}
                 </Typography>
@@ -446,84 +369,145 @@ function TransactionRow({ row }: childProps) {
                 </Typography>
               </Stack>
             </Stack>
-          </TableCell>
-        )}
-
-        {/* Distributor Detail */}
-        {user?.role === "m_distributor" && (
-          <>
-            <TableCell>
+          ) : newRow?.walletLedgerData?.from?.id ==
+            newRow.distributorDetails.id?._id ? (
+            <Stack flexDirection={"row"} gap={1}>
+              <Avatar
+                alt={newRow?.distributorDetails?.id?.firstName}
+                src={newRow?.distributorDetails?.id?.selfie}
+              />
+              <Stack>
+                <Typography variant="body2" noWrap>
+                  {newRow?.distributorDetails?.id?.firstName}{" "}
+                  {newRow?.distributorDetails?.id?.lastName}
+                </Typography>
+                <Typography variant="body2">
+                  {newRow?.distributorDetails?.id?.userCode}
+                </Typography>
+              </Stack>
+            </Stack>
+          ) : newRow?.walletLedgerData?.from?.id ==
+            newRow.masterDistributorDetails.id?._id ? (
+            <Stack flexDirection={"row"} gap={1}>
+              <Avatar
+                alt={newRow?.masterDistributorDetails?.id?.firstName}
+                src={newRow?.masterDistributorDetails?.id?.selfie}
+              />
+              <Stack>
+                <Typography variant="body2" noWrap>
+                  {newRow?.masterDistributorDetails?.id?.firstName}{" "}
+                  {newRow?.masterDistributorDetails?.id?.lastName}
+                </Typography>
+                <Typography variant="body2">
+                  {newRow?.masterDistributorDetails?.id?.userCode}
+                </Typography>
+              </Stack>
+            </Stack>
+          ) : (
+            <Stack flexDirection={"row"} gap={1}>
+              <Avatar
+                alt={newRow?.agentDetails?.id?.firstName}
+                src={newRow?.agentDetails?.id?.selfie}
+              />
+              <Stack>
+                <Typography variant="body2" noWrap>
+                  {newRow?.agentDetails?.id?.firstName}{" "}
+                  {newRow?.agentDetails?.id?.lastName}
+                </Typography>
+                <Typography variant="body2">
+                  {newRow?.agentDetails?.id?.userCode}
+                </Typography>
+              </Stack>
+            </Stack>
+          )}
+        </TableCell>
+        {/* To */}
+        <TableCell>
+          {newRow?.walletLedgerData?.to?.id == newRow.adminDetails.id?._id ? (
+            <Stack flexDirection={"row"} gap={1}>
+              <Avatar
+                alt={newRow?.adminDetails?.id?.email}
+                src={newRow?.adminDetails?.id?.selfie}
+              />
+              <Stack>
+                <Typography variant="body2" noWrap>
+                  Admin
+                </Typography>
+                <Typography variant="body2" noWrap>
+                  {newRow?.adminDetails?.id?.email}
+                </Typography>
+              </Stack>
+            </Stack>
+          ) : newRow?.walletLedgerData?.to?.id ==
+            newRow.agentDetails.id?._id ? (
+            <Stack flexDirection={"row"} gap={1}>
+              <Avatar
+                alt={newRow?.agentDetails?.id?.firstName}
+                src={newRow?.agentDetails?.id?.selfie}
+              />
+              <Stack>
+                <Typography variant="body2" noWrap>
+                  {newRow?.agentDetails?.id?.firstName}{" "}
+                  {newRow?.agentDetails?.id?.lastName}
+                </Typography>
+                <Typography variant="body2">
+                  {newRow?.agentDetails?.id?.userCode}
+                </Typography>
+              </Stack>
+            </Stack>
+          ) : newRow?.walletLedgerData?.to?.id ==
+            newRow.distributorDetails.id?._id ? (
+            <Stack flexDirection={"row"} gap={1}>
+              <Avatar
+                alt={newRow?.distributorDetails?.id?.firstName}
+                src={newRow?.distributorDetails?.id?.selfie}
+              />
+              <Stack>
+                <Typography variant="body2" noWrap>
+                  {newRow?.distributorDetails?.id?.firstName}{" "}
+                  {newRow?.distributorDetails?.id?.lastName}
+                </Typography>
+                <Typography variant="body2">
+                  {newRow?.distributorDetails?.id?.userCode}
+                </Typography>
+              </Stack>
+            </Stack>
+          ) : (
+            newRow?.walletLedgerData?.to?.id ==
+              newRow.masterDistributorDetails.id?._id && (
               <Stack flexDirection={"row"} gap={1}>
                 <Avatar
-                  alt={newRow?.agentDetails?.id?.firstName}
-                  src={newRow?.agentDetails?.id?.selfie}
+                  alt={newRow?.masterDistributorDetails?.id?.firstName}
+                  src={newRow?.masterDistributorDetails?.id?.selfie}
                 />
                 <Stack>
-                  <Typography variant="body2">
-                    {newRow?.agentDetails?.id?.firstName}{" "}
-                    {newRow?.agentDetails?.id?.lastName}
+                  <Typography variant="body2" noWrap>
+                    {newRow?.masterDistributorDetails?.id?.firstName}{" "}
+                    {newRow?.masterDistributorDetails?.id?.lastName}
                   </Typography>
                   <Typography variant="body2">
-                    {newRow?.agentDetails?.id?.userCode}
+                    {newRow?.masterDistributorDetails?.id?.userCode}
                   </Typography>
                 </Stack>
               </Stack>
-            </TableCell>
-            <TableCell>
-              <Stack flexDirection={"row"} gap={1}>
-                <Avatar
-                  alt={newRow?.distributorDetails?.id?.firstName}
-                  src={newRow?.distributorDetails?.id?.selfie}
-                />
-                <Stack>
-                  <Typography variant="body2">
-                    {newRow?.distributorDetails?.id?.firstName}{" "}
-                    {newRow?.distributorDetails?.id?.lastName}
-                  </Typography>
-                  <Typography variant="body2">
-                    {newRow?.distributorDetails?.id?.userCode}
-                  </Typography>
-                </Stack>
-              </Stack>
-            </TableCell>
-          </>
-        )}
-
-        {/* Product  */}
-        <TableCell>
-          <Typography variant="body2">{newRow?.productName || "-"}</Typography>
-        </TableCell>
-
-        {/* Operator */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
-          <Typography variant="body2">{newRow?.operator?.key1}</Typography>
-          <Typography variant="body2">{newRow?.operator?.key2}</Typography>
-          <Typography variant="body2">{newRow?.operator?.key3}</Typography>
-        </TableCell>
-
-        {/* Mobile Number */}
-        <TableCell>
-          <Typography variant="body2">{newRow.mobileNumber}</Typography>
-        </TableCell>
-
-        {/* Operator Txn Id */}
-        <TableCell>
-          <Typography variant="body2">{newRow.vendorUtrNumber}</Typography>
+            )
+          )}
         </TableCell>
 
         {/* Transaction */}
         <TableCell sx={{ whiteSpace: "nowrap" }}>
-          <Typography variant="body2">Txn Amount : {newRow.amount}</Typography>
-          <Typography color={theme.palette.success.main} variant="body2">
-            Credit : {newRow?.credit}
-          </Typography>
-          <Typography color={theme.palette.error.main} variant="body2">
-            Debit : {newRow?.debit}
-          </Typography>
+          {user?._id == newRow?.walletLedgerData?.from?.id ? (
+            <Typography variant="body2" color={"error.main"}>
+              - {newRow.amount}
+            </Typography>
+          ) : (
+            <Typography variant="body2" color={"success.main"}>
+              + {newRow.amount}
+            </Typography>
+          )}
         </TableCell>
-
         {/* Commission */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
+        {/* <TableCell sx={{ whiteSpace: "nowrap" }}>
           <Typography variant="body2">
             Commission :{" "}
             {parseFloat(
@@ -554,18 +538,7 @@ function TransactionRow({ row }: childProps) {
                 : newRow?.masterDistributorDetails?.newMainWalletBalance
             )?.toFixed(2)}
           </Typography>
-        </TableCell>
-
-        {/* GST/TDS */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
-          <Typography variant="body2">
-            GST : {parseFloat(newRow?.GST)?.toFixed(2)}
-          </Typography>
-          <Typography variant="body2">
-            TDS : {parseFloat(newRow?.TDS)?.toFixed(3)}
-          </Typography>
-        </TableCell>
-
+        </TableCell> */}
         <TableCell
           sx={{
             textTransform: "lowercase",
@@ -573,194 +546,23 @@ function TransactionRow({ row }: childProps) {
             textAlign: "left",
           }}
         >
-          <Typography
-            sx={
-              newRow.status.toLowerCase() == "pending" ||
-              newRow.status.toLowerCase() == "hold"
-                ? { color: "#ffc107" }
-                : newRow.status.toLowerCase() == "failed"
-                ? { color: "#dc3545" }
-                : { color: "#198754" }
-            }
-          >
-            {newRow.status}
+          <Typography>
+            <Label
+              variant="soft"
+              color={
+                (newRow.status === "failed" && "error") ||
+                ((newRow.status === "pending" ||
+                  newRow.status === "in_process") &&
+                  "warning") ||
+                "success"
+              }
+              sx={{ textTransform: "capitalize" }}
+            >
+              {newRow.status ? sentenceCase(newRow.status) : ""}
+            </Label>
           </Typography>
         </TableCell>
-
-        {/* <TableCell>
-          <Stack flexDirection={'row'} flexWrap={'nowrap'} width={100}>
-            <IconButton>
-              <img src={Group} alt="Receipt Icon" />
-            </IconButton>
-            {newRow.status !== 'success' && (
-              <Tooltip title="Check Status" placement="top">
-                <IconButton
-                  onClick={() => !loading && CheckTransactionStatus(newRow)}
-                  color="primary"
-                  aria-label="check transaction status"
-                >
-                  <img src={autorenew} alt="Receipt Icon" />
-                </IconButton>
-              </Tooltip>
-            )}
-            <IconButton>
-              <img src={receipt_long} alt="Receipt Icon" onClick={openModal} />
-            </IconButton>
-          </Stack>
-        </TableCell> */}
       </TableRow>
-      <Modal
-        open={modalOpen}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Grid
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "#ffffff",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: "20px",
-          }}
-        >
-          <TableContainer ref={componentRef}>
-            <TableRow sx={{ display: "flex" }}>
-              <Typography fontSize={10} marginLeft={2}>
-                {" "}
-                <Typography fontSize={15}>{user?.shopAddress}</Typography>
-                <Typography fontSize={10} sx={{ marginTop: "10px" }}>
-                  <Typography fontSize={10}>
-                    {" "}
-                    Sender Details :{newRow?.agentDetails?.id?.firstName}
-                    {newRow?.agentDetails?.id?.lastName}{" "}
-                  </Typography>
-                  <Typography fontSize={10}>
-                    {" "}
-                    Mobile Number :{newRow?.contact_no}
-                  </Typography>
-                  <Typography fontSize={10}>
-                    {" "}
-                    Service Type : {newRow?.categoryName}
-                  </Typography>
-                </Typography>
-              </Typography>
-              <Typography variant="h6" marginLeft={15}>
-                PAYMENT RECEIPT
-              </Typography>
-              <TableCell>
-                <Typography marginLeft={3}>
-                  <img src={LogoMain} alt="LOGO" width={"50%"} height={"50%"} />{" "}
-                  <Typography variant="h6">
-                    {" "}
-                    Benificary Details
-                    <br />
-                  </Typography>
-                  <Typography fontSize={10}>
-                    {" "}
-                    Account Holder Name :{" "}
-                    {newRow?.moneyTransferBeneficiaryDetails?.beneName}
-                  </Typography>
-                  <Typography fontSize={10}>
-                    {" "}
-                    Bank Name :{" "}
-                    {newRow?.moneyTransferBeneficiaryDetails?.bankName}{" "}
-                  </Typography>
-                  <Typography fontSize={10}>
-                    Account Number :
-                    {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
-                  </Typography>
-                  <Typography fontSize={10}>
-                    {" "}
-                    IFSC :{newRow?.moneyTransferBeneficiaryDetails?.ifsc}
-                  </Typography>
-                </Typography>
-              </TableCell>
-            </TableRow>
-            <Table sx={{ border: "1px solid black" }}>
-              <TableHead>
-                <TableRow sx={{ border: "1px solid black" }}>
-                  <TableCell sx={{ border: "1px solid black" }}>
-                    Client Ref Id
-                  </TableCell>
-                  <TableCell sx={{ border: "1px solid black" }} align="center">
-                    Mode
-                  </TableCell>
-                  <TableCell sx={{ border: "1px solid black" }} align="center">
-                    UTR
-                  </TableCell>
-                  <TableCell sx={{ border: "1px solid black" }} align="center">
-                    Amount
-                  </TableCell>
-                  <TableCell sx={{ border: "1px solid black" }} align="center">
-                    Status
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                <TableCell
-                  sx={{ whiteSpace: "nowrap", border: "1px solid black" }}
-                >
-                  <Typography variant="subtitle2">
-                    {newRow?.clientRefId}
-                  </Typography>
-                </TableCell>
-                <TableCell sx={{ border: "1px solid black" }}>
-                  <Typography>{newRow?.productName}</Typography>
-                </TableCell>
-                <TableCell
-                  sx={{ placeItems: "center", border: "1px solid black" }}
-                >
-                  <Typography>{newRow?.vendorUtrNumber}</Typography>
-                </TableCell>
-                <TableCell
-                  sx={{ placeItems: "center", border: "1px solid black" }}
-                >
-                  <Typography>{newRow?.amount}</Typography>
-                </TableCell>
-                <TableCell
-                  sx={{
-                    textTransform: "lowercase",
-                    fontWeight: 600,
-                    textAlign: "left",
-                    border: "1px solid black",
-                  }}
-                >
-                  <Typography>{newRow.status}</Typography>
-                </TableCell>
-              </TableBody>
-              <TableCell sx={{ columnSpan: "5" }}>
-                <Typography fontSize={9}>
-                  Transaction Amount:{newRow.amount}
-                  <Typography fontSize={9}>
-                    Convienience Fee:{newRow.amount}
-                  </Typography>
-                  <Typography fontSize={9}>
-                    Total Amount:{newRow.newMainWalletBalance}
-                  </Typography>
-                </Typography>
-              </TableCell>
-            </Table>
-            <Typography variant="body2" paddingBottom={1}>
-              Note: This transaction receipt is generated automatically and dose
-              not require a physical signature. It is not a tax invoice but
-              serves as a record of your transaction with Tramo. Please retain
-              it for your refrence, and if you have any queries, fell free to
-              contact our Customer Support team.
-            </Typography>
-          </TableContainer>
-          <Stack flexDirection={"row"}>
-            <Button onClick={closeModal}>close</Button>
-            <ReactToPrint
-              trigger={() => <Button>Print this out!</Button>}
-              content={() => componentRef.current}
-              onAfterPrint={closeModal}
-            />
-          </Stack>
-        </Grid>
-      </Modal>
     </>
   );
-}
+});
