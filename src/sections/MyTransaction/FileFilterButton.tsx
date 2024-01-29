@@ -18,6 +18,7 @@ export default function FileFilterButton({
       variant="soft"
       color="inherit"
       sx={{
+        whiteSpace: "nowrap",
         textTransform: "unset",
         color: "text.secondary",
         width: { xs: 1, md: "auto" },
