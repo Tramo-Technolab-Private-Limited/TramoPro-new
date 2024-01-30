@@ -119,9 +119,6 @@ export default function AccountPopover() {
               {user?.referralCode}
             </Typography>
           </Typography>
-          <Typography variant="caption">
-            Updated : {fDateTime(eval(`${process.env.REACT_APP_BUILD_DATE}`))}
-          </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: "dashed" }} />
