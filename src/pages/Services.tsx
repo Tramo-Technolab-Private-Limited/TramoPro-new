@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import React, { useEffect, useState } from "react";
-import { Tab, Tabs, Box, Grid } from "@mui/material";
+import { Tab, Tabs, Box, Grid, Typography } from "@mui/material";
 import { Api } from "src/webservices";
 import {
   AEPS,
@@ -15,12 +15,14 @@ import {
 } from "../sections/services";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import ServiceUnderUpdate from "./ServiceUnderUpdate";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 // ----------------------------------------------------------------------
 
 export const CategoryContext = React.createContext({});
 
 export default function Services(props: any) {
+  const { user } = useAuthContext();
   const [categoryList, setCategoryList] = useState([]);
   const [superCurrentTab, setSuperCurrentTab] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +72,7 @@ export default function Services(props: any) {
       <Grid>
         {isLoading ? (
           <ApiDataLoading />
-        ) : (
+        ) : user?.role == "agent" ? (
           <>
             <Tabs
               value={superCurrentTab}
@@ -122,6 +124,8 @@ export default function Services(props: any) {
                 )
             )}
           </>
+        ) : (
+          <Typography>You are not authorised to use Services</Typography>
         )}
       </Grid>
     </>
