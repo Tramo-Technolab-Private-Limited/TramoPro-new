@@ -138,7 +138,6 @@ function Bbps_One() {
   const getCategoryList = () => {
     let token = localStorage.getItem("token");
     Api(`category/get_CategoryList`, "GET", "", token).then((Response: any) => {
-      console.log("======getcategory_list====>", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           const sortedData = Response?.data?.data
@@ -146,7 +145,15 @@ function Bbps_One() {
               (item: any) =>
                 item?.category_name.toLowerCase() === "bill payment"
             )[0]
-            .sub_category.toSorted((a: any, b: any) => a.order - b.order);
+            .sub_category.filter((item: any) => {
+              if (
+                item.sub_category_name.toLowerCase() == "electricity" ||
+                item.sub_category_name.toLowerCase() == "water"
+              ) {
+                return item;
+              }
+            })
+            .toSorted((a: any, b: any) => a.order - b.order);
           setValue("category.cateName", sortedData[0]?.sub_category_name);
           setValue("category.cateId", sortedData[0]?._id);
 
@@ -347,20 +354,22 @@ function Bbps_One() {
                       </Button>
                     );
                   })}
-                  <Stack my={0.4}>
-                    <Label
-                      variant="soft"
-                      color={"primary"}
-                      onClick={(e) => !isBillFetch && handleOpenPopover(e)}
-                      sx={{ cursor: "pointer" }}
-                    >
-                      +
-                      {categoryListOne?.length > (isMobile ? 6 : 1)
-                        ? categoryListTwo?.length - 1
-                        : categoryListTwo?.length}{" "}
-                      more
-                    </Label>
-                  </Stack>
+                  {categoryListOne?.length > 6 && (
+                    <Stack my={0.4}>
+                      <Label
+                        variant="soft"
+                        color={"primary"}
+                        onClick={(e) => !isBillFetch && handleOpenPopover(e)}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        +
+                        {categoryListOne?.length > (isMobile ? 6 : 1)
+                          ? categoryListTwo?.length - 1
+                          : categoryListTwo?.length}{" "}
+                        more
+                      </Label>
+                    </Stack>
+                  )}
                   <MenuPopover
                     open={openPopover}
                     onClose={handleClosePopover}
