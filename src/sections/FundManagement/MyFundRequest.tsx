@@ -50,6 +50,7 @@ export default function (props: any) {
   const tableLabels = [
     { id: "Date", label: "Date & Time" },
     { id: "amount", label: "Amount" },
+    { id: "modeType", label: "ModeType" },
     { id: "Charge", label: "Charge" },
     { id: "Commission", label: "Commission" },
     { id: " deposit_type", label: " Deposit Type" },
@@ -309,18 +310,6 @@ export default function (props: any) {
                 </MenuItem>
               </RHFSelect>
 
-              {/* <RHFSelect
-                name="request_type"
-                label="Request Type"
-                SelectProps={{
-                  native: false,
-                  sx: { textTransform: "capitalize" },
-                }}
-              >
-                <MenuItem value="mannual">Mannual</MenuItem>
-                <MenuItem value="auto collect">Auto Collect</MenuItem>
-              </RHFSelect> */}
-
               <RHFSelect
                 name="status"
                 label="Status"
@@ -330,7 +319,7 @@ export default function (props: any) {
                 }}
               >
                 <MenuItem value="Approved">Approved</MenuItem>
-                <MenuItem value="Pendding">Pendding</MenuItem>
+                <MenuItem value="Pending">Pending</MenuItem>
                 <MenuItem value="Rejected">Rejected</MenuItem>
               </RHFSelect>
 

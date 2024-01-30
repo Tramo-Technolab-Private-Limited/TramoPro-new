@@ -98,7 +98,7 @@ export default function WalletLadger() {
     { id: "Remark/TransactionType", label: "Remark/TransactionType" },
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
-    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Charge/Commission", label: "Debit/Credit" },
     { id: "walletType", label: "WalletType " },
     { id: "Transcation ", label: "Transcation ID " },
     { id: "statue", label: "Status " },
@@ -108,7 +108,7 @@ export default function WalletLadger() {
     { id: "Remark/TransactionType", label: "Remark/TransactionType" },
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
-    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Charge/Commission", label: "Debit/Credit" },
     { id: "walletType", label: "WalletType " },
     { id: "Transcation ", label: "Transcation ID " },
     { id: "statue", label: "Status " },
@@ -120,7 +120,7 @@ export default function WalletLadger() {
     { id: "Remark/TransactionType", label: "Remark/TransactionType" },
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
-    { id: "Charge/Commission", label: "Charge/Commission" },
+    { id: "Charge/Commission", label: "Debit/Credit" },
     { id: "walletType", label: "WalletType " },
     { id: "Transcation ", label: "Transcation ID " },
     { id: "statue", label: "Status " },
@@ -443,50 +443,19 @@ const LadgerRow = ({ row }: any) => {
         <StyledTableCell>
           <Stack direction="row" gap={0.5}>
             <Typography variant="subtitle2">
-              {" "}
-              {fCurrency(row?.from?.amount)}
+              {fCurrency(row?.transaction?.amount) || "0"}
             </Typography>
           </Stack>
         </StyledTableCell>
         <StyledTableCell>
-          {row?.transaction?.debit ? (
-            <Typography variant="subtitle2" color={"error"}>
-              -{fCurrency(row?.transaction?.debit)}
+          {user?._id === row?.to?.id?._id ? (
+            <Typography sx={{ color: "success.dark" }}>
+              {fCurrency(row?.to?.amount) || "0"}
             </Typography>
           ) : (
-            <>
-              {user?.role === "agent" && (
-                <Typography variant="subtitle2" sx={{ color: "success.dark" }}>
-                  {" "}
-                  +{" "}
-                  {fCurrency(
-                    row?.transaction?.agentDetails?.commissionAmount || "0"
-                  )}
-                </Typography>
-              )}
-
-              {user?.role === "distributor" && (
-                <Typography variant="subtitle2" color={"success.dark"}>
-                  {" "}
-                  +{" "}
-                  {fCurrency(
-                    row?.transaction?.distributorDetails?.commissionAmount ||
-                      "0"
-                  )}
-                </Typography>
-              )}
-
-              {user?.role === "masterdistributor" && (
-                <Typography variant="subtitle2" color={"success.dark"}>
-                  {" "}
-                  +
-                  {fCurrency(
-                    row?.transaction?.masterDistributorDetails
-                      ?.commissionAmount || "0"
-                  )}
-                </Typography>
-              )}
-            </>
+            <Typography color={"error"}>
+              {fCurrency(row?.from?.amount) || "0"}{" "}
+            </Typography>
           )}
         </StyledTableCell>
         <StyledTableCell>
@@ -507,9 +476,9 @@ const LadgerRow = ({ row }: any) => {
                   </Label>
                   :
                   {row?.to?.walletType === "MAIN" ? (
-                    <>{row?.to?.newMainWalletBalance.toFixed(2)}</>
+                    <>{row?.to?.newMainWalletBalance?.toFixed(2)}</>
                   ) : (
-                    <>{row?.to?.newAepsWalletBalance.toFixed(2)}</>
+                    <>{row?.to?.newAepsWalletBalance?.toFixed(2)}</>
                   )}
                 </Typography>
               </>
@@ -528,9 +497,9 @@ const LadgerRow = ({ row }: any) => {
                 </Label>
                 :
                 {row?.from?.walletType === "MAIN" ? (
-                  <>{row?.from?.newMainWalletBalance.toFixed(2)}</>
+                  <>{row?.from?.newMainWalletBalance?.toFixed(2)}</>
                 ) : (
-                  <>{row?.from?.newAepsWalletBalance.toFixed(2)}</>
+                  <>{row?.from?.newAepsWalletBalance?.toFixed(2)}</>
                 )}
               </>
             )}
