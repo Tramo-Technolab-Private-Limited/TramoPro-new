@@ -112,8 +112,6 @@ export default function WalletLadger() {
     { id: "walletType", label: "WalletType " },
     { id: "Transcation ", label: "Transcation ID " },
     { id: "statue", label: "Status " },
-
-    { id: "walletId", label: "Wallet Id" },
   ];
   const MDtableLabels = [
     { id: "date", label: "Date/Time " },
