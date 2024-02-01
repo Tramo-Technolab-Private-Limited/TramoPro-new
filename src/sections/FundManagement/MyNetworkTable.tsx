@@ -26,7 +26,7 @@ import React from "react";
 import { Api } from "src/webservices";
 import { useSnackbar } from "notistack";
 import { fDateTime } from "src/utils/formatTime";
-import SecureAvatar from "src/components/customFunctions/SecureAvatar";
+import { CustomAvatar } from "src/components/custom-avatar";
 
 // ----------------------------------------------------------------------
 
@@ -135,7 +135,11 @@ function MyNetworkTableRow({ row, gopro }: MyNetworkTableRowProps) {
       >
         <TableCell>
           <Stack direction="row" alignItems="center">
-            <SecureAvatar alt={row.name} src={row.selfie[0]} />
+            <CustomAvatar
+              name={row.firstName}
+              alt={row.firstName}
+              src={row.selfie[0]}
+            />
 
             <Box sx={{ ml: 2 }}>
               <Typography variant="subtitle2"> {row.firstName} </Typography>

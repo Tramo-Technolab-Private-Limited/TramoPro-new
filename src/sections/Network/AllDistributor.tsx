@@ -21,7 +21,7 @@ import { TableHeadCustom } from "../../components/table";
 import React, { useEffect, useState, useCallback } from "react";
 import { fDateTime } from "src/utils/formatTime";
 import useResponsive from "src/hooks/useResponsive";
-import SecureAvatar from "src/components/customFunctions/SecureAvatar";
+import { CustomAvatar } from "src/components/custom-avatar";
 
 // ----------------------------------------------------------------------
 
@@ -228,7 +228,11 @@ function EcommerceBestSalesmanRow({
     <TableRow onClick={() => openEditModal(row)}>
       <TableCell>
         <Stack direction="row" alignItems="center">
-          <SecureAvatar alt={row.name} src={row.selfie[0]} />
+          <CustomAvatar
+            alt={row.firstName}
+            src={row.selfie[0]}
+            name={row.firstName}
+          />
 
           <Box sx={{ ml: 2 }}>
             <Typography variant="subtitle2"> {row.firstName} </Typography>

@@ -16,10 +16,11 @@ import {
 import { Api } from "src/webservices";
 import Scrollbar from "../../components/scrollbar";
 import { TableHeadCustom } from "../../components/table";
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { fDateTime } from "src/utils/formatTime";
 import useResponsive from "src/hooks/useResponsive";
-import SecureAvatar from "src/components/customFunctions/SecureAvatar";
+import { CustomAvatar } from "src/components/custom-avatar";
+
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -152,7 +153,11 @@ function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
     <TableRow>
       <TableCell sx={{ padding: "0px" }}>
         <Stack direction="row" alignItems="center">
-          <SecureAvatar alt={row.name} src={row.selfie[0]} />
+          <CustomAvatar
+            name={row.firstName}
+            alt={row.firstName}
+            src={row.selfie[0]}
+          />
 
           <Box sx={{ ml: 2 }}>
             <Typography variant="subtitle2"> {row.firstName} </Typography>
