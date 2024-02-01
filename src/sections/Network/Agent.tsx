@@ -18,6 +18,7 @@ import Scrollbar from "../../components/scrollbar";
 import { TableHeadCustom } from "../../components/table";
 import React, { useEffect, useState, useCallback } from "react";
 import { fDateTime } from "src/utils/formatTime";
+import useResponsive from "src/hooks/useResponsive";
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -47,6 +48,7 @@ type RowProps = {
 
 export default function Agent() {
   const [appdata, setAppdata] = useState([]);
+  const isMobile = useResponsive("up", "sm");
 
   const [currentPage, setCurrentPage] = useState<any>(1);
 
@@ -80,12 +82,6 @@ export default function Agent() {
             );
           });
           setAppdata(arr);
-          console.log(
-            "======ApprovedList===data.data udata====>",
-            Response.data.data
-          );
-        } else {
-          console.log("======ApprovedList=Error======>" + Response);
         }
       }
     });
@@ -102,7 +98,9 @@ export default function Agent() {
     <>
       <Card>
         <TableContainer>
-          <Scrollbar sx={{ height: "70vh" }}>
+          <Scrollbar
+            sx={{ maxHeight: window.innerHeight - (isMobile ? 140 : 50) }}
+          >
             <Table sx={{ minWidth: 720 }}>
               <TableHeadCustom headLabel={tableLabels} />
 

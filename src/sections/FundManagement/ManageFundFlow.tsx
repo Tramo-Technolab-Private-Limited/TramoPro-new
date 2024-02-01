@@ -1,35 +1,23 @@
-import React, { useEffect, useState } from "react";
-import {
-  Stack,
-  MenuItem,
-  Grid,
-  Typography,
-  Button,
-  TextField,
-  Modal,
-  Box,
-  Card,
-  CardContent,
-  Avatar,
-} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Stack, MenuItem, Grid, Typography, Avatar } from "@mui/material";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
-  RHFAutocomplete,
   RHFSelect,
   RHFTextField,
 } from "../../components/hook-form";
 import { Api } from "src/webservices";
 import { useSnackbar } from "notistack";
-import { Icon } from "@iconify/react";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
-import { Image } from "@mui/icons-material";
+import Scrollbar from "src/components/scrollbar/Scrollbar";
+import ConfirmDialog from "src/components/confirm-dialog/ConfirmDialog";
+import TransactionModal from "src/components/customFunctions/TrasactionModal";
 
 type FormValuesProps = {
   transactionType: string;
+  User: string;
   from: {
     firstName: string;
     lastName: string;
@@ -53,52 +41,46 @@ type FormValuesProps = {
 export default function ManageFundFlow() {
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail } = useAuthContext();
-  const agentDetail: any = user;
-  const [txnAmount, setTxnAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [filteredUser, setFilteredUser] = useState([]);
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
-  const [txnresponse, setTxnResponse] = useState({
-    from: "",
-    fromName: "",
-    to: "",
-    toName: "",
-    txnId: "",
-    amount: "",
-    reason: "",
-    remarks: "",
-    walletId: "",
-    _id: "",
+  const [isTxnOpen, setIsTxnOpen] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
+  const [transactionDetail, setTransactionDetail] = useState({
+    status: "",
   });
 
-  const [open, setOpen] = React.useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => {
-    setOpen(false);
+  //confirm modal
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const handleOpenDetails = () => setOpenConfirm(true);
+  const handleCloseDetails = () => {
+    setOpenConfirm(false);
     reset(defaultValues);
-  };
-  const handleDetail = (event: any, newValue: any) => {
-    setSelectedUser(newValue);
   };
 
   const FilterSchema = Yup.object().shape({
-    // transactionType: Yup.string().required('Transaction Type is required'),
-    // from: txntype == 'credit' ? Yup.string() : Yup.string().required('From is required'),
-    // fromsearchby:
-    //   txntype == 'debit' ? Yup.string().required('Search by is required') : Yup.string(),
-    // to: txntype == 'debit' ? Yup.string() : Yup.string().required('to is required'),
-    // tosearchby: txntype == 'credit' ? Yup.string().required('Search by is required') : Yup.string(),
-    // reason: Yup.string().required('Reason is required'),
-    // amount:
-    //   creditReason == 'wrongdebit' ||
-    //   creditReason == 'wrongcredit' ||
-    //   creditReason == 'creditreturn' ||
-    //   creditReason == 'chargeback'
-    //     ? Yup.string()
-    //     : Yup.string().required('Amount is required'),
-    // remarks: Yup.string().required('Remark is required'),
+    transactionType: Yup.string().required("Transaction Type is required"),
+    User: Yup.string().required("Please Select User"),
+    from: Yup.object().shape({
+      _id: Yup.string().when("transactionType", {
+        is: "debit",
+        then: Yup.string().required("please select User"),
+      }),
+    }),
+    to: Yup.object().shape({
+      _id: Yup.string().when("transactionType", {
+        is: "credit",
+        then: Yup.string().required("please select User"),
+      }),
+    }),
+    reason: Yup.string().required("Reason is required"),
+    amount: Yup.string().required("Reason is required"),
+    remarks: Yup.string().required("Reason is required"),
   });
+
   const defaultValues = {
     transactionType: "",
+    User: "",
     from: {
       firstName: "",
       lastName: "",
@@ -118,118 +100,98 @@ export default function ManageFundFlow() {
     amount: "",
     remarks: "",
   };
+
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(FilterSchema),
     defaultValues,
     mode: "all",
   });
+
   const {
     reset,
-    register,
+    resetField,
     getValues,
     setValue,
     watch,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, isValid },
   } = methods;
 
   useEffect(() => {
     searchUsers();
   }, []);
+  useEffect(() => {
+    setFilteredUser(
+      users.filter((item: any) =>
+        item.firstName.toLowerCase().startsWith(getValues("User").toLowerCase())
+      )
+    );
+  }, [watch("User")]);
 
   useEffect(() => {
-    if (getValues("transactionType") === "credit") {
-      setValue("from", agentDetail);
-      setValue("to", {
-        firstName: "",
-        lastName: "",
-        userCode: "",
-        contact_no: "",
-        _id: "",
-      });
-    }
-    if (getValues("transactionType") === "debit") {
-      setValue("to", agentDetail);
-      setValue("from", {
-        firstName: "",
-        lastName: "",
-        userCode: "",
-        contact_no: "",
-        _id: "",
-      });
-    }
+    resetField("User");
+    resetField("amount");
+    resetField("reason");
+    resetField("remarks");
+    setValue("from._id", "");
+    setValue("from.contact_no", "");
+    setValue("from.firstName", "");
+    setValue("from.lastName", "");
+    setValue("from.userCode", "");
+    setValue("to._id", "");
+    setValue("to.contact_no", "");
+    setValue("to.firstName", "");
+    setValue("to.lastName", "");
+    setValue("to.userCode", "");
   }, [watch("transactionType")]);
 
   const searchUsers = () => {
     let token = localStorage.getItem("token");
     Api(
-      user?.role == "m_distributor"
-        ? `agent/get_All_Distributor`
-        : `agent/get_All_Agents`,
+      `agent/get_All_${
+        user?.role == "m_distributor" ? "Distributor" : "Agents"
+      }`,
       "GET",
       "",
       token
     ).then((Response: any) => {
-      console.log("======get_CategoryList==response=====>" + Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           setUsers(Response.data.data);
-          console.log(
-            "======get_CategoryList get_CategoryList====>",
-            Response.data.data
-          );
-        } else {
-          console.log("======get_CategoryList=======>" + Response);
         }
       }
     });
   };
 
-  const gettransaction = (val: string) => {
-    let token = localStorage.getItem("token");
-    let body = {
-      pageInitData: {
-        pageSize: "10",
-        currentPage: "1",
-      },
-      clientRefId: val,
-      status: "",
-      transactionType: "",
-      userId: "",
-    };
-    Api(`adminTransaction/get_transaction`, "POST", body, token).then(
-      (Response: any) => {
-        console.log("======get_CategoryList==response=====>" + Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            setTxnAmount(Response.data.data[0].amount);
-            console.log(
-              "======get_CategoryList get_CategoryList====>",
-              Response.data.data
-            );
-          } else {
-            enqueueSnackbar(Response.data.message);
-            console.log("======get_CategoryList=======>" + Response);
-          }
-        }
-      }
-    );
-  };
+  const onSubmit = () => handleOpenDetails();
 
-  const onSubmit = async (data: FormValuesProps) => {
+  const confirmTransaction = () => {
+    setIsLoading(true);
+    let token = localStorage.getItem("token");
     try {
       let body = {
-        amount: data.amount,
-        from: data.from._id,
-        fromName: `${data.from.firstName} ${data.from.lastName}`,
-        to: data.to._id,
-        toName: `${data.to.firstName} ${data.to.lastName}`,
-        reason: data.reason,
-        remarks: data.remarks,
+        amount: getValues("amount"),
+        from:
+          getValues("transactionType") == "debit"
+            ? getValues("from._id")
+            : user?._id,
+        fromName:
+          getValues("transactionType") == "debit"
+            ? `${getValues("from.firstName")} ${getValues("from.lastName")}`
+            : `${user?.firstName} ${user?.lastName}`,
+        to:
+          getValues("transactionType") == "credit"
+            ? getValues("to._id")
+            : user?._id,
+        toName:
+          getValues("transactionType") == "credit"
+            ? `${getValues("to.firstName")} ${getValues("to.lastName")}`
+            : `${user?.firstName} ${user?.lastName}`,
+        reason: getValues("reason"),
+        remarks: getValues("remarks"),
         txnId: "",
       };
-      await Api(`agent/downline_fund_flow`, "POST", body, "").then(
+      Api(`agent/downline_fund_flow`, "POST", body, token).then(
         (Response: any) => {
           console.log("======get_CategoryList==response=====>" + Response);
           if (Response.status == 200) {
@@ -242,11 +204,18 @@ export default function ManageFundFlow() {
                 : UpdateUserDetail({
                     main_wallet_amount: user?.main_wallet_amount - +body.amount,
                   });
-              setTxnResponse(Response.data.data);
-              handleOpen();
+              setTransactionDetail(Response.data.data);
             } else {
               enqueueSnackbar(Response.data.message, { variant: "error" });
+              setErrorMsg(Response.data.message);
             }
+            setIsTxnOpen(true);
+            handleCloseDetails();
+            setIsLoading(false);
+          } else {
+            setIsLoading(false);
+            setErrorMsg("Failed");
+            enqueueSnackbar("failed", { variant: "error" });
           }
         }
       );
@@ -284,95 +253,69 @@ export default function ManageFundFlow() {
               <MenuItem value={"debit"}>Debit</MenuItem>
             </RHFSelect>
 
-            <RHFAutocomplete
-              name="from"
-              value={watch("from")}
-              onChange={(event, newValue) => {
-                setValue("from", newValue);
-              }}
-              disabled={getValues("transactionType") === "credit"}
-              options={users.map((option: any) => option)}
-              getOptionLabel={(option: any) =>
-                `${option.firstName} ${option.lastName}`
-              }
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                  {...props}
-                >
-                  {`${option.firstName} ${option.lastName} (${option.userCode})`}
-                </Box>
-              )}
-              freeSolo
-              disableClearable
-              renderInput={(params) => (
-                <TextField
-                  label="From"
-                  variant={
-                    getValues("transactionType") === "credit"
-                      ? "filled"
-                      : "outlined"
+            {getValues("transactionType") && (
+              <Stack sx={{ position: "relative", minWidth: "200px" }}>
+                <RHFTextField
+                  fullWidth
+                  name="User"
+                  placeholder={
+                    getValues("transactionType") == "credit" ? "To" : "From"
                   }
-                  {...params}
                 />
-              )}
-            />
-
-            <RHFAutocomplete
-              name="to"
-              value={selectedUser}
-              onChange={handleDetail}
-              disabled={getValues("transactionType") === "debit"}
-              options={users.map((option: any) => option)}
-              getOptionLabel={(option: any) =>
-                `${option.firstName} ${option.lastName}`
-              }
-              renderOption={(props, option) => (
-                <Box
-                  component="li"
-                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                  {...props}
-                >
-                  {`${option.firstName} ${option.lastName} (${option.userCode})`}
-                </Box>
-              )}
-              freeSolo
-              disableClearable
-              renderInput={(params) => (
-                <TextField
-                  label="To"
-                  placeholder="To"
-                  variant={
-                    getValues("transactionType") === "debit"
-                      ? "filled"
-                      : "outlined"
-                  }
-                  {...params}
-                />
-              )}
-            />
-            {selectedUser && (
-              <Card>
-                <CardContent>
-                  <Typography
-                    variant="subtitle2"
-                    component="div"
-                    color="ButtonText"
+                {filteredUser.length > 0 && watch("User").length > 0 && (
+                  <Stack
+                    sx={{
+                      position: "absolute",
+                      top: 40,
+                      zIndex: 9,
+                      width: "100%",
+                      bgcolor: "white",
+                      border: "1px solid grey",
+                      borderRadius: 2,
+                    }}
                   >
-                    {`${selectedUser.firstName} ${selectedUser.lastName}`}
-                  </Typography>
-                  <Typography color="text.secondary">
-                    Role: {selectedUser.role}
-                  </Typography>
-                  <Typography color="text.secondary">
-                    Email: {selectedUser.email}
-                  </Typography>
-                  <Typography color="text.secondary">
-                    Phone: {selectedUser.contact_no}
-                  </Typography>
-                </CardContent>
-              </Card>
+                    <Scrollbar sx={{ maxHeight: 400 }}>
+                      {filteredUser.map((item: any) => {
+                        return (
+                          <Stack
+                            flexDirection={"row"}
+                            gap={1}
+                            sx={{
+                              p: 1,
+                              cursor: "pointer",
+                              color: "grey",
+                              "&:hover": { color: "black" },
+                            }}
+                            onClick={() => {
+                              setValue(
+                                getValues("transactionType") == "credit"
+                                  ? "to"
+                                  : "from",
+                                item
+                              );
+                              setValue(
+                                "User",
+                                `${item.firstName} ${item.lastName}`
+                              );
+                              setFilteredUser([]);
+                            }}
+                          >
+                            <Avatar src={item?.selfie[0]} />
+                            <Stack>
+                              <Typography variant="body2">
+                                {item.firstName} {item.lastName}{" "}
+                              </Typography>{" "}
+                              <Typography variant="body2">
+                                {item.userCode}
+                              </Typography>{" "}
+                            </Stack>
+                          </Stack>
+                        );
+                      })}
+                    </Scrollbar>
+                  </Stack>
+                )}
+              </Stack>
             )}
 
             <RHFTextField name="reason" label="Reasons" placeholder="Reasons" />
@@ -392,121 +335,45 @@ export default function ManageFundFlow() {
             variant="contained"
             sx={{ my: 2 }}
             type="submit"
-            loading={isSubmitting}
+            disabled={!isValid}
           >
             Proceed
           </LoadingButton>
+          <ConfirmDialog
+            open={openConfirm}
+            onClose={handleCloseDetails}
+            title="Fund Transfer Confirmation"
+            content={`Are you sure to Transfer Rs.${getValues("amount")} ${
+              getValues("transactionType") == "debit"
+                ? `from ${getValues("from.firstName")} ${getValues(
+                    "from.lastName"
+                  )} to ${user?.firstName} ${user?.lastName}`
+                : `from ${user?.firstName} ${user?.lastName} to ${getValues(
+                    "to.firstName"
+                  )} ${getValues("to.lastName")}`
+            } `}
+            action={
+              <LoadingButton
+                variant="contained"
+                color="error"
+                loading={isLoading}
+                onClick={confirmTransaction}
+              >
+                Sure
+              </LoadingButton>
+            }
+          />
         </FormProvider>
       </Grid>
-      <Modal
-        open={open}
-        // onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute" as "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "#ffffff",
-            boxShadow: 24,
-            borderRadius: "20px",
-            p: 4,
-            width: {
-              xs: "100%",
-              sm: "50%",
-            },
-          }}
-        >
-          <FormProvider methods={methods}>
-            <Grid
-              rowGap={2}
-              columnGap={2}
-              display="grid"
-              gridTemplateColumns={{
-                xs: "repeat(1, 1fr)",
-                // sm: 'repeat(2, 1fr)'
-              }}
-            >
-              <Icon
-                icon="icon-park-solid:success"
-                style={{
-                  alignSelf: "center",
-                  color: "green",
-                  fontSize: 40,
-                  width: "100%",
-                }}
-              />
-              <Stack justifyContent={"center"} alignItems={"center"}>
-                <Typography variant="subtitle1" color={"green"}>
-                  Success
-                </Typography>
-              </Stack>
-              <Stack
-                flexDirection={"row"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-              >
-                <Typography variant="h4">From</Typography>
-                <Typography variant="body1">{`${watch(
-                  "from.firstName"
-                )} ${watch("from.lastName")}`}</Typography>
-              </Stack>
-              <Stack
-                flexDirection={"row"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-              >
-                <Typography variant="h4">To</Typography>
-                <Typography variant="body1">{`${watch("to.firstName")} ${watch(
-                  "to.lastName"
-                )}`}</Typography>
-              </Stack>
-              <Stack
-                flexDirection={"row"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-              >
-                <Typography variant="h4">Reason</Typography>
-                <Typography variant="body1">{txnresponse.reason}</Typography>
-              </Stack>
-              {txnresponse.txnId && (
-                <Stack
-                  flexDirection={"row"}
-                  justifyContent={"space-between"}
-                  alignItems={"center"}
-                >
-                  <Typography variant="h4">Transaction Id</Typography>
-                  <Typography variant="body1">{txnresponse.txnId}</Typography>
-                </Stack>
-              )}
-              <Stack
-                flexDirection={"row"}
-                justifyContent={"space-between"}
-                alignItems={"center"}
-              >
-                <Typography variant="h4">Amount</Typography>
-                <Typography variant="body1">{`${watch("amount")}`}</Typography>
-              </Stack>
-              <Stack justifyContent={"center"} alignItems={"center"}>
-                <Typography variant="body1" fontStyle={"italic"}>
-                  Remark: {txnresponse.remarks}
-                </Typography>
-              </Stack>
-              <Button
-                sx={{ margin: "auto" }}
-                size="small"
-                variant="contained"
-                onClick={handleClose}
-              >
-                Close
-              </Button>
-            </Grid>
-          </FormProvider>
-        </Box>
-      </Modal>
+      <TransactionModal
+        isTxnOpen={isTxnOpen}
+        handleTxnModal={() => {
+          setIsTxnOpen(false);
+          setErrorMsg("");
+        }}
+        errorMsg={errorMsg}
+        transactionDetail={transactionDetail}
+      />
     </Stack>
   );
 }

@@ -20,6 +20,7 @@ import Scrollbar from "../../components/scrollbar";
 import { TableHeadCustom } from "../../components/table";
 import React, { useEffect, useState, useCallback } from "react";
 import { fDateTime } from "src/utils/formatTime";
+import useResponsive from "src/hooks/useResponsive";
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +52,7 @@ type RowProps = {
 
 export default function AllDistributor() {
   const [appdata, setAppdata] = useState([]);
+  const isMobile = useResponsive("up", "sm");
   const [open, setModalEdit] = React.useState(false);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [selectedRow, setSelectedRow] = useState<RowProps | null>(null);
@@ -143,7 +145,9 @@ export default function AllDistributor() {
     <>
       <Card>
         <TableContainer>
-          <Scrollbar sx={{ height: "70vh", overflowY: "scroll" }}>
+          <Scrollbar
+            sx={{ maxHeight: window.innerHeight - (isMobile ? 140 : 50) }}
+          >
             <Table sx={{ minWidth: 720 }}>
               <TableHeadCustom headLabel={tableLabels} />
 
