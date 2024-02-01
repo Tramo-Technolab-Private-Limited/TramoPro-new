@@ -248,6 +248,7 @@ export default function (props: any) {
     );
   };
   const handdleClear = () => {
+    getFundReq();
     onChangeEndDate(null);
     onChangeStartDate(null);
     reset(defaultValues);
