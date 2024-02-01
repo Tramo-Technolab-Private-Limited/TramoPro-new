@@ -20,6 +20,8 @@ import Scrollbar from "../../components/scrollbar";
 import { TableHeadCustom } from "../../components/table";
 import React, { useEffect, useState, useCallback } from "react";
 import { fDateTime } from "src/utils/formatTime";
+import useResponsive from "src/hooks/useResponsive";
+import { CustomAvatar } from "src/components/custom-avatar";
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +53,7 @@ type RowProps = {
 
 export default function AllDistributor() {
   const [appdata, setAppdata] = useState([]);
+  const isMobile = useResponsive("up", "sm");
   const [open, setModalEdit] = React.useState(false);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [selectedRow, setSelectedRow] = useState<RowProps | null>(null);
@@ -143,7 +146,9 @@ export default function AllDistributor() {
     <>
       <Card>
         <TableContainer>
-          <Scrollbar sx={{ height: "70vh", overflowY: "scroll" }}>
+          <Scrollbar
+            sx={{ maxHeight: window.innerHeight - (isMobile ? 140 : 50) }}
+          >
             <Table sx={{ minWidth: 720 }}>
               <TableHeadCustom headLabel={tableLabels} />
 
@@ -223,7 +228,11 @@ function EcommerceBestSalesmanRow({
     <TableRow onClick={() => openEditModal(row)}>
       <TableCell>
         <Stack direction="row" alignItems="center">
-          <Avatar alt={row.name} src={row.selfie} />
+          <CustomAvatar
+            alt={row.firstName}
+            src={row.selfie[0]}
+            name={row.firstName}
+          />
 
           <Box sx={{ ml: 2 }}>
             <Typography variant="subtitle2"> {row.firstName} </Typography>

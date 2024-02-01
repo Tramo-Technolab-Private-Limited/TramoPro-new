@@ -40,6 +40,7 @@ import CustomPagination from "src/components/customFunctions/CustomPagination";
 import { sentenceCase } from "change-case";
 import Label from "src/components/label/Label";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
+import { CustomAvatar } from "src/components/custom-avatar";
 // ----------------------------------------------------------------------
 type FormValuesProps = {
   status: string;
@@ -339,9 +340,13 @@ const TransactionRow = React.memo(({ row }: childProps) => {
           {newRow?.walletLedgerData?.from?.id ==
           newRow?.adminDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.adminDetails?.id?.email}
                 alt={newRow?.adminDetails?.id?.email}
-                src={newRow?.adminDetails?.id?.selfie}
+                src={
+                  newRow?.adminDetails?.id?.selfie &&
+                  newRow?.adminDetails?.id?.selfie[0]
+                }
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -355,9 +360,10 @@ const TransactionRow = React.memo(({ row }: childProps) => {
           ) : newRow?.walletLedgerData?.from?.id ==
             newRow.agentDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.agentDetails?.id?.firstName}
                 alt={newRow?.agentDetails?.id?.firstName}
-                src={newRow?.agentDetails?.id?.selfie}
+                src={newRow?.agentDetails?.id?.selfie[0]}
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -372,9 +378,10 @@ const TransactionRow = React.memo(({ row }: childProps) => {
           ) : newRow?.walletLedgerData?.from?.id ==
             newRow.distributorDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.distributorDetails?.id?.firstName}
                 alt={newRow?.distributorDetails?.id?.firstName}
-                src={newRow?.distributorDetails?.id?.selfie}
+                src={newRow?.distributorDetails?.id?.selfie[0]}
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -389,9 +396,10 @@ const TransactionRow = React.memo(({ row }: childProps) => {
           ) : newRow?.walletLedgerData?.from?.id ==
             newRow.masterDistributorDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.masterDistributorDetails?.id?.firstName}
                 alt={newRow?.masterDistributorDetails?.id?.firstName}
-                src={newRow?.masterDistributorDetails?.id?.selfie}
+                src={newRow?.masterDistributorDetails?.id?.selfie[0]}
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -405,9 +413,10 @@ const TransactionRow = React.memo(({ row }: childProps) => {
             </Stack>
           ) : (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.agentDetails?.id?.firstName}
                 alt={newRow?.agentDetails?.id?.firstName}
-                src={newRow?.agentDetails?.id?.selfie}
+                src={newRow?.agentDetails?.id?.selfie[0]}
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -425,9 +434,13 @@ const TransactionRow = React.memo(({ row }: childProps) => {
         <TableCell>
           {newRow?.walletLedgerData?.to?.id == newRow.adminDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.adminDetails?.id?.email}
                 alt={newRow?.adminDetails?.id?.email}
-                src={newRow?.adminDetails?.id?.selfie}
+                src={
+                  newRow?.adminDetails?.id?.selfie &&
+                  newRow?.adminDetails?.id?.selfie[0]
+                }
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -441,9 +454,10 @@ const TransactionRow = React.memo(({ row }: childProps) => {
           ) : newRow?.walletLedgerData?.to?.id ==
             newRow.agentDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.agentDetails?.id?.firstName}
                 alt={newRow?.agentDetails?.id?.firstName}
-                src={newRow?.agentDetails?.id?.selfie}
+                src={newRow?.agentDetails?.id?.selfie[0]}
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -458,9 +472,10 @@ const TransactionRow = React.memo(({ row }: childProps) => {
           ) : newRow?.walletLedgerData?.to?.id ==
             newRow.distributorDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <CustomAvatar
+                name={newRow?.distributorDetails?.id?.firstName}
                 alt={newRow?.distributorDetails?.id?.firstName}
-                src={newRow?.distributorDetails?.id?.selfie}
+                src={newRow?.distributorDetails?.id?.selfie[0]}
               />
               <Stack>
                 <Typography variant="body2" noWrap>
@@ -476,9 +491,10 @@ const TransactionRow = React.memo(({ row }: childProps) => {
             newRow?.walletLedgerData?.to?.id ==
               newRow.masterDistributorDetails.id?._id && (
               <Stack flexDirection={"row"} gap={1}>
-                <Avatar
+                <CustomAvatar
+                  name={newRow?.masterDistributorDetails?.id?.firstName}
                   alt={newRow?.masterDistributorDetails?.id?.firstName}
-                  src={newRow?.masterDistributorDetails?.id?.selfie}
+                  src={newRow?.masterDistributorDetails?.id?.selfie[0]}
                 />
                 <Stack>
                   <Typography variant="body2" noWrap>
