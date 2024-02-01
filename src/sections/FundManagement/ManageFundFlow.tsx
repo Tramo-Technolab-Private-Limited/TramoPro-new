@@ -14,6 +14,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import ConfirmDialog from "src/components/confirm-dialog/ConfirmDialog";
 import TransactionModal from "src/components/customFunctions/TrasactionModal";
+import SecureAvatar from "src/components/customFunctions/SecureAvatar";
 
 type FormValuesProps = {
   transactionType: string;
@@ -300,7 +301,10 @@ export default function ManageFundFlow() {
                               setFilteredUser([]);
                             }}
                           >
-                            <Avatar src={item?.selfie[0]} />
+                            <SecureAvatar
+                              src={item?.selfie[0]}
+                              alt={item?.firstName}
+                            />
                             <Stack>
                               <Typography variant="body2">
                                 {item.firstName} {item.lastName}{" "}

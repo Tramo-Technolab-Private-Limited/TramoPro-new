@@ -60,6 +60,7 @@ import { fCurrency } from "src/utils/formatNumber";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import { Icon } from "@iconify/react";
 import useResponsive from "src/hooks/useResponsive";
+import SecureAvatar from "src/components/customFunctions/SecureAvatar";
 
 // ----------------------------------------------------------------------
 
@@ -661,9 +662,9 @@ function TransactionRow({ row }: childProps) {
         {user?.role === "distributor" && (
           <StyledTableCell>
             <Stack flexDirection={"row"} gap={1}>
-              <Avatar
+              <SecureAvatar
                 alt={newRow?.agentDetails?.id?.firstName}
-                src={newRow?.agentDetails?.id?.selfie}
+                src={newRow?.agentDetails?.id?.selfie[0]}
               />
               <Stack>
                 <Typography variant="body2">
@@ -683,9 +684,9 @@ function TransactionRow({ row }: childProps) {
           <>
             <StyledTableCell>
               <Stack flexDirection={"row"} gap={1}>
-                <Avatar
+                <SecureAvatar
                   alt={newRow?.agentDetails?.id?.firstName}
-                  src={newRow?.agentDetails?.id?.selfie}
+                  src={newRow?.agentDetails?.id?.selfie[0]}
                 />
                 <Stack>
                   <Typography variant="body2">
@@ -700,9 +701,9 @@ function TransactionRow({ row }: childProps) {
             </StyledTableCell>
             <StyledTableCell>
               <Stack flexDirection={"row"} gap={1}>
-                <Avatar
+                <SecureAvatar
                   alt={newRow?.distributorDetails?.id?.firstName}
-                  src={newRow?.distributorDetails?.id?.selfie}
+                  src={newRow?.distributorDetails?.id?.selfie[0]}
                 />
                 <Stack>
                   <Typography variant="body2">
