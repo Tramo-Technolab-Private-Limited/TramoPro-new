@@ -238,7 +238,7 @@ export default function MyTransactions() {
     { id: "Txn Amount", label: "Txn Amount" },
     { id: "Charge/Commission", label: "Charge/ Commission" },
     { id: "Closing Balance", label: "Closing Balance" },
-    { id: "GST/TDS", label: "GST/TDS" },
+    // { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
   ];
@@ -255,7 +255,7 @@ export default function MyTransactions() {
     { id: "Txn Amount", label: "Txn Amount" },
     { id: "Charge/ Commission", label: "Charge/ Commission" },
     { id: "Closing Balance", label: "Closing Balance" },
-    { id: "GST/TDS", label: "GST/TDS" },
+    // { id: "GST/TDS", label: "GST/TDS" },
     { id: "status", label: "Status" },
     { id: "Action", label: "Action" },
   ];
@@ -657,7 +657,6 @@ function TransactionRow({ row }: childProps) {
           </Typography>
         </StyledTableCell>
 
-        {/* Agent Detail */}
         {user?.role === "distributor" && (
           <StyledTableCell>
             <Stack flexDirection={"row"} gap={1}>
@@ -772,9 +771,8 @@ function TransactionRow({ row }: childProps) {
         <StyledTableCell>
           <Stack flexDirection={"row"} justifyContent={"center"}>
             <Typography variant="body2" whiteSpace={"nowrap"} color={"error"}>
-              - {fCurrency(newRow.debit) || 0}
+              {user?.role === "agent" && <>-{fCurrency(newRow.debit)}/</>}
             </Typography>{" "}
-            /
             <Typography variant="body2" whiteSpace={"nowrap"} color={"green"}>
               +{" "}
               {fCurrency(
@@ -802,28 +800,24 @@ function TransactionRow({ row }: childProps) {
         </StyledTableCell>
 
         {/* GST/TDS */}
-        <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
-          <Typography variant="body2">
-            GST :{" "}
-            {fCurrency(
-              user?.role == "agent"
-                ? newRow?.agentDetails?.GST
-                : user?.role == "distributor"
-                ? newRow?.distributorDetails?.GST
-                : newRow?.masterDistributorDetails?.GST
-            ) || 0}
-          </Typography>
-          <Typography variant="body2">
-            TDS :{" "}
-            {fCurrency(
-              user?.role == "agent"
-                ? newRow?.agentDetails?.TDSAmount
-                : user?.role == "distributor"
-                ? newRow?.distributorDetails?.TDSAmount
-                : newRow?.masterDistributorDetails?.TDSAmount
-            ) || 0}
-          </Typography>
-        </StyledTableCell>
+
+        {user?.role == "agent" && (
+          <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
+            <Typography variant="body2">
+              GST :{" "}
+              {fCurrency(
+                (user?.role == "agent" && newRow?.agentDetails?.GST) || "0"
+              )}
+            </Typography>
+            <Typography variant="body2">
+              TDS :{" "}
+              {fCurrency(
+                (user?.role == "agent" && newRow?.agentDetails?.TDSAmount) ||
+                  "0"
+              )}
+            </Typography>
+          </StyledTableCell>
+        )}
 
         <StyledTableCell
           sx={{
