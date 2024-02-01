@@ -8,6 +8,9 @@ import {
   TextField,
   Modal,
   Box,
+  Card,
+  CardContent,
+  Avatar,
 } from "@mui/material";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -22,6 +25,8 @@ import { useSnackbar } from "notistack";
 import { Icon } from "@iconify/react";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
+import { Image } from "@mui/icons-material";
 
 type FormValuesProps = {
   transactionType: string;
@@ -51,8 +56,7 @@ export default function ManageFundFlow() {
   const agentDetail: any = user;
   const [txnAmount, setTxnAmount] = useState("");
   const [users, setUsers] = useState([]);
-  const [fromusers, setFromUsers] = useState([]);
-  const [txnId, setTxnId] = useState("");
+  const [selectedUser, setSelectedUser] = useState<any>(null);
   const [txnresponse, setTxnResponse] = useState({
     from: "",
     fromName: "",
@@ -65,18 +69,15 @@ export default function ManageFundFlow() {
     walletId: "",
     _id: "",
   });
-  const [selectFromUser, setSelectFromUser] = useState({
-    userName: "",
-    _id: "",
-  });
-  const [selectToUser, setSelectToUser] = useState({ userName: "", _id: "" });
-  const [adminDetail, setAdminDetail] = useState({ email: "", _id: "" });
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     reset(defaultValues);
+  };
+  const handleDetail = (event: any, newValue: any) => {
+    setSelectedUser(newValue);
   };
 
   const FilterSchema = Yup.object().shape({
@@ -320,10 +321,8 @@ export default function ManageFundFlow() {
 
             <RHFAutocomplete
               name="to"
-              value={watch("to")}
-              onChange={(event, newValue) => {
-                setValue("to", newValue);
-              }}
+              value={selectedUser}
+              onChange={handleDetail}
               disabled={getValues("transactionType") === "debit"}
               options={users.map((option: any) => option)}
               getOptionLabel={(option: any) =>
@@ -353,6 +352,28 @@ export default function ManageFundFlow() {
                 />
               )}
             />
+            {selectedUser && (
+              <Card>
+                <CardContent>
+                  <Typography
+                    variant="subtitle2"
+                    component="div"
+                    color="ButtonText"
+                  >
+                    {`${selectedUser.firstName} ${selectedUser.lastName}`}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    Role: {selectedUser.role}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    Email: {selectedUser.email}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    Phone: {selectedUser.contact_no}
+                  </Typography>
+                </CardContent>
+              </Card>
+            )}
 
             <RHFTextField name="reason" label="Reasons" placeholder="Reasons" />
             <RHFTextField
