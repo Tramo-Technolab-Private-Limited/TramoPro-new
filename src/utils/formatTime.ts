@@ -11,7 +11,7 @@ export function fDate(date: InputValue, newFormat?: string) {
 }
 
 export function fDateTime(date: InputValue, newFormat?: string) {
-  const fm = newFormat || "dd MMM yyyy, p";
+  const fm = newFormat || "dd MMM yyyy, pp";
 
   return date ? format(new Date(date), fm) : "";
 }
