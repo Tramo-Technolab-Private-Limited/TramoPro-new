@@ -474,9 +474,9 @@ const LadgerRow = ({ row }: any) => {
                   </Label>
                   :
                   {row?.to?.walletType === "MAIN" ? (
-                    <>{row?.to?.newMainWalletBalance?.toFixed(2)}</>
+                    <>{fCurrency(row?.to?.newMainWalletBalance || "0")}</>
                   ) : (
-                    <>{row?.to?.newAepsWalletBalance?.toFixed(2)}</>
+                    <>{fCurrency(row?.to?.newAepsWalletBalance || "0")}</>
                   )}
                 </Typography>
               </>
@@ -495,9 +495,9 @@ const LadgerRow = ({ row }: any) => {
                 </Label>
                 :
                 {row?.from?.walletType === "MAIN" ? (
-                  <>{row?.from?.newMainWalletBalance?.toFixed(2)}</>
+                  <>{fCurrency(row?.from?.newMainWalletBalance || "0")}</>
                 ) : (
-                  <>{row?.from?.newAepsWalletBalance?.toFixed(2)}</>
+                  <>{fCurrency(row?.from?.newAepsWalletBalance || "0")}</>
                 )}
               </>
             )}

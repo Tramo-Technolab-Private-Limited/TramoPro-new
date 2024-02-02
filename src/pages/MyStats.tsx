@@ -27,6 +27,7 @@ import Frameorange from "../assets/icons/Frame orange.svg";
 import Graphgreen from "../assets/icons/Graph green.svg";
 import Graphorange from "../assets/icons/Graph orange.svg";
 import { useEffect, useState } from "react";
+import { fCurrency } from "src/utils/formatNumber";
 
 // ----------------------------------------------------------------------
 
@@ -272,7 +273,7 @@ export default function MyStats(props: any) {
                 }}
               >
                 <Typography>{"Transaction Value"}</Typography>
-                <Typography>{parseFloat(Success.volume).toFixed(2)}</Typography>
+                <Typography>Rs.{fCurrency(Success?.volume || "0")}</Typography>
               </Typography>
             </CardContent>
           </Card>
@@ -330,7 +331,7 @@ export default function MyStats(props: any) {
                 }}
               >
                 <Typography>{"Transaction Value"}</Typography>
-                <Typography>{parseFloat(Pending.volume).toFixed(2)}</Typography>
+                <Typography> Rs.{fCurrency(Pending?.volume || "0")}</Typography>
               </Typography>
             </CardContent>
           </Card>
@@ -388,7 +389,7 @@ export default function MyStats(props: any) {
                 }}
               >
                 <Typography>{"Transaction Value"}</Typography>
-                <Typography>{parseFloat(Failed.volume).toFixed(2)}</Typography>
+                <Typography> Rs. {fCurrency(Failed?.volume || "0")}</Typography>
               </Typography>
             </CardContent>
           </Card>
@@ -446,7 +447,7 @@ export default function MyStats(props: any) {
                 }}
               >
                 <Typography>{"Transaction Value"}</Typography>
-                <Typography>{parseFloat(Total.volume).toFixed(2)}</Typography>
+                <Typography> Rs. {fCurrency(Total?.volume || "0")}</Typography>
               </Typography>
             </CardContent>
           </Card>

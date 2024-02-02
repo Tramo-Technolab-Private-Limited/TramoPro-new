@@ -3,6 +3,7 @@ import { ApexOptions } from "apexcharts";
 import { Card, CardHeader, Box, CardProps } from "@mui/material";
 // components
 import Chart, { useChart } from "../../components/chart";
+import { fCurrency } from "src/utils/formatNumber";
 
 // ----------------------------------------------------------------------
 
@@ -50,7 +51,7 @@ export default function StatsWebsiteVisits({
       y: {
         formatter: (value: number) => {
           if (typeof value !== "undefined") {
-            return `${value.toFixed(0)} visits`;
+            return `${fCurrency(value)} visits`;
           }
           return value;
         },

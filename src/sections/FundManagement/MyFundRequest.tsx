@@ -37,6 +37,7 @@ import { useDateRangePicker } from "src/components/date-range-picker";
 import DateRangePicker from "src/components/date-range-picker/DateRangePicker";
 import Iconify from "src/components/iconify/Iconify";
 import FileFilterButton from "../MyTransaction/FileFilterButton";
+import { fCurrency } from "src/utils/formatNumber";
 // ----------------------------------------------------------------------
 
 export default function (props: any) {
@@ -388,7 +389,7 @@ export default function (props: any) {
                     <StyledTableCell>
                       <Typography variant="body1" textAlign={"center"}>
                         {!isNaN(row?.Commission)
-                          ? "Rs. " + parseFloat(row?.Commission).toFixed(2)
+                          ? "Rs. " + fCurrency(row?.Commission || "0")
                           : "-"}
                       </Typography>
                     </StyledTableCell>
