@@ -123,9 +123,16 @@ export default function ManageFundFlow() {
   }, []);
   useEffect(() => {
     setFilteredUser(
-      users.filter((item: any) =>
-        item.firstName.toLowerCase().startsWith(getValues("User").toLowerCase())
-      )
+      users.filter((item: any) => {
+        if (
+          item.firstName
+            .toLowerCase()
+            .startsWith(getValues("User").toLowerCase()) ||
+          item.email.toLowerCase().startsWith(getValues("User").toLowerCase())
+        ) {
+          return item;
+        }
+      })
     );
   }, [watch("User")]);
 
@@ -312,6 +319,9 @@ export default function ManageFundFlow() {
                               </Typography>{" "}
                               <Typography variant="body2">
                                 {item.userCode}
+                              </Typography>{" "}
+                              <Typography variant="body2">
+                                {item.email}
                               </Typography>{" "}
                             </Stack>
                           </Stack>
