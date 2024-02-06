@@ -32,18 +32,18 @@ export default function ViewRechargeTable({ comData, ...other }: Props) {
 
   const tableLabels1 = [
     { id: "ProductDetail", label: "Product Deatil" },
-    { id: "Agent", label: "Agent Commission" },
-    { id: "Distributor", label: "Distributor Commission" },
-    { id: "MDistributor", label: "Master Distributor Commission" },
+    { id: "Agent", label: "Agent Commission (in %)" },
+    { id: "Distributor", label: "Distributor Commission(in %)" },
+    { id: "MDistributor", label: "Master Distributor Commission (in %)" },
   ];
   const tableLabels2 = [
     { id: "ProductDetail", label: "Product Deatil" },
-    { id: "Agent", label: "Agent Commission" },
-    { id: "Distributor", label: "Distributor Commission" },
+    { id: "Agent", label: "Agent Commission (in %)" },
+    { id: "Distributor", label: "Distributor Commission (in %)" },
   ];
   const tableLabels3 = [
-    { id: "ProductDetail", label: "Product Deatil" },
-    { id: "Agent", label: "Agent Commission" },
+    { id: "ProductDetail", label: "Product Deatil (in %)" },
+    { id: "Agent", label: "Agent Commission (in %)" },
   ];
   let role = user?.role;
 
