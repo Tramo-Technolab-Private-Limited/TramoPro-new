@@ -42,7 +42,7 @@ export default function ViewRechargeTable({ comData, ...other }: Props) {
     { id: "Distributor", label: "Distributor Commission (in %)" },
   ];
   const tableLabels3 = [
-    { id: "ProductDetail", label: "Product Deatil (in %)" },
+    { id: "ProductDetail", label: "Product Deatil" },
     { id: "Agent", label: "Agent Commission (in %)" },
   ];
   let role = user?.role;
