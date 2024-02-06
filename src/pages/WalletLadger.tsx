@@ -88,7 +88,7 @@ export default function WalletLadger() {
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [ladgerData, setLadgerData] = useState([]);
-  const [pageSize, setPageSize] = useState<any>(20);
+  const [pageSize, setPageSize] = useState<any>(25);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [sendLoding, setSendLoading] = useState(false);
   const [WalletCount, setWalletCount] = useState(0);
@@ -293,12 +293,19 @@ export default function WalletLadger() {
       </Stack>
 
       <CustomPagination
-        pageSize={pageSize}
-        onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-          setCurrentPage(value);
+        page={currentPage - 1}
+        count={WalletCount}
+        onPageChange={(
+          event: React.MouseEvent<HTMLButtonElement> | null,
+          newPage: number
+        ) => setCurrentPage(newPage + 1)}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={(
+          event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+        ) => {
+          setPageSize(parseInt(event.target.value));
+          setCurrentPage(1);
         }}
-        page={currentPage}
-        Count={WalletCount}
       />
     </>
   );

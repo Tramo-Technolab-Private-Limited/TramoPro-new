@@ -440,13 +440,23 @@ export default function (props: any) {
               </TableBody>
             </Table>
           </Scrollbar>
+
           <CustomPagination
-            pageSize={pageSize}
-            onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-              setCurrentPage(value);
+            page={currentPage - 1}
+            count={pageCount}
+            onPageChange={(
+              event: React.MouseEvent<HTMLButtonElement> | null,
+              newPage: number
+            ) => {
+              setCurrentPage(newPage + 1);
             }}
-            page={currentPage}
-            Count={pageCount}
+            rowsPerPage={pageSize}
+            onRowsPerPageChange={(
+              event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            ) => {
+              setPageSize(parseInt(event.target.value));
+              setCurrentPage(1);
+            }}
           />
 
           {/* <CustomPagination /> */}

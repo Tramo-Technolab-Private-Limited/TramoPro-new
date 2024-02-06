@@ -1,30 +1,26 @@
-import { Pagination, Stack } from "@mui/material";
-import useResponsive from "src/hooks/useResponsive";
+import { Pagination, Stack, TablePagination } from "@mui/material";
 
-export default function CustomPagination({ Count, pageSize, ...other }: any) {
-  const isMobile = useResponsive("up", "sm");
+export default function CustomPagination({ ...other }: any) {
   return (
     <Stack
       sx={{
         position: "fixed",
-        margin: "auto",
+        bottom: 0,
         left: "50%",
         transform: "translate(-50%)",
-        bottom: 5,
         bgcolor: "white",
       }}
     >
-      <Pagination
-        count={Math.floor(Count / pageSize) + (Count % pageSize === 0 ? 0 : 1)}
+      {/* <Pagination
+        count={Math.floor(Count / pageSize) + (Count % pageSize == 0 ? 0 : 1)}
         color="primary"
         variant="outlined"
         shape="rounded"
-        size={!isMobile ? "small" : "medium"}
-        // showFirstButton
-        // showLastButton
-        sx={{ whiteSpace: "nowrap" }}
+        showFirstButton
+        showLastButton
         {...other}
-      />
+      /> */}
+      <TablePagination component="div" {...other} />
     </Stack>
   );
 }

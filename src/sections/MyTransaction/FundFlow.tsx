@@ -56,7 +56,7 @@ export default function FundFlow() {
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [pageCount, setPageCount] = useState<any>(0);
   const [sdata, setSdata] = useState([]);
-  const [pageSize, setPageSize] = useState<any>(10);
+  const [pageSize, setPageSize] = useState<any>(25);
 
   const txnSchema = Yup.object().shape({
     status: Yup.string(),
@@ -282,12 +282,21 @@ export default function FundFlow() {
               </Table>
             </Scrollbar>
             <CustomPagination
-              pageSize={pageSize}
-              onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-                setCurrentPage(value);
+              page={currentPage - 1}
+              count={pageCount}
+              onPageChange={(
+                event: React.MouseEvent<HTMLButtonElement> | null,
+                newPage: number
+              ) => {
+                setCurrentPage(newPage + 1);
               }}
-              page={currentPage}
-              Count={pageCount}
+              rowsPerPage={pageSize}
+              onRowsPerPageChange={(
+                event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+              ) => {
+                setPageSize(parseInt(event.target.value));
+                setCurrentPage(1);
+              }}
             />
           </>
         )}

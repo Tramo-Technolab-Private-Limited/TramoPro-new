@@ -81,7 +81,7 @@ export default function MyTransactions() {
   const [pageCount, setPageCount] = useState<any>(0);
   const [categoryList, setCategoryList] = useState([]);
   const [sdata, setSdata] = useState([]);
-  const [pageSize, setPageSize] = useState<any>(20);
+  const [pageSize, setPageSize] = useState<any>(25);
   const [currentTab, setCurrentTab] = useState("all");
   const [ProductList, setProductList] = useState([]);
 
@@ -536,15 +536,23 @@ export default function MyTransactions() {
             )}
             {!Loading && (
               <CustomPagination
-                pageSize={pageSize}
-                onChange={(
-                  event: React.ChangeEvent<unknown>,
-                  value: number
+                page={currentPage - 1}
+                count={pageCount}
+                onPageChange={(
+                  event: React.MouseEvent<HTMLButtonElement> | null,
+                  newPage: number
                 ) => {
-                  setCurrentPage(value);
+                  setCurrentPage(newPage + 1);
                 }}
-                page={currentPage}
-                Count={pageCount}
+                rowsPerPage={pageSize}
+                onRowsPerPageChange={(
+                  event: React.ChangeEvent<
+                    HTMLInputElement | HTMLTextAreaElement
+                  >
+                ) => {
+                  setPageSize(parseInt(event.target.value));
+                  setCurrentPage(1);
+                }}
               />
             )}
           </>
