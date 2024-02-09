@@ -52,7 +52,6 @@ import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { requestPermission } from "./firebase";
 
-
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -381,7 +380,7 @@ export default function AuthRegisterForm(props: any) {
     });
   };
 
-  useEffect(() => requestPermission(), [])
+  useEffect(() => requestPermission(), []);
 
   const createUser = () => {
     let rfcode;
@@ -398,7 +397,7 @@ export default function AuthRegisterForm(props: any) {
       role: value2 == "m_distributor" ? value2 : radioVal,
       application_no: Math.floor(Math.random() * 10000000),
       referralCode: rfcode,
-      FCM_token:sessionStorage.getItem('fcm')
+      FCM_token: sessionStorage.getItem("fcm"),
     };
     Api(`auth/create_account`, "POST", body, "").then((Response: any) => {
       console.log("=============> Create" + JSON.stringify(Response));
@@ -576,7 +575,7 @@ export default function AuthRegisterForm(props: any) {
                         }),
                       required: true,
                     })}
-                    sx={{ width: 265 }}
+                    sx={{ width: 165 }}
                   />
                   {!!errors.refCode && (
                     <FormHelperText error sx={{ pl: 2 }}>
@@ -588,7 +587,11 @@ export default function AuthRegisterForm(props: any) {
                       variant="contained"
                       size="medium"
                       loading={loading}
-                      sx={{ position: "absolute", marginLeft: "190px", top: 2 }}
+                      sx={{
+                        position: "absolute",
+                        marginLeft: "90px",
+                        top: 1,
+                      }}
                       onClick={() => {
                         setLoading(true);
                         verifyRef(formValues.refCode);
@@ -602,9 +605,9 @@ export default function AuthRegisterForm(props: any) {
               ))}
 
             {refName && (
-              <Stack justifyContent="row" gap={1}>
-                <Typography variant="h5">
-                  {refName}{" "}
+              <Stack justifyContent="row" gap={2}>
+                <Typography variant="body1">
+                  <Typography></Typography> {refName}{" "}
                   <Button
                     variant="outlined"
                     size="medium"
@@ -857,7 +860,7 @@ export default function AuthRegisterForm(props: any) {
             {/* </Box> */}
 
             <Button onClick={handleClose} variant="contained" size="medium">
-              Acept
+              Accept
             </Button>
           </Scrollbar>
         </Box>
