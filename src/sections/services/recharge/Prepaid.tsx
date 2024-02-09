@@ -200,6 +200,7 @@ function MobilePrepaid() {
   ];
 
   const circleList = [
+    // { id: 1, name: "Delhi NCR", value: "Delhi NCR" },
     { id: 1, name: "Delhi", value: "Delhi NCR" },
     { id: 2, name: "Gujarat", value: "Gujarat" },
     { id: 3, name: "Haryana", value: "Haryana" },
@@ -230,6 +231,7 @@ function MobilePrepaid() {
     { id: 20, name: "TamilNadu", value: "Tamil Nadu" },
     { id: 21, name: "UPEast", value: "UP East" },
     { id: 22, name: "UP West and Uttaranchal", value: "UP West" },
+    // { id: 22, name: "UP West", value: "UP West" },
     { id: 23, name: "WestBengal", value: "West Bengal" },
   ];
 
@@ -319,7 +321,9 @@ function MobilePrepaid() {
     let body = {
       circle: circleList.filter((item: any) => {
         return item.name === getValues("circle");
-      })[0].value,
+      })[0]?.value,
+
+      // circle: getValues("circle"),
       operator: getValues("operatorName"),
     };
     Api("agents/v1/get_plan", "POST", body, token).then((Response: any) => {
