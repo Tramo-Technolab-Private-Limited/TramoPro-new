@@ -38,7 +38,7 @@ export default function Register() {
       >
         Login
       </Button>
-      <Stack spacing={2} sx={{ mb: 5, position: "relative" }}>
+      <Stack spacing={2} sx={{ mb: 3, position: "relative" }}>
         <Typography variant="h4">
           Register in {process.env.REACT_APP_COMPANY_NAME}
         </Typography>

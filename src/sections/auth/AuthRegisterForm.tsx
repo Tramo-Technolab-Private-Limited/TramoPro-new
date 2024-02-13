@@ -121,6 +121,7 @@ export default function AuthRegisterForm(props: any) {
   const [radioVal, setRadioVal] = React.useState("agent");
   const [refName, setRefName] = useState("");
   const [verifyLoad, setVerifyLoad] = useState(false);
+  const [ClearForm, setClearForm] = useState(true);
   const [gOTP, setgOTP] = useState(false);
   const [refShow, setRefShow] = useState(false);
   const [checkbox, setCheckbox] = useState(true);
@@ -136,10 +137,13 @@ export default function AuthRegisterForm(props: any) {
     // role: '',
   });
 
-  const handleClearClick = () => {
+  const handleClearClick = (event: React.SyntheticEvent) => {
+    reset(formValues);
     setRefName("");
     setValue("refCode", "");
+    setRefShow(false);
     setFormValues({ ...formValues, refCode: "" });
+    setgOTP(false);
   };
 
   const RegisterSchema = Yup.object().shape({
@@ -286,6 +290,8 @@ export default function AuthRegisterForm(props: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
           setgOTP(true);
+          setCheckbox(!checkbox);
+          setClearForm(false);
         } else {
           enqueueSnackbar(Response.data.message);
         }
@@ -299,6 +305,7 @@ export default function AuthRegisterForm(props: any) {
 
   const handleClose = () => {
     setModalEdit(false);
+    setCheckbox(!checkbox);
   };
 
   const resendOtp = (email: string, mobile: string) => {
@@ -464,8 +471,8 @@ export default function AuthRegisterForm(props: any) {
   return (
     <>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-        <Stack spacing={2}>
-          <TabContext value={value2}>
+        <Stack spacing={1}>
+          {/* <TabContext value={value2}>
             <TabList
               variant="scrollable"
               scrollButtons={false}
@@ -508,7 +515,37 @@ export default function AuthRegisterForm(props: any) {
                 value="m_distributor"
               />
             </TabList>
-          </TabContext>
+          </TabContext> */}
+          <Typography variant="subtitle1">You want to signup as:</Typography>
+          <RadioGroup
+            aria-labelledby="demo-controlled-radio-buttons-group"
+            name="controlled-radio-buttons-group"
+            value={value2}
+            onChange={handleChangeTab}
+            row
+          >
+            <FormControlLabel label="Agent" value="agent" control={<Radio />} />
+            <FormControlLabel
+              label="Distributor"
+              value="distributor"
+              control={<Radio />}
+            />
+            <FormControlLabel
+              label="Master Distributor"
+              value="m_distributor"
+              control={<Radio />}
+            />
+          </RadioGroup>
+
+          {(value2 == "agent" || value2 == "distributor") && (
+            <Stack mt={2}>
+              <Typography variant="subtitle1">
+                {" "}
+                You want to work under
+              </Typography>
+            </Stack>
+          )}
+
           {value2 == "agent" && (
             <FormControl>
               <RadioGroup
@@ -519,9 +556,15 @@ export default function AuthRegisterForm(props: any) {
                 onChange={handleChangeRadio}
               >
                 <FormControlLabel
+                  value="company"
+                  control={<Radio />}
+                  label="Comapny"
+                  disabled
+                />
+                <FormControlLabel
                   value="agent"
                   control={<Radio />}
-                  label="Netwrok Agent"
+                  label="Distributor"
                 />
               </RadioGroup>
             </FormControl>
@@ -537,9 +580,15 @@ export default function AuthRegisterForm(props: any) {
                 onChange={handleChangeRadio}
               >
                 <FormControlLabel
+                  value="company"
+                  control={<Radio />}
+                  label="Comapny"
+                  disabled
+                />
+                <FormControlLabel
                   value="distributor"
                   control={<Radio />}
-                  label="Netwrok Distributor"
+                  label="Master Distributor"
                 />
               </RadioGroup>
             </FormControl>
@@ -551,73 +600,78 @@ export default function AuthRegisterForm(props: any) {
               gap: 1,
             }}
           >
-            {radioVal === "directagent" ||
-              radioVal === "directdistributor" ||
-              (value2 !== "m_distributor" && (
-                <Stack sx={{ position: "relative" }}>
-                  <TextField
-                    disabled={gOTP}
-                    error={!!errors.refCode}
-                    label="Referral Code"
-                    size="small"
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          {value2 == "agent" ? "D_" : "MD_"}
-                        </InputAdornment>
-                      ),
-                    }}
-                    {...register("refCode", {
-                      onChange: (e) =>
-                        setFormValues({
-                          ...formValues,
-                          refCode: e.target.value,
-                        }),
-                      required: true,
-                    })}
-                    sx={{ width: 165 }}
-                  />
-                  {!!errors.refCode && (
-                    <FormHelperText error sx={{ pl: 2 }}>
-                      Please check your Ref Code.
-                    </FormHelperText>
-                  )}
-                  {formValues.refCode && (
-                    <LoadingButton
-                      variant="contained"
-                      size="medium"
-                      loading={loading}
-                      sx={{
-                        position: "absolute",
-                        marginLeft: "90px",
-                        top: 1,
+            <Stack>
+              {radioVal === "directagent" ||
+                radioVal === "directdistributor" ||
+                (value2 !== "m_distributor" && (
+                  <Stack sx={{ position: "relative" }}>
+                    <TextField
+                      disabled={gOTP}
+                      error={!!errors.refCode}
+                      label="Referral Code"
+                      size="small"
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            {value2 == "agent" ? "D_" : "MD_"}
+                          </InputAdornment>
+                        ),
                       }}
-                      onClick={() => {
-                        setLoading(true);
-                        verifyRef(formValues.refCode);
-                      }}
-                      disabled={refShow}
-                    >
-                      Check
-                    </LoadingButton>
-                  )}
-                </Stack>
-              ))}
+                      {...register("refCode", {
+                        onChange: (e) =>
+                          setFormValues({
+                            ...formValues,
+                            refCode: e.target.value,
+                          }),
+                        required: true,
+                      })}
+                      sx={{ width: 150 }}
+                    />
+                    {!!errors.refCode && (
+                      <FormHelperText error sx={{ pl: 2 }}>
+                        Please check your Ref Code.
+                      </FormHelperText>
+                    )}
+                    {formValues.refCode && (
+                      <LoadingButton
+                        variant="contained"
+                        size="medium"
+                        loading={loading}
+                        sx={{
+                          position: "absolute",
+                          marginLeft: "160px",
+                          top: 1,
+                        }}
+                        onClick={() => {
+                          setLoading(true);
+                          verifyRef(formValues.refCode);
+                        }}
+                        disabled={refShow}
+                      >
+                        Check
+                      </LoadingButton>
+                    )}
+                  </Stack>
+                ))}
+            </Stack>
+            <Stack ml={13}>
+              {refName && (
+                <Stack flexDirection="row" gap={1}>
+                  <Typography sx={{ color: "green" }} mt={1}>
+                    {refName}
+                  </Typography>
 
-            {refName && (
-              <Stack justifyContent="row" gap={2}>
-                <Typography variant="body1">
-                  <Typography></Typography> {refName}{" "}
                   <Button
                     variant="outlined"
                     size="medium"
                     onClick={HandleClearrefCode}
+                    disabled={gOTP}
                   >
                     Clear
                   </Button>
-                </Typography>
-              </Stack>
-            )}
+                </Stack>
+              )}
+            </Stack>
           </Stack>
           <Stack
             sx={{
@@ -650,7 +704,7 @@ export default function AuthRegisterForm(props: any) {
               disabled={gOTP}
               name="password"
               label="Password"
-              type={showPassword ? "text" : "password"}
+              type="password"
             />
             <RHFTextField
               disabled={gOTP}
@@ -665,6 +719,7 @@ export default function AuthRegisterForm(props: any) {
                 {...label}
                 color={"primary"}
                 onClick={() => setCheckbox(!checkbox)}
+                disabled={gOTP}
               />
               <p style={{ fontSize: "12px", margin: "0 auto" }}>
                 You agree to receive automated promotional, transactional
@@ -676,7 +731,7 @@ export default function AuthRegisterForm(props: any) {
           </FormControl>
         </Stack>
 
-        {!gOTP && (
+        <Stack flexDirection="row" gap={2}>
           <LoadingButton
             fullWidth
             size="small"
@@ -688,7 +743,18 @@ export default function AuthRegisterForm(props: any) {
           >
             Generate OTP
           </LoadingButton>
-        )}
+
+          <Button
+            variant="outlined"
+            fullWidth
+            size="small"
+            disabled={ClearForm}
+            onClick={HandleClearrefCode}
+          >
+            {" "}
+            Clear
+          </Button>
+        </Stack>
       </FormProvider>
 
       <FormProvider methods={method2} onSubmit={handleOtpSubmit(formSubmit)}>
@@ -700,28 +766,41 @@ export default function AuthRegisterForm(props: any) {
               style={{ textAlign: "left", marginBottom: "0" }}
             >
               Mobile Verification Code &nbsp;
-              <Link
+              {/* <Link
                 sx={{ cursor: "pointer" }}
                 variant="subtitle2"
                 style={{ float: "right" }}
                 onClick={() => resendOtp("", formValues.mobileNumber)}
               >
                 Resend code
-              </Link>
+              </Link> */}
             </Typography>
-            <Stack flexDirection="row" gap={2}>
+            <Stack flexDirection="row" gap={1}>
               <RHFCodes
                 keyName="code"
                 inputs={["code1", "code2", "code3", "code4", "code5", "code6"]}
               />
-              <Button
-                variant="outlined"
-                size="medium"
-                style={{ float: "right" }}
-                onClick={HandleMobileCode}
-              >
-                Clear
-              </Button>
+              <Stack>
+                <Stack rowGap={0.5}>
+                  <Button
+                    variant="contained"
+                    style={{ float: "right", fontSize: "10px", height: "25px" }}
+                    onClick={() => resendOtp("", formValues.mobileNumber)}
+                    size="small"
+                  >
+                    Resend code
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    style={{ float: "right", fontSize: "10px", height: "25px" }}
+                    onClick={HandleMobileCode}
+                    size="small"
+                  >
+                    Clear
+                  </Button>
+                </Stack>
+              </Stack>
             </Stack>
             {(!!error2.code1 ||
               !!error2.code2 ||
@@ -739,28 +818,45 @@ export default function AuthRegisterForm(props: any) {
               style={{ textAlign: "left", marginBottom: "0" }}
             >
               Email Verification Code &nbsp;
-              <Link
+              {/* <Link
                 sx={{ cursor: "pointer" }}
                 variant="subtitle2"
                 style={{ float: "right" }}
                 onClick={() => resendOtp(formValues.email, "")}
               >
                 Resend code
-              </Link>
+              </Link> */}
             </Typography>
-            <Stack flexDirection="row" gap={2}>
+            <Stack
+              sx={{
+                display: "flex",
+                flexDirection: { xs: "column", md: "row" },
+
+                gap: 1,
+              }}
+            >
               <RHFCodes
                 keyName="otp"
                 inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
               />
-              <Button
-                variant="outlined"
-                size="medium"
-                style={{ float: "right" }}
-                onClick={HandleEmailCode}
-              >
-                Clear
-              </Button>
+              <Stack rowGap={0.5}>
+                <Button
+                  variant="contained"
+                  style={{ float: "right", fontSize: "10px", height: "25px" }}
+                  onClick={() => resendOtp(formValues.email, "")}
+                  size="small"
+                >
+                  Resend code
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="small"
+                  style={{ float: "right", fontSize: "10px", height: "25px" }}
+                  onClick={HandleEmailCode}
+                >
+                  Clear
+                </Button>
+              </Stack>
             </Stack>
             {(!!error2.otp1 ||
               !!error2.otp2 ||
@@ -777,15 +873,18 @@ export default function AuthRegisterForm(props: any) {
               {verifyLoad ? (
                 <ApiDataLoading />
               ) : (
-                <LoadingButton
-                  fullWidth
-                  type="submit"
-                  variant="contained"
-                  loading={isSubmitting2}
-                  sx={{ mt: 3, mb: 8 }}
-                >
-                  Verify
-                </LoadingButton>
+                <Stack alignItems="center" justifyContent="center">
+                  <LoadingButton
+                    fullWidth
+                    type="submit"
+                    variant="contained"
+                    loading={isSubmitting2}
+                    sx={{ mt: 2, mb: 8, width: "100px" }}
+                    size="small"
+                  >
+                    Verify
+                  </LoadingButton>
+                </Stack>
               )}
             </Stack>
           </Stack>

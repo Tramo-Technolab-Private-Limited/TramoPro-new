@@ -38,6 +38,7 @@ import AddharImage from "src/assets/Onboarding/AddharImage.png";
 import PanImage from "src/assets/Onboarding/PanImage.png";
 import { LoadingButton } from "@mui/lab";
 import AWS from "aws-sdk";
+import { Watch } from "@mui/icons-material";
 
 // ----------------------------------------------------------------------
 
@@ -57,6 +58,7 @@ export default function AadharForm(props: any) {
   const { user, UpdateUserDetail } = useAuthContext();
   const [activeStep, setActiveStep] = useState<any>(0);
   const [otpSendSuccess, setOtpSendSuccess] = useState(false);
+  const [varifyaadhar, setVerifyAadhar] = useState(false);
   const [imageAadhar, setImageAadhar] = useState("");
   const [timer, setTimer] = useState(0);
   const [aadharTemp, setAadharTemp] = useState("");
@@ -102,6 +104,7 @@ export default function AadharForm(props: any) {
 
   const {
     reset: otpReset,
+    watch: watchOpt,
     register: otpRegister,
     handleSubmit: handleOtpSubmit,
     formState: { errors: error2, isSubmitting: isSubmitting2 },
@@ -110,6 +113,7 @@ export default function AadharForm(props: any) {
   const {
     reset,
     setValue,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = methods;
@@ -172,6 +176,7 @@ export default function AadharForm(props: any) {
                 image_on_aadhaar: Response.data.resData.image,
               });
               setOtpSendSuccess(false);
+              setVerifyAadhar(true);
             } else if (Response.data.code == 500) {
               otpReset(defaultValues2);
 
@@ -186,6 +191,11 @@ export default function AadharForm(props: any) {
     } catch (err) {
       console.log(err);
     }
+  };
+
+  const handleClar = () => {
+    setValue("aadhar", "");
+    setOtpSendSuccess(false);
   };
 
   const HandleAadharVarified = () => {
@@ -318,26 +328,37 @@ export default function AadharForm(props: any) {
                 xs: "repeat(1, 1fr)",
               }}
             >
-              <Stack flexDirection={"row"} gap={2}>
+              <Stack width={{ xs: "100%", sm: "80%", md: "60%", lg: "40%" }}>
                 <RHFTextField
                   name="aadhar"
                   type="number"
                   label="Aadhar Card Number"
+                  disabled={otpSendSuccess}
                 />
-                <Button
-                  variant="outlined"
-                  onClick={() => setValue("aadhar", "")}
-                >
-                  Clear
-                </Button>
+
+                <Stack flexDirection="row" mt={2} gap={2}>
+                  <LoadingButton
+                    variant="contained"
+                    type="submit"
+                    loading={isSubmitting}
+                    fullWidth
+                    size="medium"
+                    disabled={watch("aadhar") == "" || otpSendSuccess}
+                  >
+                    Send OTP
+                  </LoadingButton>
+
+                  <Button
+                    variant="outlined"
+                    onClick={handleClar}
+                    fullWidth
+                    // disabled={!otpSendSuccess || watch("aadhar") == ""}
+                    disabled={watch("aadhar") == ""}
+                  >
+                    Clear
+                  </Button>
+                </Stack>
               </Stack>
-              <LoadingButton
-                variant="contained"
-                type="submit"
-                loading={isSubmitting}
-              >
-                Send OTP
-              </LoadingButton>
             </Grid>
           </FormProvider>
           {otpSendSuccess && (
@@ -354,12 +375,6 @@ export default function AadharForm(props: any) {
                   {/* <Typography variant="subtitle1">
                     Resend Code {timer !== 0 && `(${timer})`}{" "}
                   </Typography> */}
-                  <Button
-                    variant="outlined"
-                    onClick={() => otpReset(defaultValues2)}
-                  >
-                    Clear
-                  </Button>
                 </Stack>
               </Stack>
 
@@ -380,82 +395,120 @@ export default function AadharForm(props: any) {
                   </FormHelperText>
                 )}
               </Stack>
-              <LoadingButton
-                variant="contained"
-                type="submit"
-                loading={isSubmitting2}
+              <Stack
+                flexDirection="row"
+                gap={1}
+                width={{ xs: "100%", sm: "80%", md: "60%", lg: "35%" }}
               >
-                Verify OTP
-              </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  loading={isSubmitting2}
+                  fullWidth
+                  disabled={watchOpt("otp6") == ""}
+                >
+                  Verify OTP
+                </LoadingButton>
+
+                <Button
+                  variant="outlined"
+                  onClick={() => otpReset(defaultValues2)}
+                  fullWidth
+                  disabled={watchOpt("otp1") == ""}
+                >
+                  Clear
+                </Button>
+              </Stack>
             </FormProvider>
           )}
-          {user?.getAadhar && (
-            <Stack gap={3} justifyContent={"space-between"}>
-              <Typography variant="h4" color="green" justifySelf={"center"}>
-                Aadhaar Verified Successfully{" "}
-                <Icon icon="el:ok" color="green" fontSize={25} />
-              </Typography>
+          <Stack flexDirection="row" gap={2}>
+            <Stack>
+              {user?.getAadhar && (
+                <Stack gap={3} justifyContent={"space-between"}>
+                  <Typography variant="h4" color="green" justifySelf={"center"}>
+                    Aadhaar Verified Successfully{" "}
+                    <Icon icon="el:ok" color="green" fontSize={25} />
+                  </Typography>
 
-              <Stack flexDirection={"row"} gap={2}>
+                  <Stack flexDirection={"row"} gap={2}>
+                    <Image
+                      src={imageAadhar && imageAadhar}
+                      style={{
+                        borderRadius: "8px",
+                        border: "1px solid black",
+                        width: 150,
+                        height: 150,
+                      }}
+                    />
+                    <Typography>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                        gap={5}
+                      >
+                        <Typography variant="subtitle1">
+                          Name :{user?.nameInAadhaar}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                        gap={5}
+                      >
+                        <Typography variant="subtitle1">
+                          Date of Birth :{formattedDate}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                        gap={5}
+                      >
+                        <Typography variant="subtitle1">
+                          Gender : {user?.gender}
+                        </Typography>
+                      </Stack>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                        gap={5}
+                      >
+                        <Typography
+                          variant="subtitle1"
+                          width={{ lg: "60%", sm: "60%", md: "80%" }}
+                        >
+                          Address : {user?.addressInAadhar}
+                        </Typography>
+                      </Stack>
+                    </Typography>
+                  </Stack>
+                </Stack>
+              )}
+            </Stack>
+            {user?.getAadhar && (
+              <Stack flexDirection={"row"} justifyContent={"right"}>
                 <Image
-                  src={imageAadhar && imageAadhar}
-                  style={{
-                    borderRadius: "8px",
-                    border: "1px solid black",
-                    width: 150,
-                    height: 150,
+                  disabledEffect
+                  visibleByDefault
+                  alt="auth"
+                  src={AddharImage}
+                  sx={{
+                    width: { xs: 200, sm: 350 },
                   }}
                 />
-                <Typography>
-                  <Stack
-                    flexDirection={"row"}
-                    justifyContent={"space-between"}
-                    gap={5}
-                  >
-                    <Typography variant="subtitle1">
-                      Name :{user?.nameInAadhaar}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    flexDirection={"row"}
-                    justifyContent={"space-between"}
-                    gap={5}
-                  >
-                    <Typography variant="subtitle1">
-                      Date of Birth :{formattedDate}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    flexDirection={"row"}
-                    justifyContent={"space-between"}
-                    gap={5}
-                  >
-                    <Typography variant="subtitle1">
-                      Gender : {user?.gender}
-                    </Typography>
-                  </Stack>
-                  <Stack
-                    flexDirection={"row"}
-                    justifyContent={"space-between"}
-                    gap={5}
-                  >
-                    <Typography variant="subtitle1">
-                      Address : {user?.addressInAadhar}
-                    </Typography>
-                  </Stack>
-                </Typography>
               </Stack>
-            </Stack>
-          )}
-          {!user?.getAadhar && (
-            <Stack flexDirection={"row"} justifyContent={"center"}>
+            )}
+          </Stack>
+
+          {!user?.addressInAadhar && (
+            <Stack flexDirection={"row"} justifyContent={"right"}>
               <Image
                 disabledEffect
                 visibleByDefault
                 alt="auth"
                 src={AddharImage}
                 sx={{
-                  width: { xs: 250, sm: 450 },
+                  width: { xs: 200, sm: 350 },
                 }}
               />
             </Stack>
@@ -567,10 +620,16 @@ function PanCard(props: any) {
       rowGap={2}
     >
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-        <Stack flexDirection={"row"} justifyContent={"space-between"} gap={2}>
+        <Stack
+          flexDirection={"row"}
+          justifyContent={"space-between"}
+          gap={2}
+          width={{ xs: "100%", sm: "80%", md: "60%", lg: "25%" }}
+        >
           <TextField
             error={!!errors.pan}
             sx={{ width: "100%" }}
+            size="small"
             label="Pan Number"
             disabled={user?.PANnumber}
             value={panNumber || user?.PANnumber}
@@ -579,14 +638,14 @@ function PanCard(props: any) {
               required: true,
             })}
           />
-          <Button
+          {/* <Button
             variant="outlined"
             size="large"
             style={{ marginTop: "5px" }}
             onClick={HandleClearPAN}
           >
             Cancel
-          </Button>
+          </Button> */}
         </Stack>
         {!!errors.pan && (
           <FormHelperText error sx={{ pl: 2 }}>
@@ -639,12 +698,12 @@ function PanCard(props: any) {
         <>
           <Stack
             alignItems={"center"}
-            justifyContent={"center"}
+            justifyContent={"left"}
             flexDirection={"row"}
-            my={3}
+            my={1}
             gap={1}
           >
-            <Typography variant="h4" color="green">
+            <Typography variant="h5" color="green">
               Pan Verified Successfully{" "}
             </Typography>
             <Icon icon="el:ok" color="green" fontSize={25} />
@@ -668,10 +727,9 @@ function PanCard(props: any) {
 
       {user?.getPan && (
         <>
-          <Stack my={5}>
+          <Stack flexDirection="row" justifyContent={"space-between"} mt={2}>
             <Button
               variant="contained"
-              sx={{ width: "fit-content", margin: "auto" }}
               // onClick={() => props.callback(2)}
 
               onClick={HandlePanVarified}

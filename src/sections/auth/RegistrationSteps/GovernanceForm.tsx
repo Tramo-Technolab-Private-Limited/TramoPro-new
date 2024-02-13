@@ -187,6 +187,7 @@ export default function GovernanceForm(props: any) {
   const {
     reset,
     setError,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = methods;
@@ -413,21 +414,17 @@ export default function GovernanceForm(props: any) {
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             {!user?.isGSTVerified && (
               <>
-                <Stack flexDirection={"row"} gap={2}>
+                <Stack
+                  flexDirection={"row"}
+                  gap={2}
+                  width={{ xs: "100%", sm: "80%", md: "60%", lg: "35%" }}
+                >
                   <RHFTextField
                     name="gst"
                     label="GST Number"
                     disabled={user?.isGSTVerified}
                     style={{ marginTop: "20px" }}
                   />
-                  <Button
-                    variant="outlined"
-                    size="medium"
-                    style={{ marginTop: "20px" }}
-                    onClick={HandleClearGST}
-                  >
-                    Clear
-                  </Button>
                 </Stack>
                 <Stack my={2} alignItems={"left"}>
                   {loading ? (
@@ -437,36 +434,34 @@ export default function GovernanceForm(props: any) {
                       <Stack
                         flexDirection={"row"}
                         gap={2}
-                        alignItems={"center"}
+                        width={{ xs: "100%", sm: "80%", md: "60%", lg: "35%" }}
                       >
-                        <Button variant="contained" type="submit">
+                        <Button
+                          variant="contained"
+                          type="submit"
+                          size="small"
+                          fullWidth
+                          disabled={watch("gst") == ""}
+                        >
                           verify
                         </Button>
-                        {remainingAttempt && (
-                          <Typography variant="caption">
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          fullWidth
+                          onClick={HandleClearGST}
+                          disabled={watch("gst") == ""}
+                        >
+                          Clear
+                        </Button>
+                      </Stack>
+                      <Stack mt={2}>
+                        {verifyDetail && (
+                          <Typography variant="h6">
                             Remaining Attempt : {remainingAttempt}
                           </Typography>
                         )}
                       </Stack>
-                      {!remainingAttempt && (
-                        <Stack>
-                          <Image
-                            disabledEffect
-                            visibleByDefault
-                            alt="auth"
-                            src={GSTImage}
-                            sx={{
-                              width: "50%",
-                              marginTop: "50px",
-                              // height: '200px',
-                              // backgroundSize: 'cover',
-                              // boxShadow: 10,
-                              // border: '20px  #F0F9FB',
-                              marginLeft: "250px",
-                            }}
-                          />
-                        </Stack>
-                      )}
                     </>
                   )}
                 </Stack>
@@ -491,69 +486,71 @@ export default function GovernanceForm(props: any) {
             ) : (
               ""
             )}
+
             <FormProvider
               methods={method2}
               onSubmit={handleFormSubmit(formSubmit)}
             >
-              <Typography variant="subtitle1">Constitution Type</Typography>
+              <Typography variant="subtitle1" mt={3}>
+                Please select your constitution type
+              </Typography>
               <FormControl sx={{ my: 2 }}>
                 <RadioGroup
-                  row
                   aria-labelledby="demo-row-radio-buttons-group-label"
                   name="row-radio-buttons-group"
                   value={radioVal}
                   onChange={handleChangeRadio}
                 >
-                  <FormControlLabel
-                    value="Individual"
-                    control={<Radio />}
-                    label="Individual"
-                  />
-                  <FormControlLabel
-                    value="Proprietorship"
-                    control={<Radio />}
-                    label="Proprietorship"
-                  />
-                  <FormControlLabel
-                    value="Private Limited Company"
-                    control={<Radio />}
-                    label="Private Limited Company"
-                  />
-                  <FormControlLabel
-                    value="Partnership"
-                    control={<Radio />}
-                    label="Partnership"
-                  />
-                  <FormControlLabel
-                    value="Limited Liability Partnership"
-                    control={<Radio />}
-                    label="Limited Liability Partnership"
-                  />
-                  <FormControlLabel
-                    value="One Person Company"
-                    control={<Radio />}
-                    label="One Person Company"
-                  />
-                  <FormControlLabel
-                    value="Limited Company"
-                    control={<Radio />}
-                    label="Limited Company"
-                  />
+                  <Stack flexDirection="row" gap={1}>
+                    <FormControlLabel
+                      value="Individual"
+                      control={<Radio />}
+                      label="Individual"
+                    />
+                    <FormControlLabel
+                      value="Proprietorship"
+                      control={<Radio />}
+                      label="Proprietorship"
+                    />
+                    <FormControlLabel
+                      value="Private Limited Company"
+                      control={<Radio />}
+                      label="Private Limited Company"
+                    />
+                    <FormControlLabel
+                      value="Partnership"
+                      control={<Radio />}
+                      label="Partnership"
+                    />
+                  </Stack>
+                  <Stack flexDirection="row" gap={1}>
+                    <FormControlLabel
+                      value="Limited Liability Partnership"
+                      control={<Radio />}
+                      label="Limited Liability Partnership"
+                    />
+                    <FormControlLabel
+                      value="One Person Company"
+                      control={<Radio />}
+                      label="One Person Company"
+                    />
+                    <FormControlLabel
+                      value="Limited Company"
+                      control={<Radio />}
+                      label="Limited Company"
+                    />
+                  </Stack>
                 </RadioGroup>
               </FormControl>
 
               <>
-                <Grid
-                  display="grid"
-                  gridTemplateColumns={{
-                    xs: "repeat(1, fr)",
-                    sm: "repeat(2, 1fr)",
-                  }}
-                  gap={2}
+                <Stack
+                  gap={1}
+                  width={{ xs: "100%", sm: "80%", md: "60%", lg: "45%" }}
                 >
                   <RHFTextField
                     name="BusinessName"
-                    label="Business Name"
+                    label="Shop/Business Name"
                     disabled={gstData}
                   />
 
@@ -563,49 +560,55 @@ export default function GovernanceForm(props: any) {
                     disabled={gstData}
                   />
 
-                  <RHFSelect
-                    name="stateJurisdiction"
-                    label="Select State"
-                    placeholder="Select State"
-                    SelectProps={{
-                      native: false,
-                      sx: { textTransform: "capitalize" },
-                    }}
-                    sx={{ width: "100%", margin: "auto" }}
-                    disabled={gstData}
-                  >
-                    {stateName.map((item: any) => (
-                      <MenuItem key={item} value={item}>
-                        {item}
-                      </MenuItem>
-                    ))}
-                  </RHFSelect>
-                  {radioVal == "Individual" && !user?.isGSTVerified ? (
+                  <Stack flexDirection="row" gap={2}>
                     <RHFTextField
-                      name="ShopName"
-                      label="Shop Name"
+                      name="BusinessName"
+                      label="Village/City"
                       disabled={gstData}
                     />
-                  ) : (
+
                     <RHFTextField
-                      name="panNumber"
-                      label=" Business Pan "
+                      name="address"
+                      label="District"
                       disabled={gstData}
                     />
-                  )}
-                </Grid>
+                  </Stack>
+                  <Stack flexDirection="row" gap={2}>
+                    <RHFSelect
+                      name="stateJurisdiction"
+                      label="Select State"
+                      placeholder="Select State"
+                      SelectProps={{
+                        native: false,
+                        sx: { textTransform: "capitalize" },
+                      }}
+                      sx={{ width: "100%", margin: "auto" }}
+                      disabled={gstData}
+                    >
+                      {stateName.map((item: any) => (
+                        <MenuItem key={item} value={item}>
+                          {item}
+                        </MenuItem>
+                      ))}
+                    </RHFSelect>
+
+                    <RHFTextField
+                      name="address"
+                      label="PIN Code"
+                      disabled={gstData}
+                    />
+                  </Stack>
+                </Stack>
                 <Stack flexDirection={"row"} gap={1}>
                   <Stack my={3}>
-                    {radioVal !== "" && (
-                      <Button
-                        variant="contained"
-                        onClick={SaveGstData}
-                        sx={{ margin: "auto" }}
-                        disabled={gstData}
-                      >
-                        Save
-                      </Button>
-                    )}
+                    <Button
+                      variant="contained"
+                      onClick={SaveGstData}
+                      sx={{ margin: "auto" }}
+                      disabled={gstData || radioVal == ""}
+                    >
+                      Save
+                    </Button>
                   </Stack>
                   <Stack my={3}>
                     <Button
@@ -631,23 +634,6 @@ export default function GovernanceForm(props: any) {
                 </Stack>
               </>
             </FormProvider>
-            <Stack>
-              <Image
-                disabledEffect
-                visibleByDefault
-                alt="auth"
-                src={NotGSTImage}
-                sx={{
-                  width: "40%",
-                  marginTop: "50px",
-                  // height: '200px',
-                  // backgroundSize: 'cover',
-                  // boxShadow: 10,
-                  // border: '20px  #F0F9FB',
-                  marginLeft: "150px",
-                }}
-              />
-            </Stack>
           </>
         )}
         {user?.isGSTVerified ? (
@@ -739,114 +725,118 @@ export default function GovernanceForm(props: any) {
                 Confirm & continue
               </Button>
             </Stack>
-            <Stack>
-              <Image
-                disabledEffect
-                visibleByDefault
-                alt="auth"
-                src={GSTImage}
-                sx={{
-                  width: "50%",
-                  marginTop: "50px",
-                  // height: '200px',
-                  // backgroundSize: 'cover',
-                  // boxShadow: 10,
-                  // border: '20px  #F0F9FB',
-                  marginLeft: "250px",
-                }}
-              />
-            </Stack>
           </>
         ) : (
           ""
         )}
 
-        {verifyDetail && (
-          <>
-            <Stack
-              alignItems={"center"}
-              justifyContent={"center"}
-              flexDirection={"row"}
-              my={3}
-              gap={1}
-            >
-              <Typography variant="h4" color="green">
-                GST Fetch Successfully{" "}
-              </Typography>
-              <Icon icon="el:ok" color="green" fontSize={25} />
-            </Stack>
-            <Stack columnGap={10}>
-              <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                <Typography variant="subtitle1" sx={{ width: 250 }}>
-                  Company Name
-                  <Typography variant="body1">
-                    {gstDeatil.company_name}
+        <Stack flexDirection="row" gap={5}>
+          <Stack>
+            {verifyDetail && (
+              <>
+                <Stack
+                  justifyContent={"flex-start"}
+                  flexDirection={"row"}
+                  my={2}
+                  gap={1}
+                >
+                  <Typography variant="h4" color="green">
+                    GST Fetch Successfully{" "}
                   </Typography>
-                </Typography>
-                <Typography variant="subtitle1" sx={{ width: 250 }}>
-                  GST number
-                  <Typography variant="body1">
-                    {" "}
-                    {gstDeatil.gst_number}{" "}
-                  </Typography>
-                </Typography>
+                  <Icon icon="el:ok" color="green" fontSize={25} />
+                </Stack>
+                <Stack columnGap={10}>
+                  <Stack
+                    flexDirection={"row"}
+                    justifyContent="space-between"
+                    width={{ xs: "100%", sm: "80%", md: "60%", lg: "100%" }}
+                  >
+                    <Typography variant="subtitle1">
+                      Company Name
+                      <Typography variant="body1">
+                        {gstDeatil.company_name}
+                      </Typography>
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      GST number
+                      <Typography variant="body1">
+                        {" "}
+                        {gstDeatil.gst_number}{" "}
+                      </Typography>
+                    </Typography>
+                  </Stack>
 
-                <Typography variant="subtitle1" sx={{ width: 250 }}>
-                  Address
-                  <Typography variant="body1"> {gstDeatil.address} </Typography>
-                </Typography>
-              </Stack>
+                  <Stack
+                    flexDirection={"row"}
+                    justifyContent="space-between"
+                    width={{ xs: "100%", sm: "80%", md: "60%", lg: "100%" }}
+                  >
+                    <Typography variant="subtitle1">
+                      State Jurisdiction
+                      <Typography variant="body1">
+                        {gstDeatil.state_jurisdiction}
+                      </Typography>
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      constitution Of Business
+                      <Typography variant="body1">
+                        {" "}
+                        {gstDeatil.constitution_type}{" "}
+                      </Typography>
+                    </Typography>
+                  </Stack>
 
-              <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                <Typography variant="subtitle1" sx={{ width: 250 }}>
-                  State Jurisdiction
-                  <Typography variant="body1">
-                    {gstDeatil.state_jurisdiction}
-                  </Typography>
-                </Typography>
-                <Typography variant="subtitle1" sx={{ width: 250 }}>
-                  constitution Of Business
-                  <Typography variant="body1">
-                    {" "}
-                    {gstDeatil.constitution_type}{" "}
-                  </Typography>
-                </Typography>
-
-                <Typography variant="subtitle1" sx={{ width: 250 }}>
-                  Status
-                  <Typography variant="body1"> {gstDeatil.status}</Typography>
-                </Typography>
-              </Stack>
-            </Stack>
-            <Stack my={3}>
-              <Button
-                variant="contained"
-                sx={{ margin: "auto" }}
-                onClick={confirmDetail}
-              >
-                Confirm & continue
-              </Button>
-            </Stack>
-
-            <Stack>
-              <Image
-                disabledEffect
-                visibleByDefault
-                alt="auth"
-                src={GSTImage}
-                sx={{
-                  width: "50%",
-                  marginTop: "50px",
-                  // height: '200px',
-                  // backgroundSize: 'cover',
-                  // boxShadow: 10,
-                  // border: '20px  #F0F9FB',
-                  marginLeft: "250px",
-                }}
-              />
-            </Stack>
-          </>
-        )}
+                  <Stack
+                    flexDirection={"row"}
+                    justifyContent="space-between"
+                    width={{ xs: "100%", sm: "80%", md: "60%", lg: "100%" }}
+                  >
+                    <Typography variant="subtitle1">
+                      Address
+                      <Typography variant="body1">
+                        {" "}
+                        {gstDeatil.address}{" "}
+                      </Typography>
+                    </Typography>
+                    <Typography variant="subtitle1">
+                      Status
+                      <Typography variant="body1">
+                        {" "}
+                        {gstDeatil.status}
+                      </Typography>
+                    </Typography>
+                  </Stack>
+                </Stack>
+                <Stack my={5}>
+                  <Button
+                    variant="contained"
+                    sx={{ margin: "auto" }}
+                    onClick={confirmDetail}
+                  >
+                    Confirm & continue
+                  </Button>
+                </Stack>
+              </>
+            )}
+          </Stack>
+          <Stack>
+            <Image
+              disabledEffect
+              visibleByDefault
+              alt="auth"
+              src={GSTImage}
+              sx={{
+                width: "50%",
+                marginTop: "50px",
+                // height: '200px',
+                // backgroundSize: 'cover',
+                // boxShadow: 10,
+                // border: '20px  #F0F9FB',
+                marginLeft: "250px",
+              }}
+            />
+          </Stack>
+        </Stack>
       </Box>
     </Stack>
   );

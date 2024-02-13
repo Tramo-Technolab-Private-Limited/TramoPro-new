@@ -168,6 +168,21 @@ export default function WalletLadger() {
     getTransactional();
   }, [currentPage]);
 
+  const formattedStart = startDate
+    ? new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        day: "2-digit",
+        month: "2-digit",
+      }).format(startDate)
+    : "";
+  const formattedSEndDate = endDate
+    ? new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        day: "2-digit",
+        month: "2-digit",
+      }).format(endDate)
+    : "";
+
   const getTransactional = () => {
     let token = localStorage.getItem("token");
     setSendLoading(true);
@@ -178,8 +193,8 @@ export default function WalletLadger() {
         currentPage: currentPage,
       },
       clientRefId: getValues("clientRefId") || "",
-      startDate: startDate || "",
-      endDate: endDate || "",
+      startDate: formattedStart || "",
+      endDate: formattedSEndDate || "",
     };
     Api(`agent/walletLedger`, "POST", body, token).then((Response: any) => {
       console.log("======Transaction==response=====>" + Response);

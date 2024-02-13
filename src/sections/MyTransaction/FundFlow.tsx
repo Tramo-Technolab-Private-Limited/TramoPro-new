@@ -137,6 +137,21 @@ export default function FundFlow() {
     );
   };
 
+  const formattedStart = startDate
+    ? new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        day: "2-digit",
+        month: "2-digit",
+      }).format(startDate)
+    : "";
+  const formattedSEndDate = endDate
+    ? new Intl.DateTimeFormat("en-GB", {
+        year: "numeric",
+        day: "2-digit",
+        month: "2-digit",
+      }).format(endDate)
+    : "";
+
   const filterTransaction = (data: FormValuesProps) => {
     setCurrentPage(1);
     setLoading(true);
@@ -149,8 +164,8 @@ export default function FundFlow() {
       clientRefId: data.clientRefId,
       status: data.status,
       transactionType: "",
-      startDate: startDate,
-      endDate: endDate,
+      startDate: formattedStart,
+      endDate: formattedSEndDate,
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
