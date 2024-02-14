@@ -45,7 +45,7 @@ export default function MotionModal({
           {...other}
         >
           <Box sx={{ ...style, width }} component={MotionContainer}>
-            <m.div variants={varBounce().in}>
+            <m.div variants={varFade().inUp}>
               <Stack
                 sx={{
                   backgroundColor: "#fff",

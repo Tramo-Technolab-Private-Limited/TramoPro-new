@@ -25,11 +25,14 @@ import { Api } from "src/webservices";
 import NPinReset from "../Settings/NPinReset";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom";
 import { PATH_DASHBOARD } from "src/routes/paths";
+import { DialogAnimate } from "src/components/animate";
+import dayjs from "dayjs";
+import { fDate, fDateTime } from "src/utils/formatTime";
 
 type FormValuesProps = {
-  amount: string;
+  amount: number | null | string;
   ifsc: string;
   accountNumber: string;
   otp1: string;
@@ -104,9 +107,21 @@ type childProps = {
 const SettlementToBank = ({ userBankList }: childProps) => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, initialize } = useAuthContext();
   const [eligibleSettlementAmount, setEligibleSettlementAmount] = useState("");
   const [transferTo, setTransferTo] = useState<boolean | null>(null);
+  const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
+  const [defaultAccountNumber, setDefaultAccountNumber] = useState("");
+  const [defaultIfsc, setDefaultIfsc] = useState("");
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+    reset(defaultValues);
+    setValue("accountNumber", defaultAccountNumber);
+    setValue("ifsc", defaultIfsc);
+  };
 
   const FilterSchema = Yup.object().shape({
     amount: Yup.number()
@@ -139,13 +154,13 @@ const SettlementToBank = ({ userBankList }: childProps) => {
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(FilterSchema),
     defaultValues,
-    mode: "onChange",
+    mode: "all",
   });
   const {
     reset,
     setError,
     setValue,
-    watch,
+    getValues,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = methods;
@@ -154,14 +169,30 @@ const SettlementToBank = ({ userBankList }: childProps) => {
     navigate(PATH_DASHBOARD.fundmanagement.mybankaccount);
   }
 
-
   useEffect(() => {
     getEligibleSettlementAmount();
-    userBankList.map((item: any) => {
-      if (item.isDefaultBank === true) {
-        setValue('accountNumber', item.accountNumber);
-      }
-    });
+    setValue(
+      "ifsc",
+      userBankList.filter((item: any) => {
+        return item.isDefaultBank == true;
+      })[0]?.ifsc
+    );
+    setValue(
+      "accountNumber",
+      userBankList.filter((item: any) => {
+        return item.isDefaultBank == true;
+      })[0]?.accountNumber
+    );
+    setDefaultAccountNumber(
+      userBankList.filter((item: any) => {
+        return item.isDefaultBank == true;
+      })[0]?.accountNumber
+    );
+    setDefaultIfsc(
+      userBankList.filter((item: any) => {
+        return item.isDefaultBank == true;
+      })[0]?.ifsc
+    );
   }, [userBankList]);
 
   const getEligibleSettlementAmount = () => {
@@ -179,29 +210,39 @@ const SettlementToBank = ({ userBankList }: childProps) => {
     );
   };
 
-  const settleToBank = (data: FormValuesProps) => {
+  const settleToBank = () => {
+    setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
     let body = {
-      amount: String(data.amount),
-      accountNumber: data.accountNumber,
-      ifsc: data.ifsc,
+      amount: String(getValues("amount")),
+      accountNumber: getValues("accountNumber"),
+      ifsc: getValues("ifsc"),
       nPin:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
+        getValues("otp1") +
+        getValues("otp2") +
+        getValues("otp3") +
+        getValues("otp4") +
+        getValues("otp5") +
+        getValues("otp6"),
     };
 
     Api(`settlement/to_bank_account`, "POST", body, token).then(
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
-            UpdateUserDetail({
-              AEPS_wallet_amount:
-                user?.AEPS_wallet_amount - Number(data.amount),
-            });
+            initialize();
+            handleClose();
             reset(defaultValues);
+            setValue("accountNumber", defaultAccountNumber);
+            setValue("ifsc", defaultIfsc);
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
+          setIsSubmitLoading(false);
+        } else {
+          enqueueSnackbar("Failed", { variant: "error" });
+          setIsSubmitLoading(false);
         }
       }
     );
@@ -227,7 +268,11 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                 {Number(eligibleSettlementAmount)}
               </Typography>
               {Number(eligibleSettlementAmount) < 1000 && (
-                <Typography variant="caption" textAlign={"center"} color={"red"}>
+                <Typography
+                  variant="caption"
+                  textAlign={"center"}
+                  color={"red"}
+                >
                   Minimum amount for AEPS settlement is 1000
                 </Typography>
               )}
@@ -252,7 +297,9 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                           const lastFourDigits = item.accountNumber.slice(
                             item.accountNumber.length - 4
                           );
-                          const maskedDigits = "*".repeat(item.accountNumber.length - 4);
+                          const maskedDigits = "*".repeat(
+                            item.accountNumber.length - 4
+                          );
                           const maskedNumber = maskedDigits + lastFourDigits;
                           return (
                             <MenuItem
@@ -287,7 +334,6 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                   <RHFCodes
                     keyName="otp"
                     inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                    type="password"
                   />
                   {(!!errors.otp1 ||
                     !!errors.otp2 ||
@@ -295,14 +341,14 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                     !!errors.otp4 ||
                     !!errors.otp5 ||
                     !!errors.otp6) && (
-                      <FormHelperText error sx={{ px: 2 }}>
-                        Code is required
-                      </FormHelperText>
-                    )}
+                    <FormHelperText error sx={{ px: 2 }}>
+                      Code is required
+                    </FormHelperText>
+                  )}
                 </Stack>
                 <LoadingButton
                   variant="contained"
-                  type="submit"
+                  onClick={handleOpen}
                   disabled={!isValid}
                   loading={isSubmitting}
                   sx={{ width: "fit-content", alignSelf: "center" }}
@@ -311,10 +357,48 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                 </LoadingButton>
               </Stack>
             </Grid>
+            <DialogAnimate open={open}>
+              <Stack sx={{ p: 4 }} gap={1}>
+                <Typography variant="h6">Confirmation</Typography>
+                <Typography>
+                  Are you sure to settle{" "}
+                  <strong> Rs. {getValues("amount")}</strong> to Bank Account
+                </Typography>
+                <Stack
+                  flexDirection={"row"}
+                  gap={1}
+                  justifyContent={"end"}
+                  mt={3}
+                >
+                  <LoadingButton
+                    onClick={handleClose}
+                    loading={isSubmitLoading}
+                  >
+                    cancel
+                  </LoadingButton>
+                  <LoadingButton
+                    variant="contained"
+                    loading={isSubmitLoading}
+                    onClick={settleToBank}
+                  >
+                    Sure
+                  </LoadingButton>
+                </Stack>
+              </Stack>
+            </DialogAnimate>
           </Scrollbar>
         ) : (
-          <Stack sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', mt: 20 }}>
-            <LoadingButton variant="contained" onClick={goTomybankaccount}>Add New Bank Account</LoadingButton>
+          <Stack
+            sx={{
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+              mt: 20,
+            }}
+          >
+            <LoadingButton variant="contained" onClick={goTomybankaccount}>
+              Add New Bank Account
+            </LoadingButton>
           </Stack>
         )}
       </FormProvider>
@@ -324,11 +408,18 @@ const SettlementToBank = ({ userBankList }: childProps) => {
 
 const SettlementToMainWallet = ({ userBankList }: childProps) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, initialize } = useAuthContext();
   const [eligibleSettlementAmount, setEligibleSettlementAmount] = useState("");
   const [bankifsc, setBankIfsc] = useState("");
   const [resetNpin, setResetNpin] = useState(false);
-  const [transferTo, setTransferTo] = useState<boolean | null>(null);
+  const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => {
+    setOpen(false);
+    reset(defaultValues);
+  };
 
   const FilterSchema = Yup.object().shape({
     amount: Yup.number()
@@ -357,10 +448,11 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(FilterSchema),
     defaultValues,
+    mode: "all",
   });
   const {
     reset,
-    setError,
+    getValues,
     watch,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
@@ -386,29 +478,34 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
     );
   };
 
-  const settleToMainWallet = (data: FormValuesProps) => {
+  const settleToMainWallet = () => {
+    setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
     let body = {
-      amount: String(data.amount),
+      amount: String(getValues("amount")),
       nPin:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
+        getValues("otp1") +
+        getValues("otp2") +
+        getValues("otp3") +
+        getValues("otp4") +
+        getValues("otp5") +
+        getValues("otp6"),
     };
 
     Api(`settlement/to_main_wallet`, "POST", body, token).then(
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
-            UpdateUserDetail({
-              main_wallet_amount:
-                user?.main_wallet_amount + Number(data.amount),
-              AEPS_wallet_amount:
-                user?.AEPS_wallet_amount - Number(data.amount),
-            });
-
+            initialize();
+            handleClose();
             enqueueSnackbar(Response.data.message);
           } else {
             enqueueSnackbar(Response.data.message);
           }
+          setIsSubmitLoading(false);
+        } else {
+          enqueueSnackbar("Failed", { variant: "error" });
+          setIsSubmitLoading(false);
         }
       }
     );
@@ -432,7 +529,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
             }}
           >
             <Typography variant="subtitle1" textAlign="center">
-              Maximum Eligible Settlement Amount for Bank account is{" "}
+              Maximum Eligible Settlement Amount for Main Wallet is{" "}
               {Number(eligibleSettlementAmount)}
             </Typography>
 
@@ -451,6 +548,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
                     name="amount"
                     label="Amount"
                     placeholder="Amount"
+                    type="number"
                   />
                 </Stack>
 
@@ -465,10 +563,14 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
                   <RHFCodes
                     keyName="otp"
                     inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                    type="password"
                   />
 
-                  {Object.values(errors).some((error) => !!error) && (
+                  {(!!errors.otp1 ||
+                    !!errors.otp2 ||
+                    !!errors.otp3 ||
+                    !!errors.otp4 ||
+                    !!errors.otp5 ||
+                    !!errors.otp6) && (
                     <FormHelperText error sx={{ px: 2 }}>
                       Code is required
                     </FormHelperText>
@@ -477,9 +579,8 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
 
                 <LoadingButton
                   variant="contained"
-                  type="submit"
-                  disabled={+watch("amount") > 500 ? false : true}
-                  loading={isSubmitting}
+                  onClick={handleOpen}
+                  disabled={!isValid}
                   sx={{ width: "fit-content", alignSelf: "center" }}
                 >
                   Settle amount to Main Wallet
@@ -488,6 +589,27 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
             )}
           </Grid>
         </Scrollbar>
+        <DialogAnimate open={open}>
+          <Stack sx={{ p: 4 }} gap={1}>
+            <Typography variant="h6">Confirmation</Typography>
+            <Typography>
+              Are you sure to settle Rs. {getValues("amount")} to main wallet
+            </Typography>
+            <Stack flexDirection={"row"} gap={1} justifyContent={"end"} mt={3}>
+              <LoadingButton onClick={handleClose} loading={isSubmitLoading}>
+                cancel
+              </LoadingButton>
+              <LoadingButton
+                type="submit"
+                variant="contained"
+                loading={isSubmitLoading}
+                onClick={settleToMainWallet}
+              >
+                Sure
+              </LoadingButton>
+            </Stack>
+          </Stack>
+        </DialogAnimate>
       </FormProvider>
     </Box>
   );
