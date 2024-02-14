@@ -28,6 +28,8 @@ import Graphgreen from "../assets/icons/Graph green.svg";
 import Graphorange from "../assets/icons/Graph orange.svg";
 import { useEffect, useState } from "react";
 import { fCurrency } from "src/utils/formatNumber";
+import { m } from "framer-motion";
+import { MotionContainer, varBounce, varZoom } from "src/components/animate";
 
 // ----------------------------------------------------------------------
 
@@ -215,405 +217,432 @@ export default function MyStats(props: any) {
 
   return (
     <>
-      <Helmet>
-        <title> My Stats | {process.env.REACT_APP_COMPANY_NAME} </title>
-      </Helmet>
-      <Grid width={"100%"}>
-        <Stack sx={{ flexDirection: "row", gap: 1, marginTop: "10px" }}>
-          <Card
-            sx={{
-              backgroundColor: "#FFFFFF",
-              borderRadius: "15px",
-              boxShadow: "30px",
-              width: "33%",
-            }}
-          >
-            <CardContent>
-              <Stack
+      <MotionContainer>
+        <m.div variants={varZoom().in}>
+          <Helmet>
+            <title> My Stats | {process.env.REACT_APP_COMPANY_NAME} </title>
+          </Helmet>
+          <Grid width={"100%"}>
+            <Stack sx={{ flexDirection: "row", gap: 1, marginTop: "10px" }}>
+              <Card
                 sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "18px",
-                  fontWeight: 600,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "15px",
+                  boxShadow: "30px",
+                  width: "33%",
                 }}
               >
-                <Typography style={{ color: Success.color }}>
-                  {Success.status}
-                </Typography>
-                <Typography>{Success.count}</Typography>
-              </Stack>
-              <Stack
-                sx={{ flexDirection: "row", justifyContent: "space-between" }}
-              >
-                <img
-                  src={Success.logo}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-                <img
-                  src={Success.graph}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-              </Stack>
-              <Typography
-                sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "15px",
-                  fontWeight: 100,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography>{"Transaction Value"}</Typography>
-                <Typography>Rs.{fCurrency(Success?.volume || "0")}</Typography>
-              </Typography>
-            </CardContent>
-          </Card>
-
-          <Card
-            sx={{
-              backgroundColor: "#FFFFFF",
-              borderRadius: "15px",
-              boxShadow: "30px",
-              width: "33%",
-            }}
-          >
-            <CardContent>
-              <Stack
-                sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "18px",
-                  fontWeight: 600,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography style={{ color: Pending.color }}>
-                  {Pending.status}
-                </Typography>
-                <Typography>{Pending.count}</Typography>
-              </Stack>
-              <Stack
-                sx={{ flexDirection: "row", justifyContent: "space-between" }}
-              >
-                <img
-                  src={Pending.logo}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-                <img
-                  src={Pending.graph}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-              </Stack>
-              <Typography
-                sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "15px",
-                  fontWeight: 100,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography>{"Transaction Value"}</Typography>
-                <Typography> Rs.{fCurrency(Pending?.volume || "0")}</Typography>
-              </Typography>
-            </CardContent>
-          </Card>
-
-          <Card
-            sx={{
-              backgroundColor: "#FFFFFF",
-              borderRadius: "15px",
-              boxShadow: "30px",
-              width: "33%",
-            }}
-          >
-            <CardContent>
-              <Stack
-                sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "18px",
-                  fontWeight: 600,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography style={{ color: Failed.color }}>
-                  {Failed.status}
-                </Typography>
-                <Typography>{Failed.count}</Typography>
-              </Stack>
-              <Stack
-                sx={{ flexDirection: "row", justifyContent: "space-between" }}
-              >
-                <img
-                  src={Failed.logo}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-                <img
-                  src={Failed.graph}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-              </Stack>
-              <Typography
-                sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "15px",
-                  fontWeight: 100,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography>{"Transaction Value"}</Typography>
-                <Typography> Rs. {fCurrency(Failed?.volume || "0")}</Typography>
-              </Typography>
-            </CardContent>
-          </Card>
-
-          <Card
-            sx={{
-              backgroundColor: "#FFFFFF",
-              borderRadius: "15px",
-              boxShadow: "30px",
-              width: "33%",
-            }}
-          >
-            <CardContent>
-              <Stack
-                sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "18px",
-                  fontWeight: 600,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography style={{ color: Total.color }}>
-                  {Total.status}
-                </Typography>
-                <Typography>{Total.count}</Typography>
-              </Stack>
-              <Stack
-                sx={{ flexDirection: "row", justifyContent: "space-between" }}
-              >
-                <img
-                  src={Total.logo}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-                <img
-                  src={Total.graph}
-                  alt="logo"
-                  style={{
-                    width: "40px",
-                    height: "30px",
-                  }}
-                />
-              </Stack>
-              <Typography
-                sx={{
-                  fontFamily: "Public Sans",
-                  fontSize: "15px",
-                  fontWeight: 100,
-                  display: "flex",
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography>{"Transaction Value"}</Typography>
-                <Typography> Rs. {fCurrency(Total?.volume || "0")}</Typography>
-              </Typography>
-            </CardContent>
-          </Card>
-        </Stack>
-      </Grid>
-
-      <Grid sx={{ display: "flex", gap: 2, marginTop: 2 }}>
-        {Values.map((item, index) => (
-          <Grid item key={index} xs={4} width={"100%"}>
-            <Card
-              sx={{
-                backgroundColor: "#fffff",
-                // height: '150px',
-                // width: '186px',
-                borderColor: " #e5ecf6",
-                borderRadius: "15px",
-              }}
-            >
-              <CardContent>
-                <Stack>
-                  <Typography
+                <CardContent>
+                  <Stack
                     sx={{
                       fontFamily: "Public Sans",
                       fontSize: "18px",
-                      fontWeight: 700,
+                      fontWeight: 600,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
                     }}
-                    style={{ color: item.color }}
                   >
-                    {item.data}
-                  </Typography>
-                  <Stack
-                    flexDirection={"row"}
-                    justifyContent={"space-between"}
-                    alignItems={"center"}
-                  >
-                    <Typography
-                      sx={{
-                        fontFamily: "Public Sans",
-                        fontSize: "14px",
-                        fontWeight: 600,
-                      }}
-                    >
-                      {item.value}
+                    <Typography style={{ color: Success.color }}>
+                      {Success.status}
                     </Typography>
+                    <Typography>{Success.count}</Typography>
+                  </Stack>
+                  <Stack
+                    sx={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
                     <img
-                      src={item.logo}
+                      src={Success.logo}
                       alt="logo"
                       style={{
-                        display: "block",
-                        width: "50px",
-                        height: "40px",
+                        width: "40px",
+                        height: "30px",
+                      }}
+                    />
+                    <img
+                      src={Success.graph}
+                      alt="logo"
+                      style={{
+                        width: "40px",
+                        height: "30px",
                       }}
                     />
                   </Stack>
-                </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+                  <Typography
+                    sx={{
+                      fontFamily: "Public Sans",
+                      fontSize: "15px",
+                      fontWeight: 100,
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography>{"Transaction Value"}</Typography>
+                    <Typography>
+                      Rs.{fCurrency(Success?.volume || "0")}
+                    </Typography>
+                  </Typography>
+                </CardContent>
+              </Card>
 
-      <Grid sx={{ display: "flex", gap: "25px", marginTop: "25px" }}>
-        <Grid>
-          <AppCurrentDownload
-            title="Services"
-            chart={{
-              series: [
-                { label: "Recharges", value: 0 },
-                { label: "Bill Payament", value: 0 },
-                { label: "Money Transfer", value: 0 },
-                { label: "Payot", value: 0 },
-                { label: "AEPS", value: 0 },
-                { label: "Adhar Pay", value: 0 },
-                { label: "mATM", value: 0 },
-                { label: "Indo Nepal", value: 0 },
-              ],
-              colors: [
-                theme.palette.primary.main,
-                theme.palette.info.main,
-                theme.palette.error.main,
-                theme.palette.info.main,
-              ],
-            }}
-          />
-        </Grid>
-        <Grid
-          sx={{
-            width: "81vw",
-            backgroundColor: "#ffffff",
-            borderRadius: "15px",
-            boxShadow: "0px 2px 2px #00000040",
-          }}
-        >
-          <StatsWebsiteVisits
-            title="Website Visit"
-            subheader="(+43%) than last year"
-            chart={{
-              labels: [
-                "01/01/2003",
-                "02/01/2003",
-                "03/01/2003",
-                "04/01/2003",
-                "05/01/2003",
-                "06/01/2003",
-                "07/01/2003",
-                "08/01/2003",
-                "09/01/2003",
-                "10/01/2003",
-                "11/01/2003",
-                "12/01/2003",
-                "01/01/2004",
-              ],
-              series: [
-                {
-                  name: "Recharges",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-                {
-                  name: "Bill Payment",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-                {
-                  name: "Money Transfer",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-                {
-                  name: "Payout",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-                {
-                  name: "AEPS",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-                {
-                  name: "Adhar Pay",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-                {
-                  name: "mATM",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-                {
-                  name: "Indo Nepal",
-                  type: "line",
-                  fill: "solid",
-                  data: [],
-                },
-              ],
-            }}
-          />
-        </Grid>
-      </Grid>
+              <Card
+                sx={{
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "15px",
+                  boxShadow: "30px",
+                  width: "33%",
+                }}
+              >
+                <CardContent>
+                  <Stack
+                    sx={{
+                      fontFamily: "Public Sans",
+                      fontSize: "18px",
+                      fontWeight: 600,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography style={{ color: Pending.color }}>
+                      {Pending.status}
+                    </Typography>
+                    <Typography>{Pending.count}</Typography>
+                  </Stack>
+                  <Stack
+                    sx={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <img
+                      src={Pending.logo}
+                      alt="logo"
+                      style={{
+                        width: "40px",
+                        height: "30px",
+                      }}
+                    />
+                    <img
+                      src={Pending.graph}
+                      alt="logo"
+                      style={{
+                        width: "40px",
+                        height: "30px",
+                      }}
+                    />
+                  </Stack>
+                  <Typography
+                    sx={{
+                      fontFamily: "Public Sans",
+                      fontSize: "15px",
+                      fontWeight: 100,
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography>{"Transaction Value"}</Typography>
+                    <Typography>
+                      {" "}
+                      Rs.{fCurrency(Pending?.volume || "0")}
+                    </Typography>
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              <Card
+                sx={{
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "15px",
+                  boxShadow: "30px",
+                  width: "33%",
+                }}
+              >
+                <CardContent>
+                  <Stack
+                    sx={{
+                      fontFamily: "Public Sans",
+                      fontSize: "18px",
+                      fontWeight: 600,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography style={{ color: Failed.color }}>
+                      {Failed.status}
+                    </Typography>
+                    <Typography>{Failed.count}</Typography>
+                  </Stack>
+                  <Stack
+                    sx={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <img
+                      src={Failed.logo}
+                      alt="logo"
+                      style={{
+                        width: "40px",
+                        height: "30px",
+                      }}
+                    />
+                    <img
+                      src={Failed.graph}
+                      alt="logo"
+                      style={{
+                        width: "40px",
+                        height: "30px",
+                      }}
+                    />
+                  </Stack>
+                  <Typography
+                    sx={{
+                      fontFamily: "Public Sans",
+                      fontSize: "15px",
+                      fontWeight: 100,
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography>{"Transaction Value"}</Typography>
+                    <Typography>
+                      {" "}
+                      Rs. {fCurrency(Failed?.volume || "0")}
+                    </Typography>
+                  </Typography>
+                </CardContent>
+              </Card>
+
+              <Card
+                sx={{
+                  backgroundColor: "#FFFFFF",
+                  borderRadius: "15px",
+                  boxShadow: "30px",
+                  width: "33%",
+                }}
+              >
+                <CardContent>
+                  <Stack
+                    sx={{
+                      fontFamily: "Public Sans",
+                      fontSize: "18px",
+                      fontWeight: 600,
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography style={{ color: Total.color }}>
+                      {Total.status}
+                    </Typography>
+                    <Typography>{Total.count}</Typography>
+                  </Stack>
+                  <Stack
+                    sx={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <img
+                      src={Total.logo}
+                      alt="logo"
+                      style={{
+                        width: "40px",
+                        height: "30px",
+                      }}
+                    />
+                    <img
+                      src={Total.graph}
+                      alt="logo"
+                      style={{
+                        width: "40px",
+                        height: "30px",
+                      }}
+                    />
+                  </Stack>
+                  <Typography
+                    sx={{
+                      fontFamily: "Public Sans",
+                      fontSize: "15px",
+                      fontWeight: 100,
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
+                  >
+                    <Typography>{"Transaction Value"}</Typography>
+                    <Typography>
+                      {" "}
+                      Rs. {fCurrency(Total?.volume || "0")}
+                    </Typography>
+                  </Typography>
+                </CardContent>
+              </Card>
+            </Stack>
+          </Grid>
+
+          <Grid sx={{ display: "flex", gap: 2, marginTop: 2 }}>
+            {Values.map((item, index) => (
+              <Grid item key={index} xs={4} width={"100%"}>
+                <Card
+                  sx={{
+                    backgroundColor: "#fffff",
+                    // height: '150px',
+                    // width: '186px',
+                    borderColor: " #e5ecf6",
+                    borderRadius: "15px",
+                  }}
+                >
+                  <CardContent>
+                    <Stack>
+                      <Typography
+                        sx={{
+                          fontFamily: "Public Sans",
+                          fontSize: "18px",
+                          fontWeight: 700,
+                        }}
+                        style={{ color: item.color }}
+                      >
+                        {item.data}
+                      </Typography>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                        alignItems={"center"}
+                      >
+                        <Typography
+                          sx={{
+                            fontFamily: "Public Sans",
+                            fontSize: "14px",
+                            fontWeight: 600,
+                          }}
+                        >
+                          {item.value}
+                        </Typography>
+                        <img
+                          src={item.logo}
+                          alt="logo"
+                          style={{
+                            display: "block",
+                            width: "50px",
+                            height: "40px",
+                          }}
+                        />
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Grid sx={{ display: "flex", gap: "25px", marginTop: "25px" }}>
+            <Grid>
+              <AppCurrentDownload
+                title="Services"
+                chart={{
+                  series: [
+                    { label: "Recharges", value: 0 },
+                    { label: "Bill Payament", value: 0 },
+                    { label: "Money Transfer", value: 0 },
+                    { label: "Payot", value: 0 },
+                    { label: "AEPS", value: 0 },
+                    { label: "Adhar Pay", value: 0 },
+                    { label: "mATM", value: 0 },
+                    { label: "Indo Nepal", value: 0 },
+                  ],
+                  colors: [
+                    theme.palette.primary.main,
+                    theme.palette.info.main,
+                    theme.palette.error.main,
+                    theme.palette.info.main,
+                  ],
+                }}
+              />
+            </Grid>
+            <Grid
+              sx={{
+                width: "81vw",
+                backgroundColor: "#ffffff",
+                borderRadius: "15px",
+                boxShadow: "0px 2px 2px #00000040",
+              }}
+            >
+              <StatsWebsiteVisits
+                title="Website Visit"
+                subheader="(+43%) than last year"
+                chart={{
+                  labels: [
+                    "01/01/2003",
+                    "02/01/2003",
+                    "03/01/2003",
+                    "04/01/2003",
+                    "05/01/2003",
+                    "06/01/2003",
+                    "07/01/2003",
+                    "08/01/2003",
+                    "09/01/2003",
+                    "10/01/2003",
+                    "11/01/2003",
+                    "12/01/2003",
+                    "01/01/2004",
+                  ],
+                  series: [
+                    {
+                      name: "Recharges",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                    {
+                      name: "Bill Payment",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                    {
+                      name: "Money Transfer",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                    {
+                      name: "Payout",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                    {
+                      name: "AEPS",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                    {
+                      name: "Adhar Pay",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                    {
+                      name: "mATM",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                    {
+                      name: "Indo Nepal",
+                      type: "line",
+                      fill: "solid",
+                      data: [],
+                    },
+                  ],
+                }}
+              />
+            </Grid>
+          </Grid>
+        </m.div>
+      </MotionContainer>
     </>
   );
 }

@@ -51,6 +51,7 @@ import GrievancePolicy from "./TermAndConditions/GrievancePolicy";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { requestPermission } from "./firebase";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 
@@ -891,79 +892,58 @@ export default function AuthRegisterForm(props: any) {
         )}
       </FormProvider>
 
-      <Modal
-        open={open}
-        // onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            borderRadius: 2,
-            bgcolor: "#ffffff",
-            p: 4,
-            width: {
-              xs: "75%",
-              sm: "75%",
-            },
-          }}
-        >
-          <Scrollbar sx={{ maxHeight: 600, minWidth: 650 }}>
-            <AppBar position="static">
-              <Tabs
-                value={tabValue}
-                onChange={handleChange}
-                variant="fullWidth"
-                aria-label="full width tabs example"
-                style={{ backgroundColor: "#ffffff" }}
-              >
-                <Tab
-                  label=" Term and Conditions"
-                  {...a11yProps(0)}
-                  style={{ color: "#C52031" }}
-                />
-                <Tab
-                  label="Refund Policy"
-                  {...a11yProps(1)}
-                  style={{ color: "#C52031" }}
-                />
-                <Tab
-                  label="Privacy Policy"
-                  {...a11yProps(2)}
-                  style={{ color: "#C52031" }}
-                />
-                <Tab
-                  label="Grievance Policy"
-                  {...a11yProps(3)}
-                  style={{ color: "#C52031" }}
-                />
-              </Tabs>
-            </AppBar>
+      <MotionModal open={open} width={{ xs: "75%" }}>
+        <Scrollbar sx={{ maxHeight: 600, minWidth: 650 }}>
+          <AppBar position="static">
+            <Tabs
+              value={tabValue}
+              onChange={handleChange}
+              variant="fullWidth"
+              aria-label="full width tabs example"
+              style={{ backgroundColor: "#ffffff" }}
+            >
+              <Tab
+                label=" Term and Conditions"
+                {...a11yProps(0)}
+                style={{ color: "#C52031" }}
+              />
+              <Tab
+                label="Refund Policy"
+                {...a11yProps(1)}
+                style={{ color: "#C52031" }}
+              />
+              <Tab
+                label="Privacy Policy"
+                {...a11yProps(2)}
+                style={{ color: "#C52031" }}
+              />
+              <Tab
+                label="Grievance Policy"
+                {...a11yProps(3)}
+                style={{ color: "#C52031" }}
+              />
+            </Tabs>
+          </AppBar>
 
-            <TabPanel value={tabValue} index={0} dir={theme.direction}>
-              <TermAndCondition />
-            </TabPanel>
-            <TabPanel value={tabValue} index={1} dir={theme.direction}>
-              <RefundPolicy />
-            </TabPanel>
-            <TabPanel value={tabValue} index={2} dir={theme.direction}>
-              <PrivacyPolicy />
-            </TabPanel>
-            <TabPanel value={tabValue} index={3} dir={theme.direction}>
-              <GrievancePolicy />
-            </TabPanel>
-            {/* </Box> */}
+          <TabPanel value={tabValue} index={0} dir={theme.direction}>
+            <TermAndCondition />
+          </TabPanel>
+          <TabPanel value={tabValue} index={1} dir={theme.direction}>
+            <RefundPolicy />
+          </TabPanel>
+          <TabPanel value={tabValue} index={2} dir={theme.direction}>
+            <PrivacyPolicy />
+          </TabPanel>
+          <TabPanel value={tabValue} index={3} dir={theme.direction}>
+            <GrievancePolicy />
+          </TabPanel>
+          {/* </Box> */}
 
-            <Button onClick={handleClose} variant="contained" size="medium">
-              Accept
-            </Button>
-          </Scrollbar>
-        </Box>
-      </Modal>
+          <Button onClick={handleClose} variant="contained" size="medium">
+            Accept
+          </Button>
+        </Scrollbar>
+      </MotionModal>
     </>
   );
 }
