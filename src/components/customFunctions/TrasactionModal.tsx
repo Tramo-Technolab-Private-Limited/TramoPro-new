@@ -15,6 +15,7 @@ import Pending from "src/assets/transactionIcons/Pending";
 import Hold from "src/assets/transactionIcons/Hold";
 import Inprocess from "src/assets/transactionIcons/Inprocess";
 import Initiated from "src/assets/transactionIcons/Initiated";
+import MotionModal from "../animate/MotionModal";
 
 const style = {
   position: "absolute" as "absolute",
@@ -37,66 +38,54 @@ export default function TransactionModal({
 }: any) {
   if (errorMsg) {
     return (
-      <Modal
-        open={isTxnOpen}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Stack flexDirection={"row"} justifyContent={"center"}>
-            <Failed />
-          </Stack>
-          <Typography variant="h4" textAlign={"center"}>
-            Transaction Failed
-          </Typography>
-          <Typography
-            variant="h4"
-            textAlign={"center"}
-            color={"#9e9e9ef0"}
-            my={1}
-          >
-            {errorMsg}
-          </Typography>
-          <Button onClick={handleTxnModal} variant="contained">
-            Close
-          </Button>
-        </Box>
-      </Modal>
-    );
-  }
-
-  return (
-    <Modal
-      open={isTxnOpen}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <Box sx={style}>
+      <MotionModal open={isTxnOpen}>
         <Stack flexDirection={"row"} justifyContent={"center"}>
-          {transactionDetail?.status == "success" ? (
-            <Success />
-          ) : transactionDetail?.status == "pending" ? (
-            <Pending />
-          ) : transactionDetail?.status == "hold" ? (
-            <Hold />
-          ) : transactionDetail?.status == "in_process" ? (
-            <Inprocess />
-          ) : (
-            <Initiated />
-          )}
+          <Failed />
         </Stack>
+        <Typography variant="h4" textAlign={"center"}>
+          Transaction Failed
+        </Typography>
         <Typography
-          id="transition-modal-title"
           variant="h4"
-          sx={{ marginBottom: 2, textAlign: "center" }}
+          textAlign={"center"}
+          color={"#9e9e9ef0"}
+          my={1}
         >
-          {transactionDetail?.status &&
-            `Trasaction ${sentenceCase(transactionDetail?.status)}`}
+          {errorMsg}
         </Typography>
         <Button onClick={handleTxnModal} variant="contained">
           Close
         </Button>
-      </Box>
-    </Modal>
+      </MotionModal>
+    );
+  }
+
+  return (
+    <MotionModal open={isTxnOpen}>
+      <Stack flexDirection={"row"} justifyContent={"center"}>
+        {transactionDetail?.status == "success" ? (
+          <Success />
+        ) : transactionDetail?.status == "pending" ? (
+          <Pending />
+        ) : transactionDetail?.status == "hold" ? (
+          <Hold />
+        ) : transactionDetail?.status == "in_process" ? (
+          <Inprocess />
+        ) : (
+          <Initiated />
+        )}
+      </Stack>
+      <Typography
+        id="transition-modal-title"
+        variant="h4"
+        sx={{ marginBottom: 2, textAlign: "center" }}
+      >
+        {transactionDetail?.status &&
+          `Trasaction ${sentenceCase(transactionDetail?.status)}`}
+      </Typography>
+      <Button onClick={handleTxnModal} variant="contained">
+        Close
+      </Button>
+    </MotionModal>
   );
 }

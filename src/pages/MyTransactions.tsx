@@ -885,12 +885,7 @@ function TransactionRow({ row }: childProps) {
           </Stack>
         </StyledTableCell>
       </StyledTableRow>
-      <Modal
-        open={modalOpen}
-        onClose={closeModal}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      <Modal open={modalOpen} onClose={closeModal}>
         <Grid sx={style}>
           <Stack
             flexDirection={"row"}

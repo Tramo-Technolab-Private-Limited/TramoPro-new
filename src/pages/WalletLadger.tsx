@@ -52,6 +52,7 @@ import FormProvider, {
   RHFTextField,
 } from "src/components/hook-form";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 
@@ -579,24 +580,13 @@ const LadgerRow = ({ row }: any) => {
         </StyledTableCell>
       </StyledTableRow>
 
-      <Modal
+      <MotionModal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        width={{ xs: "100%", sm: "90%" }}
       >
-        <Grid
-          item
-          xs={6}
-          md={6}
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <Card sx={{ p: 3 }}>
+        <Grid item xs={6} md={6}>
+          <Card>
             <TableContainer style={{ margin: "0 auto", maxHeight: "300px" }}>
               <Table>
                 <TableHead>
@@ -939,7 +929,7 @@ const LadgerRow = ({ row }: any) => {
             </Button>
           </Card>
         </Grid>
-      </Modal>
+      </MotionModal>
     </>
   );
 };

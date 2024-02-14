@@ -3,6 +3,7 @@ import { Modal, Box, Grid, Typography, Button, useTheme } from "@mui/material";
 import { useLocation, useNavigate } from "react-router";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LoadingButton } from "@mui/lab";
+import MotionModal from "../animate/MotionModal";
 
 const style = {
   position: "absolute" as "absolute",
@@ -60,40 +61,33 @@ const AutoLogout = ({ children }: any) => {
   return (
     <>
       {children}
-      <Modal
-        open={open}
-        // onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style}>
-          <Grid
-            rowGap={3}
-            columnGap={2}
-            display="grid"
-            gridTemplateColumns={{
-              xs: "repeat(1, 1fr)",
+      <MotionModal open={open}>
+        <Grid
+          rowGap={3}
+          columnGap={2}
+          display="grid"
+          gridTemplateColumns={{
+            xs: "repeat(1, 1fr)",
+          }}
+        >
+          <Typography variant="subtitle1" textAlign={"center"}>
+            You have been automatically logged out due to inactivity.
+          </Typography>
+          <LoadingButton
+            onClick={() => {
+              handleClose();
+            }}
+            variant="contained"
+            sx={{
+              mt: 1,
+              width: "fit-content",
+              margin: "auto",
             }}
           >
-            <Typography variant="subtitle1" textAlign={"center"}>
-              You have been automatically logged out due to inactivity.
-            </Typography>
-            <LoadingButton
-              onClick={() => {
-                handleClose();
-              }}
-              variant="contained"
-              sx={{
-                mt: 1,
-                width: "fit-content",
-                margin: "auto",
-              }}
-            >
-              login
-            </LoadingButton>
-          </Grid>
-        </Box>
-      </Modal>
+            login
+          </LoadingButton>
+        </Grid>
+      </MotionModal>
     </>
   );
 };

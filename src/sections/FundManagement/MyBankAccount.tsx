@@ -29,6 +29,14 @@ import React from "react";
 import { Api } from "src/webservices";
 import { LoadingButton } from "@mui/lab";
 import { Icon } from "@iconify/react";
+import { AnimatePresence, m } from "framer-motion";
+import {
+  MotionContainer,
+  varBgKenburns,
+  varBounce,
+  varSlide,
+} from "../../components/animate";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 type FormValuesProps = {
@@ -153,11 +161,7 @@ export default function MyBankAccount() {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    width: { xs: "90%", sm: 500 },
-    bgcolor: "#ffffff",
-    borderRadius: 2,
-    boxShadow: 24,
-    p: 4,
+    width: { xs: "100%", sm: 500 },
   };
 
   useEffect(() => {
@@ -184,24 +188,20 @@ export default function MyBankAccount() {
   const getBankList = () => {
     setLoading(true);
     let token = localStorage.getItem("token");
-    if (bankList.length) {
-      setLoading(false);
-    } else {
-      Api("bankManagement/get_bank", "GET", "", token).then((Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            setBankList(Response?.data?.data);
-            handleOpen();
-          } else {
-            enqueueSnackbar(Response?.data?.message, { variant: "error" });
-          }
-          setLoading(false);
+    Api("bankManagement/get_bank", "GET", "", token).then((Response: any) => {
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          setBankList(Response?.data?.data);
+          handleOpen();
         } else {
-          enqueueSnackbar("Failed", { variant: "error" });
-          setLoading(false);
+          enqueueSnackbar(Response?.data?.message, { variant: "error" });
         }
-      });
-    }
+        setLoading(false);
+      } else {
+        enqueueSnackbar("Failed", { variant: "error" });
+        setLoading(false);
+      }
+    });
   };
 
   const addBank = (data: FormValuesProps) => {
@@ -494,76 +494,83 @@ export default function MyBankAccount() {
             )
         )}
       </Box>
-      <Modal
+
+      <MotionModal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        width={{ xs: "100%", sm: 500 }}
       >
         <FormProvider methods={methods} onSubmit={handleSubmit(addBank)}>
-          <Box sx={style}>
-            <Grid
-              rowGap={3}
-              columnGap={2}
-              display="grid"
-              gridTemplateColumns={{
-                xs: "repeat(1, 1fr)",
+          <Grid
+            rowGap={3}
+            columnGap={2}
+            display="grid"
+            gridTemplateColumns={{
+              xs: "repeat(1, 1fr)",
+            }}
+          >
+            <RHFAutocomplete
+              name="bank"
+              onChange={(event, value) => {
+                setValue("bankName", value?.bankName);
+                setValue("ifsc", value?.masterIFSC);
               }}
-            >
-              <RHFAutocomplete
-                name="bank"
-                onChange={(event, value) => {
-                  setValue("bankName", value?.bankName);
-                  setValue("ifsc", value?.masterIFSC);
-                }}
-                options={bankList.map((option: any) => option)}
-                getOptionLabel={(option: any) => option.bankName}
-                renderOption={(props, option) => (
-                  <Box
-                    component="li"
-                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                    {...props}
-                  >
-                    {option.bankName}
-                  </Box>
-                )}
-                renderInput={(params) => (
-                  <RHFTextField name="bankName" label="Bank Name" {...params} />
-                )}
-              />
+              options={bankList.map((option: any) => option)}
+              getOptionLabel={(option: any) => option.bankName}
+              renderOption={(props, option) => (
+                <Box
+                  component="li"
+                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  {...props}
+                >
+                  {option.bankName}
+                </Box>
+              )}
+              renderInput={(params) => (
+                <RHFTextField name="bankName" label="Bank Name" {...params} />
+              )}
+            />
 
-              <RHFTextField
-                name="ifsc"
-                label="IFSC code"
-                placeholder="IFSC code"
-                InputLabelProps={{ shrink: watch("ifsc") ? true : false }}
-              />
-              <RHFTextField
-                type="number"
-                name="accountNumber"
-                label="Account Number"
-                placeholder="Account Number"
-              />
-              <RHFTextField
-                type="password"
-                name="confirmAccountNumber"
-                label="Confirm Account Number"
-                placeholder="Confirm Account Number"
-              />
-            </Grid>
+            <RHFTextField
+              name="ifsc"
+              label="IFSC code"
+              placeholder="IFSC code"
+              InputLabelProps={{
+                shrink: watch("ifsc") ? true : false,
+              }}
+            />
+            <RHFTextField
+              type="number"
+              name="accountNumber"
+              label="Account Number"
+              placeholder="Account Number"
+            />
+            <RHFTextField
+              type="password"
+              name="confirmAccountNumber"
+              label="Confirm Account Number"
+              placeholder="Confirm Account Number"
+            />
+          </Grid>
+          <Stack flexDirection={"row"} gap={1} justifyContent={"end"} mt={1}>
             <LoadingButton
-              fullWidth
+              loading={addBankLoading}
+              size="medium"
+              onClick={handleClose}
+            >
+              Cancel
+            </LoadingButton>
+            <LoadingButton
               size="medium"
               type="submit"
               variant="contained"
-              sx={{ mt: 1 }}
               loading={addBankLoading}
             >
               Submit
             </LoadingButton>
-          </Box>
+          </Stack>
         </FormProvider>
-      </Modal>
+      </MotionModal>
     </>
   );
 }
