@@ -443,7 +443,7 @@ export default function GovernanceForm(props: any) {
                           fullWidth
                           disabled={watch("gst") == ""}
                         >
-                          verify
+                          Fetch
                         </Button>
                         <Button
                           variant="outlined"
