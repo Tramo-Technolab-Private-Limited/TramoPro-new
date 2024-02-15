@@ -1,4 +1,4 @@
-import { Theme } from '@mui/material/styles';
+import { Theme } from "@mui/material/styles";
 
 // ----------------------------------------------------------------------
 
@@ -7,14 +7,14 @@ export default function Menu(theme: Theme) {
     MuiMenuItem: {
       styleOverrides: {
         root: {
-          '&.Mui-selected': {
+          "&.Mui-selected": {
             backgroundColor: theme.palette.action.selected,
-            '&:hover': {
-              backgroundColor: theme.palette.action.hover
-            }
-          }
-        }
-      }
-    }
+            "&:hover": {
+              backgroundColor: theme.palette.action.hover,
+            },
+          },
+        },
+      },
+    },
   };
 }

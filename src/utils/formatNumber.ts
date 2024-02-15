@@ -11,7 +11,7 @@ export function fNumber(number: InputValue) {
 export function fCurrency(number: InputValue) {
   const format = number ? numeral(number).format("0,0.00") : "";
 
-  return result(format, ".00");
+  return result("₹" + format, ".00");
 }
 
 export function fPercent(number: InputValue) {

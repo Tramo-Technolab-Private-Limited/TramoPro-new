@@ -37,6 +37,7 @@ import {
   ManageFundFlow,
   MyNetwrokFunds,
   UserProfilePage,
+  MyFundDeposit,
 } from "./elements";
 
 // ----------------------------------------------------------------------
@@ -148,6 +149,7 @@ export default function Router() {
               ),
               index: true,
             },
+            { path: "myfunddeposit", element: <MyFundDeposit /> },
             { path: "myfunddeposits", element: <MyFundDeposits /> },
             { path: "mybankaccount", element: <MyBankAccount /> },
             { path: "aepssettlement", element: <AEPSsettlement /> },
