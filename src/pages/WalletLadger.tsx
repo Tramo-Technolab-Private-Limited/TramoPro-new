@@ -10,6 +10,7 @@ import {
   styled,
   Tooltip,
   IconButton,
+  TextField,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
@@ -37,7 +38,7 @@ import * as XLSX from "xlsx";
 import FileFilterButton from "../sections/MyTransaction/FileFilterButton";
 import { fDate, fDateTime } from "src/utils/formatTime";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { sentenceCase } from "change-case";
 import { green, red } from "@mui/material/colors";
@@ -52,7 +53,11 @@ import FormProvider, {
   RHFTextField,
 } from "src/components/hook-form";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
+<<<<<<< HEAD
 import MotionModal from "src/components/animate/MotionModal";
+=======
+import dayjs from "dayjs";
+>>>>>>> 73d1736 (update code)
 
 // ----------------------------------------------------------------------
 
@@ -64,7 +69,8 @@ type FormValuesProps = {
   distributorId: string;
   masterDistributorId: string;
   partnerId: string;
-  date: string;
+  startDate: Date | null;
+  endDate: Date | null;
   clientRefId: string;
   walletType: string;
 };
@@ -148,7 +154,8 @@ export default function WalletLadger() {
     distributorId: "",
     masterDistributorId: "",
     partnerId: "",
-    date: "",
+    startDate: null,
+    endDate: null,
     clientRefId: "",
     walletType: "",
   };
@@ -194,8 +201,13 @@ export default function WalletLadger() {
         currentPage: currentPage,
       },
       clientRefId: getValues("clientRefId") || "",
+<<<<<<< HEAD
       startDate: formattedStart || "",
       endDate: formattedSEndDate || "",
+=======
+      startDate: dayjs(getValues("startDate")).add(1, "day"),
+      endDate: dayjs(getValues("endDate")).add(1, "day"),
+>>>>>>> 73d1736 (update code)
     };
     Api(`agent/walletLedger`, "POST", body, token).then((Response: any) => {
       console.log("======Transaction==response=====>" + Response);
@@ -231,26 +243,29 @@ export default function WalletLadger() {
               sx={{ width: 300 }}
             />
             <Stack flexDirection={"row"} gap={1}>
-              <FileFilterButton
-                isSelected={!!isSelectedValuePicker}
-                startIcon={<Iconify icon="eva:calendar-fill" />}
-                onClick={onOpenPicker}
-              >
-                {isSelectedValuePicker ? shortLabel : "Select Date"}
-              </FileFilterButton>
-              <DateRangePicker
-                variant="input"
-                title="Choose Maximum 31 Days"
-                startDate={startDate}
-                endDate={endDate}
-                onChangeStartDate={onChangeStartDate}
-                onChangeEndDate={onChangeEndDate}
-                open={openPicker}
-                onClose={onClosePicker}
-                isSelected={isSelectedValuePicker}
-                isError={isError}
-                // additionalFunction={ExportData}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Start date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("startDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+                <DatePicker
+                  label="End date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("endDate")}
+                  minDate={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("endDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+              </LocalizationProvider>
             </Stack>
             <LoadingButton
               variant="contained"
