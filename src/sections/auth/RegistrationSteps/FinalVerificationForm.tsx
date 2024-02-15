@@ -1431,37 +1431,40 @@ function PersonalIdentification(props: any) {
                                     </Button>
                                   ) : (
                                     <>
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-
-                                          color: "black",
-
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handleDocuments("ShopImage")
-                                        }
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
                                       >
-                                        Reset
-                                      </Button>
-                                      <Image
-                                        src={ShopImage && ShopImage}
-                                        style={{
-                                          borderRadius: "3px",
-                                          border: "1px solid black",
-                                          width: 50,
-                                          height: 50,
-                                        }}
-                                        onClick={() =>
-                                          ShopImage && handleOpen(ShopImage)
-                                        }
-                                      />
-                                      {}
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+                                            color: "black",
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handleDocuments("ShopImage")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={ShopImage && ShopImage}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 40,
+                                            height: 40,
+                                          }}
+                                          onClick={() =>
+                                            ShopImage && handleOpen(ShopImage)
+                                          }
+                                        />
+                                      </Stack>
                                     </>
                                   )}
                                 </>
@@ -1476,13 +1479,21 @@ function PersonalIdentification(props: any) {
               )}
             </>
             {/* </Grid> */}
+
+            <Stack flexDirection="row" gap={1} ml={5} mt={3}>
+              <Typography variant="h6">Note :</Typography>
+              <Typography variant="body1" mt={0.5}>
+                Please ensure all your Personal KYC documents are self attested
+                and the company documents must be stamped and duly signed.{" "}
+              </Typography>
+            </Stack>
             <Stack my={5}>
               <Button
                 variant="contained"
                 sx={{ width: "fit-content", margin: "auto" }}
                 type="submit"
               >
-                Confirm & Continue
+                Continue
               </Button>
             </Stack>
           </>
@@ -2523,9 +2534,7 @@ function ConstitutionIdentification() {
                                       size="small"
                                       sx={{
                                         border: "1px solid",
-
                                         color: "black",
-
                                         fontFamily: "Public Sans",
                                         fontSize: "14px",
                                         textTransform: "none",
@@ -2544,24 +2553,42 @@ function ConstitutionIdentification() {
                                     </Button>
                                   ) : (
                                     <>
-                                      <Button
-                                        component="label"
-                                        size="small"
-                                        sx={{
-                                          border: "1px solid",
-
-                                          color: "black",
-
-                                          fontFamily: "Public Sans",
-                                          fontSize: "14px",
-                                          textTransform: "none",
-                                        }}
-                                        onClick={() =>
-                                          handlePIDDocuments("MSME")
-                                        }
+                                      <Stack
+                                        display={"flex"}
+                                        direction={"row"}
+                                        spacing={1}
                                       >
-                                        Reset
-                                      </Button>
+                                        <Button
+                                          component="label"
+                                          size="small"
+                                          sx={{
+                                            border: "1px solid",
+
+                                            color: "black",
+
+                                            fontFamily: "Public Sans",
+                                            fontSize: "14px",
+                                            textTransform: "none",
+                                          }}
+                                          onClick={() =>
+                                            handlePIDDocuments("MSME")
+                                          }
+                                        >
+                                          Reset
+                                        </Button>
+                                        <Image
+                                          src={imageMSME && imageMSME}
+                                          style={{
+                                            borderRadius: "3px",
+                                            border: "1px solid black",
+                                            width: 50,
+                                            height: 50,
+                                          }}
+                                          onClick={() =>
+                                            imageMSME && handleOpen(imageMSME)
+                                          }
+                                        />
+                                      </Stack>
                                     </>
                                   )}
                                 </>
@@ -3663,14 +3690,32 @@ function ConstitutionIdentification() {
               No Need of any Business Documents
             </Typography>
           )}
-          <Stack mt={10}>
+          <Stack flexDirection="row" gap={1} ml={5} mt={3}>
+            <Typography variant="h6">Note :</Typography>
+            <Typography variant="body1" mt={0.5}>
+              Please ensure all your Personal KYC documents are self attested
+              and the company documents must be stamped and duly signed.{" "}
+            </Typography>
+          </Stack>
+          <Stack mt={5}>
             {user?.isAadhaarVerified &&
             user?.isGSTVerified &&
             user?.isPANVerified &&
             user?.is_PID_Docs ? (
-              <Button variant="contained" onClick={submitDocs}>
-                Final Submit
-              </Button>
+              <>
+                <Stack justifyContent="center">
+                  <Button
+                    variant="contained"
+                    onClick={submitDocs}
+                    sx={{
+                      width: "fit-content",
+                      mx: "auto",
+                    }}
+                  >
+                    Continue
+                  </Button>
+                </Stack>
+              </>
             ) : (
               <Typography variant="h4" color="green">
                 Your Application has been submitted successfully

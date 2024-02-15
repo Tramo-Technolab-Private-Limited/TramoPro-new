@@ -146,7 +146,7 @@ export default function CreateNpin() {
     <Stack margin={"auto"} alignItems={"center"}>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Typography variant="h4" textAlign={"center"} mb={3}>
-          Create TPIN
+          Create Your TPIN
         </Typography>
         <Stack spacing={3}>
           <Typography variant="subtitle1" sx={{ mb: 0 }}>

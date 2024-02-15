@@ -28,18 +28,22 @@ export default function NPinPage() {
   return (
     <>
       <Stack
-        sx={{ alignItems: "center", justifyContent: "center", margin: "40px" }}
+        sx={{ alignItems: "center", justifyContent: "center", margin: "20px" }}
       >
         <Helmet>
           <title> Esignature | {process.env.REACT_APP_COMPANY_NAME}</title>
         </Helmet>
 
-        <Stack alignItems={"center"} justifyContent={"center"} my={3} gap={1}>
-          <Typography variant="h3" color="green">
+        <Stack alignItems={"center"} justifyContent={"center"} gap={1}>
+          <Typography variant="h4" color="green">
             Congratulations! Your profile has been successfully approved!
           </Typography>
 
-          <Typography variant="h4" marginTop={3}>
+          <Typography
+            variant="h5"
+            width={{ xs: "100%", sm: "100%", md: "90%", lg: "60%" }}
+            justifyContent="space-between"
+          >
             To begin your journey with us, please sign the digital agreement by
             clicking the button below. This agreement outlines the terms and
             conditions of your association with{" "}

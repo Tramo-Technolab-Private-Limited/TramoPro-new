@@ -333,7 +333,7 @@ export default function AadharForm(props: any) {
                   name="aadhar"
                   type="number"
                   label="Aadhar Card Number"
-                  disabled={otpSendSuccess}
+                  disabled={user?.getAadhar ? user?.getAadhar : otpSendSuccess}
                 />
 
                 <Stack flexDirection="row" mt={2} gap={2}>
@@ -343,7 +343,9 @@ export default function AadharForm(props: any) {
                     loading={isSubmitting}
                     fullWidth
                     size="medium"
-                    disabled={watch("aadhar") == "" || otpSendSuccess}
+                    disabled={
+                      watch("aadhar") == "" || otpSendSuccess || user?.getAadhar
+                    }
                   >
                     Send OTP
                   </LoadingButton>
@@ -352,8 +354,9 @@ export default function AadharForm(props: any) {
                     variant="outlined"
                     onClick={handleClar}
                     fullWidth
-                    // disabled={!otpSendSuccess || watch("aadhar") == ""}
-                    disabled={watch("aadhar") == ""}
+                    disabled={
+                      user?.getAadhar ? user?.getAadhar : watch("aadhar") == ""
+                    }
                   >
                     Clear
                   </Button>
@@ -520,7 +523,7 @@ export default function AadharForm(props: any) {
                 sx={{ width: "fit-content", margin: "auto" }}
                 onClick={HandleAadharVarified}
               >
-                Confirm & Continue
+                Continue
               </Button>
             </Stack>
           )}
@@ -604,12 +607,6 @@ function PanCard(props: any) {
   };
 
   const HandlePanVarified = () => {
-    // dispatch(
-    //   user?InRedux({
-    //     ...user?,
-    //     isPANVerified: true,
-    //   })
-    // );
     props.callback(2);
   };
 
@@ -638,14 +635,6 @@ function PanCard(props: any) {
               required: true,
             })}
           />
-          {/* <Button
-            variant="outlined"
-            size="large"
-            style={{ marginTop: "5px" }}
-            onClick={HandleClearPAN}
-          >
-            Cancel
-          </Button> */}
         </Stack>
         {!!errors.pan && (
           <FormHelperText error sx={{ pl: 2 }}>
@@ -659,8 +648,18 @@ function PanCard(props: any) {
               <ApiDataLoading />
             ) : (
               <>
-                <Stack flexDirection={"row"} alignItems={"center"} gap={2}>
-                  <Button variant="contained" type="submit">
+                <Stack
+                  flexDirection={"row"}
+                  alignItems={"center"}
+                  gap={2}
+                  width={{ xs: "100%", sm: "80%", md: "60%", lg: "35%" }}
+                >
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    type="submit"
+                    // disabled={panNumber == "" || user?.PANnumber}
+                  >
                     Check
                   </Button>
 
@@ -679,13 +678,13 @@ function PanCard(props: any) {
                     alt="auth"
                     src={PanImage}
                     sx={{
-                      width: "60%",
-                      marginTop: "50px",
+                      width: "40%",
+                      marginTop: "40px",
                       // height: '200px',
                       // backgroundSize: 'cover',
                       // boxShadow: 10,
                       // border: '20px  #F0F9FB',
-                      marginLeft: "250px",
+                      marginLeft: "450px",
                     }}
                   />
                 </Stack>
@@ -708,11 +707,7 @@ function PanCard(props: any) {
             </Typography>
             <Icon icon="el:ok" color="green" fontSize={25} />
           </Stack>
-          <Stack
-            flexDirection={"row"}
-            justifyContent={"space-between"}
-            width={300}
-          >
+          <Stack flexDirection={"row"} gap={2} width={300}>
             <Typography variant="subtitle1">FullName:</Typography>
             <Typography variant="body1">
               {user?.firstName + " " + user?.lastName}
@@ -727,7 +722,7 @@ function PanCard(props: any) {
 
       {user?.getPan && (
         <>
-          <Stack flexDirection="row" justifyContent={"space-between"} mt={2}>
+          <Stack flexDirection="row" justifyContent={"space-between"} mt={1}>
             <Button
               variant="contained"
               // onClick={() => props.callback(2)}

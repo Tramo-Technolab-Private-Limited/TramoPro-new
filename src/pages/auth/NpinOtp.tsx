@@ -80,12 +80,33 @@ export default function NpinOtp(props: any) {
 
   const methods = useForm({
     mode: "onChange",
+
     resolver: yupResolver(VerifyCodeSchema),
     defaultValues,
   });
 
+  const HandleMobileCode = () => {
+    setValue("code1", "");
+    setValue("code2", "");
+    setValue("code3", "");
+    setValue("code4", "");
+    setValue("code5", "");
+    setValue("code6", "");
+  };
+
+  const HandleEmailCode = () => {
+    setValue("otp1", "");
+    setValue("otp2", "");
+    setValue("otp3", "");
+    setValue("otp4", "");
+    setValue("otp5", "");
+    setValue("otp6", "");
+  };
+
   const {
     handleSubmit,
+    reset,
+    setValue,
     formState: { isSubmitting, errors },
   } = methods;
 
@@ -163,10 +184,51 @@ export default function NpinOtp(props: any) {
               >
                 Mobile Verification Code &nbsp;
               </Typography>
-              <RHFCodes
-                keyName="code"
-                inputs={["code1", "code2", "code3", "code4", "code5", "code6"]}
-              />
+
+              <Stack flexDirection="row" gap={1}>
+                <Stack>
+                  <RHFCodes
+                    keyName="code"
+                    inputs={[
+                      "code1",
+                      "code2",
+                      "code3",
+                      "code4",
+                      "code5",
+                      "code6",
+                    ]}
+                  />
+                </Stack>
+                <Stack>
+                  <Stack rowGap={0.5}>
+                    <Button
+                      variant="contained"
+                      style={{
+                        float: "right",
+                        fontSize: "10px",
+                        height: "25px",
+                      }}
+                      onClick={() => getotp()}
+                      size="small"
+                    >
+                      Resend code
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      style={{
+                        float: "right",
+                        fontSize: "10px",
+                        height: "25px",
+                      }}
+                      onClick={HandleMobileCode}
+                      size="small"
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Stack>
 
               {(!!errors.code1 ||
                 !!errors.code2 ||
@@ -178,6 +240,7 @@ export default function NpinOtp(props: any) {
                   Code is required
                 </FormHelperText>
               )}
+
               <Typography
                 variant="subtitle2"
                 sx={{ my: 3 }}
@@ -185,10 +248,41 @@ export default function NpinOtp(props: any) {
               >
                 Email Verification Code &nbsp;
               </Typography>
-              <RHFCodes
-                keyName="otp"
-                inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-              />
+              <Stack flexDirection="row" gap={1}>
+                <RHFCodes
+                  keyName="otp"
+                  inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+                />
+                <Stack>
+                  <Stack rowGap={0.5}>
+                    <Button
+                      variant="contained"
+                      style={{
+                        float: "right",
+                        fontSize: "10px",
+                        height: "25px",
+                      }}
+                      onClick={() => getotp()}
+                      size="small"
+                    >
+                      Resend code
+                    </Button>
+
+                    <Button
+                      variant="outlined"
+                      style={{
+                        float: "right",
+                        fontSize: "10px",
+                        height: "25px",
+                      }}
+                      onClick={HandleEmailCode}
+                      size="small"
+                    >
+                      Clear
+                    </Button>
+                  </Stack>
+                </Stack>
+              </Stack>
 
               {(!!errors.otp1 ||
                 !!errors.otp2 ||
@@ -200,7 +294,7 @@ export default function NpinOtp(props: any) {
                   Code is required
                 </FormHelperText>
               )}
-              <Typography
+              {/* <Typography
                 variant="body2"
                 sx={{ my: 3 }}
                 style={{ textAlign: "left", marginBottom: "0" }}
@@ -210,11 +304,10 @@ export default function NpinOtp(props: any) {
                   sx={{ cursor: "pointer" }}
                   variant="subtitle2"
                   style={{ float: "right" }}
-                  onClick={() => getotp()}
                 >
                   Resend code
                 </Link>{" "}
-              </Typography>
+              </Typography> */}
 
               <LoadingButton
                 fullWidth

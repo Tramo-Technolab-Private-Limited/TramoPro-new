@@ -441,7 +441,7 @@ export default function GovernanceForm(props: any) {
                           type="submit"
                           size="small"
                           fullWidth
-                          disabled={watch("gst") == ""}
+                          disabled={watch("gst") == "" || verifyDetail}
                         >
                           Fetch
                         </Button>
@@ -479,7 +479,7 @@ export default function GovernanceForm(props: any) {
                 gap={1}
               >
                 <Typography variant="h4" color="green">
-                  Business Details Saved Successfully
+                  Business Details Fetched Successfully
                 </Typography>
                 <Icon icon="el:ok" color="green" fontSize={25} />
               </Stack>
@@ -617,7 +617,7 @@ export default function GovernanceForm(props: any) {
                       sx={{ margin: "auto" }}
                       disabled={!gstData}
                     >
-                      Confirm & continue
+                      continue
                     </Button>
                   </Stack>
 
@@ -667,14 +667,7 @@ export default function GovernanceForm(props: any) {
                   {gstDeatil.gst_number}
                 </Typography>
               </Stack>
-              {/* <Stack flexDirection={'row'} justifyContent={'space-between'}>
-                <Typography variant="subtitle1" sx={{ width: 250 }}>
-                  Pan number
-                </Typography>
-                <Typography variant="body1" textAlign={'end'}>
-                  {localStorage.getItem('PANnumber')}
-                </Typography>
-              </Stack> */}
+
               <Stack flexDirection={"row"} justifyContent={"space-between"}>
                 <Typography variant="subtitle1" sx={{ width: 250 }}>
                   Address
@@ -828,10 +821,6 @@ export default function GovernanceForm(props: any) {
               sx={{
                 width: "50%",
                 marginTop: "50px",
-                // height: '200px',
-                // backgroundSize: 'cover',
-                // boxShadow: 10,
-                // border: '20px  #F0F9FB',
                 marginLeft: "250px",
               }}
             />
