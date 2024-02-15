@@ -24,6 +24,7 @@ import {
   Card,
   Divider,
   MenuItem,
+  Container,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import * as Yup from "yup";
@@ -61,6 +62,9 @@ import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import { Icon } from "@iconify/react";
 import useResponsive from "src/hooks/useResponsive";
 import { CustomAvatar } from "src/components/custom-avatar";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
 
 // ----------------------------------------------------------------------
 
@@ -69,6 +73,8 @@ type FormValuesProps = {
   clientRefId: string;
   category: string;
   product: string;
+  startDate: Date | null;
+  endDate: Date | null;
 };
 
 export default function MyTransactions() {
@@ -95,6 +101,8 @@ export default function MyTransactions() {
     status: "",
     clientRefId: "",
     product: "",
+    startDate: null,
+    endDate: null,
   };
 
   const methods = useForm<FormValuesProps>({
@@ -105,6 +113,8 @@ export default function MyTransactions() {
   const {
     reset,
     setError,
+    setValue,
+    watch,
     getValues,
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
@@ -287,8 +297,8 @@ export default function MyTransactions() {
       clientRefId: "",
       status: "",
       transactionType: "",
-      startDate: startDate,
-      endDate: endDate,
+      startDate: dayjs(getValues("startDate")).add(1, "day"),
+      endDate: dayjs(getValues("endDate")).add(1, "day"),
     };
 
     Api(`transaction/transactionByUser`, "POST", body, token).then(
@@ -310,36 +320,36 @@ export default function MyTransactions() {
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.id?.firstName
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.id?.firstName
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.id?.firstName
-                      : "",
+                        ? item?.distributorDetails?.id?.firstName
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.id?.firstName
+                          : "",
 
                   "Opening Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.oldMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.oldMainWalletBalance
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.oldMainWalletBalance
-                      : "",
+                        ? item?.distributorDetails?.oldMainWalletBalance
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.oldMainWalletBalance
+                          : "",
 
                   "Closing Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.newMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.newMainWalletBalance
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.newMainWalletBalance
-                      : "",
+                        ? item?.distributorDetails?.newMainWalletBalance
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.newMainWalletBalance
+                          : "",
                   " Commission Amount":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.commissionAmount
                       : user?._id === item?.distributorDetails?.id?._id
-                      ? item?.distributorDetails?.commissionAmount
-                      : user?._id === item?.masterDistributorDetails?.id?._id
-                      ? item?.masterDistributorDetails?.commissionAmount
-                      : "",
+                        ? item?.distributorDetails?.commissionAmount
+                        : user?._id === item?.masterDistributorDetails?.id?._id
+                          ? item?.masterDistributorDetails?.commissionAmount
+                          : "",
                   amount: item?.amount,
                   credit: item?.credit,
                   debit: item?.debit,
@@ -478,25 +488,29 @@ export default function MyTransactions() {
               </Stack>
             </Stack>
             <Stack direction={"row"} gap={1}>
-              <FileFilterButton
-                isSelected={!!isSelectedValuePicker}
-                startIcon={<Iconify icon="eva:calendar-fill" />}
-                onClick={onOpenPicker}
-              >
-                {`${fDate(startDate)} - ${fDate(endDate)}`}
-              </FileFilterButton>
-              <DateRangePicker
-                variant="input"
-                title="Select Date Range"
-                startDate={startDate}
-                endDate={endDate}
-                onChangeStartDate={onChangeStartDate}
-                onChangeEndDate={onChangeEndDate}
-                open={openPicker}
-                onClose={onClosePicker}
-                isSelected={isSelectedValuePicker}
-                isError={isError}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Start date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("startDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+                <DatePicker
+                  label="End date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("endDate")}
+                  minDate={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("endDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+              </LocalizationProvider>
               <Button variant="contained" onClick={ExportData}>
                 Export
               </Button>
@@ -521,8 +535,8 @@ export default function MyTransactions() {
                       user?.role == "m_distributor"
                         ? tableLabels
                         : user?.role == "distributor"
-                        ? tableLabels1
-                        : tableLabels2
+                          ? tableLabels1
+                          : tableLabels2
                     }
                   />
 
@@ -575,8 +589,13 @@ function TransactionRow({ row }: childProps) {
   const [newRow, setNewRow] = useState(row);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [textFieldValue, setTextFieldValue] = useState('');
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
+
+  const handleTextFieldChange = (event:any) => {
+    setTextFieldValue(event.target.value);
+  };
 
   const CheckTransactionStatus = (row: any) => {
     setLoading(true);
@@ -586,11 +605,11 @@ function TransactionRow({ row }: childProps) {
       rowFor.categoryName.toLowerCase() == "money transfer"
         ? `moneyTransfer/checkStatus/` + rowFor._id
         : rowFor.categoryName.toLowerCase() == "recharges"
-        ? `agents/v1/checkStatus/` + rowFor._id
-        : rowFor.categoryName.toLowerCase() == "dmt2"
-        ? `dmt2/transaction/status/` + rowFor._id
-        : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
-          `settlement/checkStatus/` + rowFor._id,
+          ? `agents/v1/checkStatus/` + rowFor._id
+          : rowFor.categoryName.toLowerCase() == "dmt2"
+            ? `dmt2/transaction/status/` + rowFor._id
+            : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
+            `settlement/checkStatus/` + rowFor._id,
       "GET",
       "",
       token
@@ -766,8 +785,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.oldMainWalletBalance
-                : newRow?.masterDistributorDetails?.oldMainWalletBalance
+                  ? newRow?.distributorDetails?.oldMainWalletBalance
+                  : newRow?.masterDistributorDetails?.oldMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -791,8 +810,8 @@ function TransactionRow({ row }: childProps) {
                 user?.role === "agent"
                   ? newRow?.agentDetails?.creditedAmount
                   : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.creditedAmount
-                  : newRow?.masterDistributorDetails?.creditedAmount
+                    ? newRow?.distributorDetails?.creditedAmount
+                    : newRow?.masterDistributorDetails?.creditedAmount
               ) || 0}
             </Typography>
           </Stack>
@@ -805,8 +824,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.newMainWalletBalance
-                : newRow?.masterDistributorDetails?.newMainWalletBalance
+                  ? newRow?.distributorDetails?.newMainWalletBalance
+                  : newRow?.masterDistributorDetails?.newMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -825,7 +844,7 @@ function TransactionRow({ row }: childProps) {
               TDS :{" "}
               {fCurrency(
                 (user?.role == "agent" && newRow?.agentDetails?.TDSAmount) ||
-                  "0"
+                "0"
               )}
             </Typography>
           </StyledTableCell>
@@ -890,7 +909,6 @@ function TransactionRow({ row }: childProps) {
           <Stack
             flexDirection={"row"}
             justifyContent={"flex-end"}
-            mt={1}
             mx={1}
           >
             <Tooltip title="Close" onClick={closeModal}>
@@ -910,261 +928,252 @@ function TransactionRow({ row }: childProps) {
               onAfterPrint={closeModal}
             />
           </Stack>
-          <Card ref={componentRef} sx={{ p: 3 }}>
-            <Scrollbar sx={{ maxHeight: 600 }}>
-              <Stack sx={{ pr: 2 }}>
+          <Grid ref={componentRef} sx={{ p: 3 }}>
+            <Grid container spacing={0}>
+              <Grid item xs={12} sm={4}>
+                <Stack flexDirection={"row"} gap={1}>
+                  <Typography variant="caption">
+                    Agent Name:{" "}
+                  </Typography>
+                  <Typography variant="caption">
+                    {`${user?.firstName} ${user?.lastName}`}
+                  </Typography>
+                </Stack>
+                <Stack flexDirection={"row"} gap={1}>
+                  <Typography variant="caption">User code: </Typography>
+                  <Typography variant="caption">
+                    {`${user?.userCode}`}
+                  </Typography>
+                </Stack>
+                <Stack flexDirection={"row"} gap={1}>
+                  <Typography variant="caption">
+                    {" "}
+                    Mobile Number:{" "}
+                  </Typography>
+                  <Typography variant="caption">
+                    {user?.contact_no}
+                  </Typography>
+                </Stack>
+                <Stack flexDirection={"row"} gap={1}>
+                  <Typography variant="caption">
+                    {" "}
+                    Shop Name:{" "}
+                  </Typography>
+                  <Typography variant="caption">
+                    {user?.shopAddress}
+                  </Typography>
+                </Stack>
+                <Stack flexDirection={"row"} gap={1} mt={4}>
+                  <Typography variant="caption">
+                    Sender Name :{" "}
+                  </Typography>
+                  <Typography variant="caption">
+                    {newRow?.moneyTransferSenderId?.remitterFN}
+                    {newRow?.moneyTransferSenderId?.remitterLN}{" "}
+                  </Typography>
+                </Stack>
+                <Stack flexDirection={"row"} gap={1}>
+                  <Typography variant="caption">
+                    {" "}
+                    Mobile Number:{" "}
+                  </Typography>
+                  <Typography variant="caption">
+                    {newRow?.moneyTransferSenderId?.remitterMobile}
+                  </Typography>
+                </Stack>
+                <Stack flexDirection={"row"} gap={1}>
+                  <Typography variant="caption">
+                    {" "}
+                    Service Type:{" "}
+                  </Typography>
+                  <Typography variant="caption">
+                    {newRow?.productName}
+                  </Typography>
+                </Stack>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Typography variant="h6">PAYMENT RECEIPT</Typography>
+              </Grid>
+              <Grid item xs={10} sm={4}>
+                <Logo />
+                <Typography variant="body2">
+                  TRX Date: {fDateTime(newRow?.createdAt)}
+                </Typography>
                 <Stack>
-                  {/* shop detail */}
-                  <Stack
-                    flexDirection={{ xs: "column", sm: "row" }}
-                    justifyContent={"space-between"}
-                    mb={1}
-                  >
-                    <Stack>
-                      <Logo />
-                    </Stack>
-                    <Grid sx={{ mt: 1 }}>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          Agent Name:{" "}
-                        </Typography>
-                        <Typography variant="subtitle2">
-                          {`${user?.firstName} ${user?.lastName}`}
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">User code: </Typography>
-                        <Typography variant="subtitle2">
-                          {`${user?.userCode}`}
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          {" "}
-                          Mobile Number:{" "}
-                        </Typography>
-                        <Typography variant="subtitle2">
-                          {user?.contact_no}
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          {" "}
-                          Shop Name:{" "}
-                        </Typography>
-                        <Typography variant="subtitle2">
-                          {user?.shopAddress}
-                        </Typography>
-                      </Stack>
-                    </Grid>
-                  </Stack>
-                  <Divider />
-                  {/* sender & beneficiary  detail */}
-                  <Stack
-                    flexDirection={{ xs: "column", sm: "row" }}
-                    justifyContent={"space-between"}
-                    mt={3}
-                  >
-                    <Grid sx={{ mt: 1 }}>
-                      <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                        Sender Details
-                      </Typography>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          Sender Name :{" "}
-                        </Typography>
-                        <Typography variant="body2">
-                          {newRow?.moneyTransferSenderId?.remitterFN}
-                          {newRow?.moneyTransferSenderId?.remitterLN}{" "}
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          {" "}
-                          Mobile Number:{" "}
-                        </Typography>
-                        <Typography variant="body2">
-                          {newRow?.moneyTransferSenderId?.remitterMobile}
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          {" "}
-                          Service Type:{" "}
-                        </Typography>
-                        <Typography variant="body2">
-                          {newRow?.productName}
-                        </Typography>
-                      </Stack>
-                    </Grid>
-                    <Grid sx={{ mt: 1 }}>
-                      <Typography variant="subtitle1" sx={{ mb: 1 }}>
-                        Benificary Details
-                      </Typography>
+                  <Typography variant="subtitle1">
+                    Benificary Details
+                  </Typography>
 
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          {" "}
-                          Account Holder Name:{" "}
-                        </Typography>
-                        <Typography variant="body2">
-                          {newRow?.moneyTransferBeneficiaryDetails?.beneName}
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          {" "}
-                          Bank Name:{" "}
-                        </Typography>
-                        <Typography variant="body2">
-                          {newRow?.moneyTransferBeneficiaryDetails?.bankName}
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2">
-                          {" "}
-                          Account Number:{" "}
-                        </Typography>
-                        <Typography variant="body2">
-                          {
-                            newRow?.moneyTransferBeneficiaryDetails
-                              ?.accountNumber
-                          }
-                        </Typography>
-                      </Stack>
-                      <Stack flexDirection={"row"} gap={1}>
-                        <Typography variant="subtitle2"> IFSC : </Typography>
-                        <Typography variant="body2">
-                          {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
-                        </Typography>
-                      </Stack>
-                    </Grid>
-                  </Stack>
-                  {/* careated at dat */}
-                  <Stack my={3}>
-                    <Typography variant="subtitle2">
-                      Transaction Date
+                  <Stack flexDirection={"row"}>
+                    <Typography variant="body2">
+                      {" "}
+                      Account Holder Name:{" "}
                     </Typography>
                     <Typography variant="body2">
-                      {fDateTime(newRow?.createdAt)}
+                      {newRow?.moneyTransferBeneficiaryDetails?.beneName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2">
+                      {" "}
+                      Bank Name:{" "}
+                    </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2">
+                      {" "}
+                      Account Number:{" "}
+                    </Typography>
+                    <Typography variant="body2">
+                      {
+                        newRow?.moneyTransferBeneficiaryDetails
+                          ?.accountNumber
+                      }
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> IFSC : </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
                     </Typography>
                   </Stack>
                 </Stack>
-
-                <Typography variant="subtitle1" my={1}>
-                  #Transaction Detail
-                </Typography>
-
-                <TableContainer sx={{ overflow: "unset" }}>
-                  <Table>
-                    <TableRow
-                      sx={{
-                        borderBottom: (theme) =>
-                          `solid 1.5px ${theme.palette.divider}`,
-                      }}
-                    >
-                      <StyledTableCell align="center">
-                        <Typography variant="subtitle1">
-                          Transaction Id
-                        </Typography>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Typography variant="subtitle1">Service</Typography>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Typography variant="subtitle1">UTR</Typography>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Typography variant="subtitle1">Status</Typography>
-                      </StyledTableCell>
-                      <StyledTableCell align="center">
-                        <Typography variant="subtitle1">Amount</Typography>
-                      </StyledTableCell>
-                    </TableRow>
-
-                    <TableBody>
+              </Grid>
+            </Grid>
+            <Grid>
+              <Scrollbar sx={{ maxHeight: 600 }}>
+                <Stack sx={{ pr: 2 }}>
+                  <TableContainer sx={{ overflow: "unset", border: "solid 1px" }}>
+                    <Table>
                       <TableRow
                         sx={{
                           borderBottom: (theme) =>
                             `solid 1.5px ${theme.palette.divider}`,
                         }}
                       >
-                        <TableCell align="left">
-                          <Typography variant="body2" noWrap>
-                            {newRow?.clientRefId}
+                        <StyledTableCell align="center">
+                          <Typography variant="subtitle2">
+                            Transaction Id
                           </Typography>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2" noWrap>
-                            {newRow?.productName}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="center">
-                          <Typography variant="body2" noWrap>
-                            {newRow?.vendorUtrNumber || "-"}
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell align="center">
-                          <Label
-                            variant="soft"
-                            color={
-                              (newRow.status === "failed" && "error") ||
-                              ((newRow.status === "pending" ||
-                                newRow.status === "in_process") &&
-                                "warning") ||
-                              "success"
-                            }
-                            sx={{ textTransform: "capitalize" }}
-                          >
-                            {newRow.status ? sentenceCase(newRow.status) : ""}
-                          </Label>
-                        </TableCell>
-                        <TableCell align="center">
-                          <Typography variant="body2" noWrap>
-                            Rs.{fCurrency(newRow?.amount)}
-                          </Typography>
-                        </TableCell>
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          <Typography variant="subtitle2">Service</Typography>
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          <Typography variant="subtitle2">UTR</Typography>
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          <Typography variant="subtitle2">Status</Typography>
+                        </StyledTableCell>
+                        <StyledTableCell align="center">
+                          <Typography variant="subtitle2">Amount</Typography>
+                        </StyledTableCell>
                       </TableRow>
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-                <Stack my={2}>
-                  <Typography align="right" variant="h6" whiteSpace={"nowrap"}>
-                    Total Amount : {" " + fCurrency(newRow.amount)}
-                  </Typography>
+
+                      <TableBody>
+                        <TableRow
+                          sx={{
+                            borderBottom: (theme) =>
+                              `solid 1.5px ${theme.palette.divider}`,
+                          }}
+                        >
+                          <TableCell align="left">
+                            <Typography variant="body2" noWrap>
+                              {newRow?.clientRefId}
+                            </Typography>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography variant="body2" noWrap>
+                              {newRow?.productName}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell align="center">
+                            <Typography variant="body2" noWrap>
+                              {newRow?.vendorUtrNumber || "-"}
+                            </Typography>
+                          </TableCell>
+
+                          <TableCell align="center">
+                            <Label
+                              variant="soft"
+                              color={
+                                (newRow.status === "failed" && "error") ||
+                                ((newRow.status === "pending" ||
+                                  newRow.status === "in_process") &&
+                                  "warning") ||
+                                "success"
+                              }
+                              sx={{ textTransform: "capitalize" }}
+                            >
+                              {newRow.status ? sentenceCase(newRow.status) : ""}
+                            </Label>
+                          </TableCell>
+                          <TableCell align="center">
+                            <Typography variant="body2" noWrap>
+                              Rs.{fCurrency(newRow?.amount)}
+                            </Typography>
+                          </TableCell>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                  <Stack >
+                    <Typography align="left" variant="body2" whiteSpace={"nowrap"}>
+                      Transaction Amount : {" " + fCurrency(newRow.amount)}
+                    </Typography>
+                    <Typography align="left" variant="body2" whiteSpace={"nowrap"}>
+                      Agent Convienience Fee:    <TextField
+                        variant="standard"
+                        size="small"
+                        value={textFieldValue}
+                        onChange={handleTextFieldChange}
+                      /> 
+                    </Typography>
+                    <Grid item xs={12} md={9}>
+                        <Typography variant="caption">The convienience fee charged is the sole responsibility of the Agent. Tramo assumes no libiility for the imposition of this fee and any associated consequences or issues arising from its application rest entirely with the Agent </Typography>
+                      </Grid>
+                    <Typography align="left" variant="body1" whiteSpace={"nowrap"}>Total Amount:{`${+textFieldValue + +newRow.amount}`}</Typography>
+                  </Stack>
+                  <Typography variant="subtitle2">NOTES</Typography>
+                  <Grid container>
+                    <Grid item xs={12} md={9}>
+                      <Typography variant="caption">
+                        This transaction receipt is generated automatically and
+                        dose not require a physical signature. It is not a tax
+                        invoice but serves as a record of your transaction with
+                        Tramo. Please retain it for your refrence, and if you have
+                        any queries, fell free to contact our Customer Support
+                        team.
+                      </Typography>
+                      <Typography>
+                        <Stack
+                          flexDirection={{ xs: "column", sm: "row" }}
+                          sx={{ color: "white", bgcolor: "darkblue", pt: 1, pb: 1 }}
+                          justifyContent="space-between"
+                        >
+                          <Typography variant="caption">
+                            Helpline Numbers +{process.env.REACT_APP_COMPANY_MOBILE} ,{" "}
+                            {process.env.REACT_APP_COMPANY_MOBILEOTHER}
+                          </Typography>
+                          <Typography variant="caption">
+                            Timings : 08:00AM to 10:00 PM (Mon-Sun)
+                          </Typography>
+                          <Typography variant="caption">
+                            {process.env.REACT_APP_COMPANY_EMAIL}
+                          </Typography>
+                        </Stack>
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Stack>
-
-                <Divider sx={{ mt: 5 }} />
-
-                <Grid container>
-                  <Grid item xs={12} md={9} sx={{ py: 3 }}>
-                    <Typography variant="subtitle2">NOTES</Typography>
-
-                    <Typography variant="body2">
-                      This transaction receipt is generated automatically and
-                      dose not require a physical signature. It is not a tax
-                      invoice but serves as a record of your transaction with
-                      Tramo. Please retain it for your refrence, and if you have
-                      any queries, fell free to contact our Customer Support
-                      team.
-                    </Typography>
-                  </Grid>
-
-                  <Grid item xs={12} md={3} sx={{ py: 3, textAlign: "right" }}>
-                    <Typography variant="subtitle2">
-                      Have a Question?
-                    </Typography>
-
-                    <Typography variant="body2">
-                      {process.env.REACT_APP_COMPANY_EMAIL}
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Stack>
-            </Scrollbar>
-          </Card>
+              </Scrollbar>
+            </Grid>
+            <Divider variant="fullWidth" style={{ borderWidth: '2px', borderStyle: 'dashed '}} />
+          </Grid>
         </Grid>
       </Modal>
     </>

@@ -71,7 +71,7 @@ export default function RHFCodes({
               {...field}
               size="small"
               error={!!error}
-              autoFocus={index === 0}
+              // autoFocus={index === 0}
               placeholder="-"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 handleChangeWithNextField(event, field.onChange);
