@@ -170,13 +170,8 @@ export default function FundFlow() {
       clientRefId: data.clientRefId,
       status: data.status,
       transactionType: "",
-<<<<<<< HEAD
       startDate: formattedStart,
       endDate: formattedSEndDate,
-=======
-      startDate: dayjs(getValues("startDate")).add(1, "day"),
-      endDate: dayjs(getValues("endDate")).add(1, "day"),
->>>>>>> 73d1736 (update code)
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {

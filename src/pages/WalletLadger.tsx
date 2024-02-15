@@ -53,11 +53,7 @@ import FormProvider, {
   RHFTextField,
 } from "src/components/hook-form";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
-<<<<<<< HEAD
 import MotionModal from "src/components/animate/MotionModal";
-=======
-import dayjs from "dayjs";
->>>>>>> 73d1736 (update code)
 
 // ----------------------------------------------------------------------
 
@@ -201,13 +197,8 @@ export default function WalletLadger() {
         currentPage: currentPage,
       },
       clientRefId: getValues("clientRefId") || "",
-<<<<<<< HEAD
       startDate: formattedStart || "",
       endDate: formattedSEndDate || "",
-=======
-      startDate: dayjs(getValues("startDate")).add(1, "day"),
-      endDate: dayjs(getValues("endDate")).add(1, "day"),
->>>>>>> 73d1736 (update code)
     };
     Api(`agent/walletLedger`, "POST", body, token).then((Response: any) => {
       console.log("======Transaction==response=====>" + Response);
