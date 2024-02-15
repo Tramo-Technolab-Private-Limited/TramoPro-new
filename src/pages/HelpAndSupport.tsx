@@ -36,8 +36,8 @@ function HelpAndSupport() {
             }}
           >
             <EmailIcon /> E-mail :
-            <a href={`mailto:${process.env.react_app_company_email}`}>
-              {process.env.react_app_company_email}
+            <a href={`mailto:${process.env.REACT_APP_COMPANY_EMAIL}`}>
+              {process.env.REACT_APP_COMPANY_EMAIL}
             </a>
           </Typography>
         </Stack>
