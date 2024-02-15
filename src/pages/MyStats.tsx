@@ -37,8 +37,7 @@ export default function MyStats(props: any) {
   const theme = useTheme();
 
   const logo = [Group321, Group320, Frame10, Frame9, isolationMode, intersect];
-  const [categoryList, setCategoryList] = useState([]);
-  const [superCurrentTab, setSuperCurrentTab] = useState("");
+ 
 
   const [Success, setSuccess] = useState<any>({
     status: "Success",
