@@ -39,7 +39,6 @@ export const PATH_DASHBOARD = {
   },
   fundmanagement: {
     root: path(ROOTS_DASHBOARD, "/fundmanagement"),
-    myfunddeposit: path(ROOTS_DASHBOARD, "/fundmanagement/myfunddeposit"),
     myfunddeposits: path(ROOTS_DASHBOARD, "/fundmanagement/myfunddeposits"),
     mybankaccount: path(ROOTS_DASHBOARD, "/fundmanagement/mybankaccount"),
     aepssettlement: path(ROOTS_DASHBOARD, "/fundmanagement/aepssettlement"),

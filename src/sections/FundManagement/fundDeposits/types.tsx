@@ -66,6 +66,8 @@ export type fundRequestProps = {
       address: string;
     };
     _id: string;
+    min_Deposit_Amount: string;
+    max_Deposit_Amount: string;
     modes_of_transfer: {
       transactionFeeType: string;
       _id: string;
@@ -73,6 +75,7 @@ export type fundRequestProps = {
   };
   modeId: {
     transfer_mode_name: string;
+    _id: string;
   };
   Charge: string;
   Commission: string;
@@ -81,6 +84,8 @@ export type fundRequestProps = {
   amount: string;
   transactional_details: {
     mobile: string;
+    branch: string;
+    trxId: string;
   };
   transactionSlip: string;
   isEditable: false;

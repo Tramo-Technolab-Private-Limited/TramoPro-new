@@ -1,11 +1,8 @@
 import {
-  Box,
   Button,
   Card,
-  FormHelperText,
   MenuItem,
   Stack,
-  TextField,
   Typography,
   styled,
 } from "@mui/material";
@@ -20,7 +17,7 @@ import FormProvider, {
 } from "../../../components/hook-form";
 import { useContext, useEffect, useState } from "react";
 import { BankAccountContext } from "../MyFundDeposite";
-import { bankAccountProps, paymentModesProps } from "./types";
+import { bankAccountProps, fundRequestProps, paymentModesProps } from "./types";
 import { LoadingButton } from "@mui/lab";
 
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -65,7 +62,6 @@ type FormValuesProps = {
     address: string;
     min_Deposit_Amount: string;
     max_Deposit_Amount: string;
-
     _id: string;
   };
   modesDetail: {
@@ -89,7 +85,7 @@ type FormValuesProps = {
   feeCalc: string;
   paymentModeId: string;
   amount: string;
-  date: Date | null;
+  date: Date | string | null;
   branchName: string;
   mobileNumber: string;
   txnId: string;
@@ -99,14 +95,19 @@ type FormValuesProps = {
 };
 
 type props = {
+  preData: fundRequestProps;
+  handleClose: VoidFunction;
   getRaisedRequest: VoidFunction;
 };
 
-function NewFundRequest({ getRaisedRequest }: props) {
+function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
+  console.log(preData);
   const bankListContext = useContext(BankAccountContext);
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
-  const [paymentModes, setPaymentModes] = useState<any>([]);
+  const [paymentModes, setPaymentModes] = useState<any>(
+    preData.bankId.modes_of_transfer || []
+  );
 
   const fundRequestSchema = Yup.object().shape({
     bank_details: Yup.object().shape({
@@ -121,29 +122,28 @@ function NewFundRequest({ getRaisedRequest }: props) {
     mobileNumber: Yup.string().required("Mobile number field is required"),
     txnId: Yup.string()
       .when("modesDetail.modeName", {
-        is: "RTGS",
-        then: Yup.string().required("Transaction ID is required"),
-      })
-      .when("modesDetail.modeName", {
-        is: "IMPS",
-        then: Yup.string().required("Transaction ID is required"),
-      })
-      .when("modesDetail.modeName", {
-        is: "NEFT",
-        then: Yup.string().required("Transaction ID is required"),
-      })
-      .when("modesDetail.modeName", {
-        is: "Fund Transfer",
-        then: Yup.string().required("Transaction ID is required"),
-      }),
-
-    filePath: Yup.string()
-      .when("modesDetail.modeName", {
         is: "Cash deposit at branch",
-        then: Yup.string().required("Please Select Slip"),
+        then: Yup.string().required("Transaction ID is required"),
       })
       .when("modesDetail.modeName", {
         is: "Cash deposit at CDM",
+        then: Yup.string().required("Transaction ID is required"),
+      }),
+    filePath: Yup.string()
+      .when("modesDetail.modeName", {
+        is: "RTGS",
+        then: Yup.string().required("Please Select Slip"),
+      })
+      .when("modesDetail.modeName", {
+        is: "IMPS",
+        then: Yup.string().required("Please Select Slip"),
+      })
+      .when("modesDetail.modeName", {
+        is: "NEFT",
+        then: Yup.string().required("Please Select Slip"),
+      })
+      .when("modesDetail.modeName", {
+        is: "Fund Transfer",
         then: Yup.string().required("Please Select Slip"),
       }),
     remarks: Yup.string().required("Remark Field is required"),
@@ -151,25 +151,33 @@ function NewFundRequest({ getRaisedRequest }: props) {
 
   const defaultValues = {
     bank_details: {
-      ifsc: "",
-      account_number: "",
-      bank_name: "",
-      branch_name: "",
-      address: "",
-      min_Deposit_Amount: "",
-      max_Deposit_Amount: "",
-      _id: "",
+      ifsc: preData.bankId.bank_details.ifsc,
+      account_number: preData.bankId.bank_details.account_number,
+      bank_name: preData.bankId.bank_details.bank_name,
+      branch_name: preData.bankId.bank_details.branch_name,
+      address: preData.bankId.bank_details.address,
+      min_Deposit_Amount: preData.bankId.min_Deposit_Amount,
+      max_Deposit_Amount: preData.bankId.max_Deposit_Amount,
+      _id: preData.bankId._id,
     },
     feeCalc: "",
-    paymentModeId: "",
+    modesDetail: preData.bankId.modes_of_transfer.filter(
+      (item: any) => item.modeId == preData.modeId._id
+    )[0],
+    paymentModeId: (
+      preData.bankId.modes_of_transfer.filter(
+        (item: any) => item.modeId == preData.modeId._id
+      )[0] as any
+    ).modeId,
     transactionFeeType: "",
-    amount: "",
-    date: new Date(),
-    branchName: "",
-    mobileNumber: "",
-    txnId: "",
-    filePath: "",
-    remarks: "",
+    amount: preData.amount,
+    date: preData.date_of_deposit,
+    branchName: preData.transactional_details.branch,
+    mobileNumber: preData.transactional_details.mobile,
+    txnId: preData.transactional_details.trxId,
+    filePath: preData.transactionSlip,
+    secureFilePath: AwsDocSign(preData.transactionSlip),
+    remarks: preData.comments,
   };
 
   const methods = useForm<FormValuesProps>({
@@ -185,9 +193,18 @@ function NewFundRequest({ getRaisedRequest }: props) {
     formState: { errors, isSubmitting },
   } = methods;
 
-  console.log(
-    errors?.filePath?.type == "required" && errors?.filePath?.message
-  );
+  useEffect(() => {
+    const s3 = new AWS.S3();
+    const params = {
+      Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
+      Key: preData.transactionSlip?.split("/").splice(4, 4).join("/"),
+      Expires: 600, // Expiration time in seconds
+    };
+
+    s3.getSignedUrl("getObject", params, (err: any, url: any) => {
+      setValue("secureFilePath", url);
+    });
+  }, []);
 
   //upload file
   const handleFile = (e: any) => {
@@ -249,20 +266,23 @@ function NewFundRequest({ getRaisedRequest }: props) {
       transactionSlip: data.filePath,
     };
 
-    Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            console.log(Response.data.data);
-            reset(defaultValues);
-            getRaisedRequest();
-            enqueueSnackbar(Response.data.message);
-          } else {
-            enqueueSnackbar(Response.data.message);
-          }
+    Api(
+      `agent/fundManagement/updateRaisedRequests/${preData._id}`,
+      "POST",
+      body,
+      token
+    ).then((Response: any) => {
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          reset(defaultValues);
+          getRaisedRequest();
+          enqueueSnackbar(Response.data.message);
+        } else {
+          enqueueSnackbar(Response.data.message);
         }
+        handleClose();
       }
-    );
+    });
   };
 
   //calculate fee
@@ -288,19 +308,17 @@ function NewFundRequest({ getRaisedRequest }: props) {
   }, [watch("amount")]);
 
   const calculateFee = (type: any, value: any, option: any) => {
-    console.log(value, option);
     let amount: any = getValues("amount");
-
     if (option == "flat") setValue("feeCalc", value);
     if (option == "percentage")
       setValue("feeCalc", String((Number(amount) * Number(value)) / 100));
   };
 
   return (
-    <Card sx={{ p: 2, bgcolor: "primary.lighter", height: "100%" }}>
-      <Typography variant="subtitle1">New Fund Request</Typography>
+    <>
+      <Typography variant="subtitle1">Update Fund Request</Typography>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-        <Stack justifyContent={"space-between"} gap={2} mt={2}>
+        <Stack gap={2} mt={2}>
           <RHFSelect
             name="bank_details.bank_name"
             label="Select Bank Account"
@@ -320,16 +338,14 @@ function NewFundRequest({ getRaisedRequest }: props) {
                       min_Deposit_Amount: item.min_Deposit_Amount,
                       max_Deposit_Amount: item.max_Deposit_Amount,
                     });
-
                     setPaymentModes(item.modes_of_transfer);
                   }}
                 >
-                  {`${item?.bank_details?.bank_name} (Ending with ${
-                    "*".repeat(item.bank_details.account_number.length - 4) +
-                    item.bank_details.account_number.slice(
-                      item.bank_details.account_number.length - 4
-                    )
-                  })`}
+                  {`${
+                    item?.bank_details?.bank_name
+                  } (Ending with ${item.bank_details.account_number.slice(
+                    item.bank_details.account_number.length - 4
+                  )})`}
                 </MenuItem>
               );
             })}
@@ -361,10 +377,10 @@ function NewFundRequest({ getRaisedRequest }: props) {
             {watch("bank_details.min_Deposit_Amount") &&
               watch("bank_details.max_Deposit_Amount") && (
                 <>
-                  <Typography variant="caption" ml={2}>
+                  <Typography variant="caption" ml={1}>
                     {convertToWords(+watch("amount") || 0)}
                   </Typography>
-                  <Typography variant="caption" ml={2}>
+                  <Typography variant="caption" ml={1}>
                     Please enter amount between{" "}
                     <strong>
                       {" "}
@@ -378,7 +394,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
               watch("amount") !== null && (
                 <Typography
                   variant="caption"
-                  ml={2}
+                  ml={1}
                   sx={{
                     color:
                       watch("modesDetail.transactionFeeType") == "Charge"
@@ -395,17 +411,12 @@ function NewFundRequest({ getRaisedRequest }: props) {
             <DatePicker
               label="Start date"
               inputFormat="DD/MM/YYYY"
-              value={dayjs(watch("date"))}
+              value={watch("date")}
               maxDate={new Date()}
               minDate={dayjs(new Date()).subtract(4, "day") as any}
               onChange={(newValue: any) => setValue("date", newValue)}
               renderInput={(params: any) => (
-                <RHFTextField
-                  name="date"
-                  type="date"
-                  size="small"
-                  {...params}
-                />
+                <RHFTextField name="date" size="small" {...params} />
               )}
             />
           </LocalizationProvider>
@@ -420,58 +431,31 @@ function NewFundRequest({ getRaisedRequest }: props) {
           </Stack>
 
           {/* file upload */}
-          <Stack>
-            <Typography
-              component="label"
-              role={undefined}
-              tabIndex={-1}
-              sx={{
-                border: `1px solid ${
-                  errors?.filePath?.type == "required"
-                    ? "red"
-                    : "rgba(145, 158, 171, 0.32)"
-                } `,
-                borderRadius: 1,
-                p: 1,
-                px: 2,
-                cursor: "pointer",
-              }}
-            >
-              <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                <Typography
-                  sx={{
-                    color:
-                      errors?.filePath?.type == "required"
-                        ? "error.main"
-                        : "#919EAB",
-                  }}
-                >
-                  Receipt Upload{" "}
-                </Typography>
-                <Stack flexDirection={"row"} gap={1}>
-                  <UploadIcon
-                    sx={{
-                      alignSelf: "end",
-                    }}
-                    color={
-                      errors?.filePath?.type == "required" ? "red" : "default"
-                    }
-                  />
-                </Stack>
+          <Typography
+            component="label"
+            role={undefined}
+            tabIndex={-1}
+            sx={{
+              border: "1px solid rgba(145, 158, 171, 0.32)",
+              borderRadius: 1,
+              p: 1,
+              px: 2,
+              cursor: "pointer",
+            }}
+          >
+            <Stack flexDirection={"row"} justifyContent={"space-between"}>
+              <Typography sx={{ color: "#919EAB" }}>Receipt Upload </Typography>
+              <Stack flexDirection={"row"} gap={1}>
+                <UploadIcon sx={{ alignSelf: "end" }} />
               </Stack>
+            </Stack>
 
-              <VisuallyHiddenInput
-                type="file"
-                accept="image/*"
-                onChange={handleFile}
-              />
-            </Typography>
-            {errors?.filePath?.type == "required" && (
-              <FormHelperText sx={{ ml: 2 }} error>
-                {errors?.filePath?.message}
-              </FormHelperText>
-            )}
-          </Stack>
+            <VisuallyHiddenInput
+              type="file"
+              accept="image/*"
+              onChange={handleFile}
+            />
+          </Typography>
 
           {/* image preview */}
           {watch("secureFilePath") && (
@@ -481,18 +465,22 @@ function NewFundRequest({ getRaisedRequest }: props) {
           )}
 
           <RHFTextField name="remarks" label="Remarks" />
-
-          <LoadingButton
-            variant="contained"
-            type="submit"
-            loading={isSubmitting}
-          >
-            Submit
-          </LoadingButton>
+          <Stack flexDirection={"row"} gap={1}>
+            <LoadingButton
+              variant="contained"
+              type="submit"
+              loading={isSubmitting}
+            >
+              Update
+            </LoadingButton>
+            <LoadingButton variant="contained" onClick={handleClose}>
+              Cancel
+            </LoadingButton>
+          </Stack>
         </Stack>
       </FormProvider>
-    </Card>
+    </>
   );
 }
 
-export default React.memo(NewFundRequest);
+export default React.memo(UpdateFundRequest);

@@ -81,10 +81,6 @@ const agentNavConfig = [
         icon: ICONS.user,
         children: [
           {
-            title: "My Fund Deposit",
-            path: PATH_DASHBOARD.fundmanagement.myfunddeposit,
-          },
-          {
             title: "My Fund Deposits",
             path: PATH_DASHBOARD.fundmanagement.myfunddeposits,
           },

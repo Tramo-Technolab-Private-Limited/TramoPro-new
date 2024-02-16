@@ -1,4 +1,4 @@
-import { Grid, Paper, styled } from "@mui/material";
+import { Box, Grid, Paper, styled } from "@mui/material";
 import React, { createContext, useEffect, useState } from "react";
 import {
   CompanyBankAccounts,
@@ -8,7 +8,8 @@ import {
 } from "./fundDeposits";
 import { Api } from "src/webservices";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
-import { formatDistanceToNow } from "date-fns";
+import { m, AnimatePresence } from "framer-motion";
+import { MotionContainer, varBounce, varSlide } from "src/components/animate";
 
 export const BankAccountContext = createContext([]);
 
@@ -55,33 +56,39 @@ export default function MyFundDeposite() {
     );
   };
 
-  console.log(
-    new Date(1710069968596)
-    // formatDistanceToNow(new Date(1708069968596), {
-    //   includeSeconds: true,
-    // })
-  );
-
   return (
-    <BankAccountContext.Provider value={bankList}>
-      <Scrollbar sx={{ maxHeight: window.innerHeight - 120, p: 2 }}>
-        <Grid container spacing={2} p={1}>
-          <Grid item sm={12} md={4}>
-            <NewFundRequest getRaisedRequest={getFundReq} />
-          </Grid>
-          <Grid item spacing={2} sm={12} md={8}>
-            <Grid item mb={2}>
-              <CompanyBankAccounts />
+    <MotionContainer>
+      <BankAccountContext.Provider value={bankList}>
+        <Scrollbar sx={{ maxHeight: window.innerHeight - 120, p: 2 }}>
+          <Grid container spacing={2} p={1}>
+            <Grid item sm={12} md={4} sx={{ height: "100%" }}>
+              <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+                <NewFundRequest getRaisedRequest={getFundReq} />
+              </m.div>
             </Grid>
-            <Grid item>
-              <InstantDepositAccounts />
+            <Grid item spacing={2} sm={12} md={8}>
+              <Grid item mb={2}>
+                <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+                  <CompanyBankAccounts />
+                </m.div>
+              </Grid>
+              <Grid item>
+                <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+                  <InstantDepositAccounts />
+                </m.div>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+                <FundDepositeTable
+                  tableData={tableData}
+                  getRaisedRequest={getFundReq}
+                />
+              </m.div>
             </Grid>
           </Grid>
-          <Grid item xs={12}>
-            <FundDepositeTable tableData={tableData} />
-          </Grid>
-        </Grid>
-      </Scrollbar>
-    </BankAccountContext.Provider>
+        </Scrollbar>
+      </BankAccountContext.Provider>
+    </MotionContainer>
   );
 }

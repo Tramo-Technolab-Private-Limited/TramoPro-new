@@ -27,7 +27,6 @@ import {
   WalletLadger,
   Scheme,
   BBPSScheme,
-  MyFundDeposits,
   MyBankAccount,
   AEPSsettlement,
   MyFundRequest,
@@ -37,7 +36,7 @@ import {
   ManageFundFlow,
   MyNetwrokFunds,
   UserProfilePage,
-  MyFundDeposit,
+  MyFundDeposits,
 } from "./elements";
 
 // ----------------------------------------------------------------------
@@ -149,7 +148,6 @@ export default function Router() {
               ),
               index: true,
             },
-            { path: "myfunddeposit", element: <MyFundDeposit /> },
             { path: "myfunddeposits", element: <MyFundDeposits /> },
             { path: "mybankaccount", element: <MyBankAccount /> },
             { path: "aepssettlement", element: <AEPSsettlement /> },
