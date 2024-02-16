@@ -16,6 +16,7 @@ export type AuthUserType = null | Record<string, any>;
 export type AuthStateType = {
   isAuthenticated: boolean;
   isInitialized: boolean;
+  logOut: boolean;
   user: AuthUserType;
 };
 
@@ -25,6 +26,7 @@ export type JWTContextType = {
   method: "jwt";
   isAuthenticated: boolean;
   isInitialized: boolean;
+  logOut: boolean;
   location: any;
   user: AuthUserType;
   login: (token: string, user: any) => Promise<void>;

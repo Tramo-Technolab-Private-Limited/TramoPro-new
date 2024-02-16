@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 // @mui
 import { Box, Stack, Drawer, Button } from "@mui/material";
 // hooks
@@ -19,6 +19,7 @@ import distributorNavConfig from "./distributorconfig";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Label from "src/components/label/Label";
 import { fCurrency } from "src/utils/formatNumber";
+import { PATH_AUTH } from "src/routes/paths";
 
 // ----------------------------------------------------------------------
 
@@ -29,6 +30,7 @@ type Props = {
 
 export default function NavVertical({ openNav, onCloseNav }: Props) {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { user, logout } = useAuthContext();
 
   const isDesktop = useResponsive("up", "lg");

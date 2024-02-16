@@ -61,8 +61,11 @@ export default function MyFundDeposite() {
       <BankAccountContext.Provider value={bankList}>
         <Scrollbar sx={{ maxHeight: window.innerHeight - 120, p: 2 }}>
           <Grid container spacing={2} p={1}>
-            <Grid item sm={12} md={4} sx={{ height: "100%" }}>
-              <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+            <Grid item sm={12} md={4}>
+              <m.div
+                variants={varBounce({ durationIn: 1.1 }).in}
+                style={{ height: "100%" }}
+              >
                 <NewFundRequest getRaisedRequest={getFundReq} />
               </m.div>
             </Grid>

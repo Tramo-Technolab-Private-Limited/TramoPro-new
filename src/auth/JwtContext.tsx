@@ -61,6 +61,7 @@ type ActionsType = ActionMapType<Payload>[keyof ActionMapType<Payload>];
 const initialState: AuthStateType = {
   isInitialized: false,
   isAuthenticated: false,
+  logOut: false,
   user: null,
 };
 
@@ -68,6 +69,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
   if (action.type === Types.INITIAL) {
     return {
       isInitialized: true,
+      logOut: false,
       isAuthenticated: action.payload.isAuthenticated,
       user: action.payload.user,
     };
@@ -76,6 +78,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: true,
+      logOut: false,
       user: action.payload.user,
     };
   }
@@ -83,6 +86,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: true,
+      logOut: false,
       user: action.payload.user,
     };
   }
@@ -90,6 +94,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: true,
+      logOut: false,
       user: action.payload.user,
     };
   }
@@ -97,6 +102,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: true,
+      logOut: false,
       user: action.payload.user,
     };
   }
@@ -104,6 +110,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: false,
+      logOut: true,
       user: null,
     };
   }
@@ -174,13 +181,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         });
       }
     } catch (error) {
-      console.error(error);
       dispatch({
-        type: Types.INITIAL,
-        payload: {
-          isAuthenticated: false,
-          user: null,
-        },
+        type: Types.LOGOUT,
       });
     }
     navigator.geolocation.getCurrentPosition(

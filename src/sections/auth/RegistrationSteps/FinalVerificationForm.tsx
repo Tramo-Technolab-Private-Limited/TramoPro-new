@@ -49,7 +49,7 @@ import { Icon } from "@iconify/react";
 // ----------------------------------------------------------------------
 import { Api, UploadFile } from "src/webservices";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { STEP_DASHBOARD } from "src/routes/paths";
+import { PATH_AUTH, STEP_DASHBOARD } from "src/routes/paths";
 import Image from "src/components/image/Image";
 //image compressor
 import Compressor from "compressorjs";
@@ -72,7 +72,7 @@ const s3 = new AWS.S3();
 export default function FinalVerificationForm(props: any) {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState<any>(0);
-  const { user } = useAuthContext();
+  const { user, logout } = useAuthContext();
 
   useEffect(() => {
     if (user?.finalStatus == "approved" && user?.isNPIN == false) {
@@ -1542,7 +1542,7 @@ function PersonalIdentification(props: any) {
 
 function ConstitutionIdentification() {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail, initialize } = useAuthContext();
+  const { user, UpdateUserDetail, initialize, logout } = useAuthContext();
 
   //Gst Certificate
 
@@ -3747,10 +3747,7 @@ function ConstitutionIdentification() {
               style={{ width: "200px" }}
               variant="contained"
               size="large"
-              onClick={() => {
-                navigate("/login");
-                localStorage.clear();
-              }}
+              onClick={logout}
             >
               Logout
             </Button>

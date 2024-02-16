@@ -15,13 +15,18 @@ type AuthGuardProps = {
 };
 
 export default function AuthGuard({ children }: AuthGuardProps) {
-  const { isAuthenticated, isInitialized, user, location } = useAuthContext();
+  const { isAuthenticated, isInitialized, user, location, logOut } =
+    useAuthContext();
 
   const { pathname } = useLocation();
 
   const [requestedLocation, setRequestedLocation] = useState<string | null>(
     null
   );
+
+  if (logOut) {
+    return <Navigate to={"/login"} />;
+  }
 
   if (!isInitialized) {
     return <LoadingScreen />;
