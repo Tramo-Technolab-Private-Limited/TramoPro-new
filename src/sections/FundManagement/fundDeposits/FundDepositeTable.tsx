@@ -116,7 +116,9 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
         <Label
           variant="soft"
           color={
-            (row.status.toLowerCase() === "failed" && "error") ||
+            ((row.status.toLowerCase() === "failed" ||
+              row.status.toLowerCase() === "rejected") &&
+              "error") ||
             ((row.status.toLowerCase() === "pending" ||
               row.status.toLowerCase() === "in_process") &&
               "warning") ||
