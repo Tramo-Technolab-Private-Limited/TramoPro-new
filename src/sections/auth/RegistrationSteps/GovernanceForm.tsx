@@ -42,7 +42,9 @@ type FormValuesProps = {
   address: string;
   stateJurisdiction: string;
   panNumber: string;
-  ShopName: string;
+  village: string;
+  district: string;
+  pinCode: string;
   taxpayerType: string;
   Status: string;
   gstNumber: string;
@@ -69,6 +71,7 @@ export default function GovernanceForm(props: any) {
     status: "",
     address: "",
   });
+  const [saveGst, setGSTSave] = React.useState(false);
   const [radioVal, setRadioVal] = React.useState("");
   const [loading, setLoading] = React.useState(false);
   const [remainingAttempt, setRemainingAttempt] = React.useState(null);
@@ -135,20 +138,10 @@ export default function GovernanceForm(props: any) {
     BusinessName: Yup.string().required("Business Name is required"),
     address: Yup.string().required("Address is required"),
     stateJurisdiction: Yup.string().required("State is required"),
-    ShopName:
-      radioVal == "Individual" && !user?.isGSTVerified
-        ? Yup.string().required("State is required")
-        : Yup.string(),
-    panNumber:
-      radioVal !== "Individual"
-        ? Yup.string()
-            .required("PAN Card Number required")
-            .uppercase()
-            .matches(/[0-9]/, "Enter valid PAN")
-            .matches(/[A-Z]/, "Enter valid PAN")
-            .max(10)
-            .length(10, "Enter Valid PAN Number")
-        : Yup.string(),
+    village: Yup.string().required("State is required"),
+
+    district: Yup.string().required("district is required"),
+    pinCode: Yup.string().required("Pin Code is required"),
   });
 
   const defaultValues = {
@@ -161,7 +154,7 @@ export default function GovernanceForm(props: any) {
     village: "",
     district: "",
     stateJurisdiction: "",
-    pin: "",
+    pinCode: "",
   };
 
   const method2 = useForm<FormValuesProps>({
@@ -179,6 +172,7 @@ export default function GovernanceForm(props: any) {
   const {
     reset: reset2,
     register,
+    trigger,
     handleSubmit: handleFormSubmit,
     formState: { errors: error2, isSubmitting: isSubmitting2 },
   } = method2;
@@ -258,16 +252,26 @@ export default function GovernanceForm(props: any) {
   };
 
   const formSubmit = (data: FormValuesProps) => {
+    console.log(
+      "log...............................................",
+      data.BusinessName,
+      data.district,
+      data.address,
+      data.village,
+      data.pinCode
+    );
+
     let token = localStorage.getItem("token");
     if (radioVal !== "") {
       let body = {
         business_name: data.BusinessName,
         state_jurisdiction: data.stateJurisdiction,
         taxpayer_type: data.taxpayerType,
-
-        // pan_number: data.panNumber,
-        // gst_number: data.gstNumber,
-        company_name: data.ShopName,
+        district: data.district,
+        business_pincode: data.pinCode,
+        vtc: data.village,
+        gst_number: data.gstNumber,
+        // company_name: data.village,
         status: data.Status,
         userId: user?._id,
         constitution_type: radioVal,
@@ -285,6 +289,9 @@ export default function GovernanceForm(props: any) {
             localStorage.setItem("PANnumber", data.pan);
             localStorage.setItem("gst", data.gstNumber);
             localStorage.setItem("address", data.address);
+            localStorage.setItem("district", data?.district);
+            localStorage.setItem("village", data.village);
+            localStorage.setItem("pinCode", data.pinCode);
             localStorage.setItem("status", data.Status);
             localStorage.setItem("constition", radioVal);
             UpdateUserDetail({
@@ -362,9 +369,34 @@ export default function GovernanceForm(props: any) {
     reset(gstDeatil);
   };
 
-  const SaveGstData = () => {
-    setGstData(true);
+  // const SaveGstData = () => {
+  //   trigger([
+  //     "BusinessName",
+  //     "address",
+  //     "district",
+  //     "village",
+  //     "stateJurisdiction",
+  //     "pinCode",
+  //   ]);
+  //   setGstData(true);
+  // };
+
+  const SaveGstData = async () => {
+    if (
+      await trigger([
+        "BusinessName",
+        "address",
+        "district",
+        "village",
+        "stateJurisdiction",
+        "pinCode",
+      ])
+    ) {
+      setGSTSave(true);
+      setGstData(true);
+    }
   };
+
   const ClearGstData = () => {
     reset2(defaultValues2);
     setGstData(false);
@@ -493,7 +525,7 @@ export default function GovernanceForm(props: any) {
           </FormProvider>
         ) : (
           <>
-            {gstData ? (
+            {saveGst ? (
               <Stack
                 alignItems={"center"}
                 justifyContent={"center"}
@@ -616,7 +648,7 @@ export default function GovernanceForm(props: any) {
                     </RHFSelect>
 
                     <RHFTextField
-                      name="pin"
+                      name="pinCode"
                       label="PIN Code"
                       disabled={gstData}
                     />
@@ -628,7 +660,7 @@ export default function GovernanceForm(props: any) {
                       variant="contained"
                       onClick={SaveGstData}
                       sx={{ margin: "auto" }}
-                      disabled={gstData || radioVal == ""}
+                      disabled={gstData || saveGst}
                     >
                       Save
                     </Button>
