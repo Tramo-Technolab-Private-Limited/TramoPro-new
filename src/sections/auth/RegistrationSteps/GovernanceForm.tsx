@@ -252,15 +252,6 @@ export default function GovernanceForm(props: any) {
   };
 
   const formSubmit = (data: FormValuesProps) => {
-    console.log(
-      "log...............................................",
-      data.BusinessName,
-      data.district,
-      data.address,
-      data.village,
-      data.pinCode
-    );
-
     let token = localStorage.getItem("token");
     if (radioVal !== "") {
       let body = {
@@ -321,7 +312,6 @@ export default function GovernanceForm(props: any) {
         // taxpayer_type: gstDeatil.constitution_type,
         // address: gstDeatil.address,
         // pan_number: gstDeatil.pan_number,
-
         company_name: gstDeatil.company_name,
         gst_number: gstDeatil.gst_number,
         status: gstDeatil.status,
@@ -401,6 +391,8 @@ export default function GovernanceForm(props: any) {
     reset2(defaultValues2);
     setGstData(false);
     setRadioVal("");
+
+    setGSTSave(false);
   };
 
   return (

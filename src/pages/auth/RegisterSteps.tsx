@@ -131,26 +131,27 @@ export default function RegisterSteps() {
 
   return (
     <Container>
-      <Typography variant="h3" paragraph>
-        {user?.isAadhaarVerified && !user?.isPANVerified ? (
-          <Stack justifyContent={"center"}>
-            {" "}
-            Great! Now let’s verify your PAN
-          </Stack>
-        ) : user?.isAadhaarVerified &&
-          user?.isPANVerified &&
-          user?.isGSTVerified ? (
-          <Stack justifyContent={"center"}>Upload your KYC Documents</Stack>
-        ) : user?.isAadhaarVerified && user?.isPANVerified ? (
-          <>Now, Let’s verify your Business Details </>
-        ) : (
-          <>
-            Welcome to {process.env.REACT_APP_COMPANY_NAME}, Let’s verify your
-            Aadhar{" "}
-          </>
-        )}
-      </Typography>
-
+      <Stack display="flex" alignItems="center">
+        <Typography variant="h3" paragraph>
+          {user?.isAadhaarVerified && !user?.isPANVerified ? (
+            <Stack justifyContent={"center"}>
+              {" "}
+              Great! Now let’s verify your PAN
+            </Stack>
+          ) : user?.isAadhaarVerified &&
+            user?.isPANVerified &&
+            user?.isGSTVerified ? (
+            <Stack justifyContent={"center"}>Upload your KYC Documents</Stack>
+          ) : user?.isAadhaarVerified && user?.isPANVerified ? (
+            <>Now, Let’s verify your Business Details </>
+          ) : (
+            <>
+              Welcome to {process.env.REACT_APP_COMPANY_NAME}, Let’s verify your
+              Aadhaar{" "}
+            </>
+          )}
+        </Typography>
+      </Stack>
       <Stack sx={{ width: "100%" }} spacing={4}>
         <Stepper
           alternativeLabel

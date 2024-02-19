@@ -292,7 +292,7 @@ export default function AuthRegisterForm(props: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
           setgOTP(true);
-          setCheckbox(!checkbox);
+          setCheckbox(true);
           setClearForm(false);
         } else {
           enqueueSnackbar(Response.data.message);
@@ -307,7 +307,7 @@ export default function AuthRegisterForm(props: any) {
 
   const handleClose = () => {
     setModalEdit(false);
-    setCheckbox(!checkbox);
+    setCheckbox(false);
   };
 
   const resendOtp = (email: string, mobile: string) => {
@@ -451,6 +451,8 @@ export default function AuthRegisterForm(props: any) {
     setFormValues({ ...formValues, refCode: "" });
     setRefShow(false);
     setgOTP(false);
+    HandleEmailCode();
+    HandleMobileCode();
   };
 
   const HandleMobileCode = () => {
@@ -609,7 +611,7 @@ export default function AuthRegisterForm(props: any) {
                 (value2 !== "m_distributor" && (
                   <Stack sx={{ position: "relative" }}>
                     <TextField
-                      disabled={gOTP}
+                      disabled={gOTP || refShow}
                       error={!!errors.refCode}
                       label="Referral Code"
                       size="small"
@@ -727,8 +729,8 @@ export default function AuthRegisterForm(props: any) {
               <p style={{ fontSize: "12px", margin: "0 auto" }}>
                 You agree to receive automated promotional, transactional
                 messages from {process.env.REACT_APP_COMPANY_NAME}. Also agree
-                our <Link onClick={openEditModal}> terms & conditions</Link>,
-                privacy policies and cookies policy.
+                our <Link onClick={openEditModal}> Terms & Conditions</Link>,
+                Privacy Policies and Cookies Policy.
               </p>
             </Stack>
           </FormControl>
