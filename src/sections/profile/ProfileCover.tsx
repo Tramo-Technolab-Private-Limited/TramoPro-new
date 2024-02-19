@@ -48,7 +48,7 @@ export default function ProfileCover({ cover }: any) {
       <StyledInfo>
         <CustomAvatar
           // src={user?.photoURL}
-          src={user?.selfie}
+          src={user?.selfie[0]}
           alt={user?.displayName}
           // name={user?.displayName}
           name={`${user?.firstName} ${user?.lastName}`}

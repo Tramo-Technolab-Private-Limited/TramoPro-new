@@ -28,6 +28,8 @@ type props = {
 };
 
 function FundDepositeTable({ tableData, getRaisedRequest }: props) {
+  const [requestEditTime, setRequestEditTime] = useState(0);
+
   const tableLabels = [
     { id: "depositor", label: "Deposited TO" },
     { id: "Ref", label: "#UTR/Payment Reference Number" },
@@ -72,8 +74,10 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
   const [localTiming, setLocalTiming] = React.useState(0);
 
   useEffect(() => {
-    row.createdAt + 120000 - Date.now() > 0 &&
-      setLocalTiming(Math.floor(row.createdAt + 120000 - Date.now()));
+    row.createdAt + row.requestEditTime - Date.now() > 0 &&
+      setLocalTiming(
+        Math.floor(row.createdAt + row.requestEditTime - Date.now())
+      );
   }, []);
 
   useEffect(() => {
@@ -157,7 +161,7 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
       </TableCell>
       <TableCell sx={{ width: 150 }}>
         <Stack justifyContent={"center"} alignItems={"center"} gap={1}>
-          <Stack onClick={() => !!(localTiming / 1000 > 0) && handleOpen()}>
+          <Stack onClick={() => !(localTiming / 1000 > 0) && handleOpen()}>
             <EditIcon active={!!(localTiming / 1000 > 0)} />
           </Stack>
           {localTiming / 1000 > 0 && (

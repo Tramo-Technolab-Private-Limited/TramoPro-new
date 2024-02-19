@@ -10,6 +10,7 @@ import { Api } from "src/webservices";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { m, AnimatePresence } from "framer-motion";
 import { MotionContainer, varBounce, varSlide } from "src/components/animate";
+import { fundRequestProps } from "./fundDeposits/types";
 
 export const BankAccountContext = createContext([]);
 
@@ -49,7 +50,14 @@ export default function MyFundDeposite() {
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
-            setTableData(Response.data.data);
+            setTableData(
+              Response.data.data.map((item: fundRequestProps) => {
+                return {
+                  ...item,
+                  requestEditTime: Response.data.MS_to_permanent,
+                };
+              })
+            );
           }
         }
       }

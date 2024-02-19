@@ -27,10 +27,12 @@ const AutoLogout = ({ children }: any) => {
   const timeoutRef: any = useRef();
 
   const handleLogout = () => {
-    localStorage.getItem("token") && handleOpen();
+    (localStorage.getItem("token") ||
+      localStorage.getItem("authentication") == "false") &&
+      handleOpen();
     logout();
     navigate("/login");
-    localStorage.clear();
+    localStorage.removeItem("token");
   };
 
   const resetTimeout = () => {
@@ -41,6 +43,7 @@ const AutoLogout = ({ children }: any) => {
   };
 
   const onEvent = () => {
+    localStorage.getItem("authentication") == "false" && handleLogout();
     resetTimeout();
   };
 
@@ -54,7 +57,6 @@ const AutoLogout = ({ children }: any) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
-
       events.forEach((event) => {
         document.removeEventListener(event, onEvent);
       });
@@ -74,10 +76,13 @@ const AutoLogout = ({ children }: any) => {
           }}
         >
           <Typography variant="subtitle1" textAlign={"center"}>
-            You have been automatically logged out due to inactivity.
+            {localStorage.getItem("authentication") == "false"
+              ? "Authentication failed. please login!"
+              : "You have been automatically logged out due to inactivity"}
           </Typography>
           <LoadingButton
             onClick={() => {
+              localStorage.setItem("authentication", "true");
               handleClose();
             }}
             variant="contained"

@@ -93,4 +93,5 @@ export type fundRequestProps = {
   comments: string;
   fund_request_Id: string;
   createdAt: number;
+  remark: string;
 };

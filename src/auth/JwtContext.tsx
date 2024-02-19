@@ -227,6 +227,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       },
     });
     localStorage.setItem("token", token);
+    localStorage.setItem("authentication", "true");
   };
 
   // REGISTER

@@ -16,6 +16,8 @@ import {
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import ServiceUnderUpdate from "./ServiceUnderUpdate";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { m, AnimatePresence } from "framer-motion";
+import { MotionContainer, varSlide } from "src/components/animate";
 
 // ----------------------------------------------------------------------
 
@@ -96,29 +98,34 @@ export default function Services(props: any) {
               (tab: any) =>
                 tab.category_name == superCurrentTab && (
                   <CategoryContext.Provider value={tab} key={tab.category_name}>
-                    <Box sx={{ m: 1 }}>
-                      {superCurrentTab.toLowerCase() == "recharges" ? (
-                        <Recharges />
-                      ) : // <ServiceUnderUpdate />
-                      superCurrentTab.toLowerCase() == "money transfer" ? (
-                        <DMT />
-                      ) : superCurrentTab.toLowerCase() == "aeps" ? (
-                        <AEPS supCategory={tab} />
-                      ) : superCurrentTab.toLowerCase() == "indo nepal" ? (
-                        <IndoNepal supCategory={tab} />
-                      ) : superCurrentTab.toLowerCase() == "bill payment" ? (
-                        <BillPayment />
-                      ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
-                        // <AadharPay supCategory={tab} />
-                        <ServiceUnderUpdate />
-                      ) : superCurrentTab.toLowerCase() == "matm" ? (
-                        <MATM supCategory={tab} />
-                      ) : superCurrentTab.toLowerCase() == "dmt1" ? (
-                        <DMT1 />
-                      ) : superCurrentTab.toLowerCase() == "dmt2" ? (
-                        <DMT2 />
-                      ) : null}
-                    </Box>
+                    <AnimatePresence mode="wait">
+                      <Box sx={{ m: 1 }} component={MotionContainer}>
+                        <m.div variants={varSlide().inUp}>
+                          {superCurrentTab.toLowerCase() == "recharges" ? (
+                            <Recharges />
+                          ) : // <ServiceUnderUpdate />
+                          superCurrentTab.toLowerCase() == "money transfer" ? (
+                            <DMT />
+                          ) : superCurrentTab.toLowerCase() == "aeps" ? (
+                            <AEPS supCategory={tab} />
+                          ) : superCurrentTab.toLowerCase() == "indo nepal" ? (
+                            <IndoNepal supCategory={tab} />
+                          ) : superCurrentTab.toLowerCase() ==
+                            "bill payment" ? (
+                            <BillPayment />
+                          ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
+                            // <AadharPay supCategory={tab} />
+                            <ServiceUnderUpdate />
+                          ) : superCurrentTab.toLowerCase() == "matm" ? (
+                            <MATM supCategory={tab} />
+                          ) : superCurrentTab.toLowerCase() == "dmt1" ? (
+                            <DMT1 />
+                          ) : superCurrentTab.toLowerCase() == "dmt2" ? (
+                            <DMT2 />
+                          ) : null}
+                        </m.div>
+                      </Box>
+                    </AnimatePresence>
                   </CategoryContext.Provider>
                 )
             )}

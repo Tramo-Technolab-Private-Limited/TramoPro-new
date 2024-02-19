@@ -1,9 +1,18 @@
 import { m, AnimatePresence } from "framer-motion";
 // @mui
-import { Dialog, Box, Paper, DialogProps, Modal, Stack } from "@mui/material";
+import {
+  Dialog,
+  Box,
+  Paper,
+  DialogProps,
+  Modal,
+  Stack,
+  Button,
+} from "@mui/material";
 //
 import { varFade } from "./variants";
 import MotionContainer from "./MotionContainer";
+import Scrollbar from "../scrollbar/Scrollbar";
 
 // ----------------------------------------------------------------------
 
@@ -23,7 +32,7 @@ export default function MotionModal({
   open = false,
   onClose,
   children,
-  width = { xs: "100%", sm: 500 },
+  width = { xs: "100%", sm: 500, md: 700, lg: 900 },
   sx,
   ...other
 }: Props) {
@@ -48,7 +57,15 @@ export default function MotionModal({
                   p: 4,
                 }}
               >
-                {children}
+                <Scrollbar
+                  sx={{
+                    maxHeight: `${window.innerHeight - 100}px`,
+                    maxWidth: `${window.innerWidth - 100}px`,
+                    pr: 1,
+                  }}
+                >
+                  {children}
+                </Scrollbar>
               </Stack>
             </m.div>
           </Box>

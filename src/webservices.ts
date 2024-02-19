@@ -17,6 +17,9 @@ export function UploadFile(url: any, body: any, token: any) {
           status: res.status,
           data: data,
         };
+        if (apiData.data.code == 410) {
+          localStorage.setItem("authentication", "false");
+        }
         return apiData;
       })
     )
@@ -71,6 +74,9 @@ export function Api(url: any, apiMethod: any, body: any, token: any) {
           status: res.status,
           data: data,
         };
+        if (apiData.data.code == 410) {
+          localStorage.setItem("authentication", "false");
+        }
         return apiData;
       })
     )
