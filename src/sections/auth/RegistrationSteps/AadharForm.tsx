@@ -58,6 +58,7 @@ export default function AadharForm(props: any) {
   const { user, UpdateUserDetail } = useAuthContext();
   const [activeStep, setActiveStep] = useState<any>(0);
   const [otpSendSuccess, setOtpSendSuccess] = useState(false);
+  const [resendotp, setResendOtp] = useState(false);
   const [varifyaadhar, setVerifyAadhar] = useState(false);
   const [imageAadhar, setImageAadhar] = useState("");
   const [timer, setTimer] = useState(0);
@@ -150,7 +151,8 @@ export default function AadharForm(props: any) {
           console.log("send otp", Response);
           if (Response.status == 200) {
             if (Response.data.code == 200) {
-              setTimer(90);
+              setTimer(60);
+              setResendOtp(true);
               setOtpSendSuccess(true);
               enqueueSnackbar(Response.data.message);
               setInitTxn(Response.data.init_txn_id);
@@ -209,6 +211,7 @@ export default function AadharForm(props: any) {
   const handleClar = () => {
     setValue("aadhar", "");
     setOtpSendSuccess(false);
+    clearTimeout(timer);
   };
 
   const resendOtp = () => {
@@ -244,15 +247,16 @@ export default function AadharForm(props: any) {
     otpSetValue("otp6", "");
   };
 
-  // useEffect(() => {
-  //   let time = setTimeout(() => {
-  //     setTimer(timer - 1);
-  //   }, 1000);
-  //   if (timer == 0) {
-  //     clearTimeout(time);
-  //     setOtpSend(false);
-  //   }
-  // }, [timer]);
+  useEffect(() => {
+    let time = setTimeout(() => {
+      setTimer(timer - 1);
+    }, 1000);
+    if (timer == 0) {
+      clearTimeout(time);
+      // setOtpSend(false);
+      setResendOtp(false);
+    }
+  }, [timer]);
 
   useEffect(() => {
     if (user?.isAadhaarVerified) {
@@ -448,10 +452,11 @@ export default function AadharForm(props: any) {
                           fontSize: "10px",
                           height: "25px",
                         }}
+                        disabled={resendotp}
                         onClick={resendOtp}
                         size="small"
                       >
-                        Resend code
+                        Resend code {timer !== 0 && `(${timer})`}
                       </Button>
 
                       <Button
