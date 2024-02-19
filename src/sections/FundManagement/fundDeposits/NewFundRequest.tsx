@@ -3,6 +3,7 @@ import {
   Button,
   Card,
   FormHelperText,
+  LinearProgress,
   MenuItem,
   Stack,
   TextField,
@@ -37,6 +38,8 @@ import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
 import Image from "src/components/image/Image";
 import AWS from "aws-sdk";
 import React from "react";
+import CloseIcon from "src/assets/icons/CloseIcon";
+import MotionModal from "src/components/animate/MotionModal";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -107,6 +110,12 @@ function NewFundRequest({ getRaisedRequest }: props) {
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [paymentModes, setPaymentModes] = useState<any>([]);
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+
+  //modal for preview image
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const fundRequestSchema = Yup.object().shape({
     bank_details: Yup.object().shape({
@@ -116,7 +125,9 @@ function NewFundRequest({ getRaisedRequest }: props) {
     amount: Yup.string().required("Amount is required field"),
     date: Yup.date()
       .typeError("please enter a valid date")
-      .required("Please select Date"),
+      .required("Please select Date")
+      .min(dayjs(new Date()).subtract(4, "day"), "please enter valid date"),
+
     branchName: Yup.string().required("Branch Name is required"),
     mobileNumber: Yup.string().required("Mobile number field is required"),
     txnId: Yup.string()
@@ -175,6 +186,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(fundRequestSchema),
     defaultValues,
+    mode: "all",
   });
   const {
     reset,
@@ -191,6 +203,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
 
   //upload file
   const handleFile = (e: any) => {
+    setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
       quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
@@ -227,6 +240,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
                 variant: "error",
               });
             }
+            setIsSubmitLoading(false);
           }
         );
       },
@@ -245,6 +259,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
         trxId: data.txnId,
         mobile: data.mobileNumber,
       },
+      remark: data.remarks,
       request_to: "ADMIN",
       transactionSlip: data.filePath,
     };
@@ -404,6 +419,10 @@ function NewFundRequest({ getRaisedRequest }: props) {
                   name="date"
                   type="date"
                   size="small"
+                  onPaste={(e: any) => {
+                    e.preventDefault();
+                    return false;
+                  }}
                   {...params}
                 />
               )}
@@ -430,11 +449,14 @@ function NewFundRequest({ getRaisedRequest }: props) {
                   errors?.filePath?.type == "required"
                     ? "red"
                     : "rgba(145, 158, 171, 0.32)"
-                } `,
+                }`,
                 borderRadius: 1,
                 p: 1,
                 px: 2,
                 cursor: "pointer",
+                "&:hover": {
+                  border: "1px solid #000000",
+                },
               }}
             >
               <Stack flexDirection={"row"} justifyContent={"space-between"}>
@@ -474,9 +496,32 @@ function NewFundRequest({ getRaisedRequest }: props) {
           </Stack>
 
           {/* image preview */}
-          {watch("secureFilePath") && (
-            <Stack sx={{ height: 100 }}>
-              <Image src={watch("secureFilePath")} alt={"slip"} />
+          {isSubmitLoading && <LinearProgress color="primary" />}
+          {watch("secureFilePath") && !isSubmitLoading && (
+            <Stack sx={{ height: 100, position: "relative" }}>
+              <Image
+                src={watch("secureFilePath")}
+                alt={"slip"}
+                sx={{ borderRadius: 1, cursor: "zoom-in" }}
+                onClick={handleOpen}
+              />
+              <CloseIcon
+                sx={{
+                  position: "absolute",
+                  top: 3,
+                  right: 3,
+                  height: 25,
+                  width: 25,
+                  cursor: "pointer",
+                  "&:hover": {
+                    color: "primary.main",
+                  },
+                }}
+                onClick={() => {
+                  setValue("filePath", "");
+                  setValue("secureFilePath", "");
+                }}
+              />
             </Stack>
           )}
 
@@ -491,6 +536,20 @@ function NewFundRequest({ getRaisedRequest }: props) {
           </LoadingButton>
         </Stack>
       </FormProvider>
+      <MotionModal
+        open={open}
+        onClose={handleClose}
+        sx={{ width: { sm: "100%", md: "80%" } }}
+      >
+        <Image src={watch("secureFilePath")} alt={"slip"} />
+        <Button
+          onClick={handleClose}
+          variant="contained"
+          sx={{ alignSelf: "end", mt: 1 }}
+        >
+          Close
+        </Button>
+      </MotionModal>
     </Card>
   );
 }

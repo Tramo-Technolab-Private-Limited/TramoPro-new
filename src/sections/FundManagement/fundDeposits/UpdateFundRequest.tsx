@@ -1,6 +1,8 @@
 import {
   Button,
   Card,
+  FormHelperText,
+  LinearProgress,
   MenuItem,
   Stack,
   Typography,
@@ -34,6 +36,8 @@ import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
 import Image from "src/components/image/Image";
 import AWS from "aws-sdk";
 import React from "react";
+import MotionModal from "src/components/animate/MotionModal";
+import CloseIcon from "src/assets/icons/CloseIcon";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -101,13 +105,18 @@ type props = {
 };
 
 function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
-  console.log(preData);
   const bankListContext = useContext(BankAccountContext);
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [paymentModes, setPaymentModes] = useState<any>(
     preData.bankId.modes_of_transfer || []
   );
+
+  //modal for preview image
+  const [openModal, setOpenModal] = useState(false);
+  const handleOpenModal = () => setOpenModal(true);
+  const handleCloseModal = () => setOpenModal(false);
 
   const fundRequestSchema = Yup.object().shape({
     bank_details: Yup.object().shape({
@@ -177,12 +186,13 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
     txnId: preData.transactional_details.trxId,
     filePath: preData.transactionSlip,
     secureFilePath: AwsDocSign(preData.transactionSlip),
-    remarks: preData.comments,
+    remarks: preData.remark,
   };
 
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(fundRequestSchema),
     defaultValues,
+    mode: "all",
   });
   const {
     reset,
@@ -208,6 +218,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
 
   //upload file
   const handleFile = (e: any) => {
+    setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
       quality: 0.2, // 0.6 can also be used, but its not recommended to go below.
@@ -244,6 +255,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
                 variant: "error",
               });
             }
+            setIsSubmitLoading(false);
           }
         );
       },
@@ -262,6 +274,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
         trxId: data.txnId,
         mobile: data.mobileNumber,
       },
+      remark: data.remarks,
       request_to: "ADMIN",
       transactionSlip: data.filePath,
     };
@@ -411,12 +424,22 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
             <DatePicker
               label="Start date"
               inputFormat="DD/MM/YYYY"
-              value={watch("date")}
+              value={dayjs(watch("date"))}
               maxDate={new Date()}
               minDate={dayjs(new Date()).subtract(4, "day") as any}
               onChange={(newValue: any) => setValue("date", newValue)}
               renderInput={(params: any) => (
-                <RHFTextField name="date" size="small" {...params} />
+                <RHFTextField
+                  name="date"
+                  type="date"
+                  size="small"
+                  disabled
+                  onPaste={(e: any) => {
+                    e.preventDefault();
+                    return false;
+                  }}
+                  {...params}
+                />
               )}
             />
           </LocalizationProvider>
@@ -431,36 +454,89 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
           </Stack>
 
           {/* file upload */}
-          <Typography
-            component="label"
-            role={undefined}
-            tabIndex={-1}
-            sx={{
-              border: "1px solid rgba(145, 158, 171, 0.32)",
-              borderRadius: 1,
-              p: 1,
-              px: 2,
-              cursor: "pointer",
-            }}
-          >
-            <Stack flexDirection={"row"} justifyContent={"space-between"}>
-              <Typography sx={{ color: "#919EAB" }}>Receipt Upload </Typography>
-              <Stack flexDirection={"row"} gap={1}>
-                <UploadIcon sx={{ alignSelf: "end" }} />
+          <Stack>
+            <Typography
+              component="label"
+              role={undefined}
+              tabIndex={-1}
+              sx={{
+                border: `1px solid ${
+                  errors?.filePath?.type == "required"
+                    ? "red"
+                    : "rgba(145, 158, 171, 0.32)"
+                }`,
+                borderRadius: 1,
+                p: 1,
+                px: 2,
+                cursor: "pointer",
+                "&:hover": {
+                  border: "1px solid #000000",
+                },
+              }}
+            >
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography
+                  sx={{
+                    color:
+                      errors?.filePath?.type == "required"
+                        ? "error.main"
+                        : "#919EAB",
+                  }}
+                >
+                  Receipt Upload{" "}
+                </Typography>
+                <Stack flexDirection={"row"} gap={1}>
+                  <UploadIcon
+                    sx={{
+                      alignSelf: "end",
+                    }}
+                    color={
+                      errors?.filePath?.type == "required" ? "red" : "default"
+                    }
+                  />
+                </Stack>
               </Stack>
-            </Stack>
 
-            <VisuallyHiddenInput
-              type="file"
-              accept="image/*"
-              onChange={handleFile}
-            />
-          </Typography>
+              <VisuallyHiddenInput
+                type="file"
+                accept="image/*"
+                onChange={handleFile}
+              />
+            </Typography>
+            {errors?.filePath?.type == "required" && (
+              <FormHelperText sx={{ ml: 2 }} error>
+                {errors?.filePath?.message}
+              </FormHelperText>
+            )}
+          </Stack>
 
           {/* image preview */}
-          {watch("secureFilePath") && (
-            <Stack sx={{ height: 100 }}>
-              <Image src={watch("secureFilePath")} alt={"slip"} />
+          {isSubmitLoading && <LinearProgress color="primary" />}
+          {watch("secureFilePath") && !isSubmitLoading && (
+            <Stack sx={{ height: 100, position: "relative" }}>
+              <Image
+                src={watch("secureFilePath")}
+                alt={"slip"}
+                sx={{ borderRadius: 1, cursor: "zoom-in" }}
+                onClick={handleOpenModal}
+              />
+              <CloseIcon
+                sx={{
+                  position: "absolute",
+                  top: 3,
+                  right: 3,
+                  height: 25,
+                  width: 25,
+                  cursor: "pointer",
+                  "&:hover": {
+                    color: "primary.main",
+                  },
+                }}
+                onClick={() => {
+                  setValue("filePath", "");
+                  setValue("secureFilePath", "");
+                }}
+              />
             </Stack>
           )}
 
@@ -479,6 +555,16 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
           </Stack>
         </Stack>
       </FormProvider>
+      <MotionModal open={openModal} onClose={handleCloseModal}>
+        <Image src={watch("secureFilePath")} alt={"slip"} />
+        <Button
+          onClick={handleCloseModal}
+          variant="contained"
+          sx={{ alignSelf: "end", mt: 1 }}
+        >
+          Close
+        </Button>
+      </MotionModal>
     </>
   );
 }
