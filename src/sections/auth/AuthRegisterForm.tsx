@@ -52,6 +52,7 @@ import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { requestPermission } from "./firebase";
 import MotionModal from "src/components/animate/MotionModal";
+import CircularWithValueLabel from "src/components/customFunctions/ProgressCircular";
 
 // ----------------------------------------------------------------------
 
@@ -444,11 +445,12 @@ export default function AuthRegisterForm(props: any) {
   }, [watch("mobile")]);
 
   const HandleClearrefCode = () => {
-    reset(formValues);
+    reset();
     setRefName("");
     setValue("refCode", "");
     setFormValues({ ...formValues, refCode: "" });
     setRefShow(false);
+    setgOTP(false);
   };
 
   const HandleMobileCode = () => {
@@ -744,6 +746,8 @@ export default function AuthRegisterForm(props: any) {
           >
             Generate OTP
           </LoadingButton>
+
+          {/* <CircularWithValueLabel /> */}
 
           <Button
             variant="outlined"
