@@ -17,10 +17,8 @@ import {
   TableRow,
   TableCell,
   TableContainer,
-  CircularProgress,
   Box,
   FormHelperText,
-  Button,
   InputAdornment,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
@@ -57,8 +55,9 @@ type FormValuesProps = {
 
 const initialPlanState = {
   data: {
+    "2G": [],
     "3G/4G": [],
-    COMBO: [],
+    FULLTT: [],
     Roaming: [],
     TOPUP: [],
   },
@@ -94,7 +93,6 @@ const Reducer = (state: any, action: any) => {
 function MobilePrepaid() {
   const { user, UpdateUserDetail } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
-  const [isLoading, setIsLoading] = useState(false);
   const subCategoryContext: any = useContext(SubCategoryContext);
   const categoryContext: any = useContext(CategoryContext);
   const [planState, planDispatch] = useReducer(Reducer, initialPlanState);
@@ -109,7 +107,7 @@ function MobilePrepaid() {
   const [open, setModal] = React.useState(false);
   const openModal = (val: any) => {
     setModal(true);
-    tabChange("3G/4G");
+    tabChange("2G");
   };
   const handleClose = () => setModal(false);
 
@@ -123,10 +121,11 @@ function MobilePrepaid() {
 
   const [planList, setPlanList] = useState([]);
   const [tabsData, setTabsData] = useState({
+    "2G": [],
     "3G/4G": [],
-    COMBO: [],
     Roaming: [],
     TOPUP: [],
+    FULLTT: [],
   });
 
   const rechargePageSchema = Yup.object().shape({
@@ -193,8 +192,9 @@ function MobilePrepaid() {
   } = method2;
 
   const TABS = [
+    { value: "2G", label: "2G" },
     { value: "3G/4G", label: "3G/4G" },
-    { value: "COMBO", label: "COMBO" },
+    { value: "FULLTT", label: "FULLTT" },
     { value: "Roaming", label: "Roaming" },
     { value: "TOPUP", label: "TOPUP" },
   ];
@@ -238,10 +238,12 @@ function MobilePrepaid() {
   function tabChange(val: any) {
     setPlanCurrentTab(val);
     if (val == "3G/4G") {
+      setPlanList(tabsData["2G"] || []);
+    } else if (val == "2G") {
       setPlanList(tabsData["3G/4G"] || []);
-    } else if (val == "COMBO") {
-      setPlanList(tabsData.COMBO || []);
-    } else if (val == "Romaing") {
+    } else if (val == "FULLTT") {
+      setPlanList(tabsData.FULLTT || []);
+    } else if (val == "Roaming") {
       setPlanList(tabsData.Roaming || []);
     } else if (val == "TOPUP") {
       setPlanList(tabsData.TOPUP || []);

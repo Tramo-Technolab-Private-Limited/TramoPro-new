@@ -28,11 +28,10 @@ type props = {
 };
 
 function FundDepositeTable({ tableData, getRaisedRequest }: props) {
-  const [requestEditTime, setRequestEditTime] = useState(0);
-
   const tableLabels = [
-    { id: "depositor", label: "Deposited TO" },
-    { id: "Ref", label: "#UTR/Payment Reference Number" },
+    { id: "frid", label: "FRID" },
+    { id: "depositor", label: "Deposited To" },
+    { id: "Ref", label: "UTR/Payment Reference Number" },
     { id: "RequestType", label: "Request Mode" },
     { id: "From", label: "Amount" },
     { id: "tobank", label: "Charge/Commission" },
@@ -86,11 +85,15 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
     }, 1000);
     if (localTiming <= 0) {
       clearTimeout(localTime);
+      handleClose();
     }
   }, [localTiming]);
 
   return (
     <TableRow key={row?._id} hover>
+      <TableCell>
+        <Typography variant="body2">{row?.fund_request_Id}</Typography>
+      </TableCell>
       <TableCell>
         <Typography variant="body2">
           {`${
@@ -161,7 +164,7 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
       </TableCell>
       <TableCell sx={{ width: 150 }}>
         <Stack justifyContent={"center"} alignItems={"center"} gap={1}>
-          <Stack onClick={() => !(localTiming / 1000 > 0) && handleOpen()}>
+          <Stack onClick={() => !!(localTiming / 1000 > 0) && handleOpen()}>
             <EditIcon active={!!(localTiming / 1000 > 0)} />
           </Stack>
           {localTiming / 1000 > 0 && (
