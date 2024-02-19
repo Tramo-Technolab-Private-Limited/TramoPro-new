@@ -126,7 +126,7 @@ export default function AuthRegisterForm(props: any) {
   const [ClearForm, setClearForm] = useState(true);
   const [gOTP, setgOTP] = useState(false);
   const [refShow, setRefShow] = useState(false);
-  const [checkbox, setCheckbox] = useState(true);
+  const [checkbox, setCheckbox] = useState(false);
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
   const [loading, setLoading] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -292,7 +292,7 @@ export default function AuthRegisterForm(props: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
           setgOTP(true);
-          setCheckbox(true);
+          setCheckbox(false);
           setClearForm(false);
         } else {
           enqueueSnackbar(Response.data.message);
@@ -307,7 +307,7 @@ export default function AuthRegisterForm(props: any) {
 
   const handleClose = () => {
     setModalEdit(false);
-    setCheckbox(false);
+    setCheckbox(true);
   };
 
   const resendOtp = (email: string, mobile: string) => {
@@ -453,6 +453,7 @@ export default function AuthRegisterForm(props: any) {
     setgOTP(false);
     HandleEmailCode();
     HandleMobileCode();
+    setCheckbox(false);
   };
 
   const HandleMobileCode = () => {
@@ -471,6 +472,10 @@ export default function AuthRegisterForm(props: any) {
     otpSetValue("otp4", "");
     otpSetValue("otp5", "");
     otpSetValue("otp6", "");
+  };
+
+  const handleChangeCheck = (event: any) => {
+    setCheckbox(event.target.checked);
   };
 
   return (
@@ -722,10 +727,12 @@ export default function AuthRegisterForm(props: any) {
             <Stack flexDirection="row" alignItems="start">
               <Checkbox
                 {...label}
+                checked={checkbox}
                 color={"primary"}
-                onClick={() => setCheckbox(!checkbox)}
+                onChange={handleChangeCheck}
                 disabled={gOTP}
               />
+
               <p style={{ fontSize: "12px", margin: "0 auto" }}>
                 You agree to receive automated promotional, transactional
                 messages from {process.env.REACT_APP_COMPANY_NAME}. Also agree
@@ -741,7 +748,7 @@ export default function AuthRegisterForm(props: any) {
             fullWidth
             size="small"
             variant="contained"
-            disabled={checkbox}
+            disabled={!checkbox}
             // onClick={sendOTP}
             loading={isSubmitting}
             type="submit"
@@ -900,13 +907,23 @@ export default function AuthRegisterForm(props: any) {
 
       <MotionModal open={open} width={{ xs: "75%" }}>
         <Scrollbar sx={{ maxHeight: 600, minWidth: 650 }}>
-          <AppBar position="static">
+          <AppBar
+            position="fixed"
+            style={{
+              borderRadius: "20px",
+              border: `1px solid `,
+            }}
+          >
             <Tabs
               value={tabValue}
               onChange={handleChange}
               variant="fullWidth"
               aria-label="full width tabs example"
-              style={{ backgroundColor: "#ffffff" }}
+              style={{
+                backgroundColor: "#ffffff",
+                borderRadius: "10px",
+                border: `1px solid `,
+              }}
             >
               <Tab
                 label=" Term and Conditions"
