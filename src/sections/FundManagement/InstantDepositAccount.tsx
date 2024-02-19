@@ -380,7 +380,7 @@ export default function InstantDepositAccount() {
     let token = localStorage.getItem("token");
     let id = user?._id;
 
-    Api(`agent/createVirtualAccount/` + id, "GET", "", token).then(
+    Api(`agent/createVirtualAccount`, "GET", "", token).then(
       (Response: any) => {
         if (Response.status == 200) {
           console.log("CreateCustomerId==========>", Response);
@@ -397,7 +397,7 @@ export default function InstantDepositAccount() {
   const RegisterVPAacc = () => {
     let token = localStorage.getItem("token");
     let id = user?._id;
-    Api(`agent/registerForAutoCollect/` + id, "GET", "", token).then(
+    Api(`agent/registerForAutoCollect`, "GET", "", token).then(
       (Response: any) => {
         if (Response.status == 200) {
           console.log("RegisterVPAAccount==========>", Response);

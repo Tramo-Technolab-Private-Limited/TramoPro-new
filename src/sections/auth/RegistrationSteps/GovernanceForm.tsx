@@ -158,12 +158,10 @@ export default function GovernanceForm(props: any) {
   const defaultValues2 = {
     BusinessName: "",
     address: "",
+    village: "",
+    district: "",
     stateJurisdiction: "",
-    panNumber: "",
-    ShopName: "",
-    Status: "",
-    taxpayerType: "",
-    gstNumber: "",
+    pin: "",
   };
 
   const method2 = useForm<FormValuesProps>({
@@ -179,6 +177,7 @@ export default function GovernanceForm(props: any) {
   });
 
   const {
+    reset: reset2,
     register,
     handleSubmit: handleFormSubmit,
     formState: { errors: error2, isSubmitting: isSubmitting2 },
@@ -367,7 +366,7 @@ export default function GovernanceForm(props: any) {
     setGstData(true);
   };
   const ClearGstData = () => {
-    reset(defaultValues2);
+    reset2(defaultValues2);
     setGstData(false);
     setRadioVal("");
   };
@@ -379,7 +378,31 @@ export default function GovernanceForm(props: any) {
       )}
       <Box sx={{ width: "100%" }}>
         <Box sx={{ borderBottom: 0, borderColor: "divider" }}>
-          <Tabs value={valueTabs} onChange={handleChangePanel2}>
+          <FormControl sx={{ my: 2 }}>
+            <Typography variant="subtitle2">
+              Are you GSTIN registerd?
+            </Typography>
+            <RadioGroup
+              aria-labelledby="demo-row-radio-buttons-group-label"
+              name="row-radio-buttons-group"
+              value={valueTabs}
+              sx={{ display: "flex", flexDirection: "row" }}
+            >
+              <FormControlLabel
+                value={1}
+                onClick={(e) => handleChangePanel2(e, 1)}
+                control={<Radio />}
+                label="Yes"
+              />
+              <FormControlLabel
+                value={0}
+                onClick={(e) => handleChangePanel2(e, 0)}
+                control={<Radio />}
+                label="No"
+              />
+            </RadioGroup>
+          </FormControl>
+          {/* <Tabs value={valueTabs} onChange={handleChangePanel2}>
             {user?.isGST == null || !user?.isGST ? (
               <Tab
                 style={{
@@ -408,9 +431,9 @@ export default function GovernanceForm(props: any) {
                 {...a11yProp2(1)}
               />
             ) : null}
-          </Tabs>
+          </Tabs> */}
         </Box>
-        {valueTabs == 0 ? (
+        {valueTabs == 1 ? (
           <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             {!user?.isGSTVerified && (
               <>
@@ -562,13 +585,13 @@ export default function GovernanceForm(props: any) {
 
                   <Stack flexDirection="row" gap={2}>
                     <RHFTextField
-                      name="BusinessName"
+                      name="village"
                       label="Village/City"
                       disabled={gstData}
                     />
 
                     <RHFTextField
-                      name="address"
+                      name="district"
                       label="District"
                       disabled={gstData}
                     />
@@ -593,7 +616,7 @@ export default function GovernanceForm(props: any) {
                     </RHFSelect>
 
                     <RHFTextField
-                      name="address"
+                      name="pin"
                       label="PIN Code"
                       disabled={gstData}
                     />

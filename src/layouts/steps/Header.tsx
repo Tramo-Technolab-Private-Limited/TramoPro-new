@@ -14,6 +14,8 @@ import Iconify from "../../components/iconify";
 import { useSettingsContext } from "../../components/settings";
 import AccountPopover from "../dashboard/header/AccountPopover";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { useNavigate } from "react-router";
+import { PATH_AUTH } from "src/routes/paths";
 
 // ----------------------------------------------------------------------
 
@@ -23,6 +25,8 @@ type Props = {
 
 export default function Header({ onOpenNav }: Props) {
   const theme = useTheme();
+
+  const navigate = useNavigate();
 
   const { logout } = useAuthContext();
 

@@ -27,7 +27,6 @@ import {
   WalletLadger,
   Scheme,
   BBPSScheme,
-  MyFundDeposits,
   MyBankAccount,
   AEPSsettlement,
   MyFundRequest,
@@ -37,6 +36,7 @@ import {
   ManageFundFlow,
   MyNetwrokFunds,
   UserProfilePage,
+  MyFundDeposits,
 } from "./elements";
 
 // ----------------------------------------------------------------------

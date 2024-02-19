@@ -19,6 +19,7 @@ const style = {
 
 const AutoLogout = ({ children }: any) => {
   const { logout } = useAuthContext();
+  const navigate = useNavigate();
 
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -28,6 +29,8 @@ const AutoLogout = ({ children }: any) => {
   const handleLogout = () => {
     localStorage.getItem("token") && handleOpen();
     logout();
+    navigate("/login");
+    localStorage.clear();
   };
 
   const resetTimeout = () => {

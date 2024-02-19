@@ -99,8 +99,8 @@ export default function Services(props: any) {
                     <Box sx={{ m: 1 }}>
                       {superCurrentTab.toLowerCase() == "recharges" ? (
                         <Recharges />
-                        // <ServiceUnderUpdate />
-                      ) : superCurrentTab.toLowerCase() == "money transfer" ? (
+                      ) : // <ServiceUnderUpdate />
+                      superCurrentTab.toLowerCase() == "money transfer" ? (
                         <DMT />
                       ) : superCurrentTab.toLowerCase() == "aeps" ? (
                         <AEPS supCategory={tab} />

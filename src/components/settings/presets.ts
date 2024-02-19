@@ -66,7 +66,7 @@ export const presets = [
   // RED
   {
     name: "red",
-    lighter: "#FFE3D5",
+    lighter: "#ff30300d",
     light: "#FFC1AC",
     main: "#FF3030",
     dark: "#B71833",

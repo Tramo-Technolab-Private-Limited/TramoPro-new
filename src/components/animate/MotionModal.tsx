@@ -2,13 +2,7 @@ import { m, AnimatePresence } from "framer-motion";
 // @mui
 import { Dialog, Box, Paper, DialogProps, Modal, Stack } from "@mui/material";
 //
-import {
-  varBgColor,
-  varBgKenburns,
-  varBgPan,
-  varBounce,
-  varFade,
-} from "./variants";
+import { varFade } from "./variants";
 import MotionContainer from "./MotionContainer";
 
 // ----------------------------------------------------------------------

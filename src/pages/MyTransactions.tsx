@@ -928,7 +928,7 @@ function TransactionRow({ row }: childProps) {
               onAfterPrint={closeModal}
             />
           </Stack>
-          <Grid ref={componentRef} sx={{ p: 3 }}>
+          <Grid ref={componentRef} sx={{ p:3}}>
             <Grid container spacing={0}>
               <Grid item xs={12} sm={4}>
                 <Stack flexDirection={"row"} gap={1}>
