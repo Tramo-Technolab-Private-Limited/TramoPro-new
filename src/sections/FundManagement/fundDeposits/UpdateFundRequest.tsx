@@ -38,6 +38,7 @@ import AWS from "aws-sdk";
 import React from "react";
 import MotionModal from "src/components/animate/MotionModal";
 import CloseIcon from "src/assets/icons/CloseIcon";
+import { fCurrency } from "src/utils/formatNumber";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -88,7 +89,7 @@ type FormValuesProps = {
   };
   feeCalc: string;
   paymentModeId: string;
-  amount: string;
+  amount: number;
   date: Date | string | null;
   branchName: string;
   mobileNumber: string;
@@ -107,6 +108,10 @@ type props = {
 function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
   const bankListContext = useContext(BankAccountContext);
   const { user } = useAuthContext();
+  const [amountMinMaxValidation, setAmountMinMaxValidation] = useState({
+    min: preData.bankId.min_Deposit_Amount || 0,
+    max: preData.bankId.max_Deposit_Amount || 0,
+  });
   const { enqueueSnackbar } = useSnackbar();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [paymentModes, setPaymentModes] = useState<any>(
@@ -123,36 +128,50 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
       bank_name: Yup.string().required("Please select Bank"),
     }),
     paymentModeId: Yup.string().required("Please select Mode"),
-    amount: Yup.string().required("Amount is required field"),
+    amount: Yup.number()
+      .typeError("That doesn't look like an Amount")
+      .positive("An Amount can't start with a minus")
+      .min(
+        +amountMinMaxValidation.min,
+        `Please enter minimum ${fCurrency(amountMinMaxValidation.min)}`
+      )
+      .max(
+        +amountMinMaxValidation.max,
+        `You can enter maximum ${fCurrency(amountMinMaxValidation.max)}`
+      )
+      .required("Amount is required"),
     date: Yup.date()
       .typeError("please enter a valid date")
       .required("Please select Date"),
     branchName: Yup.string().required("Branch Name is required"),
-    mobileNumber: Yup.string().required("Mobile number field is required"),
+    mobileNumber: Yup.string()
+      .required("Mobile number field is required")
+      .matches(/^\d{10}$/, "Mobile number must be exactly 10 digits")
+      .max(10),
     txnId: Yup.string()
       .when("modesDetail.modeName", {
-        is: "Cash deposit at branch",
+        is: "RTGS",
         then: Yup.string().required("Transaction ID is required"),
       })
       .when("modesDetail.modeName", {
-        is: "Cash deposit at CDM",
+        is: "IMPS",
+        then: Yup.string().required("Transaction ID is required"),
+      })
+      .when("modesDetail.modeName", {
+        is: "NEFT",
+        then: Yup.string().required("Transaction ID is required"),
+      })
+      .when("modesDetail.modeName", {
+        is: "Fund Transfer",
         then: Yup.string().required("Transaction ID is required"),
       }),
     filePath: Yup.string()
       .when("modesDetail.modeName", {
-        is: "RTGS",
+        is: "Cash deposit at branch",
         then: Yup.string().required("Please Select Slip"),
       })
       .when("modesDetail.modeName", {
-        is: "IMPS",
-        then: Yup.string().required("Please Select Slip"),
-      })
-      .when("modesDetail.modeName", {
-        is: "NEFT",
-        then: Yup.string().required("Please Select Slip"),
-      })
-      .when("modesDetail.modeName", {
-        is: "Fund Transfer",
+        is: "Cash deposit at CDM",
         then: Yup.string().required("Please Select Slip"),
       }),
     remarks: Yup.string().required("Remark Field is required"),
@@ -179,7 +198,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
       )[0] as any
     ).modeId,
     transactionFeeType: "",
-    amount: preData.amount,
+    amount: +preData.amount,
     date: preData.date_of_deposit,
     branchName: preData.transactional_details.branch,
     mobileNumber: preData.transactional_details.mobile,
@@ -351,6 +370,10 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
                       min_Deposit_Amount: item.min_Deposit_Amount,
                       max_Deposit_Amount: item.max_Deposit_Amount,
                     });
+                    setAmountMinMaxValidation({
+                      min: +item.min_Deposit_Amount,
+                      max: +item.max_Deposit_Amount,
+                    });
                     setPaymentModes(item.modes_of_transfer);
                   }}
                 >
@@ -377,7 +400,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
                   value={item.modeId}
                   onClick={() => {
                     setValue("modesDetail", item);
-                    setValue("amount", "");
+                    setValue("amount", 0);
                   }}
                 >
                   {item.modeName}
@@ -390,10 +413,10 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
             {watch("bank_details.min_Deposit_Amount") &&
               watch("bank_details.max_Deposit_Amount") && (
                 <>
-                  <Typography variant="caption" ml={1}>
+                  <Typography variant="caption" ml={2}>
                     {convertToWords(+watch("amount") || 0)}
                   </Typography>
-                  <Typography variant="caption" ml={1}>
+                  <Typography variant="caption" ml={2}>
                     Please enter amount between{" "}
                     <strong>
                       {" "}
@@ -407,7 +430,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
               watch("amount") !== null && (
                 <Typography
                   variant="caption"
-                  ml={1}
+                  ml={2}
                   sx={{
                     color:
                       watch("modesDetail.transactionFeeType") == "Charge"
@@ -450,7 +473,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
           />
           <Stack flexDirection={"row"} gap={2}>
             <RHFTextField name="branchName" label="Deposit Branch" />
-            <RHFTextField name="txnId" label="TrxID/UTR - 123456" />
+            <RHFTextField name="txnId" label="TrxID/UTR" />
           </Stack>
 
           {/* file upload */}

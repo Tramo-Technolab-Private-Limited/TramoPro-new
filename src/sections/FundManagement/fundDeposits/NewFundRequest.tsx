@@ -40,6 +40,7 @@ import AWS from "aws-sdk";
 import React from "react";
 import CloseIcon from "src/assets/icons/CloseIcon";
 import MotionModal from "src/components/animate/MotionModal";
+import { fCurrency } from "src/utils/formatNumber";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -91,7 +92,7 @@ type FormValuesProps = {
   };
   feeCalc: string;
   paymentModeId: string;
-  amount: string;
+  amount: number;
   date: Date | null;
   branchName: string;
   mobileNumber: string;
@@ -107,6 +108,10 @@ type props = {
 
 function NewFundRequest({ getRaisedRequest }: props) {
   const bankListContext = useContext(BankAccountContext);
+  const [amountMinMaxValidation, setAmountMinMaxValidation] = useState({
+    min: 0,
+    max: 0,
+  });
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [paymentModes, setPaymentModes] = useState<any>([]);
@@ -122,14 +127,28 @@ function NewFundRequest({ getRaisedRequest }: props) {
       bank_name: Yup.string().required("Please select Bank"),
     }),
     paymentModeId: Yup.string().required("Please select Mode"),
-    amount: Yup.string().required("Amount is required field"),
+    amount: Yup.number()
+      .typeError("That doesn't look like an Amount")
+      .positive("An Amount can't start with a minus")
+      .min(
+        +amountMinMaxValidation.min,
+        `Please enter minimum ${fCurrency(amountMinMaxValidation.min)}`
+      )
+      .max(
+        +amountMinMaxValidation.max,
+        `You can enter maximum ${fCurrency(amountMinMaxValidation.max)}`
+      )
+      .required("Amount is required"),
     date: Yup.date()
       .typeError("please enter a valid date")
       .required("Please select Date")
       .min(dayjs(new Date()).subtract(4, "day"), "please enter valid date"),
 
     branchName: Yup.string().required("Branch Name is required"),
-    mobileNumber: Yup.string().required("Mobile number field is required"),
+    mobileNumber: Yup.string()
+      .required("Mobile number field is required")
+      .matches(/^\d{10}$/, "Mobile number must be exactly 10 digits")
+      .max(10),
     txnId: Yup.string()
       .when("modesDetail.modeName", {
         is: "RTGS",
@@ -174,7 +193,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
     feeCalc: "",
     paymentModeId: "",
     transactionFeeType: "",
-    amount: "",
+    amount: 0,
     date: new Date(),
     branchName: "",
     mobileNumber: "",
@@ -335,7 +354,10 @@ function NewFundRequest({ getRaisedRequest }: props) {
                       min_Deposit_Amount: item.min_Deposit_Amount,
                       max_Deposit_Amount: item.max_Deposit_Amount,
                     });
-
+                    setAmountMinMaxValidation({
+                      min: +item.min_Deposit_Amount,
+                      max: +item.max_Deposit_Amount,
+                    });
                     setPaymentModes(item.modes_of_transfer);
                   }}
                 >
@@ -363,7 +385,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
                   value={item.modeId}
                   onClick={() => {
                     setValue("modesDetail", item);
-                    setValue("amount", "");
+                    setValue("amount", 0);
                   }}
                 >
                   {item.modeName}
@@ -372,7 +394,12 @@ function NewFundRequest({ getRaisedRequest }: props) {
             })}
           </RHFSelect>
           <Stack>
-            <RHFTextField name="amount" label="Amount" type="number" />
+            <RHFTextField
+              name="amount"
+              label="Amount"
+              type="number"
+              autoComplete="off"
+            />
             {watch("bank_details.min_Deposit_Amount") &&
               watch("bank_details.max_Deposit_Amount") && (
                 <>
@@ -419,6 +446,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
                   name="date"
                   type="date"
                   size="small"
+                  autoComplete="off"
                   onPaste={(e: any) => {
                     e.preventDefault();
                     return false;
@@ -435,7 +463,8 @@ function NewFundRequest({ getRaisedRequest }: props) {
           />
           <Stack flexDirection={"row"} gap={2}>
             <RHFTextField name="branchName" label="Deposit Branch" />
-            <RHFTextField name="txnId" label="TrxID/UTR - 123456" />
+
+            <RHFTextField name="txnId" label="TrxID/UTR" autoComplete="off" />
           </Stack>
 
           {/* file upload */}
