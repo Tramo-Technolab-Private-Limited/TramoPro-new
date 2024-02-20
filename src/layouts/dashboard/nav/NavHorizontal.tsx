@@ -9,8 +9,7 @@ import { bgBlur } from "../../../utils/cssStyles";
 // components
 import { NavSectionHorizontal } from "../../../components/nav-section";
 //
-import agentNavConfig from "./agentconfig";
-import distributorNavConfig from "./distributorconfig";
+import NavConfig from "./config";
 import { useAuthContext } from "src/auth/useAuthContext";
 
 // ----------------------------------------------------------------------
@@ -40,9 +39,7 @@ function NavHorizontal() {
         }}
         variant="dense"
       >
-        <NavSectionHorizontal
-          data={user?.role == "agent" ? agentNavConfig : distributorNavConfig}
-        />
+        <NavSectionHorizontal data={NavConfig} />
       </Toolbar>
 
       <Shadow />

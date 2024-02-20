@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 import React, { useEffect, useState } from "react";
-import { Tab, Tabs, Box, Grid, Typography } from "@mui/material";
+import { Tab, Tabs, Box, Grid, Stack } from "@mui/material";
 import { Api } from "src/webservices";
 import {
   AEPS,
@@ -9,7 +9,6 @@ import {
   DMT2,
   IndoNepal,
   MATM,
-  AadharPay,
   BillPayment,
   Recharges,
 } from "../sections/services";
@@ -18,6 +17,9 @@ import ServiceUnderUpdate from "./ServiceUnderUpdate";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { m, AnimatePresence } from "framer-motion";
 import { MotionContainer, varSlide } from "src/components/animate";
+import Image from "src/components/image/Image";
+import authorizationImage from "../assets/icons/You are not authorized.svg";
+import RoleBasedGuard from "src/auth/RoleBasedGuard";
 
 // ----------------------------------------------------------------------
 
@@ -69,71 +71,80 @@ export default function Services(props: any) {
   return (
     <>
       <Helmet>
-        <title> Recharges | {process.env.REACT_APP_COMPANY_NAME} </title>
+        <title> Services | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
-      <Grid>
-        {isLoading ? (
-          <ApiDataLoading />
-        ) : user?.role == "agent" ? (
-          <>
-            <Tabs
-              value={superCurrentTab}
-              variant="scrollable"
-              sx={{ background: "#F4F6F8" }}
-              onChange={(event, newValue) => setSuperCurrentTab(newValue)}
-              aria-label="icon label tabs example"
-            >
-              {categoryList.map((tab: any) => (
-                <Tab
-                  key={tab._id}
-                  sx={{ mx: { xs: 0.5, sm: 2 }, fontSize: { xs: 12, sm: 16 } }}
-                  label={tab.category_name}
-                  iconPosition="top"
-                  value={tab.category_name}
-                />
-              ))}
-            </Tabs>
+      <RoleBasedGuard hasContent roles={["agent"]}>
+        <Grid>
+          {isLoading ? (
+            <ApiDataLoading />
+          ) : (
+            <>
+              <Tabs
+                value={superCurrentTab}
+                variant="scrollable"
+                sx={{ background: "#F4F6F8" }}
+                onChange={(event, newValue) => setSuperCurrentTab(newValue)}
+                aria-label="icon label tabs example"
+              >
+                {categoryList.map((tab: any) => (
+                  <Tab
+                    key={tab._id}
+                    sx={{
+                      mx: { xs: 0.5, sm: 2 },
+                      fontSize: { xs: 12, sm: 16 },
+                    }}
+                    label={tab.category_name}
+                    iconPosition="top"
+                    value={tab.category_name}
+                  />
+                ))}
+              </Tabs>
 
-            {categoryList.map(
-              (tab: any) =>
-                tab.category_name == superCurrentTab && (
-                  <CategoryContext.Provider value={tab} key={tab.category_name}>
-                    <AnimatePresence mode="wait">
-                      <Box sx={{ m: 1 }} component={MotionContainer}>
-                        <m.div variants={varSlide().inUp}>
-                          {superCurrentTab.toLowerCase() == "recharges" ? (
-                            <Recharges />
-                          ) : // <ServiceUnderUpdate />
-                          superCurrentTab.toLowerCase() == "money transfer" ? (
-                            <DMT />
-                          ) : superCurrentTab.toLowerCase() == "aeps" ? (
-                            <AEPS supCategory={tab} />
-                          ) : superCurrentTab.toLowerCase() == "indo nepal" ? (
-                            <IndoNepal supCategory={tab} />
-                          ) : superCurrentTab.toLowerCase() ==
-                            "bill payment" ? (
-                            <BillPayment />
-                          ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
-                            // <AadharPay supCategory={tab} />
-                            <ServiceUnderUpdate />
-                          ) : superCurrentTab.toLowerCase() == "matm" ? (
-                            <MATM supCategory={tab} />
-                          ) : superCurrentTab.toLowerCase() == "dmt1" ? (
-                            <DMT1 />
-                          ) : superCurrentTab.toLowerCase() == "dmt2" ? (
-                            <DMT2 />
-                          ) : null}
-                        </m.div>
-                      </Box>
-                    </AnimatePresence>
-                  </CategoryContext.Provider>
-                )
-            )}
-          </>
-        ) : (
-          <Typography>You are not authorised to use Services</Typography>
-        )}
-      </Grid>
+              {categoryList.map(
+                (tab: any) =>
+                  tab.category_name == superCurrentTab && (
+                    <CategoryContext.Provider
+                      value={tab}
+                      key={tab.category_name}
+                    >
+                      <AnimatePresence mode="wait">
+                        <Box sx={{ m: 1 }} component={MotionContainer}>
+                          <m.div variants={varSlide().inUp}>
+                            {superCurrentTab.toLowerCase() == "recharges" ? (
+                              <Recharges />
+                            ) : // <ServiceUnderUpdate />
+                            superCurrentTab.toLowerCase() ==
+                              "money transfer" ? (
+                              <DMT />
+                            ) : superCurrentTab.toLowerCase() == "aeps" ? (
+                              <AEPS supCategory={tab} />
+                            ) : superCurrentTab.toLowerCase() ==
+                              "indo nepal" ? (
+                              <IndoNepal supCategory={tab} />
+                            ) : superCurrentTab.toLowerCase() ==
+                              "bill payment" ? (
+                              <BillPayment />
+                            ) : superCurrentTab.toLowerCase() ==
+                              "aadhaar pay" ? (
+                              // <AadharPay supCategory={tab} />
+                              <ServiceUnderUpdate />
+                            ) : superCurrentTab.toLowerCase() == "matm" ? (
+                              <MATM supCategory={tab} />
+                            ) : superCurrentTab.toLowerCase() == "dmt1" ? (
+                              <DMT1 />
+                            ) : superCurrentTab.toLowerCase() == "dmt2" ? (
+                              <DMT2 />
+                            ) : null}
+                          </m.div>
+                        </Box>
+                      </AnimatePresence>
+                    </CategoryContext.Provider>
+                  )
+              )}
+            </>
+          )}
+        </Grid>
+      </RoleBasedGuard>
     </>
   );
 }

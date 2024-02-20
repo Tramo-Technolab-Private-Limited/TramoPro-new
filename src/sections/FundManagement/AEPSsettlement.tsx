@@ -30,6 +30,7 @@ import { PATH_DASHBOARD } from "src/routes/paths";
 import { DialogAnimate } from "src/components/animate";
 import dayjs from "dayjs";
 import { fDate, fDateTime } from "src/utils/formatTime";
+import RoleBasedGuard from "src/auth/RoleBasedGuard";
 
 type FormValuesProps = {
   amount: number | null | string;
@@ -73,29 +74,31 @@ export default function AEPSsettlement() {
           View Update Bank Detail | {process.env.REACT_APP_COMPANY_NAME}
         </title>
       </Helmet>
-      <Box
-        sx={{
-          pl: 1,
-          borderTopLeftRadius: 10,
-          borderTopRightRadius: 10,
-        }}
-      >
-        <Tabs
-          value={currentTab}
-          aria-label="basic tabs example"
-          onChange={(event, newValue) => setCurrentTab(newValue)}
+      <RoleBasedGuard hasContent roles={["agent"]}>
+        <Box
+          sx={{
+            pl: 1,
+            borderTopLeftRadius: 10,
+            borderTopRightRadius: 10,
+          }}
         >
-          <Tab label="Settlement To bank" value={1} />
-          <Tab label="Settlement To Main Wallet" value={2} />
-        </Tabs>
-      </Box>
-      <Stack mt={2}>
-        {currentTab === 1 ? (
-          <SettlementToBank userBankList={userBankList} />
-        ) : (
-          <SettlementToMainWallet userBankList={userBankList} />
-        )}
-      </Stack>
+          <Tabs
+            value={currentTab}
+            aria-label="basic tabs example"
+            onChange={(event, newValue) => setCurrentTab(newValue)}
+          >
+            <Tab label="Settlement To bank" value={1} />
+            <Tab label="Settlement To Main Wallet" value={2} />
+          </Tabs>
+        </Box>
+        <Stack mt={2}>
+          {currentTab === 1 ? (
+            <SettlementToBank userBankList={userBankList} />
+          ) : (
+            <SettlementToMainWallet userBankList={userBankList} />
+          )}
+        </Stack>
+      </RoleBasedGuard>
     </>
   );
 }

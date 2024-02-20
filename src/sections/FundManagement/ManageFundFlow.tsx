@@ -15,6 +15,7 @@ import Scrollbar from "src/components/scrollbar/Scrollbar";
 import ConfirmDialog from "src/components/confirm-dialog/ConfirmDialog";
 import TransactionModal from "src/components/customFunctions/TrasactionModal";
 import { CustomAvatar } from "src/components/custom-avatar";
+import RoleBasedGuard from "src/auth/RoleBasedGuard";
 
 type FormValuesProps = {
   transactionType: string;
@@ -233,7 +234,7 @@ export default function ManageFundFlow() {
   };
 
   return (
-    <Stack>
+    <RoleBasedGuard hasContent roles={["distributor", "m_distributor"]}>
       <Grid display={"grid"} m={1}>
         <Typography variant="h3" my={2}>
           Fund Flow
@@ -389,6 +390,6 @@ export default function ManageFundFlow() {
         errorMsg={errorMsg}
         transactionDetail={transactionDetail}
       />
-    </Stack>
+    </RoleBasedGuard>
   );
 }

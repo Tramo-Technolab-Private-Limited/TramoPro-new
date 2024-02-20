@@ -19,7 +19,7 @@ const ICONS = {
   dashboard: icon("ic_dashboard"),
 };
 
-const agentNavConfig = [
+const NavConfig = [
   // GENERAL
   // ----------------------------------------------------------------------
   {
@@ -38,9 +38,15 @@ const agentNavConfig = [
       {
         title: "services",
         path: PATH_DASHBOARD.services,
+        roles: ["agent"],
         icon: ICONS.ecommerce,
       },
-
+      {
+        title: "Network",
+        path: PATH_DASHBOARD.network,
+        roles: ["distributor", "m_distributor"],
+        icon: ICONS.ecommerce,
+      },
       {
         title: "Transactions",
         path: PATH_DASHBOARD.transaction.root,
@@ -86,11 +92,18 @@ const agentNavConfig = [
           },
           {
             title: "AEPS settlement",
+            roles: ["agent"],
             path: PATH_DASHBOARD.fundmanagement.aepssettlement,
           },
           {
             title: "Bank Accounts",
             path: PATH_DASHBOARD.fundmanagement.mybankaccount,
+          },
+          {
+            title: "Manage Fund Flow",
+            roles: ["distributor", "m_distributor"],
+
+            path: PATH_DASHBOARD.fundmanagement.managefundflow,
           },
           {
             title: "My Fund Requests",
@@ -112,4 +125,4 @@ const agentNavConfig = [
   },
 ];
 
-export default agentNavConfig;
+export default NavConfig;
