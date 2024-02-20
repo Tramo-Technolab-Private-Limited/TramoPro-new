@@ -727,7 +727,7 @@ export default function AuthRegisterForm(props: any) {
                   </Stack>
                 ))}
             </Stack>
-            <Stack ml={13}>
+            <Stack ml={20}>
               {refName && (
                 <Stack flexDirection="row" gap={1}>
                   <Typography sx={{ color: "green" }} mt={1}>

@@ -43,6 +43,7 @@ export default function LoginLayout({ children, illustration, title }: Props) {
         </Typography>
 
         <DashboardIcon />
+
         <Typography
           variant="subtitle1"
           sx={{ mt: 5, mb: 10, maxWidth: 580, textAlign: "center" }}
