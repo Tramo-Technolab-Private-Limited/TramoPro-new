@@ -123,7 +123,7 @@ export default function GovernanceForm(props: any) {
     // gst: Yup.number().required('GST Number required').test('len', 'Enter Valid 15-digits GST Number', (val:any) => val.toString().length == 15),
 
     gst:
-      valueTabs == 0 || radioVal !== "Individual"
+      valueTabs == 0
         ? Yup.string()
             .matches(
               /^([0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1})$/,
@@ -417,12 +417,14 @@ export default function GovernanceForm(props: any) {
                 onClick={(e) => handleChangePanel2(e, 1)}
                 control={<Radio />}
                 label="Yes"
+                disabled={saveGst}
               />
               <FormControlLabel
                 value={0}
                 onClick={(e) => handleChangePanel2(e, 0)}
                 control={<Radio />}
                 label="No"
+                disabled={saveGst}
               />
             </RadioGroup>
           </FormControl>
@@ -526,7 +528,7 @@ export default function GovernanceForm(props: any) {
                 gap={1}
               >
                 <Typography variant="h4" color="green">
-                  Business Details Fetched Successfully
+                  Business Details Save Successfully
                 </Typography>
                 <Icon icon="el:ok" color="green" fontSize={25} />
               </Stack>
@@ -553,21 +555,25 @@ export default function GovernanceForm(props: any) {
                       value="Individual"
                       control={<Radio />}
                       label="Individual"
+                      disabled={saveGst}
                     />
                     <FormControlLabel
                       value="Proprietorship"
                       control={<Radio />}
                       label="Proprietorship"
+                      disabled={saveGst}
                     />
                     <FormControlLabel
                       value="Private Limited Company"
                       control={<Radio />}
                       label="Private Limited Company"
+                      disabled={saveGst}
                     />
                     <FormControlLabel
                       value="Partnership"
                       control={<Radio />}
                       label="Partnership"
+                      disabled={saveGst}
                     />
                   </Stack>
                   <Stack flexDirection="row" gap={1}>
@@ -575,16 +581,19 @@ export default function GovernanceForm(props: any) {
                       value="Limited Liability Partnership"
                       control={<Radio />}
                       label="Limited Liability Partnership"
+                      disabled={saveGst}
                     />
                     <FormControlLabel
                       value="One Person Company"
                       control={<Radio />}
                       label="One Person Company"
+                      disabled={saveGst}
                     />
                     <FormControlLabel
                       value="Limited Company"
                       control={<Radio />}
                       label="Limited Company"
+                      disabled={saveGst}
                     />
                   </Stack>
                 </RadioGroup>

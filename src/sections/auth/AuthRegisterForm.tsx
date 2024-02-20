@@ -508,6 +508,7 @@ export default function AuthRegisterForm(props: any) {
     HandleEmailCode();
     HandleMobileCode();
     setCheckbox(false);
+    clearTimeout(timer);
   };
 
   const HandleMobileCode = () => {

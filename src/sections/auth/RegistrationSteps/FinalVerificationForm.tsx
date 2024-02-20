@@ -548,12 +548,16 @@ function PersonalIdentification(props: any) {
               if (Response.data.status == "success") {
                 enqueueSnackbar("successfully file uploaded");
                 console.log("===200=shop====", Response.data.filePath);
-                // shopImg.push(Response.data.filePath)
+
                 let path = Response.data.filePath;
                 if (shoppath?.length < 3) {
                   setShoppath((shoppath) => [...shoppath, path]);
                   setAadharFileShopBtnDis(true);
                   setbtnDisabledForGstDocsShop(false);
+                  console.log(
+                    "///////////////////////////////////////////////////////////////////////",
+                    "jjjjjjjjjjjjjjjjjj"
+                  );
                 } else {
                   enqueueSnackbar("Only 3 images you can select!");
                 }
@@ -574,7 +578,7 @@ function PersonalIdentification(props: any) {
   };
   const ShopImageCard = {
     Bucket: process.env.REACT_APP_AWS_BUCKET_NAME,
-    Key: shoppath?.map((item: any) => item?.split("/").splice(4, 4).join("/")),
+    Key: shoppath[0]?.split("/").splice(4, 4).join("/"),
     Expires: 600, // Expiration time in seconds
   };
 
@@ -595,6 +599,8 @@ function PersonalIdentification(props: any) {
       setAadharFileChequeBtnDis(false);
     } else if (docVal == "ShopImage") {
       setAadharFileShopBtnDis(false);
+    } else if (docVal == "Selfie") {
+      setAadharFileSelfieBtnDis(false);
     }
   };
   const onSubmit = (data: FormValuesProps) => {
@@ -779,7 +785,7 @@ function PersonalIdentification(props: any) {
                                             handleDocuments("AadharFront")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
 
                                         <Image
@@ -914,7 +920,7 @@ function PersonalIdentification(props: any) {
                                             handleDocuments("AadharBack")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={
@@ -1050,7 +1056,7 @@ function PersonalIdentification(props: any) {
                                             handleDocuments("PanNumber")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={PANCard && PANCard}
@@ -1183,7 +1189,7 @@ function PersonalIdentification(props: any) {
                                             handleDocuments("CancelledCheque")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={
@@ -1319,7 +1325,7 @@ function PersonalIdentification(props: any) {
                                             handleDocuments("Selfie")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
 
                                         <Image
@@ -1450,15 +1456,15 @@ function PersonalIdentification(props: any) {
                                             handleDocuments("ShopImage")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={ShopImage && ShopImage}
                                           style={{
                                             borderRadius: "3px",
                                             border: "1px solid black",
-                                            width: 40,
-                                            height: 40,
+                                            width: 50,
+                                            height: 50,
                                           }}
                                           onClick={() =>
                                             ShopImage && handleOpen(ShopImage)
@@ -2437,7 +2443,7 @@ function ConstitutionIdentification() {
                                             handlePIDDocuments("MSME")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
 
                                         <Image
@@ -2574,7 +2580,7 @@ function ConstitutionIdentification() {
                                             handlePIDDocuments("MSME")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={imageMSME && imageMSME}
@@ -2712,7 +2718,7 @@ function ConstitutionIdentification() {
                                               handlePIDDocuments("BusPrf")
                                             }
                                           >
-                                            Reset
+                                            Clear
                                           </Button>
                                           <Image
                                             src={imagePAN && imagePAN}
@@ -2847,7 +2853,7 @@ function ConstitutionIdentification() {
                                             )
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
 
                                         <Image
@@ -2985,7 +2991,7 @@ function ConstitutionIdentification() {
                                             )
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={
@@ -3120,7 +3126,7 @@ function ConstitutionIdentification() {
                                             handlePIDDocuments("Incorporation")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={imageCOI && imageCOI}
@@ -3251,7 +3257,7 @@ function ConstitutionIdentification() {
                                             handlePIDDocuments("MOA")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={imageMOA && imageMOA}
@@ -3382,7 +3388,7 @@ function ConstitutionIdentification() {
                                             handlePIDDocuments("AOA")
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
 
                                         <Image
@@ -3518,7 +3524,7 @@ function ConstitutionIdentification() {
                                             )
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={
@@ -3653,7 +3659,7 @@ function ConstitutionIdentification() {
                                             )
                                           }
                                         >
-                                          Reset
+                                          Clear
                                         </Button>
                                         <Image
                                           src={
