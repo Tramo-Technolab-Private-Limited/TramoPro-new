@@ -320,36 +320,36 @@ export default function MyTransactions() {
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.id?.firstName
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.id?.firstName
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.id?.firstName
-                          : "",
+                      ? item?.distributorDetails?.id?.firstName
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.id?.firstName
+                      : "",
 
                   "Opening Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.oldMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.oldMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.oldMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.oldMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.oldMainWalletBalance
+                      : "",
 
                   "Closing Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.newMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.newMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.newMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.newMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.newMainWalletBalance
+                      : "",
                   " Commission Amount":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.commissionAmount
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.commissionAmount
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.commissionAmount
-                          : "",
+                      ? item?.distributorDetails?.commissionAmount
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.commissionAmount
+                      : "",
                   amount: item?.amount,
                   credit: item?.credit,
                   debit: item?.debit,
@@ -535,8 +535,8 @@ export default function MyTransactions() {
                       user?.role == "m_distributor"
                         ? tableLabels
                         : user?.role == "distributor"
-                          ? tableLabels1
-                          : tableLabels2
+                        ? tableLabels1
+                        : tableLabels2
                     }
                   />
 
@@ -589,11 +589,11 @@ function TransactionRow({ row }: childProps) {
   const [newRow, setNewRow] = useState(row);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-  const [textFieldValue, setTextFieldValue] = useState('');
+  const [textFieldValue, setTextFieldValue] = useState("");
   const openModal = () => setModalOpen(true);
   const closeModal = () => setModalOpen(false);
 
-  const handleTextFieldChange = (event:any) => {
+  const handleTextFieldChange = (event: any) => {
     setTextFieldValue(event.target.value);
   };
 
@@ -605,11 +605,11 @@ function TransactionRow({ row }: childProps) {
       rowFor.categoryName.toLowerCase() == "money transfer"
         ? `moneyTransfer/checkStatus/` + rowFor._id
         : rowFor.categoryName.toLowerCase() == "recharges"
-          ? `agents/v1/checkStatus/` + rowFor._id
-          : rowFor.categoryName.toLowerCase() == "dmt2"
-            ? `dmt2/transaction/status/` + rowFor._id
-            : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
-            `settlement/checkStatus/` + rowFor._id,
+        ? `agents/v1/checkStatus/` + rowFor._id
+        : rowFor.categoryName.toLowerCase() == "dmt2"
+        ? `dmt2/transaction/status/` + rowFor._id
+        : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
+          `settlement/checkStatus/` + rowFor._id,
       "GET",
       "",
       token
@@ -785,8 +785,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.oldMainWalletBalance
-                  : newRow?.masterDistributorDetails?.oldMainWalletBalance
+                ? newRow?.distributorDetails?.oldMainWalletBalance
+                : newRow?.masterDistributorDetails?.oldMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -810,8 +810,8 @@ function TransactionRow({ row }: childProps) {
                 user?.role === "agent"
                   ? newRow?.agentDetails?.creditedAmount
                   : user?.role === "distributor"
-                    ? newRow?.distributorDetails?.creditedAmount
-                    : newRow?.masterDistributorDetails?.creditedAmount
+                  ? newRow?.distributorDetails?.creditedAmount
+                  : newRow?.masterDistributorDetails?.creditedAmount
               ) || 0}
             </Typography>
           </Stack>
@@ -824,8 +824,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.newMainWalletBalance
-                  : newRow?.masterDistributorDetails?.newMainWalletBalance
+                ? newRow?.distributorDetails?.newMainWalletBalance
+                : newRow?.masterDistributorDetails?.newMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -844,7 +844,7 @@ function TransactionRow({ row }: childProps) {
               TDS :{" "}
               {fCurrency(
                 (user?.role == "agent" && newRow?.agentDetails?.TDSAmount) ||
-                "0"
+                  "0"
               )}
             </Typography>
           </StyledTableCell>
@@ -906,11 +906,7 @@ function TransactionRow({ row }: childProps) {
       </StyledTableRow>
       <Modal open={modalOpen} onClose={closeModal}>
         <Grid sx={style}>
-          <Stack
-            flexDirection={"row"}
-            justifyContent={"flex-end"}
-            mx={1}
-          >
+          <Stack flexDirection={"row"} justifyContent={"flex-end"} mx={1}>
             <Tooltip title="Close" onClick={closeModal}>
               <IconButton>
                 <Iconify icon="carbon:close-outline" />
@@ -928,13 +924,11 @@ function TransactionRow({ row }: childProps) {
               onAfterPrint={closeModal}
             />
           </Stack>
-          <Grid ref={componentRef} sx={{ p:3}}>
+          <Grid ref={componentRef} sx={{ p: 3 }}>
             <Grid container spacing={0}>
               <Grid item xs={12} sm={4}>
                 <Stack flexDirection={"row"} gap={1}>
-                  <Typography variant="caption">
-                    Agent Name:{" "}
-                  </Typography>
+                  <Typography variant="caption">Agent Name: </Typography>
                   <Typography variant="caption">
                     {`${user?.firstName} ${user?.lastName}`}
                   </Typography>
@@ -946,46 +940,28 @@ function TransactionRow({ row }: childProps) {
                   </Typography>
                 </Stack>
                 <Stack flexDirection={"row"} gap={1}>
-                  <Typography variant="caption">
-                    {" "}
-                    Mobile Number:{" "}
-                  </Typography>
-                  <Typography variant="caption">
-                    {user?.contact_no}
-                  </Typography>
+                  <Typography variant="caption"> Mobile Number: </Typography>
+                  <Typography variant="caption">{user?.contact_no}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} gap={1}>
-                  <Typography variant="caption">
-                    {" "}
-                    Shop Name:{" "}
-                  </Typography>
-                  <Typography variant="caption">
-                    {user?.shopAddress}
-                  </Typography>
+                  <Typography variant="caption"> Shop Name: </Typography>
+                  <Typography variant="caption">{user?.shopAddress}</Typography>
                 </Stack>
                 <Stack flexDirection={"row"} gap={1} mt={4}>
-                  <Typography variant="caption">
-                    Sender Name :{" "}
-                  </Typography>
+                  <Typography variant="caption">Sender Name : </Typography>
                   <Typography variant="caption">
                     {newRow?.moneyTransferSenderId?.remitterFN}
                     {newRow?.moneyTransferSenderId?.remitterLN}{" "}
                   </Typography>
                 </Stack>
                 <Stack flexDirection={"row"} gap={1}>
-                  <Typography variant="caption">
-                    {" "}
-                    Mobile Number:{" "}
-                  </Typography>
+                  <Typography variant="caption"> Mobile Number: </Typography>
                   <Typography variant="caption">
                     {newRow?.moneyTransferSenderId?.remitterMobile}
                   </Typography>
                 </Stack>
                 <Stack flexDirection={"row"} gap={1}>
-                  <Typography variant="caption">
-                    {" "}
-                    Service Type:{" "}
-                  </Typography>
+                  <Typography variant="caption"> Service Type: </Typography>
                   <Typography variant="caption">
                     {newRow?.productName}
                   </Typography>
@@ -1014,24 +990,15 @@ function TransactionRow({ row }: childProps) {
                     </Typography>
                   </Stack>
                   <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2">
-                      {" "}
-                      Bank Name:{" "}
-                    </Typography>
+                    <Typography variant="body2"> Bank Name: </Typography>
                     <Typography variant="body2">
                       {newRow?.moneyTransferBeneficiaryDetails?.bankName}
                     </Typography>
                   </Stack>
                   <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Account Number: </Typography>
                     <Typography variant="body2">
-                      {" "}
-                      Account Number:{" "}
-                    </Typography>
-                    <Typography variant="body2">
-                      {
-                        newRow?.moneyTransferBeneficiaryDetails
-                          ?.accountNumber
-                      }
+                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
                     </Typography>
                   </Stack>
                   <Stack flexDirection={"row"} gap={1}>
@@ -1046,7 +1013,9 @@ function TransactionRow({ row }: childProps) {
             <Grid>
               <Scrollbar sx={{ maxHeight: 600 }}>
                 <Stack sx={{ pr: 2 }}>
-                  <TableContainer sx={{ overflow: "unset", border: "solid 1px" }}>
+                  <TableContainer
+                    sx={{ overflow: "unset", border: "solid 1px" }}
+                  >
                     <Table>
                       <TableRow
                         sx={{
@@ -1121,22 +1090,43 @@ function TransactionRow({ row }: childProps) {
                       </TableBody>
                     </Table>
                   </TableContainer>
-                  <Stack >
-                    <Typography align="left" variant="body2" whiteSpace={"nowrap"}>
+                  <Stack>
+                    <Typography
+                      align="left"
+                      variant="body2"
+                      whiteSpace={"nowrap"}
+                    >
                       Transaction Amount : {" " + fCurrency(newRow.amount)}
                     </Typography>
-                    <Typography align="left" variant="body2" whiteSpace={"nowrap"}>
-                      Agent Convienience Fee:    <TextField
+                    <Typography
+                      align="left"
+                      variant="body2"
+                      whiteSpace={"nowrap"}
+                    >
+                      Agent Convienience Fee:{" "}
+                      <TextField
                         variant="standard"
                         size="small"
                         value={textFieldValue}
                         onChange={handleTextFieldChange}
-                      /> 
+                      />
                     </Typography>
                     <Grid item xs={12} md={9}>
-                        <Typography variant="caption">The convienience fee charged is the sole responsibility of the Agent. Tramo assumes no libiility for the imposition of this fee and any associated consequences or issues arising from its application rest entirely with the Agent </Typography>
-                      </Grid>
-                    <Typography align="left" variant="body1" whiteSpace={"nowrap"}>Total Amount:{`${+textFieldValue + +newRow.amount}`}</Typography>
+                      <Typography variant="caption">
+                        The convienience fee charged is the sole responsibility
+                        of the Agent. Tramo assumes no libiility for the
+                        imposition of this fee and any associated consequences
+                        or issues arising from its application rest entirely
+                        with the Agent{" "}
+                      </Typography>
+                    </Grid>
+                    <Typography
+                      align="left"
+                      variant="body1"
+                      whiteSpace={"nowrap"}
+                    >
+                      Total Amount:{`${+textFieldValue + +newRow.amount}`}
+                    </Typography>
                   </Stack>
                   <Typography variant="subtitle2">NOTES</Typography>
                   <Grid container>
@@ -1145,25 +1135,31 @@ function TransactionRow({ row }: childProps) {
                         This transaction receipt is generated automatically and
                         dose not require a physical signature. It is not a tax
                         invoice but serves as a record of your transaction with
-                        Tramo. Please retain it for your refrence, and if you have
-                        any queries, fell free to contact our Customer Support
-                        team.
+                        Tramo. Please retain it for your refrence, and if you
+                        have any queries, fell free to contact our Customer
+                        Support team.
                       </Typography>
                       <Typography>
                         <Stack
                           flexDirection={{ xs: "column", sm: "row" }}
-                          sx={{ color: "white", bgcolor: "darkblue", pt: 1, pb: 1 }}
+                          sx={{
+                            color: "white",
+                            bgcolor: "darkblue",
+                            pt: 1,
+                            pb: 1,
+                          }}
                           justifyContent="space-between"
                         >
                           <Typography variant="caption">
-                            Helpline Numbers +{process.env.REACT_APP_COMPANY_MOBILE} ,{" "}
+                            Helpline Numbers +
+                            {process.env.REACT_APP_COMPANY_MOBILE} ,{" "}
                             {process.env.REACT_APP_COMPANY_MOBILEOTHER}
                           </Typography>
                           <Typography variant="caption">
                             Timings : 08:00AM to 10:00 PM (Mon-Sun)
                           </Typography>
                           <Typography variant="caption">
-                            {process.env.REACT_APP_COMPANY_EMAIL}
+                            Email : {process.env.REACT_APP_COMPANY_EMAIL}
                           </Typography>
                         </Stack>
                       </Typography>
@@ -1172,7 +1168,10 @@ function TransactionRow({ row }: childProps) {
                 </Stack>
               </Scrollbar>
             </Grid>
-            <Divider variant="fullWidth" style={{ borderWidth: '2px', borderStyle: 'dashed '}} />
+            <Divider
+              variant="fullWidth"
+              style={{ borderWidth: "2px", borderStyle: "dashed " }}
+            />
           </Grid>
         </Grid>
       </Modal>

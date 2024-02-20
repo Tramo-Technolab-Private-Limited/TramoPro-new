@@ -37,7 +37,7 @@ export default function StepsLayout() {
               Timings : 08:00AM to 10:00 PM (Mon-Sun)
             </Typography>
             <Typography variant="subtitle2">
-              {process.env.REACT_APP_COMPANY_EMAIL}
+              Email : {process.env.REACT_APP_COMPANY_EMAIL}
             </Typography>
           </Stack>
         </Container>

@@ -121,10 +121,15 @@ export default function AuthRegisterForm(props: any) {
   const [showPassword2, setconfirmPassword] = useState(false);
   const [value2, setvalue2] = React.useState("agent");
   const [radioVal, setRadioVal] = React.useState("agent");
+  const [timer, setTimer] = useState(0);
+  const [timerEmail, setTimerEmail] = useState(0);
   const [refName, setRefName] = useState("");
   const [verifyLoad, setVerifyLoad] = useState(false);
   const [ClearForm, setClearForm] = useState(true);
   const [gOTP, setgOTP] = useState(false);
+  const [resendotpMobile, setResendOtp] = useState(false);
+  const [resendotpEmail, setResendotpEmail] = useState(false);
+
   const [refShow, setRefShow] = useState(false);
   const [checkbox, setCheckbox] = useState(false);
   const label = { inputProps: { "aria-label": "Checkbox demo" } };
@@ -244,6 +249,7 @@ export default function AuthRegisterForm(props: any) {
   const {
     register: otpForm,
     reset: otpReset,
+    watch: watchOpt,
     setValue: otpSetValue,
     handleSubmit: handleOtpSubmit,
     formState: { errors: error2, isSubmitting: isSubmitting2 },
@@ -273,6 +279,29 @@ export default function AuthRegisterForm(props: any) {
     setFormValues({ ...formValues, refCode: "" });
   };
 
+  useEffect(() => {
+    let time = setTimeout(() => {
+      setTimer(timer - 1);
+    }, 1000);
+    if (timer == 0) {
+      clearTimeout(time);
+      // setOtpSend(false);
+      setResendOtp(false);
+    }
+  }, [timer]);
+
+  useEffect(() => {
+    let time = setTimeout(() => {
+      setTimerEmail(timerEmail - 1);
+    }, 1000);
+    if (timerEmail == 0) {
+      clearTimeout(time);
+      // setOtpSend(false);
+
+      setResendotpEmail(false);
+    }
+  }, [timerEmail]);
+
   const onSubmit = (data: FormValuesProps) => {
     setFormValues({
       ...formValues,
@@ -292,7 +321,11 @@ export default function AuthRegisterForm(props: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
           setgOTP(true);
-          setCheckbox(false);
+          setTimer(60);
+          setTimerEmail(60);
+          // setCheckbox(false);
+          setResendOtp(true);
+          setResendotpEmail(true);
           setClearForm(false);
         } else {
           enqueueSnackbar(Response.data.message);
@@ -320,6 +353,27 @@ export default function AuthRegisterForm(props: any) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
+          setTimer(60);
+          setResendOtp(true);
+        } else {
+          enqueueSnackbar(Response.data.message);
+        }
+      }
+    });
+  };
+
+  const resendOtpEmail = (email: string, mobile: string) => {
+    let body = {
+      email: email.toLowerCase(),
+      mobileNumber: mobile,
+    };
+    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+      console.log("=============>" + JSON.stringify(Response));
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          enqueueSnackbar(Response.data.message);
+          setTimerEmail(60);
+          setResendotpEmail(true);
         } else {
           enqueueSnackbar(Response.data.message);
         }
@@ -534,16 +588,23 @@ export default function AuthRegisterForm(props: any) {
             onChange={handleChangeTab}
             row
           >
-            <FormControlLabel label="Agent" value="agent" control={<Radio />} />
+            <FormControlLabel
+              label="Agent"
+              value="agent"
+              control={<Radio />}
+              disabled={gOTP}
+            />
             <FormControlLabel
               label="Distributor"
               value="distributor"
               control={<Radio />}
+              disabled={gOTP}
             />
             <FormControlLabel
               label="Master Distributor"
               value="m_distributor"
               control={<Radio />}
+              disabled={gOTP}
             />
           </RadioGroup>
 
@@ -575,6 +636,7 @@ export default function AuthRegisterForm(props: any) {
                   value="agent"
                   control={<Radio />}
                   label="Distributor"
+                  disabled={gOTP}
                 />
               </RadioGroup>
             </FormControl>
@@ -599,6 +661,7 @@ export default function AuthRegisterForm(props: any) {
                   value="distributor"
                   control={<Radio />}
                   label="Master Distributor"
+                  disabled={gOTP}
                 />
               </RadioGroup>
             </FormControl>
@@ -748,7 +811,7 @@ export default function AuthRegisterForm(props: any) {
             fullWidth
             size="small"
             variant="contained"
-            disabled={!checkbox}
+            disabled={!checkbox || gOTP}
             // onClick={sendOTP}
             loading={isSubmitting}
             type="submit"
@@ -798,11 +861,19 @@ export default function AuthRegisterForm(props: any) {
                 <Stack rowGap={0.5}>
                   <Button
                     variant="contained"
-                    style={{ float: "right", fontSize: "10px", height: "25px" }}
+                    style={{
+                      float: "right",
+                      fontSize: "10px",
+                      height: "25px",
+                    }}
                     onClick={() => resendOtp("", formValues.mobileNumber)}
                     size="small"
+                    disabled={resendotpMobile}
                   >
-                    Resend code
+                    <Typography sx={{ whiteSpace: "nowrap" }} variant="caption">
+                      {" "}
+                      Resend code {timer !== 0 && `(${timer})`}{" "}
+                    </Typography>
                   </Button>
 
                   <Button
@@ -810,6 +881,7 @@ export default function AuthRegisterForm(props: any) {
                     style={{ float: "right", fontSize: "10px", height: "25px" }}
                     onClick={HandleMobileCode}
                     size="small"
+                    disabled={watchOpt("code1") == ""}
                   >
                     Clear
                   </Button>
@@ -832,14 +904,6 @@ export default function AuthRegisterForm(props: any) {
               style={{ textAlign: "left", marginBottom: "0" }}
             >
               Email Verification Code &nbsp;
-              {/* <Link
-                sx={{ cursor: "pointer" }}
-                variant="subtitle2"
-                style={{ float: "right" }}
-                onClick={() => resendOtp(formValues.email, "")}
-              >
-                Resend code
-              </Link> */}
             </Typography>
             <Stack
               sx={{
@@ -856,17 +920,22 @@ export default function AuthRegisterForm(props: any) {
               <Stack rowGap={0.5}>
                 <Button
                   variant="contained"
-                  style={{ float: "right", fontSize: "10px", height: "25px" }}
-                  onClick={() => resendOtp(formValues.email, "")}
+                  style={{ float: "left", fontSize: "10px", height: "25px" }}
+                  onClick={() => resendOtpEmail(formValues.email, "")}
                   size="small"
+                  disabled={resendotpEmail}
                 >
-                  Resend code
+                  <Typography sx={{ whiteSpace: "nowrap" }} variant="caption">
+                    {" "}
+                    Resend code {timerEmail !== 0 && `(${timerEmail})`}
+                  </Typography>
                 </Button>
                 <Button
                   variant="outlined"
                   size="small"
-                  style={{ float: "right", fontSize: "10px", height: "25px" }}
+                  style={{ float: "left", fontSize: "10px", height: "25px" }}
                   onClick={HandleEmailCode}
+                  disabled={watchOpt("otp1") == ""}
                 >
                   Clear
                 </Button>

@@ -212,6 +212,7 @@ export default function AadharForm(props: any) {
     setValue("aadhar", "");
     setOtpSendSuccess(false);
     clearTimeout(timer);
+    setResendOtp(false);
   };
 
   const resendOtp = () => {
@@ -697,7 +698,7 @@ function PanCard(props: any) {
   };
 
   return (
-    <Stack flexDirection="row" gap={10}>
+    <Stack>
       <Grid
         display={"grid"}
         gridTemplateColumns={{ xs: "repeat(1, 1fr)", sm: "repeat(1, 1fr)" }}
@@ -706,11 +707,9 @@ function PanCard(props: any) {
         mt={4}
       >
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-          <Stack flexDirection={"row"} justifyContent={"space-evenly"} gap={2}>
+          <Stack width={{ xs: "100%", sm: "80%", md: "60%", lg: "30%" }}>
             <TextField
               error={!!errors.pan}
-              // sx={{ width: "100%" }}
-              fullWidth
               size="small"
               label="Pan Number"
               disabled={user?.PANnumber}
@@ -797,13 +796,13 @@ function PanCard(props: any) {
           alt="auth"
           src={PanImage}
           sx={{
-            width: "50%",
+            width: "40%",
             marginTop: "50px",
             // height: '200px',
             // backgroundSize: 'cover',
             // boxShadow: 10,
             // border: '20px  #F0F9FB',
-            marginLeft: "250px",
+            marginLeft: "350px",
           }}
         />
       </Stack>
