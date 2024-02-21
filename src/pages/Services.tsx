@@ -109,7 +109,7 @@ export default function Services(props: any) {
                     >
                       <AnimatePresence mode="wait">
                         <Box sx={{ m: 1 }} component={MotionContainer}>
-                          <m.div variants={varSlide().inLeft}>
+                          <m.div variants={varSlide().inUp}>
                             {superCurrentTab.toLowerCase() == "recharges" ? (
                               <Recharges />
                             ) : // <ServiceUnderUpdate />

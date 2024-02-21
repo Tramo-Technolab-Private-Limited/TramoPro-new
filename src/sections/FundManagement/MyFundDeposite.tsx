@@ -9,7 +9,12 @@ import {
 import { Api } from "src/webservices";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { m, AnimatePresence } from "framer-motion";
-import { MotionContainer, varBounce, varSlide } from "src/components/animate";
+import {
+  MotionContainer,
+  varBounce,
+  varFade,
+  varSlide,
+} from "src/components/animate";
 import { fundRequestProps } from "./fundDeposits/types";
 
 export const BankAccountContext = createContext([]);
@@ -70,27 +75,24 @@ export default function MyFundDeposite() {
         <Scrollbar sx={{ maxHeight: window.innerHeight - 120, p: 2 }}>
           <Grid container spacing={2} p={1}>
             <Grid item sm={12} md={4}>
-              <m.div
-                variants={varBounce({ durationIn: 1.1 }).in}
-                style={{ height: "100%" }}
-              >
+              <m.div variants={varFade().inLeft} style={{ height: "100%" }}>
                 <NewFundRequest getRaisedRequest={getFundReq} />
               </m.div>
             </Grid>
             <Grid item spacing={2} sm={12} md={8}>
               <Grid item mb={2}>
-                <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+                <m.div variants={varFade().inRight}>
                   <CompanyBankAccounts />
                 </m.div>
               </Grid>
               <Grid item>
-                <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+                <m.div variants={varFade().inRight}>
                   <InstantDepositAccounts />
                 </m.div>
               </Grid>
             </Grid>
             <Grid item xs={12}>
-              <m.div variants={varBounce({ durationIn: 1.1 }).in}>
+              <m.div variants={varFade().inUp}>
                 <FundDepositeTable
                   tableData={tableData}
                   getRaisedRequest={getFundReq}
