@@ -400,7 +400,6 @@ export default function AEPS(props: any) {
         } else {
           handleCloseLoading();
           handleOpenError();
-          setFailedMessage("Internal Server Error");
         }
       }
     );
@@ -657,6 +656,8 @@ export default function AEPS(props: any) {
     if (localAttendance <= 0) {
       clearTimeout(localTime);
       setAttend(false);
+      handleCloseAttendance();
+      handleCloseConfirmDetail();
     }
   }, [localAttendance]);
 
@@ -1019,14 +1020,14 @@ export default function AEPS(props: any) {
             style={{ borderRadius: "20px" }}
             width={{ sm: "100%", md: "60%" }}
           >
-            {statement.length ? (
-              <TableContainer sx={{ overflow: "unset" }}>
-                {resAmount && (
-                  <Typography variant="h2" textAlign={"center"}>
-                    Balance: {resAmount}
-                  </Typography>
-                )}
-                <Scrollbar sx={{ maxHeight: 500 }}>
+            <Scrollbar sx={{ maxHeight: 500 }}>
+              {statement.length ? (
+                <TableContainer sx={{ overflow: "unset" }}>
+                  {resAmount && (
+                    <Typography variant="h2" textAlign={"center"}>
+                      Balance: {resAmount}
+                    </Typography>
+                  )}
                   <Table>
                     <TableHeadCustom headLabel={tableHead} />
                     <TableBody>
@@ -1052,20 +1053,20 @@ export default function AEPS(props: any) {
                       )}
                     </TableBody>
                   </Table>
-                </Scrollbar>
-              </TableContainer>
-            ) : (
-              <Typography variant="h3" noWrap>
-                Statement Not Available
-              </Typography>
-            )}
-            <Button
-              variant="contained"
-              onClick={handleCloseResponse}
-              sx={{ my: 3 }}
-            >
-              Close
-            </Button>
+                </TableContainer>
+              ) : (
+                <Typography variant="h3" noWrap>
+                  Statement Not Available
+                </Typography>
+              )}
+              <Button
+                variant="contained"
+                onClick={handleCloseResponse}
+                sx={{ my: 3 }}
+              >
+                Close
+              </Button>
+            </Scrollbar>
           </Box>
         ) : (
           <Box

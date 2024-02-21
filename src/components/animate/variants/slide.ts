@@ -6,7 +6,7 @@ import { varTranEnter, varTranExit } from "./transition";
 // ----------------------------------------------------------------------
 
 export const varSlide = (props?: VariantsType) => {
-  const distance = props?.distance || "100vw";
+  const distance = props?.distance || 160;
   const durationIn = props?.durationIn;
   const durationOut = props?.durationOut;
   const easeIn = props?.easeIn;
@@ -15,24 +15,56 @@ export const varSlide = (props?: VariantsType) => {
   return {
     // IN
     inUp: {
-      initial: { y: distance },
-      animate: { y: 0, transition: varTranEnter({ durationIn, easeIn }) },
-      exit: { y: distance, transition: varTranExit({ durationOut, easeOut }) },
+      initial: { y: distance, opacity: 0 },
+      animate: {
+        y: 0,
+        opacity: 1,
+        transition: varTranEnter({ durationIn, easeIn }),
+      },
+      exit: {
+        y: distance,
+        opacity: 0,
+        transition: varTranExit({ durationOut, easeOut }),
+      },
     },
     inDown: {
-      initial: { y: -distance },
-      animate: { y: 0, transition: varTranEnter({ durationIn, easeIn }) },
-      exit: { y: -distance, transition: varTranExit({ durationOut, easeOut }) },
+      initial: { y: -distance, opacity: 0 },
+      animate: {
+        y: 0,
+        opacity: 1,
+        transition: varTranEnter({ durationIn, easeIn }),
+      },
+      exit: {
+        y: -distance,
+        opacity: 0,
+        transition: varTranExit({ durationOut, easeOut }),
+      },
     },
     inLeft: {
-      initial: { x: -distance },
-      animate: { x: 0, transition: varTranEnter({ durationIn, easeIn }) },
-      exit: { x: -distance, transition: varTranExit({ durationOut, easeOut }) },
+      initial: { x: -distance, opacity: 0 },
+      animate: {
+        x: 0,
+        opacity: 1,
+        transition: varTranEnter({ durationIn, easeIn }),
+      },
+      exit: {
+        x: -distance,
+        opacity: 0,
+        transition: varTranExit({ durationOut, easeOut }),
+      },
     },
     inRight: {
-      initial: { x: distance },
-      animate: { x: 0, transition: varTranEnter({ durationIn, easeIn }) },
-      exit: { x: distance, transition: varTranExit({ durationOut, easeOut }) },
+      initial: { x: distance, opacity: 0 },
+      animate: {
+        x: 0,
+        opacity: 1,
+        transition: varTranEnter({ durationIn, easeIn }),
+      },
+      exit: {
+        x: distance,
+        opacity: 0,
+        transition: varTranExit({ durationOut, easeOut }),
+      },
     },
 
     // OUT
