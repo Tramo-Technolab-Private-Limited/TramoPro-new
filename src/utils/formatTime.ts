@@ -4,6 +4,13 @@ import { format, getTime, formatDistanceToNow } from "date-fns";
 
 type InputValue = Date | string | number | null;
 
+
+export function fDateFormatForApi(date: InputValue, newFormat?: string) {
+  const fm = newFormat || "dd/MM/yyyy";
+
+  return date ? format(new Date(date), fm) : "";
+}
+
 export function fDate(date: InputValue, newFormat?: string) {
   const fm = newFormat || "dd MMM yyyy";
 

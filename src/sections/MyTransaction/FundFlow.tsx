@@ -28,7 +28,7 @@ import FileFilterButton from "./FileFilterButton";
 import Iconify from "src/components/iconify/Iconify";
 import ApiDataLoading from "../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
-import { fDate, fDateTime } from "src/utils/formatTime";
+import { fDate, fDateFormatForApi, fDateTime } from "src/utils/formatTime";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -120,8 +120,8 @@ export default function FundFlow() {
       clientRefId: getValues("clientRefId"),
       status: getValues("status"),
       transactionType: "",
-      startDate: dayjs(getValues("startDate")).add(1, "day"),
-      endDate: dayjs(getValues("endDate")).add(1, "day"),
+      startDate: fDateFormatForApi(getValues("startDate")),
+      endDate: fDateFormatForApi(getValues("endDate")),
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
@@ -170,8 +170,9 @@ export default function FundFlow() {
       clientRefId: data.clientRefId,
       status: data.status,
       transactionType: "",
-      startDate: formattedStart,
-      endDate: formattedSEndDate,
+      startDate: fDateFormatForApi(getValues("startDate")),
+      endDate: fDateFormatForApi(getValues("endDate")),
+
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
@@ -243,9 +244,15 @@ export default function FundFlow() {
                     inputFormat="DD/MM/YYYY"
                     value={watch("startDate")}
                     maxDate={new Date()}
-                    onChange={(newValue: any) => setValue("startDate", newValue)}
+                    onChange={(newValue: any) =>
+                      setValue("startDate", newValue)
+                    }
                     renderInput={(params: any) => (
-                      <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                      <TextField
+                        {...params}
+                        size={"small"}
+                        sx={{ width: 150 }}
+                      />
                     )}
                   />
                   <DatePicker
@@ -256,7 +263,11 @@ export default function FundFlow() {
                     maxDate={new Date()}
                     onChange={(newValue: any) => setValue("endDate", newValue)}
                     renderInput={(params: any) => (
-                      <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                      <TextField
+                        {...params}
+                        size={"small"}
+                        sx={{ width: 150 }}
+                      />
                     )}
                   />
                 </LocalizationProvider>

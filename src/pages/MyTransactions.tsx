@@ -65,6 +65,7 @@ import { CustomAvatar } from "src/components/custom-avatar";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { fDateFormatForApi } from "src/utils/formatTime";
 
 // ----------------------------------------------------------------------
 
@@ -297,8 +298,8 @@ export default function MyTransactions() {
       clientRefId: "",
       status: "",
       transactionType: "",
-      startDate: dayjs(getValues("startDate")).add(1, "day"),
-      endDate: dayjs(getValues("endDate")).add(1, "day"),
+      startDate: fDateFormatForApi(getValues("startDate")),
+      endDate: fDateFormatForApi(getValues("endDate")),
     };
 
     Api(`transaction/transactionByUser`, "POST", body, token).then(
