@@ -9,7 +9,7 @@ export function fNumber(number: InputValue) {
 }
 
 export function fCurrency(number: InputValue) {
-  const format = number ? numeral(number).format("0,0.00") : "";
+  const format = number ? numeral(number).format("00,00.00") : "";
 
   return result(format ? "₹" + format : format, ".00");
 }
@@ -36,4 +36,13 @@ function result(format: string, key = ".00") {
   const isInteger = format.includes(key);
 
   return isInteger ? format.replace(key, "") : format;
+}
+
+export function fIndianCurrency(number: InputValue) {
+  const format = number ? number : "";
+  return format.toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+    style: "currency",
+    currency: "INR",
+  });
 }

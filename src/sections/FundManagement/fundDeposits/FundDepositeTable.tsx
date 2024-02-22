@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
 import EditIcon from "src/assets/icons/EditIcon";
 import Label from "src/components/label/Label";
 import { TableHeadCustom } from "src/components/table";
-import { fCurrency } from "src/utils/formatNumber";
+import { fIndianCurrency } from "src/utils/formatNumber";
 import { fDate } from "src/utils/formatTime";
 import { fundRequestProps } from "./types";
 import { format } from "date-fns";
@@ -133,7 +133,7 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
           }
           sx={{ textTransform: "capitalize" }}
         >
-          {fCurrency(row?.amount)}
+          {fIndianCurrency(row?.amount)}
         </Label>
       </TableCell>
       <TableCell>
@@ -142,7 +142,7 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
           color={row.Charge !== "NA" ? "error" : "success"}
           sx={{ textTransform: "capitalize" }}
         >
-          {fCurrency(row.Charge !== "NA" ? row.Charge : row.Commission)}
+          {fIndianCurrency(row.Charge !== "NA" ? row.Charge : row.Commission)}
         </Label>
       </TableCell>
       <TableCell>

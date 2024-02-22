@@ -40,7 +40,7 @@ import AWS from "aws-sdk";
 import React from "react";
 import CloseIcon from "src/assets/icons/CloseIcon";
 import MotionModal from "src/components/animate/MotionModal";
-import { fCurrency } from "src/utils/formatNumber";
+import { fIndianCurrency } from "src/utils/formatNumber";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -132,11 +132,11 @@ function NewFundRequest({ getRaisedRequest }: props) {
       .positive("An Amount can't start with a minus")
       .min(
         +amountMinMaxValidation.min,
-        `Please enter minimum ${fCurrency(amountMinMaxValidation.min)}`
+        `Please enter minimum ${fIndianCurrency(amountMinMaxValidation.min)}`
       )
       .max(
         +amountMinMaxValidation.max,
-        `You can enter maximum ${fCurrency(amountMinMaxValidation.max)}`
+        `You can enter maximum ${fIndianCurrency(amountMinMaxValidation.max)}`
       )
       .required("Amount is required"),
     date: Yup.date()

@@ -15,7 +15,7 @@ import NavConfig from "./config";
 import NavAccount from "./NavAccount";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Label from "src/components/label/Label";
-import { fCurrency } from "src/utils/formatNumber";
+import { fIndianCurrency } from "src/utils/formatNumber";
 import { PATH_AUTH } from "src/routes/paths";
 
 // ----------------------------------------------------------------------
@@ -74,10 +74,14 @@ export default function NavVertical({ openNav, onCloseNav }: Props) {
           <>
             <NavAccount />
             <Label variant="soft" color={"primary"} sx={walletStyle}>
-              {`main wallet = ${fCurrency(user?.main_wallet_amount) || 0}`}
+              {`main wallet = ${
+                fIndianCurrency(user?.main_wallet_amount) || 0
+              }`}
             </Label>
             <Label variant="soft" color={"warning"} sx={walletStyle}>
-              {`AEPS wallet = ${fCurrency(user?.AEPS_wallet_amount) || 0}`}
+              {`AEPS wallet = ${
+                fIndianCurrency(user?.AEPS_wallet_amount) || 0
+              }`}
             </Label>
           </>
         )}

@@ -57,7 +57,7 @@ import CustomPagination from "src/components/customFunctions/CustomPagination";
 import FormProvider, { RHFSelect, RHFTextField } from "../components/hook-form";
 import { LoadingButton } from "@mui/lab";
 import Logo from "src/components/logo/Logo";
-import { fCurrency } from "src/utils/formatNumber";
+import { fIndianCurrency } from "src/utils/formatNumber";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import { Icon } from "@iconify/react";
 import useResponsive from "src/hooks/useResponsive";
@@ -781,7 +781,7 @@ function TransactionRow({ row }: childProps) {
         {/* Opening Balance */}
         <StyledTableCell>
           <Typography variant="body2" whiteSpace={"nowrap"}>
-            {fCurrency(
+            {fIndianCurrency(
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
@@ -794,7 +794,7 @@ function TransactionRow({ row }: childProps) {
         {/* Transaction Amount */}
         <StyledTableCell>
           <Typography variant="body2" whiteSpace={"nowrap"}>
-            {fCurrency(newRow.amount) || 0}
+            {fIndianCurrency(newRow.amount) || 0}
           </Typography>
         </StyledTableCell>
 
@@ -802,11 +802,11 @@ function TransactionRow({ row }: childProps) {
         <StyledTableCell>
           <Stack flexDirection={"row"} justifyContent={"center"}>
             <Typography variant="body2" whiteSpace={"nowrap"} color={"error"}>
-              {user?.role === "agent" && <>-{fCurrency(newRow.debit)}/</>}
+              {user?.role === "agent" && <>-{fIndianCurrency(newRow.debit)}/</>}
             </Typography>{" "}
             <Typography variant="body2" whiteSpace={"nowrap"} color={"green"}>
               +{" "}
-              {fCurrency(
+              {fIndianCurrency(
                 user?.role === "agent"
                   ? newRow?.agentDetails?.creditedAmount
                   : user?.role === "distributor"
@@ -820,7 +820,7 @@ function TransactionRow({ row }: childProps) {
         {/* Closing Balance */}
         <StyledTableCell>
           <Typography variant="body2" whiteSpace={"nowrap"}>
-            {fCurrency(
+            {fIndianCurrency(
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
@@ -836,13 +836,13 @@ function TransactionRow({ row }: childProps) {
           <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
             <Typography variant="body2">
               GST :{" "}
-              {fCurrency(
+              {fIndianCurrency(
                 (user?.role == "agent" && newRow?.agentDetails?.GST) || "0"
               )}
             </Typography>
             <Typography variant="body2">
               TDS :{" "}
-              {fCurrency(
+              {fIndianCurrency(
                 (user?.role == "agent" && newRow?.agentDetails?.TDSAmount) ||
                   "0"
               )}
@@ -1083,7 +1083,7 @@ function TransactionRow({ row }: childProps) {
                           </TableCell>
                           <TableCell align="center">
                             <Typography variant="body2" noWrap>
-                              Rs.{fCurrency(newRow?.amount)}
+                              Rs.{fIndianCurrency(newRow?.amount)}
                             </Typography>
                           </TableCell>
                         </TableRow>
@@ -1096,7 +1096,8 @@ function TransactionRow({ row }: childProps) {
                       variant="body2"
                       whiteSpace={"nowrap"}
                     >
-                      Transaction Amount : {" " + fCurrency(newRow.amount)}
+                      Transaction Amount :{" "}
+                      {" " + fIndianCurrency(newRow.amount)}
                     </Typography>
                     <Typography
                       align="left"

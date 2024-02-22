@@ -27,7 +27,7 @@ import Frameorange from "../assets/icons/Frame orange.svg";
 import Graphgreen from "../assets/icons/Graph green.svg";
 import Graphorange from "../assets/icons/Graph orange.svg";
 import { useEffect, useState } from "react";
-import { fCurrency } from "src/utils/formatNumber";
+import { fIndianCurrency } from "src/utils/formatNumber";
 import { m } from "framer-motion";
 import { MotionContainer, varBounce, varZoom } from "src/components/animate";
 
@@ -37,7 +37,6 @@ export default function MyStats(props: any) {
   const theme = useTheme();
 
   const logo = [Group321, Group320, Frame10, Frame9, isolationMode, intersect];
- 
 
   const [Success, setSuccess] = useState<any>({
     status: "Success",
@@ -280,7 +279,7 @@ export default function MyStats(props: any) {
                   >
                     <Typography>{"Transaction Value"}</Typography>
                     <Typography>
-                      Rs.{fCurrency(Success?.volume || "0")}
+                      Rs.{fIndianCurrency(Success?.volume || "0")}
                     </Typography>
                   </Typography>
                 </CardContent>
@@ -344,7 +343,7 @@ export default function MyStats(props: any) {
                     <Typography>{"Transaction Value"}</Typography>
                     <Typography>
                       {" "}
-                      Rs.{fCurrency(Pending?.volume || "0")}
+                      Rs.{fIndianCurrency(Pending?.volume || "0")}
                     </Typography>
                   </Typography>
                 </CardContent>
@@ -408,7 +407,7 @@ export default function MyStats(props: any) {
                     <Typography>{"Transaction Value"}</Typography>
                     <Typography>
                       {" "}
-                      Rs. {fCurrency(Failed?.volume || "0")}
+                      Rs. {fIndianCurrency(Failed?.volume || "0")}
                     </Typography>
                   </Typography>
                 </CardContent>
@@ -472,7 +471,7 @@ export default function MyStats(props: any) {
                     <Typography>{"Transaction Value"}</Typography>
                     <Typography>
                       {" "}
-                      Rs. {fCurrency(Total?.volume || "0")}
+                      Rs. {fIndianCurrency(Total?.volume || "0")}
                     </Typography>
                   </Typography>
                 </CardContent>

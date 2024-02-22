@@ -20,7 +20,7 @@ import React, { useEffect, useState } from "react";
 import { fDateTime } from "src/utils/formatTime";
 import useResponsive from "src/hooks/useResponsive";
 import { CustomAvatar } from "src/components/custom-avatar";
-import { fCurrency } from "src/utils/formatNumber";
+import { fIndianCurrency } from "src/utils/formatNumber";
 
 // ----------------------------------------------------------------------
 
@@ -176,7 +176,7 @@ function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
         {row.contact_no}
       </TableCell>
       <TableCell sx={{ color: "#0D571C" }}>
-        Rs. {fCurrency(row?.main_wallet_amount || "0")}
+        Rs. {fIndianCurrency(row?.main_wallet_amount || "0")}
       </TableCell>
       <TableCell>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
