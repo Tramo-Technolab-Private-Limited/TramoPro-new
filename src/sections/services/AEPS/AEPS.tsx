@@ -62,6 +62,7 @@ type FormValuesProps = {
     details: string;
     remarks: string | null;
     timestamp: string;
+    FingpayAEPSIIN: string;
     iinno: string;
   };
 };
@@ -181,6 +182,7 @@ export default function AEPS(props: any) {
       details: "",
       remarks: "",
       timestamp: "",
+      FingpayAEPSIIN: "",
       iinno: "",
     },
   };
@@ -250,17 +252,31 @@ export default function AEPS(props: any) {
 
   const getBankList = () => {
     let token = localStorage.getItem("token");
-    Api("indoNepal/getAEPSbankData", "GET", "", token).then((Response: any) => {
+    Api("bankManagement/get_bank", "GET", "", token).then((Response: any) => {
       console.log("==============>>>fatch beneficiary Response", Response);
       if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          setBankList(Response.data.data.data);
-        } else {
-          enqueueSnackbar(Response?.data?.message);
-        }
+        setBankList(
+          Response.data.data.filter(
+            (record: any) => record.AadhaarPayFingpayStatus !== ""
+          )
+        );
       }
     });
   };
+
+  // const getBankList = () => {
+  //   let token = localStorage.getItem("token");
+  //   Api("indoNepal/getAEPSbankData", "GET", "", token).then((Response: any) => {
+  //     console.log("==============>>>fatch beneficiary Response", Response);
+  //     if (Response.status == 200) {
+  //       if (Response.data.code == 200) {
+  //         setBankList(Response.data.data.data);
+  //       } else {
+  //         enqueueSnackbar(Response?.data?.message);
+  //       }
+  //     }
+  //   });
+  // };
 
   const getAepsProduct = () => {
     let token = localStorage.getItem("token");
@@ -286,7 +302,7 @@ export default function AEPS(props: any) {
       latitude: localStorage.getItem("lat"),
       longitude: localStorage.getItem("long"),
       requestRemarks: remark,
-      nationalBankIdentificationNumber: getValues("bank.iinno"),
+      nationalBankIdentificationNumber: getValues("bank.FingpayAEPSIIN"),
       bankName: getValues("bank.bankName"),
       adhaarNumber: getValues("aadharNumber"),
       productId: productId,
@@ -346,7 +362,7 @@ export default function AEPS(props: any) {
       longitude: localStorage.getItem("long"),
       requestRemarks: remark,
       contact_no: getValues("mobileNumber"),
-      nationalBankIdentificationNumber: getValues("bank.iinno"),
+      nationalBankIdentificationNumber: getValues("bank.FingpayAEPSIIN"),
       bankName: getValues("bank.bankName"),
       adhaarNumber: getValues("aadharNumber"),
       amount: Number(getValues("amount")),
@@ -413,7 +429,7 @@ export default function AEPS(props: any) {
       latitude: localStorage.getItem("lat"),
       longitude: localStorage.getItem("long"),
       requestRemarks: remark,
-      nationalBankIdentificationNumber: getValues("bank.iinno"),
+      nationalBankIdentificationNumber: getValues("bank.FingpayAEPSIIN"),
       bankName: getValues("bank.bankName"),
       adhaarNumber: getValues("aadharNumber"),
       productId: productId,

@@ -11,6 +11,7 @@ import {
   MATM,
   BillPayment,
   Recharges,
+  AadharPay,
 } from "../sections/services";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import ServiceUnderUpdate from "./ServiceUnderUpdate";
@@ -126,9 +127,9 @@ export default function Services(props: any) {
                               <BillPayment />
                             ) : superCurrentTab.toLowerCase() ==
                               "aadhaar pay" ? (
-                              // <AadharPay supCategory={tab} />
-                              <ServiceUnderUpdate />
-                            ) : superCurrentTab.toLowerCase() == "matm" ? (
+                              <AadharPay supCategory={tab} />
+                            ) : // <ServiceUnderUpdate />
+                            superCurrentTab.toLowerCase() == "matm" ? (
                               <MATM supCategory={tab} />
                             ) : superCurrentTab.toLowerCase() == "dmt1" ? (
                               <DMT1 />

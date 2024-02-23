@@ -30,6 +30,7 @@ import aadharPayImg from "../../../assets/images/aadharpay.png";
 import RegistrationAeps from "../AEPS/RegistrationAeps";
 import AttendenceAeps from "../AEPS/AttendenceAeps";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { fDateTime } from "src/utils/formatTime";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -42,9 +43,11 @@ type FormValuesProps = {
   productId: string;
 };
 
+var localTime: any;
+
 export default function AadharPay(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuthContext();
+  const { user, UpdateUserDetail } = useAuthContext();
   const [postData, setPostData] = useState<any>({
     nationalBankIdentificationNumber: "",
     adhaarNumber: "",
@@ -59,9 +62,9 @@ export default function AadharPay(props: any) {
   const [bName, setBName] = useState("");
   const [responseAmount, setResponseAmount] = useState({
     amount: "",
-    transaction_Id: "",
-    createAt: "",
-    client_ref_Id: "",
+    transactionId: "",
+    createdAt: "",
+    clientRefId: "",
   });
   const [failedMessage, setFailedMessage] = useState("");
   const [txn, setTxn] = useState(false);
@@ -74,6 +77,9 @@ export default function AadharPay(props: any) {
   const handleClose1 = () => {
     setOpen1(false);
   };
+
+  const [attend, setAttend] = React.useState(true);
+  const [localAttendance, setLocalAttendance] = React.useState(0);
 
   const DMTSchema = Yup.object().shape({
     device: Yup.string().required("device is a required field"),
@@ -105,6 +111,7 @@ export default function AadharPay(props: any) {
   const {
     reset,
     setError,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = methods;
@@ -141,7 +148,6 @@ export default function AadharPay(props: any) {
             (record: any) => record.AadhaarPayFingpayStatus !== ""
           )
         );
-      } else {
       }
     });
   };
@@ -185,16 +191,12 @@ export default function AadharPay(props: any) {
     Api("aeps/aadhaar_pay_LTS", "POST", body, token).then((Response: any) => {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.data.message);
+          enqueueSnackbar(Response.data.message);
           if (Response.data.data.status == true) {
             reset(defaultValues);
           }
-          setResponseAmount(Response.data.txnData);
+          setResponseAmount(Response.data.txnId);
           setCheckNPIN(false);
-          console.log(
-            "==============>>> fatch beneficiary data 200",
-            Response.data.data
-          );
         } else if (Response.data.code == 400) {
           setCheckNPIN(false);
           enqueueSnackbar(Response.data.message);
@@ -219,7 +221,7 @@ export default function AadharPay(props: any) {
       setCheckNPIN(true);
       setTxn(true);
       setPostData({
-        nationalBankIdentificationNumber: bName,
+        nationalBankIdentificationNumber: iinno,
         adhaarNumber: data.aadharnumber,
         productId: data.productId,
         categoryId: props.supCategory._id,
@@ -416,7 +418,7 @@ export default function AadharPay(props: any) {
 
   function setBankValues(val: any) {
     setBName(val.bankName);
-    setIinno(val.iinno);
+    setIinno(val.FingpayAPIIN);
   }
 
   setTimeout(() => {
@@ -433,6 +435,25 @@ export default function AadharPay(props: any) {
     }
   }, [autoClose]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setLocalAttendance(
+        Math.floor((user?.presenceAtForAP + 150000 - Date.now()) / 1000)
+      );
+      setAttend(true);
+    }, 0);
+  }, [user?.presenceAtForAP]);
+
+  useEffect(() => {
+    localTime = setTimeout(() => {
+      setLocalAttendance(localAttendance - 1);
+    }, 1000);
+    if (localAttendance <= 0) {
+      clearTimeout(localTime);
+      setAttend(false);
+    }
+  }, [localAttendance]);
+
   return (
     <>
       <Helmet>
@@ -441,13 +462,26 @@ export default function AadharPay(props: any) {
       <Typography variant="h4"></Typography>
       {!user?.fingPayAPESRegistrationStatus || !user?.fingPayAEPSKycStatus ? (
         <RegistrationAeps />
-      ) : !user?.attendanceAP ? (
+      ) : user?.presenceAtForAP + 150000 < Date.now() ? (
         <AttendenceAeps attendance={"AP"} />
       ) : (
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
+          {attend && (
+            <Typography variant="subtitle2" textAlign={"end"}>
+              Aadhaar Withdrawal Attendance Timeout:{" "}
+              <span
+                style={{
+                  color: Math.floor(localAttendance) < 60 ? "red" : "green",
+                }}
+              >
+                {Math.floor(localAttendance / 60)} Minutes{" "}
+                {Math.floor(localAttendance % 60)} Seconds
+              </span>
+            </Typography>
+          )}
           <Stack my={4}>
-            <Grid container spacing={1} sx={{ marginBottom: "-25px" }}>
-              <Grid item sm={6} md={4} gap={1} display={"grid"}>
+            <Grid container spacing={1}>
+              <Grid item sm={6} md={4} display={"grid"}>
                 <RHFSelect
                   name="device"
                   label="Biometric Device"
@@ -582,7 +616,7 @@ export default function AadharPay(props: any) {
                     mt={2}
                   >
                     <Typography variant="subtitle1">Amount</Typography>
-                    <Typography variant="body1">₹{postData.amount}</Typography>
+                    <Typography variant="body1">₹{watch("amount")}</Typography>
                   </Stack>
                   <Stack
                     flexDirection={"row"}
@@ -591,7 +625,7 @@ export default function AadharPay(props: any) {
                   >
                     <Typography variant="subtitle1">Aadhar Number</Typography>
                     <Typography variant="body1">
-                      {postData.adhaarNumber}
+                      {watch("aadharnumber")}
                     </Typography>
                   </Stack>
                   <Stack
@@ -600,20 +634,9 @@ export default function AadharPay(props: any) {
                     mt={2}
                   >
                     <Typography variant="subtitle1">Bank Name</Typography>
-                    <Typography variant="body1">
-                      {postData.nationalBankIdentificationNumber}
-                    </Typography>
+                    <Typography variant="body1">{watch("bankName")}</Typography>
                   </Stack>
-                  <Stack
-                    flexDirection={"row"}
-                    justifyContent={"space-between"}
-                    mt={2}
-                  >
-                    <Typography variant="subtitle1">Date</Typography>
-                    <Typography variant="body1">
-                      {new Date().toLocaleString()}
-                    </Typography>
-                  </Stack>
+
                   <Stack flexDirection={"row"} gap={1}>
                     <Button
                       variant="contained"
@@ -695,7 +718,7 @@ export default function AadharPay(props: any) {
                 >
                   <Typography variant="subtitle1">Transaction Id</Typography>
                   <Typography variant="body1">
-                    {responseAmount.transaction_Id}
+                    {responseAmount.transactionId}
                   </Typography>
                 </Stack>
                 <Stack
@@ -705,7 +728,7 @@ export default function AadharPay(props: any) {
                 >
                   <Typography variant="subtitle1">Date</Typography>
                   <Typography variant="body1">
-                    {responseAmount.createAt}
+                    {fDateTime(responseAmount.createdAt)}
                   </Typography>
                 </Stack>
                 <Stack
@@ -715,7 +738,7 @@ export default function AadharPay(props: any) {
                 >
                   <Typography variant="subtitle1">Client Ref Id</Typography>
                   <Typography variant="body1">
-                    {responseAmount.client_ref_Id}
+                    {responseAmount.clientRefId}
                   </Typography>
                 </Stack>
                 <Button
