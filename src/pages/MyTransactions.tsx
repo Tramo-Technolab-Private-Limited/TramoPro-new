@@ -74,8 +74,12 @@ type FormValuesProps = {
   clientRefId: string;
   category: string;
   product: string;
+  accountNumber:string;
+  mobileNumber:string;
   startDate: Date | null;
   endDate: Date | null;
+  sDate: Date | null;
+  eDate: Date | null;
 };
 
 export default function MyTransactions() {
@@ -102,6 +106,10 @@ export default function MyTransactions() {
     status: "",
     clientRefId: "",
     product: "",
+    sDate:null,
+    eDate:null,
+    accountNumber:"",
+    mobileNumber:"",
     startDate: null,
     endDate: null,
   };
@@ -127,6 +135,16 @@ export default function MyTransactions() {
   }, [currentPage]);
 
   useEffect(() => setCurrentPage(1), [currentTab]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleFilterButtonClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   const {
     startDate,
@@ -171,10 +189,14 @@ export default function MyTransactions() {
         currentPage: currentPage,
       },
       clientRefId: getValues("clientRefId"),
+      accountNumber: getValues("accountNumber"),
+      mobileNumber:getValues("mobileNumber"),
       status: getValues("status"),
       transactionType: "",
       categoryId: getValues("category"),
       productId: getValues("product") || "",
+      startDate: fDateFormatForApi(getValues("startDate")),
+      endDate: fDateFormatForApi(getValues("endDate")),
     };
 
     Api(`transaction/transactionByUser`, "POST", body, token).then(
@@ -213,6 +235,10 @@ export default function MyTransactions() {
         transactionType: "",
         categoryId: data.category,
         productId: data.product,
+        mobileNumber:data.mobileNumber,
+        accountNumber:data.accountNumber,
+        startDate: fDateFormatForApi(getValues("startDate")),
+        endDate: fDateFormatForApi(getValues("endDate")),
       };
       await Api(`transaction/transactionByUser`, "POST", body, token).then(
         (Response: any) => {
@@ -298,8 +324,8 @@ export default function MyTransactions() {
       clientRefId: "",
       status: "",
       transactionType: "",
-      startDate: fDateFormatForApi(getValues("startDate")),
-      endDate: fDateFormatForApi(getValues("endDate")),
+      startDate: fDateFormatForApi(getValues("sDate")),
+      endDate: fDateFormatForApi(getValues("eDate")),
     };
 
     Api(`transaction/transactionByUser`, "POST", body, token).then(
@@ -465,30 +491,9 @@ export default function MyTransactions() {
                 <MenuItem value="initiated">Initiated</MenuItem>
               </RHFSelect>
               <RHFTextField name="clientRefId" label="Client Ref Id" />
-              <Stack
-                flexDirection={"row"}
-                flexBasis={{ xs: "100%", sm: "50%" }}
-                gap={1}
-              >
-                <LoadingButton
-                  variant="contained"
-                  type="submit"
-                  loading={isSubmitting}
-                >
-                  Search
-                </LoadingButton>
-                <LoadingButton
-                  variant="contained"
-                  onClick={() => {
-                    reset(defaultValues);
-                    getTransaction();
-                  }}
-                >
-                  Clear
-                </LoadingButton>
-              </Stack>
-            </Stack>
-            <Stack direction={"row"} gap={1}>
+              <RHFTextField name="accountNumber" label="AccountNumber" />
+              <RHFTextField name="mobileNumber" label="MobileNumber" />
+              <Stack direction={"row"} gap={1}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker
                   label="Start date"
@@ -512,11 +517,65 @@ export default function MyTransactions() {
                   )}
                 />
               </LocalizationProvider>
-              <Button variant="contained" onClick={ExportData}>
-                Export
-              </Button>
+              <Stack
+                flexDirection={"row"}
+                flexBasis={{ xs: "100%", sm: "50%" }}
+                gap={1}
+              >
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  loading={isSubmitting}
+                >
+                  Search
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => {
+                    reset(defaultValues);
+                    getTransaction();
+                  }}
+                >
+                  Clear
+                </LoadingButton>
+              </Stack>
+            </Stack>
             </Stack>
           </Stack>
+          <Stack direction={"row"} gap={1}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Start date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("sDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("sDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+                <DatePicker
+                  label="End date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("eDate")}
+                  minDate={watch("sDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("eDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+              </LocalizationProvider>
+              <Stack
+                flexDirection={"row"}
+                flexBasis={{ xs: "100%", sm: "50%" }}
+                gap={1}
+              >
+                 <Button variant="contained" onClick={ExportData}>
+                Export
+              </Button>
+              </Stack>
+              </Stack>
         </FormProvider>
         <Grid item xs={12} md={6} lg={8}>
           <>

@@ -135,7 +135,7 @@ export default function WalletLadger() {
 
   // Form Controller
   const FilterSchema = Yup.object().shape({});
-  const defaultValues = {  
+  const defaultValues = {
     startDate: null,
     endDate: null,
     clientRefId: "",
@@ -205,41 +205,41 @@ export default function WalletLadger() {
               placeholder={"Client Ref Id"}
               sx={{ width: 300 }}
             />
-           <Stack flexDirection={"row"} gap={1}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="Start date"
-                    inputFormat="DD/MM/YYYY"
-                    value={watch("startDate")}
-                    maxDate={new Date()}
-                    onChange={(newValue: any) =>
-                      setValue("startDate", newValue)
-                    }
-                    renderInput={(params: any) => (
-                      <TextField
-                        {...params}
-                        size={"small"}
-                        sx={{ width: 150 }}
-                      />
-                    )}
-                  />
-                  <DatePicker
-                    label="End date"
-                    inputFormat="DD/MM/YYYY"
-                    value={watch("endDate")}
-                    minDate={watch("startDate")}
-                    maxDate={new Date()}
-                    onChange={(newValue: any) => setValue("endDate", newValue)}
-                    renderInput={(params: any) => (
-                      <TextField
-                        {...params}
-                        size={"small"}
-                        sx={{ width: 150 }}
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-              </Stack>
+            <Stack flexDirection={"row"} gap={1}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Start date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) =>
+                    setValue("startDate", newValue)
+                  }
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      size={"small"}
+                      sx={{ width: 150 }}
+                    />
+                  )}
+                />
+                <DatePicker
+                  label="End date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("endDate")}
+                  minDate={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("endDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField
+                      {...params}
+                      size={"small"}
+                      sx={{ width: 150 }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </Stack>
             <LoadingButton
               variant="contained"
               type="submit"
@@ -278,8 +278,8 @@ export default function WalletLadger() {
                       user?.role == "m_distributor"
                         ? MDtableLabels
                         : user?.role == "distributor"
-                        ? distributortableLabels
-                        : agenttableLabels
+                          ? distributortableLabels
+                          : agenttableLabels
                     }
                   />
 

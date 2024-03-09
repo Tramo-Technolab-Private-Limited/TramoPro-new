@@ -857,6 +857,7 @@ export default function AuthRegisterForm(props: any) {
               <RHFCodes
                 keyName="code"
                 inputs={["code1", "code2", "code3", "code4", "code5", "code6"]}
+                type="password"
               />
               <Stack>
                 <Stack rowGap={0.5}>
@@ -917,6 +918,7 @@ export default function AuthRegisterForm(props: any) {
               <RHFCodes
                 keyName="otp"
                 inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+                type="password"
               />
               <Stack rowGap={0.5}>
                 <Button
