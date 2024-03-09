@@ -337,6 +337,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                   <RHFCodes
                     keyName="otp"
                     inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+                    type="password"
                   />
                   {(!!errors.otp1 ||
                     !!errors.otp2 ||
@@ -566,6 +567,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
                   <RHFCodes
                     keyName="otp"
                     inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+                    type="password"
                   />
 
                   {(!!errors.otp1 ||
