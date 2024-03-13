@@ -36,6 +36,7 @@ export const PATH_DASHBOARD = {
     root: path(ROOTS_DASHBOARD, "/scheme"),
     allscheme: path(ROOTS_DASHBOARD, "/scheme/allscheme"),
     bbpsscheme: path(ROOTS_DASHBOARD, "/scheme/bbpsscheme"),
+    loanscheme: path(ROOTS_DASHBOARD, "/scheme/loanscheme"),
   },
   fundmanagement: {
     root: path(ROOTS_DASHBOARD, "/fundmanagement"),

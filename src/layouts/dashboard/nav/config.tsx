@@ -79,6 +79,10 @@ const NavConfig = [
             title: "BBPS Scheme",
             path: PATH_DASHBOARD.scheme.bbpsscheme,
           },
+          {
+            title: "Loan Scheme",
+            path: PATH_DASHBOARD.scheme.loanscheme,
+          },
         ],
       },
       {

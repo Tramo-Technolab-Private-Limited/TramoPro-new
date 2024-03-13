@@ -72,6 +72,9 @@ export const Scheme = Loadable(lazy(() => import("../pages/SchemePage")));
 export const BBPSScheme = Loadable(
   lazy(() => import("../pages/BBPSSchemePage"))
 );
+export const LoanScheme = Loadable(
+  lazy(() => import("../pages/LoanSchemePage"))
+);
 
 //Fund Requests
 export const MyFundDeposits = Loadable(

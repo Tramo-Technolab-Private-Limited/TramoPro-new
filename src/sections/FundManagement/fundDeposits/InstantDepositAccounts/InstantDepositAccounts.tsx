@@ -239,6 +239,30 @@ function InstantDepositAccounts() {
                           </Typography>
                         </Typography>
                       </Stack>
+                      <Stack>
+                        <Typography
+                          style={{ fontWeight: "bold" }}
+                          variant="body1"
+                        >
+                          IFSC
+                        </Typography>
+                        <Typography>
+                          <Typography key={index}>
+                            {item?.data?.ifsc}
+                            <Tooltip title="Copy" placement="top">
+                              <IconButton
+                                onClick={() => onCopy(item?.data?.ifsc)}
+                              >
+                                <Iconify
+                                  icon="eva:copy-fill"
+                                  width={20}
+                                  color={"primary.main"}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </Typography>
+                        </Typography>
+                      </Stack>
                       {/* <Stack>
                       <Typography
                         style={{ fontWeight: "bold" }}
