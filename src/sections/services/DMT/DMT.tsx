@@ -328,17 +328,17 @@ const OtpSubmissionForRegistrantion = ({
     otp1: Yup.string().required(),
     otp2: Yup.string().required(),
     otp3: Yup.string().required(),
-    // otp4: Yup.string().required(),
-    // otp5: Yup.string().required(),
-    // otp6: Yup.string().required(),
+    otp4: Yup.string().required(),
+    otp5: Yup.string().required(),
+    otp6: Yup.string().required(),
   });
   const defaultValues = {
     otp1: "",
     otp2: "",
     otp3: "",
-    // otp4: '',
-    // otp5: '',
-    // otp6: '',
+    otp4: "",
+    otp5: "",
+    otp6: "",
   };
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(DMTSchema),
@@ -390,14 +390,21 @@ const OtpSubmissionForRegistrantion = ({
         justifyContent={"space-between"}
         mt={2}
         gap={2}
-        width={300}
       >
         <Typography variant="h4">Please verify OTP</Typography>
         <Stack>
-          <RHFCodes keyName="otp" inputs={["otp1", "otp2", "otp3"]} />
+          <RHFCodes
+            keyName="otp"
+            inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+          />
         </Stack>
 
-        {(!!errors.otp1 || !!errors.otp2 || !!errors.otp3) && (
+        {(!!errors.otp1 ||
+          !!errors.otp2 ||
+          !!errors.otp3 ||
+          !!errors.otp4 ||
+          !!errors.otp5 ||
+          !!errors.otp6) && (
           <FormHelperText error sx={{ px: 2 }}>
             Code is required
           </FormHelperText>

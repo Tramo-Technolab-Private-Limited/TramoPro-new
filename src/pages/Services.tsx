@@ -7,12 +7,14 @@ import {
   DMT,
   DMT1,
   DMT2,
+  // Loan,
   IndoNepal,
   MATM,
   BillPayment,
   Recharges,
   AadharPay,
 } from "../sections/services";
+import Loan from "src/sections/services/Laon/Loan";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import ServiceUnderUpdate from "./ServiceUnderUpdate";
 import { useAuthContext } from "src/auth/useAuthContext";
@@ -54,7 +56,8 @@ export default function Services(props: any) {
               item?.category_name.toLowerCase() === "aadhaar pay" ||
               item?.category_name.toLowerCase() === "recharges" ||
               item?.category_name.toLowerCase() === "bill payment" ||
-              item?.category_name.toLowerCase() === "dmt2"
+              item?.category_name.toLowerCase() === "dmt2" ||
+              item?.category_name.toLowerCase() === "loan"
             ) {
               return item;
             }
@@ -113,8 +116,7 @@ export default function Services(props: any) {
                           <m.div variants={varSlide().inUp}>
                             {superCurrentTab.toLowerCase() == "recharges" ? (
                               <Recharges />
-                            ) : // <ServiceUnderUpdate />
-                            superCurrentTab.toLowerCase() ==
+                            ) : superCurrentTab.toLowerCase() ==
                               "money transfer" ? (
                               <DMT />
                             ) : superCurrentTab.toLowerCase() == "aeps" ? (
@@ -135,6 +137,8 @@ export default function Services(props: any) {
                               <DMT1 />
                             ) : superCurrentTab.toLowerCase() == "dmt2" ? (
                               <DMT2 />
+                            ) : superCurrentTab.toLowerCase() == "loan" ? (
+                              <Loan supCategory={tab} />
                             ) : null}
                           </m.div>
                         </Box>
