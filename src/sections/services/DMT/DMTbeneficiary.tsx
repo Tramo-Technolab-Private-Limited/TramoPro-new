@@ -280,7 +280,7 @@ export default function DMTbeneficiary() {
       relationship: data.remitterRelation,
       bankName: data.bankName,
       isBeneVerified: data.isBeneVerified,
-      bankId: data.bankId,
+      // bankId: data.bankId,
     };
     Api("moneyTransfer/beneficiary", "POST", body, token).then(
       (Response: any) => {
