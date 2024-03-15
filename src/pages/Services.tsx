@@ -57,7 +57,8 @@ export default function Services(props: any) {
               item?.category_name.toLowerCase() === "recharges" ||
               item?.category_name.toLowerCase() === "bill payment" ||
               item?.category_name.toLowerCase() === "dmt2" ||
-              item?.category_name.toLowerCase() === "loan"
+              item?.category_name.toLowerCase() === "loan" ||
+              item?.category_name.toLowerCase() === "dmt1"
             ) {
               return item;
             }

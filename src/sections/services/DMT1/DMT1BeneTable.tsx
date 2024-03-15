@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { useState } from "react";
 import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
 import { useForm } from "react-hook-form";
-import Scrollbar from "../../../components/scrollbar";
 import { Icon } from "@iconify/react";
 
 // @mui
@@ -25,34 +24,35 @@ import {
   Divider,
   TextField,
   Typography,
-  CircularProgress,
-  FormHelperText,
   useTheme,
 } from "@mui/material";
 import { Api } from "src/webservices";
-// import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
+// _mock_
 import FormProvider, {
   RHFTextField,
   RHFSelect,
-  RHFCodes,
+  RHFAutocomplete,
 } from "../../../components/hook-form";
 import { useSnackbar } from "notistack";
-import _ from "lodash";
-import DMT1pay from "./DMT1pay";
-import Autocomplete from "@mui/material/Autocomplete";
+import { RemitterContext } from "./DMT1";
+import DMTpay from "./DMT1pay";
 import ApiDataLoading from "../../../components/customFunctions/ApiDataLoading";
+import { useAuthContext } from "src/auth/useAuthContext";
+import Scrollbar from "src/components/scrollbar/Scrollbar";
+import useResponsive from "src/hooks/useResponsive";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
+  bankName: string;
   beneName: string;
-  BmobileNumber: string;
-  Bemail: string;
-  BaccountNumber: string;
-  BconfirmAccountNumber: string;
-  Bifsc: string;
+  accountNumber: string;
+  ifsc: string;
+  mobileNumber: string;
+  email: string;
   remitterRelation: string;
-  remitteBank: string;
+  isBeneVerified: boolean;
+  bankId: string;
   otp1: string;
   otp2: string;
   otp3: string;
@@ -63,251 +63,332 @@ type FormValuesProps = {
 
 //--------------------------------------------------------------------
 
-export default function DMT1BeneTable(props: any) {
+const initialgetBene = {
+  isLoading: true,
+  data: [],
+};
+
+const initialRemitterVerify = {
+  isLoading: false,
+  data: {},
+  beneVerified: false,
+};
+
+const initialAddBene = {
+  isLoading: false,
+  data: {},
+};
+
+const initialgetBank = {
+  isLoading: false,
+  data: {},
+};
+
+const Reducer = (state: any, action: any) => {
+  switch (action.type) {
+    case "VERIFY_FETCH_REQUEST":
+      return { ...state, isLoading: true };
+    case "VERIFY_FETCH_SUCCESS":
+      return {
+        ...state,
+        data: action.payload,
+        isLoading: false,
+        beneVerified: true,
+      };
+    case "VERIFY_FETCH_FAILURE":
+      return { ...state, isLoading: false, data: {} };
+    case "GET_BENE_REQUEST":
+      return { ...state, isLoading: true };
+    case "GET_BENE_SUCCESS":
+      return { ...state, data: action.payload, isLoading: false };
+    case "GET_BENE_FAILURE":
+      return { ...state, isLoading: false, data: [] };
+    case "ADD_BENE_REQUEST":
+      return { ...state, isLoading: true };
+    case "ADD_BENE_SUCCESS":
+      return { ...state, data: action.payload, isLoading: false };
+    case "ADD_BENE_FAILURE":
+      return { ...state, isLoading: false, data: [] };
+    case "ADD_BANK_REQUEST":
+      return { ...state, isLoading: true };
+    case "ADD_BANK_SUCCESS":
+      return { ...state, data: action.payload, isLoading: false };
+    case "ADD_BANK_FAILURE":
+      return { ...state, isLoading: false, data: [] };
+    default:
+      return state;
+  }
+};
+
+export default function DMTbeneficiary() {
+  const { user, UpdateUserDetail } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
-  const [transferShow, settransferShow] = useState(false);
-  const [tabledata, setTableData] = useState<any>([]);
+  const isMobile = useResponsive("up", "sm");
+  const remitterContext: any = useContext(RemitterContext);
+
+  const [remitterVerify, remitterVerifyDispatch] = useReducer(
+    Reducer,
+    initialRemitterVerify
+  );
+  const [addBene, addbeneDispatch] = useReducer(Reducer, initialAddBene);
+  const [getBene, getbeneDispatch] = useReducer(Reducer, initialgetBene);
+  const [getBank, getBankDispatch] = useReducer(Reducer, initialgetBank);
 
   //modal for add Beneficiary
   const [open, setModalEdit] = React.useState(false);
-  const openEditModal = (val: any) => setModalEdit(true);
+  const openEditModal = () => setModalEdit(true);
   const handleClose = () => {
-    setVerifyName("");
     setModalEdit(false);
+    reset(defaultValues);
   };
 
-  //modal for delete beneficiary
-
-  const [verifyData, setVerifyData] = useState({
-    ifsc: "",
-    accountNumber: "",
-    bankName: "",
-    bankId: "",
-  });
-
-  const [verifyName, setVerifyName] = useState("");
-  const [bankNameErr, setBankNameErr] = useState<any>();
-  const [Name, setName] = useState("");
-
-  const [verifyDetail, setVerifyDetail] = useState({
-    remitterMobileNumber: "",
-    beneficiaryName: "",
-    accountNumber: "",
-    bankName: "",
-    ifsc: "",
-    beneficiaryMobile: "",
-    relationship: "",
-    beneficiaryEmail: "",
-    isBeneVerified: false,
-    beneId: "",
-  });
+  const [isOpen, setIsOpen] = useState(false);
 
   const [payoutData, setPayoutData] = React.useState({
     bankName: "",
-    accountNumber: "914010048942123",
-    mobileNumber: "8588040488",
-    rayzorpayBeneId: "fa_LtUNzeAyAD9pMQ",
+    accountNumber: "",
+    mobileNumber: "",
+    rayzorpayBeneId: "",
     tramoBeneId: "",
     _id: "",
   });
 
   const DMTSchema = Yup.object().shape({
+    ifsc: Yup.string().required("IFSC code is required"),
+    accountNumber: Yup.string().required("Account Number is required"),
+    bankName: Yup.string().required("Bank Name is required"),
+    beneName: Yup.string().required("Beneficiary Name is required"),
     remitterRelation: Yup.string().required("Relation is required"),
   });
   const defaultValues = {
+    bankName: "",
     beneName: "",
+    accountNumber: "",
+    ifsc: "",
+    mobileNumber: "",
+    email: "",
     remitterRelation: "",
+    isBeneVerified: false,
+    bankId: "",
   };
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(DMTSchema),
     defaultValues,
+    mode: "all",
   });
 
   const {
     reset,
     setError,
+    setValue,
+    getValues,
+    trigger,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: {},
   } = methods;
 
   useEffect(() => {
-    fatchBeneficiary(props.remitter.remitterMobile);
-  }, [props.remitter]);
+    fatchBeneficiary(remitterContext.remitterMobile);
+  }, [remitterContext]);
 
   const fatchBeneficiary = (val: any) => {
     let token = localStorage.getItem("token");
-    Api("dmt1/beneficiary/" + val, "GET", "", token).then((Response: any) => {
-      console.log("==============>>>fatch beneficiary Response", Response);
+    getbeneDispatch({ type: "GET_BENE_REQUEST" });
+    Api("DMT1/beneficiary/" + val, "GET", "", token).then((Response: any) => {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
-          setTableData(Response.data.data);
-          console.log(
-            "==============>>> fatch beneficiary data 200",
-            Response.data.data.data[0]
-          );
+          getbeneDispatch({
+            type: "GET_BENE_SUCCESS",
+            payload: Response.data.data,
+          });
         } else {
+          getbeneDispatch({ type: "GET_BENE_FAILURE" });
           enqueueSnackbar(Response.data.message);
-          console.log(
-            "==============>>> fatch beneficiary message",
-            Response.data.message
-          );
         }
       }
     });
   };
-  const addBeneficiary = (data: FormValuesProps) => {
-    if (Name == "") {
-      setBankNameErr("");
-    }
-    if (Name || verifyName) {
-      setVerifyDetail({
-        ...verifyDetail,
-        remitterMobileNumber: props.remitter.remitterMobile,
-        beneficiaryName: verifyName ? verifyName : Name,
-        accountNumber: verifyData.accountNumber,
-        bankName: verifyData.bankName,
-        ifsc: verifyData.ifsc,
-        beneficiaryMobile: data.BmobileNumber || "",
-        relationship: data.remitterRelation,
-        beneficiaryEmail: data.Bemail || "",
-        isBeneVerified: verifyName ? true : false,
-      });
-      let token = localStorage.getItem("token");
-      let body = {
-        remitterMobile: props.remitter.remitterMobile,
-        beneficiaryName: "Sumit Kumar",
-        ifsc: "UTIB0000824",
-        accountNumber: "914010048942123",
-        beneficiaryMobile: data.BmobileNumber || "",
-        beneficiaryEmail: data.Bemail || "",
-        relationship: data.remitterRelation,
-        bankName: "AxisBank",
-        isBeneVerified: verifyName ? true : false,
-        bankId: 1,
-      };
 
-      Api("dmt1/beneficiary", "POST", body, token).then((Response: any) => {
-        console.log(
-          "==============>>> register beneficiary Response",
-          Response
-        );
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            handleClose();
-            enqueueSnackbar(Response.data.message);
-            reset(defaultValues);
-            setName("");
-            setVerifyName("");
-            setTableData(Response.data.data.beneficiariesDetails);
-            setVerifyDetail({
-              ...verifyDetail,
-              beneId: "",
-            });
-            console.log(
-              "=====>>> register beneficiary data 200",
-              Response.data.data.message
-            );
-          } else {
-            enqueueSnackbar(Response.data.error.message);
-            console.log(
-              "==============>>> register beneficiary msg",
-              Response.data.message
-            );
-          }
+  const getBankList = () => {
+    getBankDispatch({ type: "ADD_BANK_REQUEST" });
+    let token = localStorage.getItem("token");
+    Api("bankManagement/get_bank", "GET", "", token).then((Response: any) => {
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          getBankDispatch({
+            type: "ADD_BANK_SUCCESS",
+            payload: Response.data.data.filter((item: any) => {
+              if (item.ekoBankId) {
+                return item;
+              }
+            }),
+          });
+          openEditModal();
+          enqueueSnackbar(Response.data.message);
+        } else {
+          getbeneDispatch({ type: "GET_BANK_FAILURE" });
         }
-      });
-    } else {
-      enqueueSnackbar("Please Enter Beneficiary Name");
-    }
+      }
+    });
   };
 
-  function varifyBank(val: any) {
-    setVerifyData(val);
-  }
-  function beneVerifyData(val: any) {
-    setVerifyName(val);
-  }
+  const verifyBene = async () => {
+    remitterVerifyDispatch({ type: "VERIFY_FETCH_REQUEST" });
+    let token = localStorage.getItem("token");
+    let body = {
+      ifsc: getValues("ifsc"),
+      accountNumber: getValues("accountNumber"),
+      bankName: getValues("bankName"),
+    };
+    (await trigger(["ifsc", "accountNumber", "bankName"])) &&
+      Api("DMT1/beneficiary/verify", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              remitterVerifyDispatch({
+                type: "VERIFY_FETCH_SUCCESS",
+                payload: Response.data.data,
+              });
+              enqueueSnackbar(Response.data.message);
+              setValue("beneName", Response.data.name);
+              setValue("isBeneVerified", true);
+              UpdateUserDetail({
+                main_wallet_amount: user?.main_wallet_amount - 3,
+              });
+            } else {
+              remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
+              enqueueSnackbar(Response.data.message);
+            }
+          }
+        }
+      );
+  };
 
-  function callback(val: any) {
-    setPayoutData(val);
-  }
+  const addBeneficiary = (data: FormValuesProps) => {
+    addbeneDispatch({ type: "ADD_BENE_REQUEST" });
+    let token = localStorage.getItem("token");
+    let body = {
+      remitterMobile: remitterContext.remitterMobile,
+      beneficiaryName: data.beneName,
+      ifsc: data.ifsc,
+      accountNumber: data.accountNumber,
+      beneficiaryMobile: data.mobileNumber,
+      beneficiaryEmail: data.email,
+      relationship: data.remitterRelation,
+      bankName: data.bankName,
+      isBeneVerified: data.isBeneVerified,
+      // bankId: data.bankId,
+    };
+    Api("DMT1/beneficiary", "POST", body, token).then((Response: any) => {
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          getbeneDispatch({
+            type: "GET_BENE_SUCCESS",
+            payload: [...getBene.data, Response.data.data],
+          });
+          addbeneDispatch({
+            type: "ADD_BENE_SUCCESS",
+            payload: Response.data.data,
+          });
+          enqueueSnackbar(Response.data.message);
+          handleClose();
+        } else {
+          addbeneDispatch({ type: "ADD_BENE_FAILURE" });
+          enqueueSnackbar(Response.data.message);
+        }
+      } else {
+        enqueueSnackbar("Internal server error");
+        addbeneDispatch({ type: "ADD_BENE_FAILURE" });
+      }
+    });
+  };
 
   function deleteBene(val: any) {
-    setTableData(
-      tabledata.filter((item: any) => {
-        return item._id !== val._id;
-      })
-    );
+    getbeneDispatch({
+      type: "GET_BENE_SUCCESS",
+      payload: getBene.data.filter((item: any) => {
+        return item._id !== val;
+      }),
+    });
   }
 
+  function setBankDetail(event: any, value: any) {
+    setValue("bankName", value?.bankName);
+    setValue("ifsc", value?.masterIFSC);
+    setValue("bankId", value?.ekoBankId);
+  }
   return (
     <>
-      <Grid
-        sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          flexDirection: "column",
-        }}
-      >
-        <Paper sx={{ width: "100%", overflow: "hidden" }}>
-          <TableContainer component={Paper}>
-            <Scrollbar
-              sx={{
-                height: "fit-content",
-                maxHeight: 500,
-                scrollbarWidth: "thin",
-              }}
-            >
-              <Table
-                stickyHeader
-                aria-label="sticky table"
-                style={{ borderBottom: "1px solid #dadada" }}
+      <Grid sx={{ maxHeight: window.innerHeight - 170 }}>
+        {getBene.isLoading ? (
+          <ApiDataLoading />
+        ) : (
+          <Paper sx={{ width: "100%", overflow: "hidden" }}>
+            <Stack justifyContent={"end"} flexDirection={"row"} mb={1}>
+              <Button variant="contained" size="medium" onClick={getBankList}>
+                <span style={{ paddingRight: "5px", fontSize: "14px" }}>
+                  +{" "}
+                </span>{" "}
+                Add New Beneficiary
+              </Button>
+            </Stack>
+            <TableContainer component={Paper}>
+              <Scrollbar
+                sx={
+                  isMobile
+                    ? { maxHeight: window.innerHeight - 250 }
+                    : { maxHeight: window.innerHeight - 440 }
+                }
               >
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 800 }}>
-                      Beneficiary Name
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>A/c No.</TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>
-                      Mobile Number
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800 }}>Verification</TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Action
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {tabledata.map((row: any) => (
-                    <BeneList
-                      key={row._id}
-                      row={row}
-                      callback={callback}
-                      remitterNumber={props.remitter.remitterMobile}
-                      deleteBene={deleteBene}
-                    />
-                  ))}
-                </TableBody>
-              </Table>
-            </Scrollbar>
-            {verifyDetail.beneId && (
-              <VerifyAddBene verifyDetail={verifyDetail} />
-            )}
-          </TableContainer>
-          <Stack justifyContent={"end"} flexDirection={"row"} my={2}>
-            <Button variant="contained" size="medium" onClick={openEditModal}>
-              <span style={{ paddingRight: "5px", fontSize: "14px" }}>+ </span>{" "}
-              Add New Beneficiary
-            </Button>
-          </Stack>
-        </Paper>
+                <Table
+                  size="small"
+                  stickyHeader
+                  aria-label="sticky table"
+                  style={{ borderBottom: "1px solid #dadada" }}
+                >
+                  <TableHead>
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        Beneficiary Name
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>A/c No.</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        Mobile Number
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        Verification
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
+                        Action
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {getBene.data.map((row: any) => (
+                      <BeneList
+                        key={row._id}
+                        row={row}
+                        callback={setPayoutData}
+                        remitterNumber={remitterContext.remitterMobile}
+                        deleteBene={deleteBene}
+                        pay={() => setIsOpen(true)}
+                      />
+                    ))}
+                  </TableBody>
+                </Table>
+              </Scrollbar>
+            </TableContainer>
+          </Paper>
+        )}
       </Grid>
-      {payoutData._id && (
-        <DMT1pay remitter={props.remitter} beneficiary={payoutData} />
-      )}
+      <DMTpay
+        isOpen={isOpen}
+        handleTxnClose={() => setIsOpen(false)}
+        remitter={remitterContext}
+        beneficiary={payoutData}
+      />
 
       {/* modal for add beneficiary */}
       <Modal
@@ -324,19 +405,16 @@ export default function DMT1BeneTable(props: any) {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
+            width: "95%",
           }}
         >
           <Card sx={{ p: 3 }}>
-            <VerifyBankAccountForm
-              verifyForm={varifyBank}
-              beneVerify={beneVerifyData}
-            />
             <FormProvider
               methods={methods}
               onSubmit={handleSubmit(addBeneficiary)}
             >
               <Box
-                rowGap={3}
+                rowGap={{ xs: 2, sm: 3 }}
                 columnGap={2}
                 display="grid"
                 gridTemplateColumns={{
@@ -344,36 +422,75 @@ export default function DMT1BeneTable(props: any) {
                   sm: "repeat(2, 1fr)",
                 }}
               >
-                {verifyName ? (
-                  <RHFTextField
-                    type="text"
-                    name="beneName1"
-                    disabled
-                    label="Beneficiary Name"
-                    variant="filled"
-                    value={verifyName}
-                    onChange={(e) => setVerifyName(e.target.value)}
-                  />
-                ) : (
-                  <TextField
-                    error={bankNameErr == ""}
-                    label="Beneficiary Name"
-                    helperText={
-                      bankNameErr == "" && "Please Enter Beneficiary Name"
-                    }
-                    value={Name}
-                    onChange={(e) => setName(e.target.value)}
-                    inputProps={{
-                      "aria-autocomplete": "none",
-                    }}
-                  />
-                  // <RHFTextField type="text" name="beneName" label="Beneficiary Name" />
-                )}
+                <RHFAutocomplete
+                  name="bank"
+                  disabled={remitterVerify?.beneVerified}
+                  onChange={setBankDetail}
+                  options={getBank?.data}
+                  getOptionLabel={(option: any) => option?.bankName}
+                  renderOption={(props, option) => (
+                    <Box
+                      component="li"
+                      sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                      {...props}
+                    >
+                      {option?.bankName}
+                    </Box>
+                  )}
+                  renderInput={(params) => (
+                    <RHFTextField
+                      name="bankName"
+                      label="Bank Name"
+                      {...params}
+                      variant={
+                        remitterVerify?.beneVerified ? "filled" : "outlined"
+                      }
+                    />
+                  )}
+                />
+
+                <RHFTextField
+                  name="ifsc"
+                  label="IFSC code"
+                  placeholder="IFSC code"
+                  disabled={remitterVerify?.beneVerified}
+                  variant={remitterVerify?.beneVerified ? "filled" : "outlined"}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <RHFTextField
+                  name="accountNumber"
+                  label="Account Number"
+                  placeholder="Account Number"
+                  disabled={remitterVerify?.beneVerified}
+                  variant={remitterVerify?.beneVerified ? "filled" : "outlined"}
+                  InputLabelProps={{ shrink: true }}
+                />
+                <Stack
+                  justifyContent={"center"}
+                  alignItems={"center"}
+                  flexDirection={"row"}
+                >
+                  <LoadingButton
+                    variant="contained"
+                    size="small"
+                    onClick={verifyBene}
+                    disabled={remitterVerify?.beneVerified}
+                    loading={remitterVerify?.isLoading}
+                  >
+                    verify Account Detail
+                  </LoadingButton>
+                </Stack>
+                <RHFTextField
+                  name="beneName"
+                  label="Beneficiary Name"
+                  placeholder="Beneficiary Name"
+                  disabled={remitterVerify?.beneVerified}
+                  variant={remitterVerify?.beneVerified ? "filled" : "outlined"}
+                />
                 <RHFSelect
                   name="remitterRelation"
                   label="Relation"
                   placeholder="Relation"
-                  // InputLabelProps={{ shrink: true }}
                   SelectProps={{
                     native: false,
                     sx: { textTransform: "capitalize" },
@@ -386,21 +503,30 @@ export default function DMT1BeneTable(props: any) {
                   <MenuItem value="Aunt/Uncle">Aunt/Uncle</MenuItem>
                   <MenuItem value="Niece/Nephew">Niece/Nephew</MenuItem>
                   <MenuItem value="Friends">Friends</MenuItem>
+                  <MenuItem value="Self">Self</MenuItem>
                   <MenuItem value="Other">other</MenuItem>
                 </RHFSelect>
-
                 <Divider />
                 <Divider />
                 <RHFTextField
-                  name="BmobileNumber"
+                  name="mobileNumber"
                   label="Mobile Number (Optional)"
+                  type="number"
                 />
-                <RHFTextField name="Bemail" label="Email (Optional)" />
+                <RHFTextField
+                  name="email"
+                  type="email"
+                  label="Email (Optional)"
+                />
               </Box>
               <Stack flexDirection={"row"} gap={2} mt={2}>
-                <Button type="submit" variant="contained">
+                <LoadingButton
+                  type="submit"
+                  variant="contained"
+                  loading={addBene.isLoading}
+                >
                   Add Beneficiary
-                </Button>
+                </LoadingButton>
                 <Button
                   variant="contained"
                   color="warning"
@@ -413,587 +539,166 @@ export default function DMT1BeneTable(props: any) {
           </Card>
         </Grid>
       </Modal>
-      {/* modal for delete bene */}
     </>
   );
 }
 
-function VerifyBankAccountForm(props: any) {
-  const theme = useTheme();
-  const [selectedValue, setSelectedValue] = useState("");
-  const [ifsc, setIfsc] = useState("");
-  const [bankid, setBankId] = useState({ BankID: "" });
-  const [accNumber, setAccNumber] = useState("");
-  const [accountNoDisable, setAccountNoDisable] = useState(false);
-  const [btn, setbtn] = useState(true);
-  const { enqueueSnackbar } = useSnackbar();
-  const [bankList, setBankList] = useState([]);
+// ----------------------------------------------------------------------
 
-  //ERROR HANDLING
-  const [ifscError, setIfscError] = useState<any>();
-  const [bankNameErr, setBankNameErr] = useState<any>("a");
-  const [bankAccErr, setBankAccErr] = useState<any>();
+const BeneList = React.memo(
+  ({ row, callback, remitterNumber, deleteBene, pay }: any) => {
+    const { user, UpdateUserDetail } = useAuthContext();
+    const { enqueueSnackbar } = useSnackbar();
+    const theme = useTheme();
+    const [isLoading, setIsLoading] = useState(false);
+    const [cell, setCell] = useState(row);
+    const [deleteOtp, setDeleteOtp] = useState("");
+    const [varifyStatus, setVarifyStatus] = useState(true);
+    const [count, setCount] = useState(0);
+    const [toPay, setToPay] = useState("");
 
-  useEffect(() => {
-    getBankList();
-  }, []);
-
-  useEffect(() => {
-    let obj = {
-      ifsc: ifsc,
-      accountNumber: accNumber,
-      bankName: selectedValue,
-      bankId: bankid,
+    const [open2, setModalEdit2] = React.useState(false);
+    const openEditModal2 = (val: any) => {
+      setModalEdit2(true);
+      deleteBeneficiary(remitterNumber);
     };
-    props.verifyForm(obj);
-  }, [ifsc, accNumber, selectedValue]);
+    const handleClose2 = () => {
+      setModalEdit2(false);
+      setDeleteOtp("");
+    };
 
-  const getBankList = () => {
-    let token = localStorage.getItem("token");
-    Api("bankManagement/get_bank", "GET", "", token).then((Response: any) => {
-      console.log("==============>>>fatch beneficiary Response", Response);
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          let bank: any = [];
-          setBankList(
-            Response.data.data.filter((item: any) => {
-              if (item.ekoBankId) {
-                return item;
-              }
-            })
-          );
-          enqueueSnackbar(Response.data.message);
-          console.log(
-            "==============>>> banklist data 200",
-            Response.data.data.data
-          );
-        } else {
-          console.log(
-            "==============>>> fatch beneficiary message",
-            Response.data.message
-          );
-        }
-      }
-    });
-  };
-
-  const verifyBene = () => {
-    setbtn(false);
-    if (!ifsc) {
-      setIfscError(0);
-    }
-    if (ifsc.length < 11) {
-      setIfscError(10);
-    }
-    if (!selectedValue) {
-      setBankNameErr("");
-    }
-    if (!accNumber) {
-      setBankAccErr("");
-    }
-    if (selectedValue !== "" || accNumber == "" || ifsc == "") {
+    const verifyBene = (val: string) => {
+      setVarifyStatus(false);
       let token = localStorage.getItem("token");
       let body = {
-        ifsc: ifsc,
-        accountNumber: accNumber,
-        bankName: selectedValue,
+        beneficiaryId: val,
       };
-      Api("dmt1/beneficiary/verify", "POST", body, token).then(
+      Api("DMT1/beneficiary/verify", "POST", body, token).then(
         (Response: any) => {
-          console.log(
-            "==============>>> verify beneficiary Response",
-            Response
-          );
           if (Response.status == 200) {
             if (Response.data.code == 200) {
               enqueueSnackbar(Response.data.message);
-              props.beneVerify(Response.data.name);
-              setAccountNoDisable(true);
-              setbtn(true);
-              setBankNameErr("a");
-              console.log(
-                "=====>>> verify beneficiary data 200",
-                Response.data.data.message
-              );
+              setCell({
+                ...cell,
+                isVerified: true,
+                beneName: Response.data.name,
+              });
+              UpdateUserDetail({
+                main_wallet_amount: user?.main_wallet_amount - 3,
+              });
             } else {
               enqueueSnackbar(Response.data.message);
-              setbtn(true);
-
-              console.log(
-                "==============>>> verify beneficiary msg",
-                Response.data.message
-              );
             }
+            setVarifyStatus(true);
           } else {
-            setbtn(true);
+            enqueueSnackbar("Internal server error");
+            setVarifyStatus(true);
           }
         }
       );
-    } else {
-      enqueueSnackbar("Please enter valid Fields");
-      setbtn(true);
-    }
-  };
-
-  function setBankValues(val: any) {
-    setBankId(val.ekoBankId);
-    setSelectedValue(val.bankName);
-    setIfsc(val.masterIFSC);
-  }
-
-  return (
-    <Box
-      rowGap={3}
-      columnGap={2}
-      display="grid"
-      gridTemplateColumns={{
-        xs: "repeat(1, 1fr)",
-        sm: "repeat(2, 1fr)",
-      }}
-      mb={2}
-    >
-      <Autocomplete
-        id="bank-select-demo"
-        options={bankList}
-        autoHighlight
-        getOptionLabel={(option: any) => option.bankName}
-        onChange={(event, value) => setBankValues(value)}
-        renderOption={(props, option) => (
-          <Box
-            component="li"
-            sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-            {...props}
-          >
-            {option.bankName}
-          </Box>
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label="Bank Name"
-            error={bankNameErr.length == 0}
-            helperText={bankNameErr.length == 0 && "Bank Name is required"}
-            inputProps={{
-              ...params.inputProps,
-              "aria-autocomplete": "none",
-            }}
-          />
-        )}
-      />
-      <TextField
-        error={ifscError == 0 || ifscError == 10}
-        label="IFSC Code"
-        helperText={
-          ifscError == 0
-            ? "Please Enter IFSC code"
-            : ifscError == 10
-            ? "Please Enter Valid IFSC"
-            : ""
-        }
-        value={ifsc}
-        onChange={(e) => setIfsc(e.target.value)}
-        inputProps={{
-          "aria-autocomplete": "none",
-        }}
-      />
-      <TextField
-        type="number"
-        error={bankAccErr == ""}
-        label="Account Number"
-        variant={accountNoDisable ? "filled" : "outlined"}
-        disabled={accountNoDisable}
-        helperText={bankAccErr == "" && "Please Enter Account Number"}
-        value={accNumber}
-        onChange={(e) => setAccNumber(e.target.value)}
-        inputProps={{
-          "aria-autocomplete": "none",
-        }}
-      />
-      <Stack
-        flexDirection={"row"}
-        alignItems={"center"}
-        justifyContent={"center"}
-        width={"fir-content"}
-      >
-        {btn ? (
-          <Button
-            variant="contained"
-            disabled={accountNoDisable}
-            onClick={verifyBene}
-          >
-            verify Account Detail
-          </Button>
-        ) : (
-          <ApiDataLoading />
-        )}
-      </Stack>
-    </Box>
-  );
-}
-// ----------------------------------------------------------------------
-
-const VerifyAddBene = ({ verifyDetail }: any) => {
-  const {
-    remitterMobileNumber,
-    beneficiaryName,
-    accountNumber,
-    bankName,
-    ifsc,
-    beneficiaryMobile,
-    relationship,
-    beneficiaryEmail,
-    isBeneVerified,
-    beneId,
-  } = verifyDetail;
-  const { enqueueSnackbar } = useSnackbar();
-  const [open, setModalEdit] = React.useState(true);
-  const openEditModal = (val: any) => setModalEdit(true);
-  const handleClose = () => setModalEdit(false);
-
-  const DMTSchema = Yup.object().shape({
-    otp1: Yup.string().required(),
-    otp2: Yup.string().required(),
-    otp3: Yup.string().required(),
-    otp4: Yup.string().required(),
-    otp5: Yup.string().required(),
-    otp6: Yup.string().required(),
-  });
-  const defaultValues = {
-    otp1: "",
-    otp2: "",
-    otp3: "",
-    otp4: "",
-    otp5: "",
-    otp6: "",
-  };
-  const methods = useForm<FormValuesProps>({
-    resolver: yupResolver(DMTSchema),
-    defaultValues,
-  });
-
-  const {
-    reset,
-    setError,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = methods;
-
-  const verifyBeneOTP = (data: FormValuesProps) => {
-    let token = localStorage.getItem("token");
-    let body = {
-      beneId: beneId,
-      remitterMobile: remitterMobileNumber,
-      otp:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
-      accountNumber: accountNumber,
-      ifsc: ifsc,
-      beneficiaryMobile: beneficiaryMobile,
-      beneficiaryName: beneficiaryName,
-      relationship: relationship,
-      bankName: bankName,
-      isBeneVerified: isBeneVerified,
-      beneficiaryEmail: beneficiaryEmail,
     };
-    Api("dmt1/beneficiary/verify", "POST", body, token).then(
-      (Response: any) => {
-        console.log("==============>>> verify beneficiary Response", Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            handleClose();
-            // setTableData(
-            //   tabledata.map((item: any) => {
-            //     if (item._id == val) {
-            //       return { ...item, isVerified: true };
-            //     } else {
-            //       return item;
-            //     }
-            //   })
-            // );
-            // setVarifyStatus(true);
-            reset(defaultValues);
-            console.log(
-              "==============>>> verify beneficiary data 200",
-              Response.data.data.message
-            );
-          } else {
-            enqueueSnackbar(Response.data.message);
-            console.log(
-              "==============>>> verify beneficiary msg",
-              Response.data.message
-            );
+
+    const deleteBeneficiary = (val: string) => {
+      let token = localStorage.getItem("token");
+      Api("DMT1/beneficiary/delete/sendOtp/" + val, "GET", "", token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+            } else {
+              enqueueSnackbar(Response.data.message);
+            }
           }
         }
-      }
-    );
-  };
+      );
+    };
+    const confirmDeleteBene = () => {
+      setIsLoading(true);
+      let token = localStorage.getItem("token");
+      let body = {
+        remitterMobile: remitterNumber,
+        beneficiaryId: row._id,
+        otp: deleteOtp,
+      };
+      Api("DMT1/beneficiary/delete", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              handleClose2();
+              setDeleteOtp("");
+              deleteBene(row._id);
+            } else {
+              enqueueSnackbar(Response.data.message);
+            }
+            setIsLoading(false);
+          } else {
+            setIsLoading(false);
+          }
+        }
+      );
+    };
 
-  return (
-    <Modal
-      open={open}
-      onClose={handleClose}
-      aria-labelledby="modal-modal-title"
-      aria-describedby="modal-modal-description"
-    >
-      <FormProvider methods={methods}>
-        <Grid
-          item
-          xs={12}
-          md={8}
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-          }}
-        >
-          <Card sx={{ p: 3 }}>
-            <FormProvider
-              methods={methods}
-              onSubmit={handleSubmit(verifyBeneOTP)}
-            >
-              <Stack
-                alignItems={"center"}
-                justifyContent={"space-between"}
-                mt={2}
-                gap={2}
+    useEffect(() => {
+      if (count > 0) {
+        const timer = setInterval(() => {
+          setCount((prevCount) => prevCount - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+      }
+    }, [count]);
+
+    function ResendOtp() {
+      deleteBeneficiary(remitterNumber);
+      setCount(30);
+    }
+
+    return (
+      <>
+        <TableRow hover key={cell._id}>
+          <TableCell>{cell.beneName}</TableCell>
+          <TableCell>{cell.bankName}</TableCell>
+          <TableCell>{cell.accountNumber}</TableCell>
+          <TableCell>{cell.ifsc}</TableCell>
+
+          <TableCell>
+            {!cell.isVerified ? (
+              <LoadingButton
+                sx={{ display: "flex", alignItems: "center", width: "105px" }}
+                variant="contained"
+                color="warning"
+                loading={!varifyStatus}
+                onClick={() => verifyBene(cell._id)}
               >
-                <Typography variant="h4">OTP</Typography>
-                <RHFCodes
-                  keyName="otp"
-                  inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                  type="password"
-                />
-                {(!!errors.otp1 ||
-                  !!errors.otp2 ||
-                  !!errors.otp3 ||
-                  !!errors.otp4 ||
-                  !!errors.otp5 ||
-                  !!errors.otp6) && (
-                  <FormHelperText error sx={{ px: 2 }}>
-                    Code is required
-                  </FormHelperText>
-                )}
-                <Stack flexDirection={"row"} gap={1} mt={2}>
-                  <Button variant="contained" type="submit">
-                    Submit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="warning"
-                    onClick={handleClose}
-                  >
-                    Close
-                  </Button>
-                </Stack>
-              </Stack>
-            </FormProvider>
-          </Card>
-        </Grid>
-      </FormProvider>
-    </Modal>
-  );
-};
-
-function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
-  const { enqueueSnackbar } = useSnackbar();
-  const theme = useTheme();
-  const [cell, setCell] = useState(row);
-  const [deleteOtp, setDeleteOtp] = useState("");
-  const [varifyStatus, setVarifyStatus] = useState(true);
-  const [confimDele, setConfimDele] = useState(true);
-  const [count, setCount] = useState(0);
-
-  const [open2, setModalEdit2] = React.useState(false);
-  const openEditModal2 = (val: any) => {
-    setModalEdit2(true);
-    setPayoutData(val);
-    deleteBeneficiary(remitterNumber);
-  };
-
-  const handleClose2 = () => {
-    setModalEdit2(false);
-    // settransferShow(false);
-    setDeleteOtp("");
-    setConfimDele(true);
-  };
-  const [payoutData, setPayoutData] = React.useState({
-    bankName: "",
-    accountNumber: "914010048942123",
-    mobileNumber: "8588040488",
-    rayzorpayBeneId: "fa_LtUNzeAyAD9pMQ",
-    tramoBeneId: "",
-    _id: "",
-  });
-
-  const DMTSchema = Yup.object().shape({
-    remitterRelation: Yup.string().required("Relation is required"),
-  });
-  const defaultValues = {
-    beneName: "",
-    remitterRelation: "",
-  };
-  const methods = useForm<FormValuesProps>({
-    resolver: yupResolver(DMTSchema),
-    defaultValues,
-  });
-
-  const {
-    reset,
-    setError,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = methods;
-
-  const verifyBene = (val: string) => {
-    setVarifyStatus(false);
-    let token = localStorage.getItem("token");
-    let body = {
-      beneficiaryId: val,
-    };
-    Api("dmt1/beneficiary/verify", "POST", body, token).then(
-      (Response: any) => {
-        console.log("==============>>> verify beneficiary Response", Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            callback(val);
-            setVarifyStatus(true);
-            console.log(
-              "==============>>> verify beneficiary data 200",
-              Response.data.data
-            );
-          } else {
-            enqueueSnackbar(Response.data.message);
-            setVarifyStatus(true);
-            console.log(
-              "==============>>> verify beneficiary msg",
-              Response.data.message
-            );
-          }
-        }
-      }
-    );
-  };
-
-  const deleteBeneficiary = (val: string) => {
-    let token = localStorage.getItem("token");
-    Api("dmt1/beneficiary/delete/sendOtp/" + val, "GET", "", token).then(
-      (Response: any) => {
-        console.log("==============>>> verify beneficiary Response", Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            console.log(
-              "==============>>> verify beneficiary data 200",
-              Response.data.data.message
-            );
-          } else {
-            enqueueSnackbar(Response.data.message);
-            console.log(
-              "==============>>> verify beneficiary msg",
-              Response.data.message
-            );
-          }
-        }
-      }
-    );
-  };
-  const confirmDeleteBene = () => {
-    setConfimDele(false);
-    let token = localStorage.getItem("token");
-    let body = {
-      remitterMobile: remitterNumber,
-      beneficiaryId: payoutData._id,
-      otp: deleteOtp,
-    };
-    Api("dmt1/beneficiary/delete", "POST", body, token).then(
-      (Response: any) => {
-        console.log("========>>> verify beneficiary Response", Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            handleClose2();
-            setDeleteOtp("");
-            setConfimDele(true);
-            deleteBene(payoutData._id);
-            console.log(
-              "==============>>> verify beneficiary data 200",
-              Response.data.data.message
-            );
-          } else {
-            enqueueSnackbar(Response.data.message);
-            console.log(
-              "==============>>> verify beneficiary msg",
-              Response.data.message
-            );
-          }
-        }
-      }
-    );
-  };
-
-  useEffect(() => {
-    if (count > 0) {
-      const timer = setInterval(() => {
-        setCount((prevCount) => prevCount - 1);
-      }, 1000);
-      return () => clearInterval(timer);
-    }
-  }, [count]);
-
-  function ResendOtp() {
-    deleteBene(remitterNumber);
-    setCount(30);
-  }
-
-  return (
-    <>
-      <TableRow hover key={cell.bene_id} sx={{ cursor: "pointer" }}>
-        <TableCell>{cell.beneName}</TableCell>
-        <TableCell>{cell.accountNumber}</TableCell>
-        <TableCell>{cell.ifsc}</TableCell>
-        <TableCell>{cell.mobileNumber}</TableCell>
-        <TableCell>
-          {varifyStatus ? (
-            <Stack>
-              {!cell.isVerified ? (
-                <Button
-                  sx={{ display: "flex", alignItems: "center", width: "105px" }}
-                  variant="contained"
-                  color="warning"
-                  onClick={() => verifyBene(cell._id)}
-                >
-                  Verify Now
-                </Button>
-              ) : (
-                <TableCell style={{ color: "#00AB55" }}>
-                  <Icon icon="material-symbols:verified" /> Verified
-                </TableCell>
-              )}
+                Verify Now
+              </LoadingButton>
+            ) : (
+              <TableCell style={{ color: "#00AB55" }}>
+                <Icon icon="material-symbols:verified" /> Verified
+              </TableCell>
+            )}
+          </TableCell>
+          <TableCell>
+            <Stack justifyContent={"center"} flexDirection={"row"}>
+              <Button
+                variant="contained"
+                onClick={() => {
+                  callback(cell);
+                  setToPay(cell._id);
+                  pay();
+                }}
+              >
+                Pay
+              </Button>
             </Stack>
-          ) : (
-            <ApiDataLoading />
-          )}
-        </TableCell>
-        <TableCell>
-          <Stack justifyContent={"center"} flexDirection={"row"}>
-            <Button variant="contained" onClick={() => callback(cell)}>
-              Pay
-            </Button>
-            <Button onClick={() => openEditModal2(cell)} sx={{ ml: 3 }}>
-              <Icon icon="ic:outline-delete" fontSize={25} color={"red"} />
-            </Button>
-          </Stack>
-        </TableCell>
-      </TableRow>
-      <Modal
-        open={open2}
-        onClose={handleClose2}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <FormProvider methods={methods}>
+          </TableCell>
+        </TableRow>
+        <Modal
+          open={open2}
+          onClose={handleClose2}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
           <Grid
             item
             xs={12}
@@ -1007,7 +712,7 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
           >
             <Card sx={{ p: 3 }}>
               <Stack>
-                <RHFTextField
+                <TextField
                   type="number"
                   name="deleteotp"
                   label="OTP"
@@ -1036,30 +741,26 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
                   Wait {count} sec to resend OTP
                 </Typography>
               )}
-              {confimDele ? (
-                <>
-                  <Button
-                    variant="contained"
-                    sx={{ mt: 2 }}
-                    onClick={confirmDeleteBene}
-                  >
-                    Delete Beneficiary
-                  </Button>
-                  <Button
-                    variant="contained"
-                    onClick={handleClose2}
-                    sx={{ mt: 2, ml: 1 }}
-                  >
-                    Close
-                  </Button>
-                </>
-              ) : (
-                <ApiDataLoading />
-              )}
+
+              <LoadingButton
+                variant="contained"
+                sx={{ mt: 2 }}
+                onClick={confirmDeleteBene}
+                loading={isLoading}
+              >
+                Delete Beneficiary
+              </LoadingButton>
+              <Button
+                variant="contained"
+                onClick={handleClose2}
+                sx={{ mt: 2, ml: 1 }}
+              >
+                Close
+              </Button>
             </Card>
           </Grid>
-        </FormProvider>
-      </Modal>
-    </>
-  );
-}
+        </Modal>
+      </>
+    );
+  }
+);

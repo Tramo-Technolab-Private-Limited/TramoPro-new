@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
 import { useForm } from "react-hook-form";
@@ -30,7 +30,10 @@ import FormProvider, {
 } from "../../../components/hook-form";
 import { useSnackbar } from "notistack";
 import { Icon } from "@iconify/react";
+import { convertToWords } from "src/components/customFunctions/ToWords";
+import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
+import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 
 // ----------------------------------------------------------------------
 
@@ -41,20 +44,22 @@ type FormValuesProps = {
   otp4: string;
   otp5: string;
   otp6: string;
+  payAmount: string;
 };
 
 //--------------------------------------------------------------------
 
-export default function DMT1pay(props: any) {
-  console.log("props", props);
-
+export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
+  const { dmt1RemitterAvailableLimit } = remitter;
+  const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const [radioValue, setRadioValue] = useState("IMPS");
-  const [txnAmount, setTxnAmount] = useState("");
+  const { UpdateUserDetail } = useAuthContext();
   const [txn, setTxn] = useState(true);
+  const [mode, setMode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [checkNPIN, setCheckNPIN] = useState(false);
   const [confirm, setConfirm] = useState(false);
+  const [count, setCount] = useState<any>(null);
   const [transactionDetail, setTransactionDetail] = useState([]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -64,6 +69,20 @@ export default function DMT1pay(props: any) {
     setCheckNPIN(false);
     setTxn(true);
   };
+
+  //success Modal
+  const [open1, setOpen1] = useState(false);
+  const handleOpen1 = () => setOpen1(true);
+  const handleClose1 = () => setOpen1(false);
+
+  const [open2, setOpen2] = useState(false);
+  const handleOpen2 = () => setOpen2(true);
+  const handleClose2 = () => {
+    setOpen2(false);
+  };
+  useEffect(() => {
+    beneficiary._id && handleOpen2();
+  }, [beneficiary._id]);
 
   const style = {
     position: "absolute" as "absolute",
@@ -82,6 +101,23 @@ export default function DMT1pay(props: any) {
     otp4: Yup.string().required(),
     otp5: Yup.string().required(),
     otp6: Yup.string().required(),
+    payAmount: Yup.string()
+      .required("Amount is required field")
+      .test(
+        "is-greater-than-100",
+        "Amount should be greater than 100",
+        (value: any) => +value > 99
+      )
+      .test(
+        "is-multiple-of-100",
+        "Amount must be a multiple of 100",
+        (value: any) => (+value > 5000 ? Number(value) % 100 === 0 : value)
+      )
+      .test(
+        "is-less-than-max",
+        "Limit Exceed ! available limit is " + dmt1RemitterAvailableLimit,
+        (value: any) => (+value > dmt1RemitterAvailableLimit ? false : true)
+      ),
   });
   const defaultValues = {
     otp1: "",
@@ -90,24 +126,42 @@ export default function DMT1pay(props: any) {
     otp4: "",
     otp5: "",
     otp6: "",
+    payAmount: "",
   };
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(DMTSchema),
     defaultValues,
+    mode: "all",
   });
   const {
     reset,
     setError,
+    getValues,
+    watch,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = methods;
 
+  useEffect(() => {
+    if (count !== null) {
+      if (count > 0) {
+        const timer = setInterval(() => {
+          setCount((prevCount: any) => prevCount - 1);
+        }, 1000);
+        return () => clearInterval(timer);
+      } else {
+        window.location.reload();
+      }
+    }
+  }, [count]);
+
   const transaction = (data: FormValuesProps) => {
     let token = localStorage.getItem("token");
     let body = {
-      beneficiaryId: props.beneficiary._id,
-      amount: txnAmount,
-      remitterId: props.remitter._id,
+      beneficiaryId: beneficiary._id,
+      amount: data.payAmount,
+      remitterId: remitter._id,
+      mode: +mode,
       note1: "",
       note2: "",
       nPin:
@@ -119,85 +173,153 @@ export default function DMT1pay(props: any) {
     {
       body.nPin &&
         Api("dmt1/transaction", "POST", body, token).then((Response: any) => {
+          console.log(
+            "==============>>> register beneficiary Response",
+            Response
+          );
           if (Response.status == 200) {
             if (Response.data.code == 200) {
-              enqueueSnackbar(Response.data.message);
-              setTransactionDetail(Response.data.response);
-            } else {
-              enqueueSnackbar(Response.data.error.message, {
-                variant: "error",
+              Response.data.response.map((element: any) => {
+                enqueueSnackbar(element.message);
+                UpdateUserDetail({
+                  main_wallet_amount:
+                    element?.data?.agentDetails?.newMainWalletBalance,
+                });
               });
-              setErrorMsg(Response.data.error.message);
+              setTransactionDetail(Response.data.response);
+              TextToSpeak(Response.data.message);
+              handleClose();
+              handleOpen1();
+              setCount(5);
+              setTxn(false);
+              setErrorMsg("");
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+              setErrorMsg(Response.data.message);
             }
+            clearPayout();
           } else {
             setCheckNPIN(false);
             enqueueSnackbar(Response, { variant: "error" });
+            clearPayout();
           }
-          setTxn(false);
-          reset(defaultValues);
         });
     }
   };
 
   return (
     <>
-      <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
+      <Modal
+        open={open2}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
         <Box
-          rowGap={10}
-          columnGap={2}
-          display="grid"
-          alignItems={"center"}
-          gridTemplateColumns={{
-            xs: "repeat(1, 1fr)",
-            sm: "repeat(3, 0.5fr)",
-          }}
+          sx={style}
+          style={{ borderRadius: "20px" }}
+          width={{ xs: "100%", sm: 400 }}
         >
-          <RHFTextField
-            sx={{ marginTop: "20px", maxWidth: "500px" }}
-            type="number"
-            aria-autocomplete="none"
-            name="payAmount"
-            label="Enter Amount"
-            value={txnAmount}
-            onChange={(e) => setTxnAmount(e.target.value)}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">₹</InputAdornment>
-              ),
-            }}
-          />
-          <FormControl style={{ display: "flex" }}>
-            <RadioGroup
-              aria-labelledby="demo-radio-buttons-group-label"
-              defaultValue="RTGS"
-              name="radiobuttonsgroup"
-              sx={{ display: "flex", flexDirection: "row", marginTop: "10px" }}
-            >
-              <FormControlLabel
-                sx={{ color: "inherit" }}
-                name="NEFT"
-                value="NEFT"
-                control={<Radio />}
-                label="NEFT"
+          <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
+            <Stack justifyContent={"space-between"} mb={2}>
+              <Stack gap={1}>
+                <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                  <Typography variant="subtitle2">Beneficiary Name</Typography>
+                  <Typography variant="subtitle2">{beneName}</Typography>
+                </Stack>
+                <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                  <Typography variant="subtitle2"> Bank Name</Typography>
+                  <Typography variant="subtitle2">{bankName}</Typography>
+                </Stack>
+                <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                  <Typography variant="subtitle2"> Account Number</Typography>
+                  <Typography variant="subtitle2">{accountNumber}</Typography>
+                </Stack>
+                <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                  <Typography variant="subtitle2">IFSC</Typography>
+                  <Typography variant="subtitle2">{ifsc}</Typography>
+                </Stack>
+              </Stack>
+
+              <RHFTextField
+                sx={{ marginTop: "20px", maxWidth: "500px" }}
+                aria-autocomplete="none"
+                name="payAmount"
+                label="Enter Amount"
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">₹</InputAdornment>
+                  ),
+                }}
               />
-              <FormControlLabel
-                value="IMPS"
-                name="IMPS"
-                control={<Radio />}
-                label="IMPS"
-              />
-            </RadioGroup>
-          </FormControl>
-          <Button
-            size="large"
-            onClick={handleOpen}
-            variant="contained"
-            sx={{ mt: 1 }}
-          >
-            Pay Now
-          </Button>
+              <FormControl style={{ display: "flex" }}>
+                <RadioGroup
+                  aria-labelledby="demo-radio-buttons-group-label"
+                  value={mode}
+                  onChange={(event, value) => setMode(value)}
+                  name="radiobuttonsgroup"
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    marginTop: "10px",
+                  }}
+                >
+                  {/* <FormControlLabel
+                    sx={{ color: "inherit" }}
+                    name="NEFT"
+                    value="1"
+                    control={<Radio />}
+                    label="NEFT"
+                  /> */}
+                  <FormControlLabel
+                    value="2"
+                    name="IMPS"
+                    control={<Radio />}
+                    label="IMPS"
+                  />
+                </RadioGroup>
+              </FormControl>
+              <Stack flexDirection={"row"} gap={1}>
+                <Button
+                  onClick={() => {
+                    handleClose2();
+                    handleOpen();
+                  }}
+                  variant="contained"
+                  sx={{ mt: 1 }}
+                  disabled={
+                    !mode ||
+                    !(+watch("payAmount") > 5000
+                      ? +watch("payAmount") % 100 === 0
+                        ? true
+                        : false
+                      : +watch("payAmount") < 100
+                      ? false
+                      : true) ||
+                    !(+watch("payAmount") > dmt1RemitterAvailableLimit
+                      ? false
+                      : true)
+                  }
+                >
+                  Pay Now
+                </Button>
+                <Button
+                  onClick={() => {
+                    handleClose2();
+                    clearPayout();
+                  }}
+                  variant="contained"
+                  sx={{ mt: 1 }}
+                >
+                  Cancel
+                </Button>
+              </Stack>
+            </Stack>
+            <Typography textAlign="end">
+              {convertToWords(+watch("payAmount"))}
+            </Typography>
+          </FormProvider>
         </Box>
-      </FormProvider>
+      </Modal>
       <Modal
         open={open}
         aria-labelledby="modal-modal-title"
@@ -247,7 +369,11 @@ export default function DMT1pay(props: any) {
               <Stack flexDirection={"row"} justifyContent={"center"}>
                 <Button
                   variant="contained"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    clearPayout();
+                    reset(defaultValues);
+                  }}
                   sx={{ mt: 2 }}
                 >
                   Close
@@ -258,69 +384,8 @@ export default function DMT1pay(props: any) {
             <Box
               sx={style}
               style={{ borderRadius: "20px" }}
-              p={2}
-              width={{ xs: "100%", sm: "fit-content" }}
-            >
-              <Stack
-                flexDirection={"row"}
-                gap={1}
-                mb={1}
-                justifyContent={"center"}
-              >
-                <Button variant="contained" onClick={handleClose} size="small">
-                  Download Receipt
-                </Button>
-                <Button variant="contained" onClick={handleClose} size="small">
-                  Close
-                </Button>
-              </Stack>
-              <Stack
-                sx={{ border: "1.5px dashed #000000" }}
-                p={3}
-                borderRadius={2}
-              >
-                <Table
-                  stickyHeader
-                  aria-label="sticky table"
-                  style={{ borderBottom: "1px solid #dadada" }}
-                >
-                  <TableHead>
-                    <TableRow>
-                      <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                        Client ref Id
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                        Created At
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                        Amount
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                        status
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {transactionDetail.map((item: any) => (
-                      <TableRow key={item.data._id}>
-                        <TableCell sx={{ fontWeight: 800 }}>
-                          {item.data.amount && "₹"} {item.data.amount || "NA"}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 800 }}>
-                          {fDateTime(item.data.createAt) || "NA"}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 800 }}>
-                          {item.data.client_ref_Id || "NA"}
-                        </TableCell>
-                        <TableCell sx={{ fontWeight: 800 }}>
-                          {item.data.status || "NA"}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </Stack>
-            </Box>
+              width={{ xs: "100%", sm: 400 }}
+            ></Box>
           )
         ) : (
           <Box
@@ -338,9 +403,7 @@ export default function DMT1pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Beneficiary Name</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.beneName}
-              </Typography>
+              <Typography variant="body1">{beneName}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -348,9 +411,7 @@ export default function DMT1pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Bank Name</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.bankName}
-              </Typography>
+              <Typography variant="body1">{bankName}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -358,9 +419,7 @@ export default function DMT1pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Account Number</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.accountNumber}
-              </Typography>
+              <Typography variant="body1">{accountNumber}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -368,7 +427,7 @@ export default function DMT1pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">IFSC code</Typography>
-              <Typography variant="body1">{props.beneficiary.ifsc}</Typography>
+              <Typography variant="body1">{ifsc}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -376,9 +435,7 @@ export default function DMT1pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Mobile Number</Typography>
-              <Typography variant="body1">
-                {props.beneficiary.mobileNumber || "-"}
-              </Typography>
+              <Typography variant="body1">{mobileNumber || "-"}</Typography>
             </Stack>
             <Stack
               flexDirection={"row"}
@@ -386,7 +443,7 @@ export default function DMT1pay(props: any) {
               mt={2}
             >
               <Typography variant="subtitle1">Transaction Amount</Typography>
-              <Typography variant="body1">₹{txnAmount}</Typography>
+              <Typography variant="body1">₹{getValues("payAmount")}</Typography>
             </Stack>
             {confirm && (
               <FormProvider
@@ -423,9 +480,13 @@ export default function DMT1pay(props: any) {
                     <Button
                       variant="contained"
                       color="warning"
-                      onClick={handleClose}
+                      onClick={() => {
+                        handleClose();
+                        clearPayout();
+                        reset(defaultValues);
+                      }}
                     >
-                      Close
+                      Close{" "}
                     </Button>
                   </Stack>
                 </Stack>
@@ -439,7 +500,11 @@ export default function DMT1pay(props: any) {
                 <Button
                   variant="contained"
                   color="warning"
-                  onClick={handleClose}
+                  onClick={() => {
+                    handleClose();
+                    clearPayout();
+                    reset(defaultValues);
+                  }}
                 >
                   Close
                 </Button>
@@ -447,6 +512,79 @@ export default function DMT1pay(props: any) {
             )}
           </Box>
         )}
+      </Modal>
+      <Modal
+        open={open1}
+        onClose={handleClose1}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style} style={{ borderRadius: "20px" }} width={"fit-content"}>
+          <Box
+            sx={style}
+            style={{ borderRadius: "20px" }}
+            p={2}
+            width={{ xs: "100%", sm: "fit-content" }}
+          >
+            <Stack
+              sx={{ border: "1.5px dashed #000000" }}
+              p={3}
+              borderRadius={2}
+            >
+              <Table
+                stickyHeader
+                aria-label="sticky table"
+                style={{ borderBottom: "1px solid #dadada" }}
+              >
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
+                      Client ref Id
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
+                      Created At
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
+                      Amount
+                    </TableCell>
+                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
+                      status
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {transactionDetail.map((item: any) => (
+                    <TableRow key={item.data._id}>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        {item.data.clientRefId || "NA"}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        {fDateTime(item?.data?.createdAt)}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        {item.data.amount && "₹"} {item.data.amount || "NA"}
+                      </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>
+                        {item.data.status || "NA"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Stack>
+            <Stack
+              flexDirection={"row"}
+              gap={1}
+              mt={1}
+              justifyContent={"center"}
+            >
+              {/* <Button variant="contained" onClick={handleClose1} size="small">
+                Download Receipt
+              </Button> */}
+              <Button variant="contained">Close({count})</Button>
+            </Stack>
+          </Box>
+        </Box>
       </Modal>
     </>
   );
