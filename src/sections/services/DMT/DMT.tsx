@@ -151,7 +151,7 @@ export default function DMT() {
             if (Response.data.data == null) {
               openEditModal1();
             } else {
-              reSendOTP(data.mobileNumber);
+              SendOTP(data.mobileNumber);
               openEditModal2();
             }
             enqueueSnackbar(Response.data.message);
@@ -168,9 +168,9 @@ export default function DMT() {
     }
   };
 
-  const reSendOTP = (val: any) => {
+  const SendOTP = (val: any) => {
     let token = localStorage.getItem("token");
-    Api("moneyTransfer/remitter/resendOtp/" + val, "GET", "", token).then(
+    Api("moneyTransfer/remitter/sendOtp/" + val, "GET", "", token).then(
       (Response: any) => {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
@@ -204,7 +204,7 @@ export default function DMT() {
             if (Response.data.data == null) {
               openEditModal1();
             } else {
-              reSendOTP(val);
+              SendOTP(val);
               openEditModal2();
             }
             enqueueSnackbar(Response.data.message);
@@ -220,7 +220,7 @@ export default function DMT() {
 
   const handleNewRegistaion = (val: string) => {
     if (val === "SUCCESS") {
-      reSendOTP(getValues("mobileNumber"));
+      SendOTP(getValues("mobileNumber"));
       handleClose1();
       openEditModal2();
     } else {
@@ -356,7 +356,8 @@ const OtpSubmissionForRegistrantion = ({
     let token = localStorage.getItem("token");
     let body = {
       remitterMobile: mobilenumber,
-      otp: data.otp1 + data.otp2 + data.otp3,
+      otp:
+        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
     };
     Api("moneyTransfer/remitter/verifyOTP", "POST", body, token).then(
       (Response: any) => {
