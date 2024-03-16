@@ -45,7 +45,7 @@ export const varSlide = (props?: VariantsType) => {
       animate: {
         x: 0,
         opacity: 1,
-        transition: varTranEnter({ durationIn, easeIn }),
+        transition: { ...varTranEnter({ durationIn, easeIn }), delay: 0.5 },
       },
       exit: {
         x: -distance,

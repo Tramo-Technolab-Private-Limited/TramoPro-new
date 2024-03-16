@@ -138,7 +138,7 @@ export default function Services(props: any) {
                             ) : superCurrentTab.toLowerCase() == "dmt2" ? (
                               <DMT2 />
                             ) : superCurrentTab.toLowerCase() == "loan" ? (
-                              <Loan supCategory={tab} />
+                              <Loan />
                             ) : null}
                           </m.div>
                         </Box>
