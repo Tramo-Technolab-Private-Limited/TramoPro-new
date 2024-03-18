@@ -958,27 +958,28 @@ const DynamicForm = ({ data, setStep }: any) => {
   };
 
   const onSubmit = async (data: dynamicFormValuesProps) => {
-    console.log(data);
-    let token = localStorage.getItem("token");
-    let body = {
-      loanSubCategory: loanSubCategory,
-      loanApplicationDetails: {
-        ...data.loanApplicationDetails,
-      },
-      user_token: user_token,
-    };
-    Api("app/loan/easy_loan_step6/" + clientRefId, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            setStep(1);
-          } else {
-            enqueueSnackbar(Response.data.message);
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        loanApplicationDetails: {
+          ...data.loanApplicationDetails,
+        },
+      };
+      Api("app/loan/easy_loan_step6/" + clientRefId, "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              setStep(1);
+            } else {
+              enqueueSnackbar(Response.data.message);
+            }
           }
         }
-      }
-    );
+      );
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
