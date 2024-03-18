@@ -21,6 +21,9 @@ import MotionModal from "src/components/animate/MotionModal";
 import UpdateFundRequest from "./UpdateFundRequest";
 import dayjs from "dayjs";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
+import { useNavigate } from "react-router";
+import { PATH_DASHBOARD } from 'src/routes/paths';
+import { LoadingButton } from "@mui/lab";
 
 type props = {
   tableData: fundRequestProps[];
@@ -28,6 +31,7 @@ type props = {
 };
 
 function FundDepositeTable({ tableData, getRaisedRequest }: props) {
+  const navigate = useNavigate();
   const tableLabels = [
     { id: "frid", label: "FRID" },
     { id: "depositor", label: "Deposited To" },
@@ -40,6 +44,16 @@ function FundDepositeTable({ tableData, getRaisedRequest }: props) {
   ];
 
   return (
+    <>
+    <Stack direction={"row"} justifyContent={'space-between'} mb={2}>
+    <Typography variant="h5">Last 5 Transaction &#9660;</Typography>
+    <LoadingButton onClick={() => navigate(PATH_DASHBOARD.fundmanagement.myfundrequest)}
+    variant='contained'
+    sx={{width:'200px'}}
+    >
+      View All Transaction
+    </LoadingButton>
+  </Stack>
     <Card>
       <TableContainer sx={{ overflow: "unset" }}>
         <Scrollbar>
@@ -59,6 +73,7 @@ function FundDepositeTable({ tableData, getRaisedRequest }: props) {
         </Scrollbar>
       </TableContainer>
     </Card>
+    </>
   );
 }
 
