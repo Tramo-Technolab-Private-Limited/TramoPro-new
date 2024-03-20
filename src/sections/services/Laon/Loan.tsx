@@ -14,6 +14,13 @@ import {
   TextField,
   Alert,
   IconButton,
+  TableBody,
+  Table,
+  Tooltip,
+  TableCell,
+  tableCellClasses,
+  TableRow,
+  TableContainer,
 } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import PersonalLoanIcon from "src/assets/icons/loan/PersonalLoanIcon";
@@ -45,11 +52,19 @@ import useResponsive from "src/hooks/useResponsive";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
-import { fDateFormatForApi } from "src/utils/formatTime";
+import { fDateFormatForApi, fDateTime } from "src/utils/formatTime";
 import { m, AnimatePresence } from "framer-motion";
 import { MotionContainer, varSlide } from "src/components/animate";
 import Iconify from "src/components/iconify/Iconify";
 import { sentenceCase } from "change-case";
+import { useAuthContext } from "src/auth/useAuthContext";
+import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
+import { TableHeadCustom, TableNoData } from "src/components/table";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
+import { fIndianCurrency } from "src/utils/formatNumber";
+import { CustomAvatar } from "src/components/custom-avatar";
+import useCopyToClipboard from "src/hooks/useCopyToClipboard";
+import Label from "src/components/label/Label";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -91,6 +106,20 @@ type FormValuesProps = {
   secureFilePath: string;
   clientRefId: string;
   loanToken: string;
+};
+
+type LoanTxnTable = {
+  //txn table
+  status: string;
+  clientRefId: string;
+  category: string;
+  product: string;
+  accountNumber: string;
+  mobileNumber: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  sDate: Date | null;
+  eDate: Date | null;
 };
 
 function Loan() {
@@ -295,284 +324,274 @@ function Loan() {
 
   return (
     <div>
-      <Stack style={{ width: "100%", borderRadius: "3px" }}>
-        <Stack flexDirection={"row"}>
-          {categoryContext.sub_category
-            .filter((row: any) => row.sub_category_name == "Business Loan")
-            .map((item: any) => {
-              return (
-                <Stack
-                  height={100}
-                  ml={2}
-                  alignItems={"center"}
-                  justifyContent={"center"}
-                  onClick={() => {
-                    setCurrentTab(item._id);
-                    getProductFilter(categoryContext._id, item._id);
-                    reset(defaultValues);
-                    setStep(1);
-                  }}
-                  sx={{ cursor: "pointer" }}
-                >
-                  {item.sub_category_name == "Personal Loan" ? (
-                    <PersonalLoanIcon active={currentTab == item._id} />
-                  ) : item.sub_category_name == "Business Loan" ? (
-                    <BusinessLoanIcon active={currentTab == item._id} />
-                  ) : item.sub_category_name == "Home Loan" ? (
-                    <HomeLoanIcon active={currentTab == item._id} />
-                  ) : item.sub_category_name == "Gold Loan" ? (
-                    <GoldLoanIcon active={currentTab == item._id} />
-                  ) : null}
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      color: currentTab == item._id ? "#C52031" : "#333333",
-                    }}
-                  >
-                    {item.sub_category_name}
-                  </Typography>
-                </Stack>
-              );
-            })}
-        </Stack>
-        {productList.length > 0 && (
-          <>
-            <Stack flexDirection={"row"} justifyContent={"space-between"}>
-              <Tabs
-                value={subCurrentTab}
-                onChange={(event: any, newValue: string) => {
-                  setSubCurrentTab(newValue);
-                  reset(defaultValues);
-                  setStep(1);
-                }}
-                sx={{ mx: 2 }}
-                aria-label="wrapped label tabs example"
-              >
-                {productList.map((item: any, index: number) => {
-                  return (
-                    <Tab
-                      value={item._id}
-                      label={item.productName}
-                      onClick={() => setProductName(item.productName || "")}
-                      sx={{ fontSize: 14 }}
-                    />
-                  );
-                })}
-              </Tabs>
-            </Stack>
-            <Scrollbar
-              sx={
-                isMobile
-                  ? { maxHeight: window.innerHeight - 350 }
-                  : { maxHeight: window.innerHeight - 280 }
-              }
-            >
-              <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-                <AnimatePresence>
-                  {step == 1 && (
-                    <Stack sx={{ p: 2 }} component={MotionContainer}>
-                      <m.div variants={varSlide().inLeft}>
-                        <Typography variant="h3">{productName}</Typography>
-                        <Stack gap={2} width={{ xs: "95%", sm: 500 }}>
-                          <RHFTextField
-                            name="mobileNumber"
-                            label="Customer Mobile Number"
-                          />
-
-                          {/* {Data.reqdFields.map((item: any) => {
-                    return item.type == "enum" ? (
-                      <RHFSelect name={item?.field} label={item?.displayName}>
-                        {item?.value?.map((item1: any) => {
-                          return <MenuItem value={item1}>{item1}</MenuItem>;
-                        })}
-                      </RHFSelect>
-                    ) : (
-                      <>
-                        <RHFTextField
-                          name={item?.field}
-                          label={item?.displayName}
-                          InputLabelProps={
-                            item?.field
-                              ? {
-                                  shrink: true,
-                                }
-                              : {}
-                          }
-                          SelectProps={{
-                            native: false,
-                            sx: { textTransform: "capitalize" },
+      <Grid container spacing={2}>
+        <Grid item sm={12} md={4}>
+          <Card sx={{ p: 2 }}>
+            <Stack style={{ width: "100%", borderRadius: "3px" }}>
+              <Stack flexDirection={"row"}>
+                {categoryContext.sub_category
+                  .filter(
+                    (row: any) => row.sub_category_name == "Business Loan"
+                  )
+                  .map((item: any) => {
+                    return (
+                      <Stack
+                        height={100}
+                        ml={2}
+                        alignItems={"center"}
+                        justifyContent={"center"}
+                        onClick={() => {
+                          setCurrentTab(item._id);
+                          getProductFilter(categoryContext._id, item._id);
+                          reset(defaultValues);
+                          setStep(1);
+                        }}
+                        sx={{ cursor: "pointer" }}
+                      >
+                        {item.sub_category_name == "Personal Loan" ? (
+                          <PersonalLoanIcon active={currentTab == item._id} />
+                        ) : item.sub_category_name == "Business Loan" ? (
+                          <BusinessLoanIcon active={currentTab == item._id} />
+                        ) : item.sub_category_name == "Home Loan" ? (
+                          <HomeLoanIcon active={currentTab == item._id} />
+                        ) : item.sub_category_name == "Gold Loan" ? (
+                          <GoldLoanIcon active={currentTab == item._id} />
+                        ) : null}
+                        <Typography
+                          variant="subtitle2"
+                          sx={{
+                            color:
+                              currentTab == item._id ? "#C52031" : "#333333",
                           }}
-                          onChange={(e) =>
-                            setValue(item?.field, +e.target.value)
-                          }
-                        />
-                        <RHFSlider
-                          name={item?.field}
-                          min={item?.lowerBound}
-                          max={item?.upperBound}
-                          step={item?.lowerBound}
-                        />
-                      </>
+                        >
+                          {item.sub_category_name}
+                        </Typography>
+                      </Stack>
                     );
-                  })} */}
-
-                          <LoadingButton
-                            variant="contained"
-                            disabled={!isValid}
-                            loading={isSubmitting}
-                            type="submit"
-                            sx={{ width: "fit-content" }}
-                          >
-                            Continue
-                          </LoadingButton>
-                        </Stack>
-                      </m.div>
-                    </Stack>
-                  )}
-                </AnimatePresence>
-                {/* otp modal */}
-                <MotionModal open={open} width={{ xs: "100%", sm: 570 }}>
-                  <Stack gap={3}>
-                    <Typography
-                      variant="body2"
-                      style={{ textAlign: "left", marginBottom: "0" }}
+                  })}
+              </Stack>
+              {productList.length > 0 ? (
+                <>
+                  <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                    <Tabs
+                      value={subCurrentTab}
+                      onChange={(event: any, newValue: string) => {
+                        setSubCurrentTab(newValue);
+                        reset(defaultValues);
+                        setStep(1);
+                      }}
+                      sx={{ mx: 2 }}
+                      aria-label="wrapped label tabs example"
                     >
-                      Mobile Verification Code &nbsp;
-                    </Typography>
-                    <Stack flexDirection="row" gap={1}>
-                      <RHFCodes
-                        keyName="code"
-                        inputs={[
-                          "code1",
-                          "code2",
-                          "code3",
-                          "code4",
-                          "code5",
-                          "code6",
-                        ]}
-                      />
-                      <Stack>
-                        <Stack rowGap={0.5}>
-                          <Button
-                            variant="contained"
-                            style={{
-                              float: "right",
-                              fontSize: "10px",
-                              height: "25px",
-                            }}
-                            onClick={resendOtp}
-                            size="small"
-                            disabled={!!timer}
+                      {productList.map((item: any, index: number) => {
+                        return (
+                          <Tab
+                            value={item._id}
+                            label={item.productName}
+                            onClick={() =>
+                              setProductName(item.productName || "")
+                            }
+                            sx={{ fontSize: 14 }}
+                          />
+                        );
+                      })}
+                    </Tabs>
+                  </Stack>
+
+                  <Scrollbar
+                    sx={
+                      isMobile
+                        ? { maxHeight: window.innerHeight - 350 }
+                        : { maxHeight: window.innerHeight - 280 }
+                    }
+                  >
+                    <FormProvider
+                      methods={methods}
+                      onSubmit={handleSubmit(onSubmit)}
+                    >
+                      <AnimatePresence>
+                        {step == 1 && (
+                          <Stack sx={{ p: 2 }} component={MotionContainer}>
+                            <m.div variants={varSlide().inLeft}>
+                              <Typography variant="h3">
+                                {productName}
+                              </Typography>
+                              <Stack gap={2}>
+                                <RHFTextField
+                                  name="mobileNumber"
+                                  label="Customer Mobile Number"
+                                />
+
+                                <LoadingButton
+                                  variant="contained"
+                                  disabled={!isValid}
+                                  loading={isSubmitting}
+                                  type="submit"
+                                  sx={{ width: "fit-content" }}
+                                >
+                                  Continue
+                                </LoadingButton>
+                              </Stack>
+                            </m.div>
+                          </Stack>
+                        )}
+                      </AnimatePresence>
+                      {/* otp modal */}
+                      <MotionModal open={open} width={{ xs: "100%", sm: 570 }}>
+                        <Stack gap={3}>
+                          <Typography
+                            variant="body2"
+                            style={{ textAlign: "left", marginBottom: "0" }}
                           >
-                            <Typography
-                              sx={{ whiteSpace: "nowrap" }}
-                              variant="caption"
+                            Mobile Verification Code &nbsp;
+                          </Typography>
+                          <Stack flexDirection="row" gap={1}>
+                            <RHFCodes
+                              keyName="code"
+                              inputs={[
+                                "code1",
+                                "code2",
+                                "code3",
+                                "code4",
+                                "code5",
+                                "code6",
+                              ]}
+                            />
+                            <Stack>
+                              <Stack rowGap={0.5}>
+                                <Button
+                                  variant="contained"
+                                  style={{
+                                    float: "right",
+                                    fontSize: "10px",
+                                    height: "25px",
+                                  }}
+                                  onClick={resendOtp}
+                                  size="small"
+                                  disabled={!!timer}
+                                >
+                                  <Typography
+                                    sx={{ whiteSpace: "nowrap" }}
+                                    variant="caption"
+                                  >
+                                    {" "}
+                                    Resend code {timer !== 0 &&
+                                      `(${timer})`}{" "}
+                                  </Typography>
+                                </Button>
+
+                                <Button
+                                  variant="outlined"
+                                  style={{
+                                    float: "right",
+                                    fontSize: "10px",
+                                    height: "25px",
+                                  }}
+                                  onClick={() => {
+                                    resetField("code1");
+                                    resetField("code2");
+                                    resetField("code3");
+                                    resetField("code4");
+                                    resetField("code5");
+                                    resetField("code6");
+                                  }}
+                                  size="small"
+                                >
+                                  Clear
+                                </Button>
+                              </Stack>
+                            </Stack>
+                            {(!!errors.code1 ||
+                              !!errors.code2 ||
+                              !!errors.code3 ||
+                              !!errors.code4 ||
+                              !!errors.code5 ||
+                              !!errors.code6) && (
+                              <FormHelperText error sx={{ px: 2 }}>
+                                Code is required
+                              </FormHelperText>
+                            )}
+                          </Stack>
+                          <Stack flexDirection={"row"} gap={1}>
+                            <LoadingButton
+                              variant="outlined"
+                              onClick={handleClose}
+                              loading={isVerifyLoading}
                             >
-                              {" "}
-                              Resend code {timer !== 0 && `(${timer})`}{" "}
-                            </Typography>
-                          </Button>
-
-                          <Button
-                            variant="outlined"
-                            style={{
-                              float: "right",
-                              fontSize: "10px",
-                              height: "25px",
-                            }}
-                            onClick={() => {
-                              resetField("code1");
-                              resetField("code2");
-                              resetField("code3");
-                              resetField("code4");
-                              resetField("code5");
-                              resetField("code6");
-                            }}
-                            size="small"
-                          >
-                            Clear
-                          </Button>
+                              Close
+                            </LoadingButton>
+                            <LoadingButton
+                              variant="contained"
+                              onClick={verifyOtp}
+                              loading={isVerifyLoading}
+                              disabled={
+                                !getValues("code1") ||
+                                !getValues("code2") ||
+                                !getValues("code3") ||
+                                !getValues("code4") ||
+                                !getValues("code5") ||
+                                !getValues("code6")
+                              }
+                            >
+                              Verify
+                            </LoadingButton>
+                          </Stack>
                         </Stack>
-                      </Stack>
-                      {(!!errors.code1 ||
-                        !!errors.code2 ||
-                        !!errors.code3 ||
-                        !!errors.code4 ||
-                        !!errors.code5 ||
-                        !!errors.code6) && (
-                        <FormHelperText error sx={{ px: 2 }}>
-                          Code is required
-                        </FormHelperText>
-                      )}
-                    </Stack>
-                    <Stack flexDirection={"row"} gap={1}>
-                      <LoadingButton
-                        variant="outlined"
-                        onClick={handleClose}
-                        loading={isVerifyLoading}
-                      >
-                        Close
-                      </LoadingButton>
-                      <LoadingButton
-                        variant="contained"
-                        onClick={verifyOtp}
-                        loading={isVerifyLoading}
-                        disabled={
-                          !getValues("code1") ||
-                          !getValues("code2") ||
-                          !getValues("code3") ||
-                          !getValues("code4") ||
-                          !getValues("code5") ||
-                          !getValues("code6")
-                        }
-                      >
-                        Verify
-                      </LoadingButton>
-                    </Stack>
-                  </Stack>
-                </MotionModal>
-              </FormProvider>
+                      </MotionModal>
+                    </FormProvider>
 
-              <AnimatePresence>
-                {step == 2 && (
-                  <Stack sx={{ p: 2 }} component={MotionContainer}>
-                    <m.div variants={varSlide().inLeft}>
-                      <Stack gap={2} width={{ xs: "95%", sm: 500 }}>
-                        <UploadPan
-                          data={{
-                            user_token: watch("loanToken"),
-                            clientRefId: watch("clientRefId"),
-                            userProfile: watch("profileDetails"),
-                          }}
-                          setStep={setStep}
-                        />
-                      </Stack>
-                    </m.div>
-                  </Stack>
-                )}
-              </AnimatePresence>
-              <AnimatePresence>
-                {step == 3 && (
-                  <Stack sx={{ p: 2 }} component={MotionContainer}>
-                    <m.div variants={varSlide().inLeft}>
-                      <Stack gap={2} width={{ xs: "95%", sm: 500 }}>
-                        <DynamicForm
-                          data={{
-                            user_token: watch("loanToken"),
-                            clientRefId: watch("clientRefId"),
-                            loanSubCategory: subCurrentTab,
-                          }}
-                          setStep={setStep}
-                        />
-                      </Stack>
-                    </m.div>
-                  </Stack>
-                )}
-              </AnimatePresence>
-            </Scrollbar>
-          </>
-        )}
-      </Stack>
+                    <AnimatePresence>
+                      {step == 2 && (
+                        <Stack sx={{ p: 2 }} component={MotionContainer}>
+                          <m.div variants={varSlide().inLeft}>
+                            <Stack gap={2}>
+                              <UploadPan
+                                data={{
+                                  user_token: watch("loanToken"),
+                                  clientRefId: watch("clientRefId"),
+                                  userProfile: watch("profileDetails"),
+                                }}
+                                setStep={setStep}
+                              />
+                            </Stack>
+                          </m.div>
+                        </Stack>
+                      )}
+                    </AnimatePresence>
+                    <AnimatePresence>
+                      {step == 3 && (
+                        <Stack sx={{ p: 2 }} component={MotionContainer}>
+                          <m.div variants={varSlide().inLeft}>
+                            <Stack gap={2}>
+                              <DynamicForm
+                                data={{
+                                  user_token: watch("loanToken"),
+                                  clientRefId: watch("clientRefId"),
+                                  loanSubCategory: subCurrentTab,
+                                }}
+                                setStep={setStep}
+                              />
+                            </Stack>
+                          </m.div>
+                        </Stack>
+                      )}
+                    </AnimatePresence>
+                  </Scrollbar>
+                </>
+              ) : (
+                <Stack flexDirection={"row"} justifyContent={"center"}>
+                  <Typography>Product Not Found for loan.</Typography>
+                </Stack>
+              )}
+            </Stack>
+          </Card>
+        </Grid>
+        <Grid item md={8}>
+          <Card sx={{ p: 2 }}>
+            <LoanTransactionTable />
+          </Card>
+        </Grid>
+      </Grid>
     </div>
   );
 }
@@ -1040,3 +1059,433 @@ const DynamicForm = ({ data, setStep }: any) => {
     </FormProvider>
   );
 };
+
+const LoanTransactionTable = () => {
+  let token = localStorage.getItem("token");
+  const isMobile = useResponsive("up", "sm");
+  const { enqueueSnackbar } = useSnackbar();
+  const [Loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState<any>(1);
+  const [pageCount, setPageCount] = useState<any>(0);
+  const [categoryList, setCategoryList] = useState([]);
+  const [pageSize, setPageSize] = useState<any>(25);
+  const [currentTab, setCurrentTab] = useState("all");
+  const [ProductList, setProductList] = useState([]);
+  const [filterdValue, setFilterdValue] = useState<any>([]);
+
+  const txnSchema = Yup.object().shape({
+    status: Yup.string(),
+    clientRefId: Yup.string(),
+  });
+
+  const defaultValues = {
+    category: "",
+    status: "",
+    clientRefId: "",
+    product: "",
+    sDate: null,
+    eDate: null,
+    accountNumber: "",
+    mobileNumber: "",
+    startDate: null,
+    endDate: null,
+  };
+
+  const methods = useForm<LoanTxnTable>({
+    resolver: yupResolver(txnSchema),
+    defaultValues,
+  });
+
+  const {
+    reset,
+    watch,
+    setValue,
+    getValues,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = methods;
+
+  useEffect(() => {
+    getCategoryList();
+    getTransaction();
+  }, [currentPage]);
+
+  useEffect(() => setCurrentPage(1), [currentTab]);
+
+  const getProductlist = (val: any) => {
+    console.log("=======>", val);
+    Api(`product/get_ProductList/${val[0]._id}`, "GET", "", token).then(
+      (Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            setProductList(Response.data.data);
+          }
+        }
+      }
+    );
+  };
+
+  const getCategoryList = () => {
+    Api(`category/get_CategoryList`, "GET", "", token).then((Response: any) => {
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          setCategoryList(Response.data.data);
+          setValue(
+            "category",
+            Response.data.data.filter(
+              (row: any) => row.category_name === "LOAN"
+            )[0]._id
+          );
+          getProductlist(
+            Response.data.data.filter((row: any) => {
+              if (row.category_name === "LOAN" && row._id) {
+                return row.sub_category.filter((item: any) => {
+                  return item.sub_category_name === "Business Loan";
+                });
+              }
+            })
+          );
+        }
+      }
+    });
+  };
+
+  const getTransaction = () => {
+    setLoading(true);
+    let body = {
+      pageInitData: {
+        pageSize: pageSize,
+        currentPage: currentPage,
+      },
+      clientRefId: getValues("clientRefId"),
+      accountNumber: getValues("accountNumber"),
+      mobileNumber: getValues("mobileNumber"),
+      status: getValues("status"),
+      transactionType: "",
+      categoryId: getValues("category"),
+      productId: getValues("product") || "",
+      startDate: fDateFormatForApi(getValues("startDate")),
+      endDate: fDateFormatForApi(getValues("endDate")),
+    };
+
+    Api(`transaction/transactionByUser`, "POST", body, token).then(
+      (Response: any) => {
+        console.log("======Transaction==response=====>" + Response);
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            setFilterdValue(Response.data.data.data);
+            setPageCount(Response.data.data.totalNumberOfRecords);
+            setCurrentTab("");
+          } else {
+            enqueueSnackbar(Response.data.message);
+          }
+          setLoading(false);
+        } else {
+          enqueueSnackbar("Failed", { variant: "error" });
+          setLoading(false);
+        }
+      }
+    );
+  };
+
+  const filterTransaction = async (data: LoanTxnTable) => {
+    setCurrentPage(1);
+    try {
+      setFilterdValue([]);
+      setLoading(true);
+      let body = {
+        pageInitData: {
+          pageSize: pageSize,
+          currentPage: currentPage,
+        },
+        clientRefId: data.clientRefId,
+        status: data.status,
+        transactionType: "",
+        categoryId: data.category,
+        productId: data.product,
+        mobileNumber: data.mobileNumber,
+        accountNumber: data.accountNumber,
+        startDate: fDateFormatForApi(getValues("startDate")),
+        endDate: fDateFormatForApi(getValues("endDate")),
+      };
+      await Api(`transaction/transactionByUser`, "POST", body, token).then(
+        (Response: any) => {
+          console.log("======Transaction==response=====>" + Response);
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              setFilterdValue(Response.data.data.data);
+              setPageCount(Response.data.data.totalNumberOfRecords);
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+            }
+            setLoading(false);
+          } else {
+            setLoading(false);
+            enqueueSnackbar("Failed", { variant: "error" });
+          }
+        }
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const tableLabels = [
+    { id: "Date&Time", label: "Date & Time" },
+    { id: "Loan Detail", label: "Loan Detail" },
+    { id: "Product", label: "Product" },
+    { id: "Amount", label: "Amount" },
+    { id: "Status", label: "Status" },
+    { id: "Action", label: "Action" },
+  ];
+
+  return (
+    <>
+      <Stack mb={1}>
+        <FormProvider
+          methods={methods}
+          onSubmit={handleSubmit(filterTransaction)}
+        >
+          <Stack gap={1} flexDirection={"row"}>
+            <RHFSelect
+              name="product"
+              label="Product"
+              SelectProps={{
+                native: false,
+                sx: { textTransform: "capitalize" },
+              }}
+            >
+              <MenuItem value="">All</MenuItem>
+              {ProductList.map((item: any) => {
+                return (
+                  <MenuItem value={item._id}>{item?.productName}</MenuItem>
+                );
+              })}
+            </RHFSelect>
+            <RHFSelect
+              name="status"
+              label="Status"
+              SelectProps={{
+                native: false,
+                sx: { textTransform: "capitalize" },
+              }}
+            >
+              <MenuItem value="">None</MenuItem>
+              <MenuItem value="success">Success</MenuItem>
+              <MenuItem value="failed">Failed</MenuItem>
+              <MenuItem value="pending">Pending</MenuItem>
+              <MenuItem value="in_process">In process</MenuItem>
+              <MenuItem value="hold">Hold</MenuItem>
+              <MenuItem value="initiated">Initiated</MenuItem>
+            </RHFSelect>
+
+            <RHFTextField name="mobileNumber" label="MobileNumber" />
+            <Stack direction={"row"} gap={1}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Start date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("startDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+                <DatePicker
+                  label="End date"
+                  inputFormat="DD/MM/YYYY"
+                  value={watch("endDate")}
+                  minDate={watch("startDate")}
+                  maxDate={new Date()}
+                  onChange={(newValue: any) => setValue("endDate", newValue)}
+                  renderInput={(params: any) => (
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                  )}
+                />
+              </LocalizationProvider>
+              <Stack
+                flexDirection={"row"}
+                flexBasis={{ xs: "100%", sm: "50%" }}
+                gap={1}
+              >
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  loading={isSubmitting}
+                >
+                  Apply
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  onClick={() => reset(defaultValues)}
+                >
+                  <Iconify icon="bx:reset" color={"common.white"} mr={1} />{" "}
+                  Reset
+                </LoadingButton>
+              </Stack>
+            </Stack>
+          </Stack>
+        </FormProvider>
+      </Stack>
+      <Stack>
+        {/* </Box> */}
+
+        <AnimatePresence>
+          {filterdValue.length ? (
+            <Stack component={MotionContainer}>
+              <m.div variants={varSlide().inLeft}>
+                {Loading ? (
+                  <ApiDataLoading />
+                ) : (
+                  <TableContainer>
+                    <Scrollbar>
+                      <Table
+                        size="small"
+                        aria-label="customized table"
+                        stickyHeader
+                        sx={{}}
+                      >
+                        <TableHeadCustom headLabel={tableLabels} />
+
+                        <TableBody>
+                          {filterdValue.map((row: any) => (
+                            <TransactionRow key={row._id} row={row} />
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </Scrollbar>
+                  </TableContainer>
+                )}
+                {!Loading && (
+                  <CustomPagination
+                    page={currentPage - 1}
+                    count={pageCount}
+                    onPageChange={(
+                      event: React.MouseEvent<HTMLButtonElement> | null,
+                      newPage: number
+                    ) => {
+                      setCurrentPage(newPage + 1);
+                    }}
+                    rowsPerPage={pageSize}
+                    onRowsPerPageChange={(
+                      event: React.ChangeEvent<
+                        HTMLInputElement | HTMLTextAreaElement
+                      >
+                    ) => {
+                      setPageSize(parseInt(event.target.value));
+                      setCurrentPage(1);
+                    }}
+                  />
+                )}
+              </m.div>
+            </Stack>
+          ) : (
+            <TableNoData isNotFound={!filterdValue} />
+          )}
+        </AnimatePresence>
+      </Stack>
+    </>
+  );
+};
+
+type childProps = {
+  row: any;
+};
+
+function TransactionRow({ row }: childProps) {
+  const { copy } = useCopyToClipboard();
+  const { enqueueSnackbar } = useSnackbar();
+
+  const onCopy = (text: string) => {
+    if (text) {
+      enqueueSnackbar("Copied!");
+      copy(text);
+    }
+  };
+
+  const StyledTableCell = styled(TableCell)(({ theme }) => ({
+    [`&.${tableCellClasses.head}`]: {
+      backgroundColor: theme.palette.common.black,
+      color: theme.palette.common.white,
+    },
+    [`&.${tableCellClasses.body}`]: {
+      fontSize: 12,
+      padding: 6,
+    },
+  }));
+
+  const StyledTableRow = styled(TableRow)(({ theme }) => ({
+    "&:nth-of-type(even)": {
+      backgroundColor: theme.palette.grey[300],
+    },
+    // hide last border
+    "&:last-child td, &:last-child th": {
+      border: 0,
+    },
+  }));
+
+  return (
+    <>
+      <StyledTableRow key={row._id}>
+        {/* Date & Time */}
+        <StyledTableCell>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {fDateTime(row?.createdAt)}
+          </Typography>
+        </StyledTableCell>
+
+        {/* Loan Detail */}
+        <StyledTableCell>
+          <Typography variant="body2">{row?.transactionType}</Typography>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {row?.clientRefId}{" "}
+            <Tooltip title="Copy" placement="top">
+              <IconButton onClick={() => onCopy(row?.clientRefId)}>
+                <Iconify icon="eva:copy-fill" width={20} />
+              </IconButton>
+            </Tooltip>
+          </Typography>
+        </StyledTableCell>
+
+        {/* Product Name */}
+        <StyledTableCell>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {row?.productName}
+          </Typography>
+        </StyledTableCell>
+
+        {/* Amount */}
+        <StyledTableCell>
+          <Typography variant="body2" whiteSpace={"nowrap"}>
+            {row?.amount}
+          </Typography>
+        </StyledTableCell>
+
+        <StyledTableCell
+          sx={{
+            textTransform: "lowercase",
+            fontWeight: 600,
+            textAlign: "center",
+          }}
+        >
+          <Label
+            variant="soft"
+            color={
+              (row.status === "failed" && "error") ||
+              ((row.status === "pending" || row.status === "in_process") &&
+                "warning") ||
+              "success"
+            }
+            sx={{ textTransform: "capitalize" }}
+          >
+            {row.status ? sentenceCase(row.status) : ""}
+          </Label>
+        </StyledTableCell>
+        <StyledTableCell>
+          <LoadingButton variant="contained"> Continue </LoadingButton>
+        </StyledTableCell>
+      </StyledTableRow>
+    </>
+  );
+}
