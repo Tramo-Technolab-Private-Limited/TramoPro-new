@@ -112,7 +112,7 @@ type LoanTxnTable = {
   //txn table
   status: string;
   clientRefId: string;
-  category: string;
+  categoryId: string;
   product: string;
   accountNumber: string;
   mobileNumber: string;
@@ -1079,7 +1079,7 @@ const LoanTransactionTable = () => {
   });
 
   const defaultValues = {
-    category: "",
+    categoryId: "",
     status: "",
     clientRefId: "",
     product: "",
@@ -1107,7 +1107,6 @@ const LoanTransactionTable = () => {
 
   useEffect(() => {
     getCategoryList();
-    getTransaction();
   }, [currentPage]);
 
   useEffect(() => setCurrentPage(1), [currentTab]);
@@ -1131,7 +1130,7 @@ const LoanTransactionTable = () => {
         if (Response.data.code == 200) {
           setCategoryList(Response.data.data);
           setValue(
-            "category",
+            "categoryId",
             Response.data.data.filter(
               (row: any) => row.category_name === "LOAN"
             )[0]._id
@@ -1145,6 +1144,7 @@ const LoanTransactionTable = () => {
               }
             })
           );
+          getTransaction();
         }
       }
     });
@@ -1162,7 +1162,7 @@ const LoanTransactionTable = () => {
       mobileNumber: getValues("mobileNumber"),
       status: getValues("status"),
       transactionType: "",
-      categoryId: getValues("category"),
+      categoryId: getValues("categoryId"),
       productId: getValues("product") || "",
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
@@ -1201,7 +1201,7 @@ const LoanTransactionTable = () => {
         clientRefId: data.clientRefId,
         status: data.status,
         transactionType: "",
-        categoryId: data.category,
+        categoryId: data.categoryId,
         productId: data.product,
         mobileNumber: data.mobileNumber,
         accountNumber: data.accountNumber,
@@ -1332,57 +1332,50 @@ const LoanTransactionTable = () => {
         {/* </Box> */}
 
         <AnimatePresence>
-          {filterdValue.length ? (
-            <Stack component={MotionContainer}>
-              <m.div variants={varSlide().inLeft}>
-                {Loading ? (
-                  <ApiDataLoading />
-                ) : (
-                  <TableContainer>
-                    <Scrollbar>
-                      <Table
-                        size="small"
-                        aria-label="customized table"
-                        stickyHeader
-                        sx={{}}
-                      >
-                        <TableHeadCustom headLabel={tableLabels} />
+          <Stack component={MotionContainer}>
+            <m.div variants={varSlide().inLeft}>
+              <TableContainer>
+                <Scrollbar>
+                  <Table
+                    size="small"
+                    aria-label="customized table"
+                    stickyHeader
+                    sx={{}}
+                  >
+                    <TableHeadCustom headLabel={tableLabels} />
 
-                        <TableBody>
-                          {filterdValue.map((row: any) => (
-                            <TransactionRow key={row._id} row={row} />
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </Scrollbar>
-                  </TableContainer>
-                )}
-                {!Loading && (
-                  <CustomPagination
-                    page={currentPage - 1}
-                    count={pageCount}
-                    onPageChange={(
-                      event: React.MouseEvent<HTMLButtonElement> | null,
-                      newPage: number
-                    ) => {
-                      setCurrentPage(newPage + 1);
-                    }}
-                    rowsPerPage={pageSize}
-                    onRowsPerPageChange={(
-                      event: React.ChangeEvent<
-                        HTMLInputElement | HTMLTextAreaElement
-                      >
-                    ) => {
-                      setPageSize(parseInt(event.target.value));
-                      setCurrentPage(1);
-                    }}
-                  />
-                )}
-              </m.div>
-            </Stack>
-          ) : (
-            <TableNoData isNotFound={!filterdValue} />
-          )}
+                    <TableBody>
+                      {filterdValue.map((row: any) => (
+                        <TransactionRow key={row._id} row={row} />
+                      ))}
+                    </TableBody>
+                    <TableNoData isNotFound={!filterdValue.length} />
+                  </Table>
+                </Scrollbar>
+              </TableContainer>
+              {!Loading && (
+                <CustomPagination
+                  page={currentPage - 1}
+                  count={pageCount}
+                  onPageChange={(
+                    event: React.MouseEvent<HTMLButtonElement> | null,
+                    newPage: number
+                  ) => {
+                    setCurrentPage(newPage + 1);
+                  }}
+                  rowsPerPage={pageSize}
+                  onRowsPerPageChange={(
+                    event: React.ChangeEvent<
+                      HTMLInputElement | HTMLTextAreaElement
+                    >
+                  ) => {
+                    setPageSize(parseInt(event.target.value));
+                    setCurrentPage(1);
+                  }}
+                />
+              )}
+            </m.div>
+          </Stack>
         </AnimatePresence>
       </Stack>
     </>
