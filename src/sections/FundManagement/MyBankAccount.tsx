@@ -148,7 +148,7 @@ export default function MyBankAccount() {
     watch,
     setValue,
     handleSubmit,
-    formState: { isSubmitting },
+    formState: { isSubmitting, isValid },
   } = methods;
 
   const category = [
@@ -396,6 +396,7 @@ export default function MyBankAccount() {
                                     )
                                   }
                                   loading={defaultLoading}
+                                  variant="contained"
                                 >
                                   Set default Bank
                                 </LoadingButton>
@@ -544,29 +545,33 @@ export default function MyBankAccount() {
               name="accountNumber"
               label="Account Number"
               placeholder="Account Number"
+              autoComplete="off"
             />
             <RHFTextField
               type="password"
               name="confirmAccountNumber"
               label="Confirm Account Number"
+              onPaste={(e) => e.preventDefault()}
               placeholder="Confirm Account Number"
             />
           </Grid>
-          <Stack flexDirection={"row"} gap={1} justifyContent={"end"} mt={1}>
-            <LoadingButton
-              loading={addBankLoading}
-              size="medium"
-              onClick={handleClose}
-            >
-              Cancel
-            </LoadingButton>
+          <Stack flexDirection={"row"} gap={1} justifyContent={"end"} mt={2}>
             <LoadingButton
               size="medium"
               type="submit"
               variant="contained"
               loading={addBankLoading}
+              disabled={!isValid}
             >
               Submit
+            </LoadingButton>
+            <LoadingButton
+              loading={addBankLoading}
+              size="medium"
+              onClick={handleClose}
+              variant="contained"
+            >
+              Close
             </LoadingButton>
           </Stack>
         </FormProvider>
