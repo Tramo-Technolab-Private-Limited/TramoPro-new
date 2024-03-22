@@ -31,6 +31,7 @@ import { DialogAnimate } from "src/components/animate";
 import dayjs from "dayjs";
 import { fDate, fDateTime } from "src/utils/formatTime";
 import RoleBasedGuard from "src/auth/RoleBasedGuard";
+import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 
 type FormValuesProps = {
   amount: number | null | string;
@@ -48,7 +49,7 @@ export default function AEPSsettlement() {
   const { enqueueSnackbar } = useSnackbar();
   const [currentTab, setCurrentTab] = useState(1);
   const [userBankList, setUserBankList] = useState([]);
-
+  const [isTabChanging, setIsTabChanging] = useState(false);
   useEffect(() => {
     BankList();
   }, []);
@@ -65,6 +66,14 @@ export default function AEPSsettlement() {
         }
       }
     });
+  };
+
+  const handleTabChange = (event: any, newValue: any) => {
+    setIsTabChanging(true);
+    setCurrentTab(newValue);
+    setTimeout(() => {
+      setIsTabChanging(false);
+    }, 500);
   };
 
   return (
@@ -85,19 +94,23 @@ export default function AEPSsettlement() {
           <Tabs
             value={currentTab}
             aria-label="basic tabs example"
-            onChange={(event, newValue) => setCurrentTab(newValue)}
+            onChange={handleTabChange} // Use handleTabChange function for tab change
           >
             <Tab label="Settlement To bank" value={1} />
             <Tab label="Settlement To Main Wallet" value={2} />
           </Tabs>
         </Box>
-        <Stack mt={2}>
-          {currentTab === 1 ? (
-            <SettlementToBank userBankList={userBankList} />
-          ) : (
-            <SettlementToMainWallet userBankList={userBankList} />
-          )}
-        </Stack>
+        {!isTabChanging ? (
+          <Stack mt={2}>
+            {currentTab === 1 ? (
+              <SettlementToBank userBankList={userBankList} />
+            ) : (
+              <SettlementToMainWallet userBankList={userBankList} />
+            )}
+          </Stack>
+        ) : (
+          <ApiDataLoading />
+        )}
       </RoleBasedGuard>
     </>
   );
@@ -111,7 +124,8 @@ const SettlementToBank = ({ userBankList }: childProps) => {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail, initialize } = useAuthContext();
-  const [eligibleSettlementAmount, setEligibleSettlementAmount] = useState("");
+  const [eligibleSettlementAmount, setEligibleSettlementAmount] =
+    useState<any>();
   const [transferTo, setTransferTo] = useState<boolean | null>(null);
   const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
   const [defaultAccountNumber, setDefaultAccountNumber] = useState("");
@@ -266,100 +280,116 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                 // sm: 'repeat(2, 1fr)'
               }}
             >
-              <Typography variant="subtitle1" textAlign={"center"}>
-                Maximum Eligible Settlement Amount for Bank account is{" "}
-                {Number(eligibleSettlementAmount)}
-              </Typography>
-              {Number(eligibleSettlementAmount) < 1000 && (
-                <Typography
-                  variant="caption"
-                  textAlign={"center"}
-                  color={"red"}
-                >
-                  Minimum amount for AEPS settlement is 1000
-                </Typography>
-              )}
-
-              <Stack gap={2}>
-                <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
-                  {!transferTo && (
-                    <>
-                      <RHFSelect
-                        name="accountNumber"
-                        label="Bank account"
-                        placeholder="Bank account"
-                        // defaultValue={}
-                        disabled
-                        variant="filled"
-                        SelectProps={{
-                          native: false,
-                          sx: { textTransform: "capitalize" },
-                        }}
+              {eligibleSettlementAmount && (
+                <>
+                  {" "}
+                  <Typography variant="subtitle1" textAlign={"center"}>
+                    Maximum Eligible Settlement Amount for Bank account is{" "}
+                    {Number(eligibleSettlementAmount) || 0}
+                  </Typography>
+                  {eligibleSettlementAmount &&
+                    Number(eligibleSettlementAmount) < 1000 && (
+                      <Typography
+                        variant="caption"
+                        textAlign={"center"}
+                        color={"red"}
                       >
-                        {userBankList.map((item: any) => {
-                          const lastFourDigits = item.accountNumber.slice(
-                            item.accountNumber.length - 4
-                          );
-                          const maskedDigits = "*".repeat(
-                            item.accountNumber.length - 4
-                          );
-                          const maskedNumber = maskedDigits + lastFourDigits;
-                          return (
-                            <MenuItem
-                              key={item._id}
-                              value={item.accountNumber}
-                              onClick={() => setValue("ifsc", item.ifsc)}
-                            >
-                              <Stack>
-                                <span>{item.bankName}</span>
-                                <span>{maskedNumber}</span>
-                              </Stack>
-                            </MenuItem>
-                          );
-                        })}
-                      </RHFSelect>
-                    </>
-                  )}
+                        Minimum amount for AEPS settlement is 1000
+                      </Typography>
+                    )}
+                  <Stack gap={2}>
+                    <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
+                      {!transferTo && (
+                        <>
+                          <RHFSelect
+                            name="accountNumber"
+                            label="Bank account"
+                            placeholder="Bank account"
+                            // defaultValue={}
+                            disabled
+                            variant="filled"
+                            SelectProps={{
+                              native: false,
+                              sx: { textTransform: "capitalize" },
+                            }}
+                          >
+                            {userBankList.map((item: any) => {
+                              const lastFourDigits = item.accountNumber.slice(
+                                item.accountNumber.length - 4
+                              );
+                              const maskedDigits = "*".repeat(
+                                item.accountNumber.length - 4
+                              );
+                              const maskedNumber =
+                                maskedDigits + lastFourDigits;
+                              return (
+                                <MenuItem
+                                  key={item._id}
+                                  value={item.accountNumber}
+                                  onClick={() => setValue("ifsc", item.ifsc)}
+                                >
+                                  <Stack>
+                                    <span>{item.bankName}</span>
+                                    <span>{maskedNumber}</span>
+                                  </Stack>
+                                </MenuItem>
+                              );
+                            })}
+                          </RHFSelect>
+                        </>
+                      )}
 
-                  <RHFTextField
-                    name="amount"
-                    label="Amount"
-                    placeholder="Amount"
-                  />
-                </Stack>
-                <Stack alignSelf={"center"}>
-                  <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                    <Typography variant="h5" textAlign={"center"}>
-                      NPIN
-                    </Typography>
-                    {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
+                      <RHFTextField
+                        name="amount"
+                        label="Amount"
+                        placeholder="Amount"
+                      />
+                    </Stack>
+                    <Stack alignSelf={"center"}>
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                      >
+                        <Typography variant="h5" textAlign={"center"}>
+                          NPIN
+                        </Typography>
+                        {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
+                      </Stack>
+                      <RHFCodes
+                        keyName="otp"
+                        inputs={[
+                          "otp1",
+                          "otp2",
+                          "otp3",
+                          "otp4",
+                          "otp5",
+                          "otp6",
+                        ]}
+                        type="password"
+                      />
+                      {(!!errors.otp1 ||
+                        !!errors.otp2 ||
+                        !!errors.otp3 ||
+                        !!errors.otp4 ||
+                        !!errors.otp5 ||
+                        !!errors.otp6) && (
+                        <FormHelperText error sx={{ px: 2 }}>
+                          Code is required
+                        </FormHelperText>
+                      )}
+                    </Stack>
+                    <LoadingButton
+                      variant="contained"
+                      onClick={handleOpen}
+                      disabled={!isValid}
+                      loading={isSubmitting}
+                      sx={{ width: "fit-content", alignSelf: "center" }}
+                    >
+                      Settle amount to Bank account
+                    </LoadingButton>
                   </Stack>
-                  <RHFCodes
-                    keyName="otp"
-                    inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                    type="password"
-                  />
-                  {(!!errors.otp1 ||
-                    !!errors.otp2 ||
-                    !!errors.otp3 ||
-                    !!errors.otp4 ||
-                    !!errors.otp5 ||
-                    !!errors.otp6) && (
-                    <FormHelperText error sx={{ px: 2 }}>
-                      Code is required
-                    </FormHelperText>
-                  )}
-                </Stack>
-                <LoadingButton
-                  variant="contained"
-                  onClick={handleOpen}
-                  disabled={!isValid}
-                  loading={isSubmitting}
-                  sx={{ width: "fit-content", alignSelf: "center" }}
-                >
-                  Settle amount to Bank account
-                </LoadingButton>
-              </Stack>
+                </>
+              )}
             </Grid>
             <DialogAnimate open={open}>
               <Stack sx={{ p: 4 }} gap={1}>
@@ -429,7 +459,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
     amount: Yup.number()
       .required("Amount is required")
       .integer()
-      .min(500)
+      .min(200)
       .max(Number(eligibleSettlementAmount))
       .typeError("Amount is required"),
     otp1: Yup.string().required(),
@@ -522,77 +552,79 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
         onSubmit={handleSubmit(settleToMainWallet)}
       >
         <Scrollbar sx={{ maxHeight: 600, pr: 1 }}>
-          <Grid
-            rowGap={3}
-            columnGap={2}
-            display="grid"
-            pt={1}
-            gridTemplateColumns={{
-              xs: "repeat(1, 1fr)",
-              // sm: 'repeat(2, 1fr)'
-            }}
-          >
-            <Typography variant="subtitle1" textAlign="center">
-              Maximum Eligible Settlement Amount for Main Wallet is{" "}
-              {Number(eligibleSettlementAmount)}
-            </Typography>
-
-            {Number(eligibleSettlementAmount) < 500 && (
-              <Typography variant="caption" textAlign="center" color="red">
-                Minimum amount for AEPS settlement is 500
+          {eligibleSettlementAmount && (
+            <Grid
+              rowGap={3}
+              columnGap={2}
+              display="grid"
+              pt={1}
+              gridTemplateColumns={{
+                xs: "repeat(1, 1fr)",
+                // sm: 'repeat(2, 1fr)'
+              }}
+            >
+              <Typography variant="subtitle1" textAlign="center">
+                Maximum Eligible Settlement Amount for Main Wallet is
+                {Number(eligibleSettlementAmount)}
               </Typography>
-            )}
 
-            {resetNpin ? (
-              <NPinReset />
-            ) : (
-              <Stack gap={2}>
-                <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
-                  <RHFTextField
-                    name="amount"
-                    label="Amount"
-                    placeholder="Amount"
-                    type="number"
-                  />
-                </Stack>
+              {Number(eligibleSettlementAmount) < 500 && (
+                <Typography variant="caption" textAlign="center" color="red">
+                  Minimum amount for AEPS settlement is 500
+                </Typography>
+              )}
 
-                <Stack alignSelf="center">
-                  <Stack flexDirection="row" justifyContent="space-between">
-                    <Typography variant="h5" textAlign="center">
-                      NPIN
-                    </Typography>
-                    {/* Add your reset NPIN button here if needed */}
+              {resetNpin ? (
+                <NPinReset />
+              ) : (
+                <Stack gap={2}>
+                  <Stack sx={{ width: 250, alignSelf: "center" }} gap={1}>
+                    <RHFTextField
+                      name="amount"
+                      label="Amount"
+                      placeholder="Amount"
+                      type="number"
+                    />
                   </Stack>
 
-                  <RHFCodes
-                    keyName="otp"
-                    inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                    type="password"
-                  />
+                  <Stack alignSelf="center">
+                    <Stack flexDirection="row" justifyContent="space-between">
+                      <Typography variant="h5" textAlign="center">
+                        NPIN
+                      </Typography>
+                      {/* Add your reset NPIN button here if needed */}
+                    </Stack>
 
-                  {(!!errors.otp1 ||
-                    !!errors.otp2 ||
-                    !!errors.otp3 ||
-                    !!errors.otp4 ||
-                    !!errors.otp5 ||
-                    !!errors.otp6) && (
-                    <FormHelperText error sx={{ px: 2 }}>
-                      Code is required
-                    </FormHelperText>
-                  )}
+                    <RHFCodes
+                      keyName="otp"
+                      inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+                      type="password"
+                    />
+
+                    {(!!errors.otp1 ||
+                      !!errors.otp2 ||
+                      !!errors.otp3 ||
+                      !!errors.otp4 ||
+                      !!errors.otp5 ||
+                      !!errors.otp6) && (
+                      <FormHelperText error sx={{ px: 2 }}>
+                        Code is required
+                      </FormHelperText>
+                    )}
+                  </Stack>
+
+                  <LoadingButton
+                    variant="contained"
+                    onClick={handleOpen}
+                    disabled={!isValid}
+                    sx={{ width: "fit-content", alignSelf: "center" }}
+                  >
+                    Settle amount to Main Wallet
+                  </LoadingButton>
                 </Stack>
-
-                <LoadingButton
-                  variant="contained"
-                  onClick={handleOpen}
-                  disabled={!isValid}
-                  sx={{ width: "fit-content", alignSelf: "center" }}
-                >
-                  Settle amount to Main Wallet
-                </LoadingButton>
-              </Stack>
-            )}
-          </Grid>
+              )}
+            </Grid>
+          )}
         </Scrollbar>
         <DialogAnimate open={open}>
           <Stack sx={{ p: 4 }} gap={1}>

@@ -28,6 +28,7 @@ import FormProvider, { RHFSelect, RHFTextField } from "../components/hook-form";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import useResponsive from "src/hooks/useResponsive";
+import NoSchemeFound from "src/assets/illustrations/NoSchemeFound";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -235,7 +236,7 @@ export default function BBPSSchemePage() {
         <ApiDataLoading />
       ) : (
         <>
-          {tableData.length > 0 && (
+          {tableData.length > 0 ? (
             <Stack mx={1}>
               <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
                 <Stack
@@ -317,19 +318,25 @@ export default function BBPSSchemePage() {
                   </Table>
                 </Scrollbar>
               </TableContainer>
+              <CustomPagination
+                pageSize={pageSize}
+                onChange={(
+                  event: React.ChangeEvent<unknown>,
+                  value: number
+                ) => {
+                  setCurrentPage(value);
+                }}
+                page={currentPage}
+                Count={(isFilter ? searchData : tableData).length}
+              />
+            </Stack>
+          ) : (
+            <Stack direction="row" justifyContent="center">
+              <NoSchemeFound />
             </Stack>
           )}
         </>
       )}
-
-      <CustomPagination
-        pageSize={pageSize}
-        onChange={(event: React.ChangeEvent<unknown>, value: number) => {
-          setCurrentPage(value);
-        }}
-        page={currentPage}
-        Count={(isFilter ? searchData : tableData).length}
-      />
     </>
   );
 }

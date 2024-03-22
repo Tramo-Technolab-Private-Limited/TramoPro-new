@@ -10,6 +10,7 @@ import {
   Typography,
   Stack,
 } from "@mui/material";
+import NoSchemeFound from "src/assets/illustrations/NoSchemeFound";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { TableHeadCustom } from "src/components/table";
@@ -114,7 +115,7 @@ function NoData() {
   return (
     <Stack justifyContent={"center"} p={2}>
       <Typography textAlign={"center"} fontSize={25}>
-        {" "}
+        <NoSchemeFound />
         Scheme Not Created for AEPS. Please Contact to Admin.
       </Typography>
     </Stack>
