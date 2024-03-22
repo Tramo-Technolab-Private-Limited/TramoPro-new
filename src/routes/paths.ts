@@ -17,6 +17,7 @@ export const PATH_AUTH = {
 export const STEP_DASHBOARD = {
   steps: path(ROOT_STEPS, "/user/registrationsteps"),
   esignature: path(ROOT_STEPS, "/user/esignature"),
+  agreement: path(ROOT_STEPS, "/user/agreement"),
   verifyusernpin: path(ROOT_STEPS, "/user/verifyuserotp"),
   createnpin: path(ROOT_STEPS, "/user/createnpin"),
 };

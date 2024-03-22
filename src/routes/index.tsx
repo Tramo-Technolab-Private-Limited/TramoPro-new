@@ -38,6 +38,7 @@ import {
   UserProfilePage,
   MyFundDeposits,
   LoanScheme,
+  Agreement,
 } from "./elements";
 
 // ----------------------------------------------------------------------
@@ -97,6 +98,7 @@ export default function Router() {
         { element: <Navigate to={PATH_STEP_PAGE} replace />, index: true },
         { path: "user/registrationsteps", element: <RegisterStepPage /> },
         { path: "user/esignature", element: <Esignature /> },
+        { path: "user/agreement", element: <Agreement /> },
         { path: "user/verifyuserotp", element: <NpinOtp /> },
         { path: "user/createnpin", element: <CreateNpin /> },
       ],

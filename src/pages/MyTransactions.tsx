@@ -101,7 +101,6 @@ export default function MyTransactions() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-
   const txnSchema = Yup.object().shape({
     status: Yup.string(),
     clientRefId: Yup.string(),
@@ -278,10 +277,7 @@ export default function MyTransactions() {
       resetField("product");
       setValue("product", "");
     }
-  }
-
-
-
+  };
 
   const tableLabels = [
     { id: "Date&Time", label: "Txn Details" },
@@ -337,7 +333,6 @@ export default function MyTransactions() {
     let token = localStorage.getItem("token");
 
     let body = {
-      
       pageInitData: {
         pageSize: "",
         currentPage: "",
@@ -372,36 +367,36 @@ export default function MyTransactions() {
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.id?.firstName
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.id?.firstName
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.id?.firstName
-                          : "",
+                      ? item?.distributorDetails?.id?.firstName
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.id?.firstName
+                      : "",
 
                   "Opening Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.oldMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.oldMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.oldMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.oldMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.oldMainWalletBalance
+                      : "",
 
                   "Closing Balance":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.newMainWalletBalance
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.newMainWalletBalance
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.newMainWalletBalance
-                          : "",
+                      ? item?.distributorDetails?.newMainWalletBalance
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.newMainWalletBalance
+                      : "",
                   " Commission Amount":
                     user?._id === item?.agentDetails?.id?._id
                       ? item?.agentDetails?.commissionAmount
                       : user?._id === item?.distributorDetails?.id?._id
-                        ? item?.distributorDetails?.commissionAmount
-                        : user?._id === item?.masterDistributorDetails?.id?._id
-                          ? item?.masterDistributorDetails?.commissionAmount
-                          : "",
+                      ? item?.distributorDetails?.commissionAmount
+                      : user?._id === item?.masterDistributorDetails?.id?._id
+                      ? item?.masterDistributorDetails?.commissionAmount
+                      : "",
                   amount: item?.amount,
                   credit: item?.credit,
                   debit: item?.debit,
@@ -438,7 +433,6 @@ export default function MyTransactions() {
       }
     );
   };
-
 
   const handleReset = () => {
     reset(defaultValues);
@@ -504,7 +498,7 @@ export default function MyTransactions() {
                 position: "absolute",
                 top: "50%",
                 left: "50%",
-                transform: "translate(-50%, -50%)",
+                transform: "translate(-60%, -60%)",
                 width: { xs: "100%", md: "50%" },
                 bgcolor: "#ffffff",
                 borderRadius: 2,
@@ -517,7 +511,8 @@ export default function MyTransactions() {
                 display="grid"
                 gridTemplateColumns={{
                   xs: "repeat(1, 1fr)",
-                  sm: "repeat(2, 1fr)",
+                  md: "repeat(1, 1fr)",
+                  sm: "repeat(1, 1fr)",
                 }}
               >
                 <RHFSelect
@@ -582,9 +577,15 @@ export default function MyTransactions() {
                       inputFormat="DD/MM/YYYY"
                       value={watch("startDate")}
                       maxDate={new Date()}
-                      onChange={(newValue: any) => setValue("startDate", newValue)}
+                      onChange={(newValue: any) =>
+                        setValue("startDate", newValue)
+                      }
                       renderInput={(params: any) => (
-                        <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                        <TextField
+                          {...params}
+                          size={"small"}
+                          sx={{ width: 150 }}
+                        />
                       )}
                     />
                     <DatePicker
@@ -592,10 +593,20 @@ export default function MyTransactions() {
                       inputFormat="DD/MM/YYYY"
                       value={watch("endDate")}
                       minDate={watch("startDate")}
-                      maxDate={new Date()}
-                      onChange={(newValue: any) => setValue("endDate", newValue)}
+                      maxDate={
+                        watch("startDate")
+                          ? dayjs(watch("startDate")).add(31, "days").toDate()
+                          : null
+                      }
+                      onChange={(newValue: any) =>
+                        setValue("endDate", newValue)
+                      }
                       renderInput={(params: any) => (
-                        <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                        <TextField
+                          {...params}
+                          size={"small"}
+                          sx={{ width: 150 }}
+                        />
                       )}
                     />
                   </LocalizationProvider>
@@ -608,7 +619,8 @@ export default function MyTransactions() {
                       Cancel
                     </LoadingButton>
                     <LoadingButton variant="contained" onClick={handleReset}>
-                      <Iconify icon="bx:reset" color={"common.white"} mr={1} /> Reset
+                      <Iconify icon="bx:reset" color={"common.white"} mr={1} />{" "}
+                      Reset
                     </LoadingButton>
                     <LoadingButton
                       variant="contained"
@@ -646,8 +658,8 @@ export default function MyTransactions() {
                       user?.role == "m_distributor"
                         ? tableLabels
                         : user?.role == "distributor"
-                          ? tableLabels1
-                          : tableLabels2
+                        ? tableLabels1
+                        : tableLabels2
                     }
                   />
 
@@ -716,11 +728,11 @@ function TransactionRow({ row }: childProps) {
       rowFor.categoryName.toLowerCase() == "money transfer"
         ? `moneyTransfer/checkStatus/` + rowFor._id
         : rowFor.categoryName.toLowerCase() == "recharges"
-          ? `agents/v1/checkStatus/` + rowFor._id
-          : rowFor.categoryName.toLowerCase() == "dmt2"
-            ? `dmt2/transaction/status/` + rowFor._id
-            : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
-            `settlement/checkStatus/` + rowFor._id,
+        ? `agents/v1/checkStatus/` + rowFor._id
+        : rowFor.categoryName.toLowerCase() == "dmt2"
+        ? `dmt2/transaction/status/` + rowFor._id
+        : rowFor.transactionType == "Wallet To Bank Account Settlement" &&
+          `settlement/checkStatus/` + rowFor._id,
       "GET",
       "",
       token
@@ -884,8 +896,15 @@ function TransactionRow({ row }: childProps) {
 
         {/* Operator Txn Id */}
         <StyledTableCell>
-          <Typography variant="body2" textAlign={"center"}>
-            {newRow?.vendorUtrNumber || "-"}
+          <Typography>
+          {newRow?.vendorUtrNumber || "-"}
+            {newRow?.vendorUtrNumber && (
+              <Tooltip title="Copy" placement="top">
+                <IconButton onClick={() => onCopy(newRow?.vendorUtrNumber)}>
+                  <Iconify icon="eva:copy-fill" width={20} />
+                </IconButton>
+              </Tooltip>
+            )}
           </Typography>
         </StyledTableCell>
 
@@ -896,8 +915,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.oldMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.oldMainWalletBalance
-                  : newRow?.masterDistributorDetails?.oldMainWalletBalance
+                ? newRow?.distributorDetails?.oldMainWalletBalance
+                : newRow?.masterDistributorDetails?.oldMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -921,8 +940,8 @@ function TransactionRow({ row }: childProps) {
                 user?.role === "agent"
                   ? newRow?.agentDetails?.creditedAmount
                   : user?.role === "distributor"
-                    ? newRow?.distributorDetails?.creditedAmount
-                    : newRow?.masterDistributorDetails?.creditedAmount
+                  ? newRow?.distributorDetails?.creditedAmount
+                  : newRow?.masterDistributorDetails?.creditedAmount
               ) || 0}
             </Typography>
           </Stack>
@@ -935,8 +954,8 @@ function TransactionRow({ row }: childProps) {
               user?.role === "agent"
                 ? newRow?.agentDetails?.newMainWalletBalance
                 : user?.role === "distributor"
-                  ? newRow?.distributorDetails?.newMainWalletBalance
-                  : newRow?.masterDistributorDetails?.newMainWalletBalance
+                ? newRow?.distributorDetails?.newMainWalletBalance
+                : newRow?.masterDistributorDetails?.newMainWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -955,7 +974,7 @@ function TransactionRow({ row }: childProps) {
               TDS :{" "}
               {fIndianCurrency(
                 (user?.role == "agent" && newRow?.agentDetails?.TDSAmount) ||
-                "0"
+                  "0"
               )}
             </Typography>
           </StyledTableCell>

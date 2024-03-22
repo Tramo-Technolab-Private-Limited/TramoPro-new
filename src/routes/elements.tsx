@@ -32,6 +32,9 @@ export const RegisterStepPage = Loadable(
 export const Esignature = Loadable(
   lazy(() => import("../pages/auth/Esignature"))
 );
+export const Agreement = Loadable(
+  lazy(() => import("../pages/auth/Agreement"))
+);
 
 //npin
 export const NpinOtp = Loadable(lazy(() => import("../pages/auth/NpinOtp")));
