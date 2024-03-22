@@ -167,7 +167,7 @@ export default function DMT2() {
 
   const reSendOTP = (val: any) => {
     let token = localStorage.getItem("token");
-    Api("dmt2/remitter/resendOtp/" + val, "GET", "", token).then(
+    Api("dmt2/remitter/sendOtp/" + val, "GET", "", token).then(
       (Response: any) => {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
