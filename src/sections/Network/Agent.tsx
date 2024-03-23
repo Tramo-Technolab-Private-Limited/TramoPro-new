@@ -197,7 +197,7 @@ export default function Agent() {
           <Scrollbar
             sx={{ maxHeight: window.innerHeight - (isMobile ? 140 : 50) }}
           >
-            <Table sx={{ minWidth: 720 }}>
+            <Table sx={{ minWidth: 720, mb: 10 }}>
               <TableHeadCustom headLabel={tableLabels} />
 
               <TableBody>
