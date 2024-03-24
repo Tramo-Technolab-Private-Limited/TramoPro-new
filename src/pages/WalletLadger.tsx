@@ -27,7 +27,7 @@ import {
   TableContainer,
 } from "@mui/material";
 import Label from "src/components/label/Label";
-import { TableHeadCustom } from "src/components/table";
+import { TableHeadCustom, TableNoData } from "src/components/table";
 import React from "react";
 import Iconify from "src/components/iconify/Iconify";
 import { Api } from "src/webservices";
@@ -83,7 +83,7 @@ interface Props extends CardProps {
 export default function WalletLadger() {
   const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
-  const [ladgerData, setLadgerData] = useState([]);
+  const [ladgerData, setLadgerData] = useState<any>([]);
   const [pageSize, setPageSize] = useState<any>(25);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [sendLoding, setSendLoading] = useState(false);
@@ -158,7 +158,6 @@ export default function WalletLadger() {
     getTransactional();
   }, [currentPage]);
 
-
   const getTransactional = () => {
     let token = localStorage.getItem("token");
     setSendLoading(true);
@@ -212,15 +211,9 @@ export default function WalletLadger() {
                   inputFormat="DD/MM/YYYY"
                   value={watch("startDate")}
                   maxDate={new Date()}
-                  onChange={(newValue: any) =>
-                    setValue("startDate", newValue)
-                  }
+                  onChange={(newValue: any) => setValue("startDate", newValue)}
                   renderInput={(params: any) => (
-                    <TextField
-                      {...params}
-                      size={"small"}
-                      sx={{ width: 150 }}
-                    />
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
                   )}
                 />
                 <DatePicker
@@ -231,11 +224,7 @@ export default function WalletLadger() {
                   maxDate={new Date()}
                   onChange={(newValue: any) => setValue("endDate", newValue)}
                   renderInput={(params: any) => (
-                    <TextField
-                      {...params}
-                      size={"small"}
-                      sx={{ width: 150 }}
-                    />
+                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
                   )}
                 />
               </LocalizationProvider>
@@ -278,8 +267,8 @@ export default function WalletLadger() {
                       user?.role == "m_distributor"
                         ? MDtableLabels
                         : user?.role == "distributor"
-                          ? distributortableLabels
-                          : agenttableLabels
+                        ? distributortableLabels
+                        : agenttableLabels
                     }
                   />
 
@@ -289,6 +278,7 @@ export default function WalletLadger() {
                         <LadgerRow key={row._id} row={row} />
                       ))}
                   </TableBody>
+                  <TableNoData isNotFound={!ladgerData?.length}/>
                 </Table>
               </Scrollbar>
             </TableContainer>
@@ -467,29 +457,28 @@ const LadgerRow = ({ row }: any) => {
             </Typography>
           )}
         </StyledTableCell>
+
         <StyledTableCell>
-          <Typography variant="body1">
+          <Stack direction={"row"} fontSize={15}>
             {user?._id === row?.to?.id?._id ? (
               <>
-                <Typography>
-                  <Label
-                    variant="soft"
-                    color={
-                      (row?.to?.walletType === "MAIN" && "error") ||
-                      (row?.to?.walletType === "AEPS" && "warning") ||
-                      "success"
-                    }
-                    sx={{ textTransform: "capitalize" }}
-                  >
-                    {row?.to?.walletType}
-                  </Label>
-                  :
-                  {row?.to?.walletType === "MAIN" ? (
-                    <>{fIndianCurrency(row?.to?.newMainWalletBalance || "0")}</>
-                  ) : (
-                    <>{fIndianCurrency(row?.to?.newAepsWalletBalance || "0")}</>
-                  )}
-                </Typography>
+                <Label
+                  variant="soft"
+                  color={
+                    (row?.to?.walletType === "MAIN" && "error") ||
+                    (row?.to?.walletType === "AEPS" && "warning") ||
+                    "success"
+                  }
+                  sx={{ textTransform: "capitalize" }}
+                >
+                  {row?.to?.walletType}
+                </Label>
+                :
+                {row?.to?.walletType === "MAIN" ? (
+                  <>{fIndianCurrency(row?.to?.newMainWalletBalance || "0")}</>
+                ) : (
+                  <>{fIndianCurrency(row?.to?.newAepsWalletBalance || "0")}</>
+                )}
               </>
             ) : (
               <>
@@ -512,7 +501,7 @@ const LadgerRow = ({ row }: any) => {
                 )}
               </>
             )}
-          </Typography>
+          </Stack>
         </StyledTableCell>
 
         {row?.transaction?.clientRefId ? (

@@ -56,7 +56,7 @@ export default function ViewAllScheme() {
         if (Response.data.code == 200) {
           setCategoryList(
             Response.data.data.filter(
-              (item: any) => item.category_name.toLowerCase() !== "bill payment"
+              (item: any) => item.category_name.toLowerCase() !== "bill payment" && item.category_name.toLowerCase() !== "loan"
             )
           );
           setSuperCurrentTab(
@@ -131,7 +131,8 @@ export default function ViewAllScheme() {
             sx={{ background: "#F4F6F8", padding: "0 10px", height: "48px" }}
             onChange={(event, newValue) => setSuperCurrentTab(newValue)}
           >
-            {categoryList.map((tab: any) => (
+            {categoryList
+            .map((tab: any) => (
               <Tab
                 style={{ fontSize: "16px" }}
                 key={tab._id}
