@@ -256,6 +256,7 @@ export default function GovernanceForm(props: any) {
     if (radioVal !== "") {
       let body = {
         business_name: data.BusinessName,
+        address: data.BusinessName,
         state_jurisdiction: data.stateJurisdiction,
         taxpayer_type: data.taxpayerType,
         district: data.district,
