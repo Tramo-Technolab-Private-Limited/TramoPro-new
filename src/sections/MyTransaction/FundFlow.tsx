@@ -214,7 +214,7 @@ export default function FundFlow() {
           methods={methods}
           onSubmit={handleSubmit(filterTransaction)}
         >
-          <Stack flexDirection={"row"} justifyContent={"end"}>
+          <Stack flexDirection={"row"} justifyContent={"start"}>
             <Stack
               direction={{ xs: "column", sm: "row" }}
               spacing={2}
