@@ -37,6 +37,7 @@ import {
   varSlide,
 } from "../../components/animate";
 import MotionModal from "src/components/animate/MotionModal";
+import NoBankAccount from "src/assets/icons/NoBankAccount";
 
 // ----------------------------------------------------------------------
 type FormValuesProps = {
@@ -156,14 +157,6 @@ export default function MyBankAccount() {
     { _id: 2, status: "disable", name: "" },
   ];
 
-  const style = {
-    position: "absolute" as "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: { xs: "100%", sm: 500 },
-  };
-
   useEffect(() => {
     getUserBankList();
   }, []);
@@ -175,7 +168,7 @@ export default function MyBankAccount() {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           if (Response.data.data.length) {
-            setUserBankList(Response?.data?.data[0]?.bankAccounts);
+            // setUserBankList(Response?.data?.data[0]?.bankAccounts);
             setSelectBank(Response?.data?.data[0]?.bankAccounts[0]);
           }
         } else {
@@ -283,6 +276,37 @@ export default function MyBankAccount() {
       }
     });
   };
+
+  if (!userBankList.length) {
+    return (
+      <>
+        <Helmet>
+          <title>
+            View Update Bank Detail | {process.env.REACT_APP_COMPANY_NAME}
+          </title>
+        </Helmet>
+        <Box>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} m={1}>
+            <Typography variant="h4">Bank Accounts</Typography>
+            <LoadingButton
+              variant="contained"
+              onClick={getBankList}
+              loading={Loading}
+              disabled={userBankList.length === 5}
+            >
+              Add New Bank Account
+            </LoadingButton>
+          </Stack>
+        </Box>
+
+        <Stack justifyContent={"center"} alignItems={"center"}>
+          <NoBankAccount />
+          <Typography variant="h5">No Bank Account Found</Typography>
+        </Stack>
+      </>
+    );
+  }
+
   return (
     <>
       <Helmet>
@@ -317,95 +341,88 @@ export default function MyBankAccount() {
                       sm: "0.2fr 0.8fr",
                     }}
                   >
-                    {userBankList?.length > 0 && (
-                      <>
-                        <Grid
-                          rowGap={3}
-                          columnGap={2}
-                          display="grid"
-                          height={"fit-content"}
-                          gridTemplateColumns={{
-                            xs: "repeat(1, 1fr)",
-                            // sm: 'repeat(2, 1fr)'
-                          }}
-                        >
-                          {userBankList?.length &&
-                            userBankList.map((item: any, index: any) => {
-                              return (
-                                <Button
-                                  variant={
-                                    selectBank.accountNumber ==
-                                    item.accountNumber
-                                      ? "contained"
-                                      : "outlined"
-                                  }
-                                  key={item._id}
-                                  value={item?.accountNumber}
-                                  onClick={() => {
-                                    changeBankDetail(item?._id);
-                                  }}
-                                >
-                                  {item.bankName}
-                                </Button>
-                              );
-                            })}
-                        </Grid>
-                        <Grid>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: "700" }}>
-                              Name
-                            </TableCell>
-                            <TableCell>{selectBank?.name}</TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: "700" }}>
-                              Bank Name
-                            </TableCell>
-                            <TableCell>{selectBank?.bankName}</TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: "700" }}>
-                              Account Number
-                            </TableCell>
-                            <TableCell>{selectBank?.accountNumber}</TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: "700" }}>
-                              IFSC code
-                            </TableCell>
-                            <TableCell>{selectBank?.ifsc}</TableCell>
-                          </TableRow>
+                    <Grid
+                      rowGap={3}
+                      columnGap={2}
+                      display="grid"
+                      height={"fit-content"}
+                      gridTemplateColumns={{
+                        xs: "repeat(1, 1fr)",
+                        // sm: 'repeat(2, 1fr)'
+                      }}
+                    >
+                      {userBankList?.length &&
+                        userBankList.map((item: any, index: any) => {
+                          return (
+                            <Button
+                              variant={
+                                selectBank.accountNumber == item.accountNumber
+                                  ? "contained"
+                                  : "outlined"
+                              }
+                              key={item._id}
+                              value={item?.accountNumber}
+                              onClick={() => {
+                                changeBankDetail(item?._id);
+                              }}
+                            >
+                              {item.bankName}
+                            </Button>
+                          );
+                        })}
+                    </Grid>
+                    <Grid>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "700" }}>Name</TableCell>
+                        <TableCell>{selectBank?.name}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "700" }}>
+                          Bank Name
+                        </TableCell>
+                        <TableCell>{selectBank?.bankName}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "700" }}>
+                          Account Number
+                        </TableCell>
+                        <TableCell>{selectBank?.accountNumber}</TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "700" }}>
+                          IFSC code
+                        </TableCell>
+                        <TableCell>{selectBank?.ifsc}</TableCell>
+                      </TableRow>
 
-                          <TableRow>
-                            <TableCell sx={{ fontWeight: "700" }}>
-                              Default Bank
-                            </TableCell>
-                            <TableCell>
-                              {selectBank?.isDefaultBank ? (
-                                <Icon
-                                  icon="ic:round-done-outline"
-                                  color={theme.palette.primary.main}
-                                  fontSize={40}
-                                />
-                              ) : (
-                                <LoadingButton
-                                  onClick={() =>
-                                    defaultBank(
-                                      selectBank.accountNumber,
-                                      selectBank.ifsc
-                                    )
-                                  }
-                                  loading={defaultLoading}
-                                  variant="contained"
-                                >
-                                  Set default Bank
-                                </LoadingButton>
-                              )}
-                            </TableCell>
-                          </TableRow>
-                        </Grid>
-                      </>
-                    )}
+                      <TableRow>
+                        <TableCell sx={{ fontWeight: "700" }}>
+                          Default Bank
+                        </TableCell>
+                        <TableCell>
+                          {selectBank?.isDefaultBank ? (
+                            <Icon
+                              icon="ic:round-done-outline"
+                              color={theme.palette.primary.main}
+                              fontSize={40}
+                            />
+                          ) : (
+                            <LoadingButton
+                              onClick={() =>
+                                defaultBank(
+                                  selectBank.accountNumber,
+                                  selectBank.ifsc
+                                )
+                              }
+                              loading={defaultLoading}
+                              variant="contained"
+                            >
+                              Set default Bank
+                            </LoadingButton>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    </Grid>
                   </Box>
                 ) : (
                   <Box
