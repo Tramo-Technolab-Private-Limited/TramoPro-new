@@ -74,11 +74,17 @@ export default function Header({ onOpenNav }: Props) {
         {isTablet ? (
           <>
             <Label variant="soft" color={"primary"} sx={walletStyle}>
-              {`main wallet = ${fIndianCurrency(user?.main_wallet_amount) || 0}`}
+              {`main wallet = ${
+                fIndianCurrency(user?.main_wallet_amount) || 0
+              }`}
             </Label>
-            <Label variant="soft" color={"warning"} sx={walletStyle}>
-              {`AEPS wallet = ${fIndianCurrency(user?.AEPS_wallet_amount) || 0}`}
-            </Label>
+            {user?.role == "agent" && (
+              <Label variant="soft" color={"warning"} sx={walletStyle}>
+                {`AEPS wallet = ${
+                  fIndianCurrency(user?.AEPS_wallet_amount) || 0
+                }`}
+              </Label>
+            )}
             <NotificationsPopover />
 
             <AccountPopover />
