@@ -24,7 +24,7 @@ function LocationInstruction() {
         </Typography>
       </Stack>
       <Stack
-        flexDirection={{ xs: "column", md: "row" }}
+        flexDirection={{ xs: "column-reverse", md: "row" }}
         alignItems={"center"}
         justifyContent={"center"}
         margin={"2vh 10px"}
@@ -70,7 +70,6 @@ function LocationInstruction() {
             the webpage.
           </Typography>
         </Stack>
-        <LocationErrorIlustrate />
       </Stack>
     </React.Fragment>
   );
