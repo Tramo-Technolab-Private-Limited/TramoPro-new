@@ -22,10 +22,16 @@ import { fDateTime } from "src/utils/formatTime";
 import useResponsive from "src/hooks/useResponsive";
 import { CustomAvatar } from "src/components/custom-avatar";
 import { fIndianCurrency } from "src/utils/formatNumber";
-import CustomPagination from "src/components/customFunctions/CustomPagination";
 import MotionModal from "src/components/animate/MotionModal";
 import FundFlow from "../FundManagement/FundFlow";
 
+import FormProvider from "src/components/hook-form/FormProvider";
+import { RHFTextField } from "src/components/hook-form";
+import { LoadingButton } from "@mui/lab";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -51,6 +57,7 @@ type RowProps = {
   role: string;
   createdAt: string;
   selfie: any;
+  company_name: any;
 };
 
 export default function Agent() {
@@ -58,11 +65,11 @@ export default function Agent() {
   const isMobile = useResponsive("up", "sm");
   const [open, setModalEdit] = React.useState(false);
   const [pageSize, setPageSize] = useState<any>(25);
+
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [TotalCount, setTotalCount] = useState<any>(0);
   const [openFundtrans, setFundTrans] = React.useState(false);
   const [selectedRow, setSelectedRow] = useState<RowProps | null>(null);
-
 
   const handleClosefunTrans = () => setFundTrans(false);
   const tableLabels: any = [
@@ -73,8 +80,41 @@ export default function Agent() {
     { id: "maxComm", label: "Member Since" },
     { id: "schemeId", label: "Scheme Id" },
     { id: "status", label: "Status" },
-    { id: "fundtrans", label: "Fund Transfer", align:"center"},
+    { id: "fundtrans", label: "Fund Transfer", align: "center" },
   ];
+
+  type FormValuesProps = {
+    status: string;
+    shopName: string;
+    mobile: string;
+    userCode: string;
+  };
+
+  const txnSchema = Yup.object().shape({
+    status: Yup.string(),
+    clientRefId: Yup.string(),
+  });
+  const defaultValues = {
+    category: "",
+    status: "",
+    userCode: "",
+    mobile: "",
+    shopName: "",
+  };
+
+  const methods = useForm<FormValuesProps>({
+    resolver: yupResolver(txnSchema),
+    defaultValues,
+  });
+
+  const {
+    reset,
+    getValues,
+    setValue,
+    watch,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
 
   useEffect(() => {
     ApprovedList();
@@ -135,6 +175,38 @@ export default function Agent() {
   };
   return (
     <>
+      <Stack>
+        <FormProvider methods={methods} onSubmit={handleSubmit(ApprovedList)}>
+          <Stack flexDirection={"row"} justifyContent={"first"}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              style={{ padding: "0 25px", marginBottom: "10px" }}
+            >
+              <RHFTextField name="shopName" label="Shop Name" />
+              <RHFTextField name="mobile" label="Mobile" />
+              <RHFTextField name="userCode" label="User Code" />
+
+              <LoadingButton
+                variant="contained"
+                type="submit"
+                loading={isSubmitting}
+              >
+                Search
+              </LoadingButton>
+              <LoadingButton
+                variant="contained"
+                onClick={() => {
+                  reset(defaultValues);
+                  ApprovedList();
+                }}
+              >
+                Clear
+              </LoadingButton>
+            </Stack>
+          </Stack>
+        </FormProvider>
+      </Stack>
       <Card>
         <TableContainer>
           <Scrollbar
@@ -184,7 +256,7 @@ export default function Agent() {
           setCurrentPage(1);
         }}
       />
-       <MotionModal
+      <MotionModal
         open={openFundtrans}
         onClose={handleClosefunTrans}
         width={{ xs: "95%", sm: 500 }}
@@ -221,6 +293,9 @@ function EcommerceBestSalesmanRow({
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
               {row.email}
             </Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              {row?.company_name ? row?.company_name : " No Shop Name "}
+            </Typography>
           </Box>
         </Stack>
       </TableCell>
@@ -242,10 +317,10 @@ function EcommerceBestSalesmanRow({
       <TableCell>{row.schemeId}</TableCell>
       <TableCell align="right">{row.verificationStatus}</TableCell>
       <TableCell align="center">
-          <Button variant="contained" onClick={() => FundTransfer(row)}>
-            Fund Transfer
-          </Button>
-        </TableCell>
+        <Button variant="contained" onClick={() => FundTransfer(row)}>
+          Fund Transfer
+        </Button>
+      </TableCell>
     </TableRow>
   );
 }
