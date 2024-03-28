@@ -21,7 +21,13 @@ import { fDateTime } from "src/utils/formatTime";
 import useResponsive from "src/hooks/useResponsive";
 import { CustomAvatar } from "src/components/custom-avatar";
 import { fIndianCurrency } from "src/utils/formatNumber";
-
+import FormProvider from "src/components/hook-form/FormProvider";
+import { RHFTextField } from "src/components/hook-form";
+import { LoadingButton } from "@mui/lab";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -52,7 +58,9 @@ type RowProps = {
 export default function Agent() {
   const [appdata, setAppdata] = useState([]);
   const isMobile = useResponsive("up", "sm");
+  const [pageSize, setPageSize] = useState<any>(25);
 
+  const [TotalCount, setTotalCount] = useState<any>(0);
   const [currentPage, setCurrentPage] = useState<any>(1);
 
   const tableLabels: any = [
@@ -65,11 +73,52 @@ export default function Agent() {
     { id: "status", label: "Status" },
   ];
 
+  type FormValuesProps = {
+    status: string;
+    shopName: string;
+    mobile: string;
+    userCode: string;
+  };
+
+  const txnSchema = Yup.object().shape({
+    status: Yup.string(),
+    clientRefId: Yup.string(),
+  });
+  const defaultValues = {
+    category: "",
+    status: "",
+    userCode: "",
+    mobile: "",
+    shopName: "",
+  };
+
+  const methods = useForm<FormValuesProps>({
+    resolver: yupResolver(txnSchema),
+    defaultValues,
+  });
+
+  const {
+    reset,
+    getValues,
+    setValue,
+    watch,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
+
   useEffect(() => {
     ApprovedList();
   }, []);
 
   const ApprovedList = () => {
+    let body = {
+      filter: {
+        shopName: getValues("shopName"),
+        userCode: getValues("userCode"),
+        mobile: getValues("mobile"),
+      },
+    };
+
     let token = localStorage.getItem("token");
     Api(`agent/get_All_Agents`, "GET", "", token).then((Response: any) => {
       console.log("======ApprovedList==User==response=====>" + Response);
@@ -99,6 +148,38 @@ export default function Agent() {
 
   return (
     <>
+      <Stack>
+        <FormProvider methods={methods} onSubmit={handleSubmit(ApprovedList)}>
+          <Stack flexDirection={"row"} justifyContent={"first"}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              style={{ padding: "0 25px", marginBottom: "10px" }}
+            >
+              <RHFTextField name="shopName" label="Shop Name" />
+              <RHFTextField name="mobile" label="Mobile" />
+              <RHFTextField name="userCode" label="User Code" />
+
+              <LoadingButton
+                variant="contained"
+                type="submit"
+                loading={isSubmitting}
+              >
+                Search
+              </LoadingButton>
+              <LoadingButton
+                variant="contained"
+                onClick={() => {
+                  reset(defaultValues);
+                  ApprovedList();
+                }}
+              >
+                Clear
+              </LoadingButton>
+            </Stack>
+          </Stack>
+        </FormProvider>
+      </Stack>
       <Card>
         <TableContainer>
           <Scrollbar
@@ -126,19 +207,24 @@ export default function Agent() {
           transform: "translate(-50%)",
           bgcolor: "white",
         }}
-      >
-        <Pagination
-          sx={{ display: "flex", justifyContent: "center" }}
-          // count={pageSize}
-          page={currentPage}
-          onChange={handlePageChange}
-          color="primary"
-          variant="outlined"
-          shape="rounded"
-          showFirstButton
-          showLastButton
-        />
-      </Stack>
+      ></Stack>
+      <CustomPagination
+        page={currentPage - 1}
+        count={TotalCount}
+        onPageChange={(
+          event: React.MouseEvent<HTMLButtonElement> | null,
+          newPage: number
+        ) => {
+          setCurrentPage(newPage + 1);
+        }}
+        rowsPerPage={pageSize}
+        onRowsPerPageChange={(
+          event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+        ) => {
+          setPageSize(parseInt(event.target.value));
+          setCurrentPage(1);
+        }}
+      />
     </>
   );
 }

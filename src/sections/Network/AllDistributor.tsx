@@ -23,7 +23,13 @@ import { fDateTime } from "src/utils/formatTime";
 import useResponsive from "src/hooks/useResponsive";
 import { CustomAvatar } from "src/components/custom-avatar";
 import { fIndianCurrency } from "src/utils/formatNumber";
-
+import FormProvider from "src/components/hook-form/FormProvider";
+import { RHFTextField } from "src/components/hook-form";
+import { LoadingButton } from "@mui/lab";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -56,9 +62,12 @@ export default function AllDistributor() {
   const [appdata, setAppdata] = useState([]);
   const isMobile = useResponsive("up", "sm");
   const [open, setModalEdit] = React.useState(false);
-  const [currentPage, setCurrentPage] = useState<any>(1);
-  const [selectedRow, setSelectedRow] = useState<RowProps | null>(null);
 
+  const [selectedRow, setSelectedRow] = useState<RowProps | null>(null);
+  const [pageSize, setPageSize] = useState<any>(25);
+  const [currentPage, setCurrentPage] = useState<any>(1);
+  const [TotalCount, setTotalCount] = useState<any>(0);
+  const [pageSizeAgent, setPageSizeAgent] = useState<any>(25);
   const [SelectAgent, setSelectAgent] = useState([]);
   console.log("========== SelectAgent==============", SelectAgent);
 
@@ -107,16 +116,62 @@ export default function AllDistributor() {
 
   useEffect(() => {
     allDistributor();
-  }, []);
+  }, [pageSize, currentPage]);
+
+  type FormValuesProps = {
+    status: string;
+    shopName: string;
+    mobile: string;
+    userCode: string;
+  };
+
+  const txnSchema = Yup.object().shape({
+    status: Yup.string(),
+    clientRefId: Yup.string(),
+  });
+  const defaultValues = {
+    category: "",
+    status: "",
+    userCode: "",
+    mobile: "",
+    shopName: "",
+  };
+
+  const methods = useForm<FormValuesProps>({
+    resolver: yupResolver(txnSchema),
+    defaultValues,
+  });
+
+  const {
+    reset,
+    getValues,
+    setValue,
+    watch,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = methods;
 
   const allDistributor = () => {
-    let token = localStorage.getItem("token");
-    Api(`agent/get_All_Distributor`, "GET", "", token).then((Response: any) => {
-      console.log("======ApprovedList==User==response=====>" + Response);
+    let body = {
+      filter: {
+        shopName: getValues("shopName"),
+        userCode: getValues("userCode"),
+        mobile: getValues("mobile"),
+      },
+    };
 
+    let token = localStorage.getItem("token");
+    Api(
+      `agent/get_All_Distributor?page=${currentPage}&limit=${pageSize}`,
+      "POST",
+      body,
+      token
+    ).then((Response: any) => {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           let arr: any = [];
+          setTotalCount(Response?.data?.count);
+
           arr = Response.data.data.filter((item: any) => {
             return (
               (item.role == "agent" && item.referralCode != "") ||
@@ -145,6 +200,38 @@ export default function AllDistributor() {
 
   return (
     <>
+      <Stack>
+        <FormProvider methods={methods} onSubmit={handleSubmit(allDistributor)}>
+          <Stack flexDirection={"row"} justifyContent={"first"}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              style={{ padding: "0 25px", marginBottom: "10px" }}
+            >
+              <RHFTextField name="shopName" label="Shop Name" />
+              <RHFTextField name="mobile" label="Mobile" />
+              <RHFTextField name="userCode" label="User Code" />
+
+              <LoadingButton
+                variant="contained"
+                type="submit"
+                loading={isSubmitting}
+              >
+                Search
+              </LoadingButton>
+              <LoadingButton
+                variant="contained"
+                onClick={() => {
+                  reset(defaultValues);
+                  allDistributor();
+                }}
+              >
+                Clear
+              </LoadingButton>
+            </Stack>
+          </Stack>
+        </FormProvider>
+      </Stack>
       <Card>
         <TableContainer>
           <Scrollbar
@@ -198,15 +285,24 @@ export default function AllDistributor() {
                   </Table>
                 </Scrollbar>
               </TableContainer>
-              <Pagination
-                sx={{ display: "flex", justifyContent: "center" }}
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                variant="outlined"
-                shape="rounded"
-                showFirstButton
-                showLastButton
+              <CustomPagination
+                page={currentPage - 1}
+                count={TotalCount}
+                onPageChange={(
+                  event: React.MouseEvent<HTMLButtonElement> | null,
+                  newPage: number
+                ) => {
+                  setCurrentPage(newPage + 1);
+                }}
+                rowsPerPage={pageSizeAgent}
+                onRowsPerPageChange={(
+                  event: React.ChangeEvent<
+                    HTMLInputElement | HTMLTextAreaElement
+                  >
+                ) => {
+                  setPageSizeAgent(parseInt(event.target.value));
+                  setCurrentPage(1);
+                }}
               />
             </Card>
           )}
