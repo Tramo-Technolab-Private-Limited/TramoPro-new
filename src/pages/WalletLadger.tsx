@@ -213,7 +213,7 @@ export default function WalletLadger() {
                   maxDate={new Date()}
                   onChange={(newValue: any) => setValue("startDate", newValue)}
                   renderInput={(params: any) => (
-                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                    <TextField {...params} size={"small"} sx={{ width: 250 }} />
                   )}
                 />
                 <DatePicker
@@ -224,7 +224,7 @@ export default function WalletLadger() {
                   maxDate={new Date()}
                   onChange={(newValue: any) => setValue("endDate", newValue)}
                   renderInput={(params: any) => (
-                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
+                    <TextField {...params} size={"small"} sx={{ width: 250 }} />
                   )}
                 />
               </LocalizationProvider>
@@ -278,7 +278,7 @@ export default function WalletLadger() {
                         <LadgerRow key={row._id} row={row} />
                       ))}
                   </TableBody>
-                  <TableNoData isNotFound={!ladgerData?.length}/>
+                  <TableNoData isNotFound={!ladgerData?.length} />
                 </Table>
               </Scrollbar>
             </TableContainer>
