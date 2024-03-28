@@ -311,7 +311,7 @@ export default function InstantDepositAccount() {
         enqueueSnackbar(Response.data.message);
       } else {
         console.log("======BankList=======>" + Response);
-        enqueueSnackbar(Response?.data?.message);
+        enqueueSnackbar(Response?.data?.message, { variant: "error" });
       }
     });
   };
@@ -388,7 +388,7 @@ export default function InstantDepositAccount() {
           setCustomerReg("Create Virtual Account");
         } else {
           console.log("======BankList=======>" + Response);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     );
@@ -404,7 +404,7 @@ export default function InstantDepositAccount() {
           enqueueSnackbar(Response.data.message);
         } else {
           console.log("======BankList=======>" + Response);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     );

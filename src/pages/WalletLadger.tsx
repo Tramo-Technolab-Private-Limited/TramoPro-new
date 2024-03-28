@@ -180,7 +180,7 @@ export default function WalletLadger() {
           enqueueSnackbar(Response.data.message);
           setSendLoading(false);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           setSendLoading(false);
         }
       }

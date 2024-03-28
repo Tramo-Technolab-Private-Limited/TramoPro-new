@@ -206,7 +206,7 @@ export default function DMT2BeneTable() {
           });
         } else {
           getbeneDispatch({ type: "GET_BENE_FAILURE" });
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -228,7 +228,7 @@ export default function DMT2BeneTable() {
             }),
           });
           openEditModal();
-          enqueueSnackbar(Response.data.message, { variant: "error" });
+          enqueueSnackbar(Response.data.message);
         } else {
           getbeneDispatch({ type: "GET_BANK_FAILURE" });
         }
@@ -307,14 +307,14 @@ export default function DMT2BeneTable() {
           handleClose();
         } else {
           addbeneDispatch({ type: "ADD_BENE_FAILURE" });
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           console.log(
             "==============>>> verify beneficiary msg",
             Response.data.message
           );
         }
       } else {
-        enqueueSnackbar("Internal server error");
+        enqueueSnackbar("Internal server error", { variant: "error" });
         addbeneDispatch({ type: "ADD_BENE_FAILURE" });
       }
     });
@@ -607,11 +607,11 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
               main_wallet_amount: user?.main_wallet_amount - 3,
             });
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setVarifyStatus(true);
         } else {
-          enqueueSnackbar("Internal server error");
+          enqueueSnackbar("Internal server error", { variant: "error" });
           setVarifyStatus(true);
         }
       }
@@ -626,7 +626,7 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
           if (Response.data.code == 200) {
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -650,7 +650,7 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
             setDeleteOtp("");
             deleteBene(row._id);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setIsLoading(false);
         } else {
@@ -703,11 +703,11 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
               enqueueSnackbar(Response.data.message);
               setCell({ ...cell, isTxnAllowed: true });
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
             setAddNnowLoading(false);
           } else {
-            enqueueSnackbar("Internal server error");
+            enqueueSnackbar("Internal server error", { variant: "error" });
             setAddNnowLoading(false);
           }
         }

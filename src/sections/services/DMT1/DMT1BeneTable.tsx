@@ -204,7 +204,7 @@ export default function DMTbeneficiary() {
           });
         } else {
           getbeneDispatch({ type: "GET_BENE_FAILURE" });
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -258,7 +258,7 @@ export default function DMTbeneficiary() {
               });
             } else {
               remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }
@@ -295,10 +295,10 @@ export default function DMTbeneficiary() {
           handleClose();
         } else {
           addbeneDispatch({ type: "ADD_BENE_FAILURE" });
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       } else {
-        enqueueSnackbar("Internal server error");
+        enqueueSnackbar("Internal server error", { variant: "error" });
         addbeneDispatch({ type: "ADD_BENE_FAILURE" });
       }
     });
@@ -587,11 +587,11 @@ const BeneList = React.memo(
                 main_wallet_amount: user?.main_wallet_amount - 3,
               });
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
             setVarifyStatus(true);
           } else {
-            enqueueSnackbar("Internal server error");
+            enqueueSnackbar("Internal server error", { variant: "error" });
             setVarifyStatus(true);
           }
         }
@@ -606,7 +606,7 @@ const BeneList = React.memo(
             if (Response.data.code == 200) {
               enqueueSnackbar(Response.data.message);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }
@@ -629,7 +629,7 @@ const BeneList = React.memo(
               setDeleteOtp("");
               deleteBene(row._id);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
             setIsLoading(false);
           } else {

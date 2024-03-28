@@ -132,7 +132,7 @@ export default function CreateNpin() {
               UpdateUserDetail({ isNPIN: true });
               navigate(PATH_DASHBOARD.root);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }

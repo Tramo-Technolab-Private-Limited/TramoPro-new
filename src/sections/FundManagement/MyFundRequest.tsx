@@ -143,7 +143,7 @@ export default function (props: any) {
             setSdata(Response.data.data);
           } else {
             console.log("======getRaisedRequests=======>" + Response);
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setIsLoading(false);
         } else {
@@ -230,7 +230,7 @@ export default function (props: any) {
             setSdata(Response.data.data);
           } else {
             console.log("======getRaisedRequests=======>" + Response);
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setIsLoading(false);
         } else {
@@ -377,10 +377,10 @@ export default function (props: any) {
                   >
                     <StyledTableCell>
                       <Typography variant="body1">
-                      createdAt{fDateTime(row?.createdAt)}
+                        createdAt{fDateTime(row?.createdAt)}
                       </Typography>
                       <Typography variant="body1">
-                      updatedAt{fDateTime(row?.actionDate)}
+                        updatedAt{fDateTime(row?.actionDate)}
                       </Typography>
                     </StyledTableCell>
 
@@ -435,7 +435,8 @@ export default function (props: any) {
                       <Label
                         variant="soft"
                         color={
-                          (row.status.toLowerCase() === "rejected" && "error") ||
+                          (row.status.toLowerCase() === "rejected" &&
+                            "error") ||
                           ((row.status.toLowerCase() === "pending" ||
                             row.status.toLowerCase() === "in_process") &&
                             "warning") ||

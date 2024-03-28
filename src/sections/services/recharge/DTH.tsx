@@ -323,7 +323,7 @@ function VerifyNPIN({ data, handleClose }: any) {
                   Response?.data?.data?.agentDetails?.newMainWalletBalance,
               });
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
               console.log(
                 "==============>>> post mobile number",
                 Response.data.message
@@ -452,7 +452,7 @@ function FetchDetail({ data }: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });

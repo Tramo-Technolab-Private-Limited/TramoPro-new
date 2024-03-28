@@ -205,7 +205,7 @@ export default function MyTransactions() {
             setCurrentTab("");
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setLoading(false);
         } else {
@@ -427,7 +427,7 @@ export default function MyTransactions() {
               XLSX.writeFile(wb, `Transaction${currentDate}.xlsx`);
               handleClose();
             } else {
-              enqueueSnackbar("Data Not Found ");
+              enqueueSnackbar("Data Not Found ", { variant: "error" });
             }
           }
         }
@@ -483,7 +483,7 @@ export default function MyTransactions() {
         </Stack>
       </Stack>
       <Stack>
-      <MotionModal
+        <MotionModal
           open={open}
           onClose={handleClose}
           width={{ xs: "95%", sm: 500 }}
@@ -503,7 +503,7 @@ export default function MyTransactions() {
                 }}
               >
                 <MenuItem value="">All</MenuItem>
-                {categoryList.map((item:any) => {
+                {categoryList.map((item: any) => {
                   return (
                     <MenuItem
                       key={item._id}
@@ -524,7 +524,7 @@ export default function MyTransactions() {
                 }}
               >
                 <MenuItem value="">All</MenuItem>
-                {ProductList.map((item:any) => {
+                {ProductList.map((item: any) => {
                   return (
                     <MenuItem value={item._id}>{item?.productName}</MenuItem>
                   );
@@ -870,7 +870,7 @@ function TransactionRow({ row }: childProps) {
         {/* Operator Txn Id */}
         <StyledTableCell>
           <Typography>
-          {newRow?.vendorUtrNumber || "-"}
+            {newRow?.vendorUtrNumber || "-"}
             {newRow?.vendorUtrNumber && (
               <Tooltip title="Copy" placement="top">
                 <IconButton onClick={() => onCopy(newRow?.vendorUtrNumber)}>

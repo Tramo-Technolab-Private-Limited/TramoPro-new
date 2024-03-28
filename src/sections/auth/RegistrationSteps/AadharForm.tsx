@@ -157,7 +157,7 @@ export default function AadharForm(props: any) {
               enqueueSnackbar(Response.data.message);
               setInitTxn(Response.data.init_txn_id);
             } else {
-              enqueueSnackbar(Response.data.err.message);
+              enqueueSnackbar(Response.data.err.message, { variant: "error" });
             }
           }
         }
@@ -195,9 +195,9 @@ export default function AadharForm(props: any) {
             } else if (Response.data.code == 500) {
               otpReset(defaultValues2);
 
-              enqueueSnackbar(Response.data.err.message);
+              enqueueSnackbar(Response.data.err.message, { variant: "error" });
             } else {
-              enqueueSnackbar(Response.data.err.message);
+              enqueueSnackbar(Response.data.err.message, { variant: "error" });
             }
           } else {
           }
@@ -227,7 +227,7 @@ export default function AadharForm(props: any) {
           if (Response.data.code == 200) {
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -679,13 +679,16 @@ function PanCard(props: any) {
           setLoading(false);
         } else {
           setLoading(false);
-          enqueueSnackbar(Response.data.err.message);
+          enqueueSnackbar(Response.data.err.message, { variant: "error" });
           setPanAttempt(Response.data.remaining_Attempts);
         }
       } else {
         setLoading(false);
         setErrorMsg(Response.data.message);
-        enqueueSnackbar(Response?.data?.message || Response.data?.err?.message);
+        enqueueSnackbar(
+          Response?.data?.message || Response.data?.err?.message,
+          { variant: "error" }
+        );
       }
     });
   };

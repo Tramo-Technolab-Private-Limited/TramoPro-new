@@ -144,10 +144,10 @@ export default function AttendenceAeps(props: any) {
 
           setMessage(Response.data.message);
         } else if (Response.data.responseCode == 410) {
-          enqueueSnackbar(Response.data.err.message);
+          enqueueSnackbar(Response.data.err.message, { variant: "error" });
           setMessage(Response.data.responseMessage);
         } else {
-          enqueueSnackbar(Response.data.data.message);
+          enqueueSnackbar(Response.data.data.message, { variant: "error" });
           setMessage(Response.data.data.message);
         }
         handleClose();

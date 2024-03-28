@@ -168,7 +168,7 @@ export default function RegistrationAeps(props: any) {
             Response.data.data
           );
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           console.log(
             "==============>>> fatch beneficiary message",
             Response.data.message
@@ -197,7 +197,7 @@ export default function RegistrationAeps(props: any) {
               main_wallet_amount: user?.main_wallet_amount - 200,
             });
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       });
@@ -224,7 +224,7 @@ export default function RegistrationAeps(props: any) {
                 handleOpen();
               }
             } else {
-              enqueueSnackbar(Response.data.data.message);
+              enqueueSnackbar(Response.data.data.message, { variant: "error" });
               console.log(
                 "==============>>> fatch beneficiary message",
                 Response.data.message
@@ -257,7 +257,7 @@ export default function RegistrationAeps(props: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -289,7 +289,7 @@ export default function RegistrationAeps(props: any) {
           capture();
         }
       } else {
-        enqueueSnackbar(Response.data.message);
+        enqueueSnackbar(Response.data.message, { variant: "error" });
         setOtpVerify(true);
       }
     });

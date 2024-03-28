@@ -183,10 +183,10 @@ function Bbps_One() {
               )
           );
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       } else {
-        enqueueSnackbar("Failed");
+        enqueueSnackbar("Failed", { variant: "error" });
       }
     });
   };
@@ -205,10 +205,10 @@ function Bbps_One() {
         if (Response.data.code == 200) {
           setProductList(Response.data.data);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       } else {
-        enqueueSnackbar("Failed");
+        enqueueSnackbar("Failed", { variant: "error" });
       }
     });
   };
@@ -221,10 +221,10 @@ function Bbps_One() {
           setParamList(Response.data.data.productParams);
           setIsBillFetchMendatory(Response.data.dataisBillFetchMandatory);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       } else {
-        enqueueSnackbar("Failed");
+        enqueueSnackbar("Failed", { variant: "error" });
       }
     });
   };
@@ -247,10 +247,10 @@ function Bbps_One() {
             setIsBillFetch(true);
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.error.message);
+            enqueueSnackbar(Response.data.error.message, { variant: "error" });
           }
         } else {
-          enqueueSnackbar("Failed");
+          enqueueSnackbar("Failed", { variant: "error" });
           handleToReset();
         }
       });

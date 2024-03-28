@@ -59,10 +59,10 @@ export default function ResetPassword() {
                 state: { userid: Response.data.data.userId },
               });
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           } else {
-            enqueueSnackbar("Failed");
+            enqueueSnackbar("Failed", { variant: "error" });
           }
         }
       );
