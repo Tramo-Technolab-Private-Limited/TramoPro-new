@@ -329,7 +329,7 @@ export default function Prepaid1(props: any) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           if (Response.data.data.response_code == 1) {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setTabsData(Response.data.data);
           setPlanCurrentTab("3G/4G");
@@ -339,10 +339,7 @@ export default function Prepaid1(props: any) {
             Response.data.data
           );
         } else {
-          console.log(
-            "==============>>> plans mobile number",
-            Response.massage
-          );
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -381,7 +378,7 @@ export default function Prepaid1(props: any) {
           handleClose1();
           console.log("==============>>> post mobile data message", Response);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           console.log(
             "==============>>> post mobile number",
             Response.data.message

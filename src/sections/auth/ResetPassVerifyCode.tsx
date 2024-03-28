@@ -133,10 +133,10 @@ export default function AuthVerifyCodeForm() {
               enqueueSnackbar(Response.data.message);
               navigate(PATH_AUTH.login);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           } else {
-            enqueueSnackbar("Failed");
+            enqueueSnackbar("Failed", { variant: "error" });
           }
         }
       );

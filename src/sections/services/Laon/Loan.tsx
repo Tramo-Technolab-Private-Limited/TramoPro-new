@@ -233,7 +233,7 @@ function Loan() {
               setTimer(60);
               enqueueSnackbar(Response.data.message);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }
@@ -255,7 +255,7 @@ function Loan() {
             setTimer(60);
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -969,7 +969,7 @@ const DynamicForm = ({ data, setStep }: any) => {
 
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -991,7 +991,7 @@ const DynamicForm = ({ data, setStep }: any) => {
               enqueueSnackbar(Response.data.message);
               setStep(1);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }
@@ -1177,7 +1177,7 @@ const LoanTransactionTable = () => {
             setPageCount(Response.data.data.totalNumberOfRecords);
             setCurrentTab("");
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setLoading(false);
         } else {

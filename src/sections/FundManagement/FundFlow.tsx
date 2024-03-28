@@ -236,7 +236,7 @@ function FundFlow() {
             setSdata(Response.data.data.data);
             setPageCount(Response.data.data.totalNumberOfRecords);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setLoading(false);
         } else {

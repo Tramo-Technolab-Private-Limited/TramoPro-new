@@ -132,7 +132,7 @@ export default function FundFlow() {
             setPageCount(Response.data.data.totalNumberOfRecords);
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setLoading(false);
         } else {
@@ -172,7 +172,6 @@ export default function FundFlow() {
       transactionType: "",
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
-
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
@@ -382,7 +381,7 @@ const TransactionRow = React.memo(({ row }: childProps) => {
         {/* From */}
         <TableCell>
           {newRow?.walletLedgerData?.from?.id ==
-            newRow?.adminDetails.id?._id ? (
+          newRow?.adminDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
               <CustomAvatar
                 name={newRow?.adminDetails?.id?.email}
@@ -533,7 +532,7 @@ const TransactionRow = React.memo(({ row }: childProps) => {
             </Stack>
           ) : (
             newRow?.walletLedgerData?.to?.id ==
-            newRow.masterDistributorDetails.id?._id && (
+              newRow.masterDistributorDetails.id?._id && (
               <Stack flexDirection={"row"} gap={1}>
                 <CustomAvatar
                   name={newRow?.masterDistributorDetails?.id?.firstName}

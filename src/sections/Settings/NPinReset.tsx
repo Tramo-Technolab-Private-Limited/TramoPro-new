@@ -144,7 +144,7 @@ export default function NPinReset(props: any) {
 
           setgOTP(true);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -161,7 +161,7 @@ export default function NPinReset(props: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -195,7 +195,7 @@ export default function NPinReset(props: any) {
           // createUser();
         } else {
           setVerifyLoad(false);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
       setVerifyLoad(false);
@@ -223,7 +223,7 @@ export default function NPinReset(props: any) {
               setVerOTP(false);
             } else {
               let msg = Response.data.message;
-              enqueueSnackbar(msg);
+              enqueueSnackbar(msg, { variant: "error" });
               // setMsg(msg);
             }
           }

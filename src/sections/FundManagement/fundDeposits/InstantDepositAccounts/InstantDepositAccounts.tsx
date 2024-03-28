@@ -61,7 +61,7 @@ function InstantDepositAccounts() {
           setIdentifiers(Response.data.data);
         } else {
           console.log("======autoCollect=======>" + Response);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -83,7 +83,7 @@ function InstantDepositAccounts() {
             );
           } else {
             console.log("======autoCollect=======>" + Response);
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -108,7 +108,7 @@ function InstantDepositAccounts() {
             setRegisterVAloading(true);
           } else {
             console.log("======autoCollect=======>" + Response);
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }

@@ -108,7 +108,7 @@ export default function ManageFundFlow() {
 
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         } else {
           enqueueSnackbar("Failed", { variant: "error" });

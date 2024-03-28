@@ -199,11 +199,11 @@ export default function AadharPay(props: any) {
           setCheckNPIN(false);
         } else if (Response.data.code == 400) {
           setCheckNPIN(false);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           setFailedMessage(Response.data.message);
         } else {
           setCheckNPIN(false);
-          enqueueSnackbar(Response.data.err.message);
+          enqueueSnackbar(Response.data.err.message, { variant: "error" });
           setFailedMessage(Response.data.err.message);
           console.log(
             "==============>>> fatch beneficiary message",

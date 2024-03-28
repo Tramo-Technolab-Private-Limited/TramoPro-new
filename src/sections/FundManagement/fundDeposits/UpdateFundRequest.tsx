@@ -310,7 +310,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
           getRaisedRequest();
           enqueueSnackbar(Response.data.message);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
         handleClose();
       }

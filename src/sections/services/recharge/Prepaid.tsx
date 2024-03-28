@@ -339,7 +339,7 @@ function MobilePrepaid() {
           setTabsData(Response.data.data);
           enqueueSnackbar(Response.data.message);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           planDispatch({
             type: "PLAN_FETCH_FAILURE",
             error: Response.data.message,
@@ -378,11 +378,11 @@ function MobilePrepaid() {
             });
             handleClose1();
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
             rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
           }
         } else {
-          enqueueSnackbar("Failed");
+          enqueueSnackbar("Failed", { variant: "error" });
           rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
         }
       }
