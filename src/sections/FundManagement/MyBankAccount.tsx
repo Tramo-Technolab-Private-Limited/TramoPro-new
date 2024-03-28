@@ -303,6 +303,86 @@ export default function MyBankAccount() {
           <NoBankAccount />
           <Typography variant="h5">No Bank Account Found</Typography>
         </Stack>
+        <MotionModal
+          open={open}
+          onClose={handleClose}
+          width={{ xs: "100%", sm: 500 }}
+        >
+          <FormProvider methods={methods} onSubmit={handleSubmit(addBank)}>
+            <Grid
+              rowGap={3}
+              columnGap={2}
+              display="grid"
+              gridTemplateColumns={{
+                xs: "repeat(1, 1fr)",
+              }}
+            >
+              <RHFAutocomplete
+                name="bank"
+                onChange={(event, value) => {
+                  setValue("bankName", value?.bankName);
+                  setValue("ifsc", value?.masterIFSC);
+                }}
+                options={bankList.map((option: any) => option)}
+                getOptionLabel={(option: any) => option.bankName}
+                renderOption={(props, option) => (
+                  <Box
+                    component="li"
+                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                    {...props}
+                  >
+                    {option.bankName}
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <RHFTextField name="bankName" label="Bank Name" {...params} />
+                )}
+              />
+
+              <RHFTextField
+                name="ifsc"
+                label="IFSC code"
+                placeholder="IFSC code"
+                InputLabelProps={{
+                  shrink: watch("ifsc") ? true : false,
+                }}
+              />
+              <RHFTextField
+                type="number"
+                name="accountNumber"
+                label="Account Number"
+                placeholder="Account Number"
+                autoComplete="off"
+              />
+              <RHFTextField
+                type="password"
+                name="confirmAccountNumber"
+                label="Confirm Account Number"
+                onPaste={(e) => e.preventDefault()}
+                placeholder="Confirm Account Number"
+              />
+            </Grid>
+            <Stack flexDirection={"row"} gap={1} justifyContent={"end"} mt={2}>
+              <LoadingButton
+                size="medium"
+                type="submit"
+                variant="contained"
+                loading={addBankLoading}
+                disabled={!isValid}
+              >
+                Submit
+              </LoadingButton>
+              <LoadingButton
+                loading={addBankLoading}
+                size="medium"
+                onClick={handleClose}
+                variant="contained"
+              >
+                Close
+              </LoadingButton>
+            </Stack>
+          </FormProvider>
+        </MotionModal>
       </>
     );
   }
