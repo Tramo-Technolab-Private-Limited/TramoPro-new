@@ -5,6 +5,8 @@ import {
   Card,
   IconButton,
   Stack,
+  Tab,
+  Tabs,
   Tooltip,
   Typography,
 } from "@mui/material";
@@ -46,18 +48,23 @@ function CompanyBankAccounts() {
       </Typography>
 
       <Stack m={1} flexDirection={"row"} alignItems={"center"} gap={2}>
-        {bankListContext.map((item: bankAccountProps) => {
-          return item.bank_details.bank_name == "ICICI BANK" ? (
-            <ICICIBank
-              active={
-                item.bank_details.account_number === activeBank.account_number
-              }
-              onClick={() => setActiveBank(item.bank_details)}
+        <Tabs
+          value={activeBank.bank_name}
+          onChange={(event, newValue) => {
+            const selectedBank = bankListContext.find(
+              (item:any) => item.bank_details.bank_name === newValue
+            );
+            if (selectedBank) setActiveBank(selectedBank.bank_details);
+          }}
+        >
+          {bankListContext.map((item: bankAccountProps) => (
+            <Tab
+              key={item.bank_details.bank_name}
+              label={item.bank_details.bank_name}
+              value={item.bank_details.bank_name}
             />
-          ) : (
-            <DemoBank onClick={() => setActiveBank(item.bank_details)} />
-          );
-        })}
+          ))}
+        </Tabs>
       </Stack>
 
       <Stack width={{ sm: "100%", md: "50%" }} gap={1}>
