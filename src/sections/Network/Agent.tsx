@@ -53,6 +53,7 @@ type RowProps = {
   role: string;
   createdAt: string;
   selfie: any;
+  company_name: any;
 };
 
 export default function Agent() {
@@ -119,13 +120,26 @@ export default function Agent() {
       },
     };
 
+    // const FundTransfer = (val: any) => {
+    //   setFundTrans(true);
+    // };
+
     let token = localStorage.getItem("token");
-    Api(`agent/get_All_Agents`, "GET", "", token).then((Response: any) => {
+
+    Api(
+      `agent/get_All_Agents?limit=${pageSize}&page=${currentPage}`,
+      "POST",
+      body,
+      token
+    ).then((Response: any) => {
       console.log("======ApprovedList==User==response=====>" + Response);
 
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           let arr: any = [];
+
+          setTotalCount(Response?.data?.count);
+
           arr = Response.data.data.filter((item: any) => {
             return (
               (item.role == "agent" && item.referralCode != "") ||
@@ -250,6 +264,9 @@ function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
             <Typography variant="subtitle2"> {row.firstName} </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
               {row.email}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              {row?.company_name ? row?.company_name : " No Shop Name "}
             </Typography>
           </Box>
         </Stack>
