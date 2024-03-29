@@ -51,6 +51,7 @@ type FormValuesProps = {
   clientRefId: string;
   startDate: Date | null;
   endDate: Date | null;
+  transactionType: string;
 };
 
 export default function FundFlow() {
@@ -68,6 +69,7 @@ export default function FundFlow() {
   });
 
   const defaultValues = {
+    transactionType: "",
     category: "",
     status: "",
     clientRefId: "",
@@ -119,7 +121,7 @@ export default function FundFlow() {
       },
       clientRefId: getValues("clientRefId"),
       status: getValues("status"),
-      transactionType: "",
+      transactionType:getValues("transactionType"),
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
     };
@@ -169,7 +171,7 @@ export default function FundFlow() {
       },
       clientRefId: data.clientRefId,
       status: data.status,
-      transactionType: "",
+      transactionType:data.transactionType,
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
     };
@@ -219,6 +221,18 @@ export default function FundFlow() {
               spacing={2}
               style={{ padding: "0 25px", marginBottom: "10px" }}
             >
+              <RHFSelect
+                name="transactionType"
+                label="Transaction Type"
+                placeholder="transaction Type"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
+                }}
+              >
+                <MenuItem value={"credit"}>Credit</MenuItem>
+                <MenuItem value={"debit"}>Debit</MenuItem>
+              </RHFSelect>
               <RHFSelect
                 name="status"
                 label="Status"
