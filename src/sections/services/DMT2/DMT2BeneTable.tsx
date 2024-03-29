@@ -336,7 +336,7 @@ export default function DMT2BeneTable() {
   }
   return (
     <>
-      <Grid sx={{ maxHeight: window.innerHeight - 170 }}>
+      <Grid>
         {getBene.isLoading ? (
           <ApiDataLoading />
         ) : (
@@ -359,8 +359,8 @@ export default function DMT2BeneTable() {
               <Scrollbar
                 sx={
                   isMobile
-                    ? { maxHeight: window.innerHeight - 250 }
-                    : { maxHeight: window.innerHeight - 440 }
+                    ? { maxHeight: window.innerHeight - 170 }
+                    : { maxHeight: window.innerHeight - 470 }
                 }
               >
                 <Table
