@@ -655,6 +655,10 @@ const UploadPan = React.memo(({ data, setStep }: any) => {
   } = methods;
 
   const handleFile = async (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setErrorMsg("");
     setIsSubmitLoading(true);
     let token = localStorage.getItem("token");

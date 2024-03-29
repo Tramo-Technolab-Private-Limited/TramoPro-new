@@ -16,6 +16,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFAutocomplete,
   RHFCodes,
+  RHFSecureCodes,
   RHFTextField,
 } from "../../../components/hook-form";
 import { useEffect, useState } from "react";
@@ -859,10 +860,9 @@ const BbpsBillPayment = ({
             gap={2}
           >
             <Typography variant="h4">Confirm NPIN</Typography>
-            <RHFCodes
+            <RHFSecureCodes
               keyName="otp"
               inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-              type="password"
             />
             {(!!errors.otp1 ||
               !!errors.otp2 ||

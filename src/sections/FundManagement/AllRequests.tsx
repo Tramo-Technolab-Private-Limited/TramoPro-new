@@ -303,6 +303,10 @@ export default function (props: any) {
     }
   };
   const uploadDoc = () => {
+    if (uploadFile?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setSuccess("wait");
     let doc = uploadFile;
     let token = localStorage.getItem("token");

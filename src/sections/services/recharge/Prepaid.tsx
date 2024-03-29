@@ -29,6 +29,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFCodes,
+  RHFSecureCodes,
   RHFSelect,
   RHFTextField,
 } from "../../../components/hook-form";
@@ -629,7 +630,7 @@ function MobilePrepaid() {
               gap={2}
             >
               <Typography variant="h4">Confirm NPIN</Typography>
-              <RHFCodes
+              <RHFSecureCodes
                 keyName="otp"
                 inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
                 type="password"

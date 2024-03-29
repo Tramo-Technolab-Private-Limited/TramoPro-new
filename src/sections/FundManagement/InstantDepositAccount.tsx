@@ -458,6 +458,10 @@ export default function InstantDepositAccount() {
   };
 
   const uploadDoc = () => {
+    if (uploadFile?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setSuccess("wait");
     let doc = uploadFile;
     console.log("===file", uploadFile);

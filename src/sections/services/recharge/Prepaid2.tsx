@@ -37,7 +37,10 @@ import Iconify from "../../../components/iconify";
 import { Api } from "src/webservices";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 
-import FormProvider, { RHFCodes } from "../../../components/hook-form";
+import FormProvider, {
+  RHFCodes,
+  RHFSecureCodes,
+} from "../../../components/hook-form";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { Helmet } from "react-helmet-async";
 // ----------------------------------------------------------------------
@@ -725,11 +728,9 @@ export default function Prepaid1(props: any) {
                 gap={2}
               >
                 <Typography variant="h4">Confirm NPIN</Typography>
-                type="password"
-                <RHFCodes
+                <RHFSecureCodes
                   keyName="otp"
                   inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                  type="password"
                 />
                 {(!!error2.otp1 ||
                   !!error2.otp2 ||

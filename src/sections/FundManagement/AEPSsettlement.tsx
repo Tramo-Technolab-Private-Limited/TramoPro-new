@@ -16,6 +16,7 @@ import FormProvider, {
   RHFTextField,
   RHFCodes,
   RHFSelect,
+  RHFSecureCodes,
 } from "src/components/hook-form";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -355,7 +356,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                         </Typography>
                         {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
                       </Stack>
-                      <RHFCodes
+                      <RHFSecureCodes
                         keyName="otp"
                         inputs={[
                           "otp1",

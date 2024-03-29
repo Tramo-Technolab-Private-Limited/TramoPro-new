@@ -27,6 +27,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFTextField,
   RHFCodes,
+  RHFSecureCodes,
 } from "../../../components/hook-form";
 import { useSnackbar } from "notistack";
 import { Icon } from "@iconify/react";
@@ -457,10 +458,9 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
                   gap={2}
                 >
                   <Typography variant="h4">Confirm NPIN</Typography>
-                  <RHFCodes
+                  <RHFSecureCodes
                     keyName="otp"
                     inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                    type="password"
                   />
 
                   {(!!errors.otp1 ||
