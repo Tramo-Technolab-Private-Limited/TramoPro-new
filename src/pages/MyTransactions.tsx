@@ -992,8 +992,7 @@ function TransactionRow({ row }: childProps) {
               </Tooltip>
             )}
             {user?.role === "agent" &&
-              (newRow?.categoryName == "MONEY TRANSFER" ||
-                newRow?.categoryName == "DMT2") && (
+              newRow?.transactionType == "Product/Service" && (
                 <Tooltip title="View Receipt" placement="top">
                   <IconButton>
                     <img
@@ -1050,25 +1049,130 @@ function TransactionRow({ row }: childProps) {
                   <Typography variant="caption"> Shop Name: </Typography>
                   <Typography variant="caption">{user?.shopAddress}</Typography>
                 </Stack>
-                <Stack flexDirection={"row"} gap={1} mt={4}>
-                  <Typography variant="caption">Sender Name : </Typography>
-                  <Typography variant="caption">
-                    {newRow?.moneyTransferSenderId?.remitterFN}
-                    {newRow?.moneyTransferSenderId?.remitterLN}{" "}
-                  </Typography>
-                </Stack>
-                <Stack flexDirection={"row"} gap={1}>
-                  <Typography variant="caption"> Mobile Number: </Typography>
-                  <Typography variant="caption">
-                    {newRow?.moneyTransferSenderId?.remitterMobile}
-                  </Typography>
-                </Stack>
-                <Stack flexDirection={"row"} gap={1}>
-                  <Typography variant="caption"> Service Type: </Typography>
-                  <Typography variant="caption">
-                    {newRow?.productName}
-                  </Typography>
-                </Stack>
+                {newRow?.categoryName == "MONEY TRANSFER" && (
+                  <Stack flexDirection={"row"} gap={1} mt={4}>
+                    <Typography variant="caption">Sender Name : </Typography>
+                    <Typography variant="caption">
+                      {newRow?.moneyTransferSenderId?.remitterFN}
+                      {newRow?.moneyTransferSenderId?.remitterLN}{" "}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "MONEY TRANSFER" && (
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.moneyTransferSenderId?.remitterMobile}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "MONEY TRANSFER" && (
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="caption"> Service Type: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.productName}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "DMT2" && (
+                  <Stack flexDirection={"row"} gap={1} mt={4}>
+                    <Typography variant="caption">Sender Name : </Typography>
+                    <Typography variant="caption">
+                      {newRow?.moneyTransferSenderId?.remitterFN}
+                      {newRow?.moneyTransferSenderId?.remitterLN}{" "}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "DMT2" && (
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.moneyTransferSenderId?.remitterMobile}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "DMT2" && (
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="caption"> Service Type: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.productName}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "DMT1" && (
+                  <Stack flexDirection={"row"} gap={1} mt={4}>
+                    <Typography variant="caption">Sender Name : </Typography>
+                    <Typography variant="caption">
+                      {newRow?.moneyTransferSenderId?.remitterFN}
+                      {newRow?.moneyTransferSenderId?.remitterLN}{" "}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "DMT1" && (
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.moneyTransferSenderId?.remitterMobile}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "DMT1" && (
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="caption"> Service Type: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.productName}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "Aadhaar Pay" && (
+                  <Stack flexDirection={"row"} gap={1} mt={2}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.mobileNumber}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "AEPS" && (
+                  <Stack flexDirection={"row"} gap={1} mt={2}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.mobileNumber}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "BILL PAYMENT" && (
+                  <Stack flexDirection={"row"} gap={1} top={10}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.mobileNumber}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "LOAN" && (
+                  <Stack flexDirection={"row"} gap={1} top={10}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.mobileNumber}
+                    </Typography>
+                  </Stack>
+                )}
+
+                {newRow?.categoryName == "withdraw" && (
+                  <Stack flexDirection={"row"} gap={1} top={10}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.mobileNumber}
+                    </Typography>
+                  </Stack>
+                )}
+                {newRow?.categoryName == "Balance Inquiry" && (
+                  <Stack flexDirection={"row"} gap={1} top={10}>
+                    <Typography variant="caption"> Mobile Number: </Typography>
+                    <Typography variant="caption">
+                      {newRow?.mobileNumber}
+                    </Typography>
+                  </Stack>
+                )}
               </Grid>
               <Grid item xs={12} sm={4}>
                 <Typography variant="h6">PAYMENT RECEIPT</Typography>
@@ -1078,6 +1182,7 @@ function TransactionRow({ row }: childProps) {
                 <Typography variant="body2">
                   TRX Date: {fDateTime(newRow?.createdAt)}
                 </Typography>
+                {newRow?.categoryName == "MONEY TRANSFER" && (
                 <Stack>
                   <Typography variant="subtitle1">
                     Benificary Details
@@ -1111,6 +1216,135 @@ function TransactionRow({ row }: childProps) {
                     </Typography>
                   </Stack>
                 </Stack>
+                )}
+                  {newRow?.categoryName == "DMT2" && (
+                <Stack>
+                  <Typography variant="subtitle1">
+                    Benificary Details
+                  </Typography>
+
+                  <Stack flexDirection={"row"}>
+                    <Typography variant="body2">
+                      {" "}
+                      Account Holder Name:{" "}
+                    </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.beneName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Bank Name: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Account Number: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> IFSC : </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                )}
+                 {newRow?.categoryName == "RECHARGES" && (
+                <Stack>
+                  <Stack flexDirection={"row"}>
+                    <Typography variant="body2">
+                      {" "}
+                      Operator:{" "}
+                    </Typography>
+                    <Typography variant="body2">
+                      {newRow?.productName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Mobile Number: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.mobileNumber}
+                    </Typography>
+                </Stack>
+                </Stack>
+                )}
+                {newRow?.categoryName == "AADHAAR PAY" && (
+                <Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Bank Name: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Account Number: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                )}
+                    {newRow?.categoryName == "AEPS" && (
+                <Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Bank Name: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Account Number: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                )}
+                    {newRow?.categoryName == "withdraw" && (
+                <Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Bank Name: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Account Number: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                )}
+                     {newRow?.categoryName == "BILL PAYMENT" && (
+                <Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Operator Name: </Typography>
+                    <Typography variant="body2">
+                      {newRow?.moneyTransferBeneficiaryDetails?.operator?.key1}
+                    </Typography>
+                  </Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> CA Number: </Typography>
+                    <Typography variant="body2">
+                    {newRow?.moneyTransferBeneficiaryDetails?.operator?.key2}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                )}
+                         {newRow?.categoryName == "LOAN" && (
+                <Stack>
+                  <Stack flexDirection={"row"} gap={1}>
+                    <Typography variant="body2"> Loan Applied for : </Typography>
+                    <Typography variant="body2">
+                      {newRow?.productName}
+                    </Typography>
+                  </Stack>
+                </Stack>
+                )}
               </Grid>
             </Grid>
             <Grid>
@@ -1263,7 +1497,7 @@ function TransactionRow({ row }: childProps) {
                             Timings : 08:00AM to 10:00 PM (Mon-Sun)
                           </Typography>
                           <Typography variant="caption">
-                            Email : {process.env.REACT_APP_COMPANY_EMAIL}
+                            Email : {process.env.react_app_company_email}
                           </Typography>
                         </Stack>
                       </Typography>
