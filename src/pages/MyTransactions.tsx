@@ -102,6 +102,15 @@ export default function MyTransactions() {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const [sumOfTransactions, setSumOfTransactions] = useState({
+    success: 0,
+    failed: 0,
+    pending: 0,
+    in_process: 0,
+    hold: 0,
+    initiated: 0,
+  });
+
   const txnSchema = Yup.object().shape({
     status: Yup.string(),
     clientRefId: Yup.string(),
@@ -204,6 +213,71 @@ export default function MyTransactions() {
             setPageCount(Response.data.data.totalNumberOfRecords);
             setCurrentTab("");
             enqueueSnackbar(Response.data.message);
+
+            setSumOfTransactions((prevState) => ({
+              ...prevState,
+              success: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (currentValue.status == "success") {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+
+              failed: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (currentValue.status == "failed") {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+              pending: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (currentValue.status == "pending") {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+              in_process: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (currentValue.status == "in_process") {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+              hold: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (currentValue.status == "hold") {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+              initiated: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (currentValue.status == "initiated") {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+            }));
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
           }
@@ -245,6 +319,70 @@ export default function MyTransactions() {
               setPageCount(Response.data.data.totalNumberOfRecords);
               handleClose();
               enqueueSnackbar(Response.data.message);
+              setSumOfTransactions((prevState) => ({
+                ...prevState,
+                success: Response.data.data.data.reduce(
+                  (accumulator: number, currentValue: any) => {
+                    if (currentValue.status == "success") {
+                      return accumulator + currentValue.amount;
+                    } else {
+                      return accumulator + 0;
+                    }
+                  },
+                  0
+                ),
+
+                failed: Response.data.data.data.reduce(
+                  (accumulator: number, currentValue: any) => {
+                    if (currentValue.status == "failed") {
+                      return accumulator + currentValue.amount;
+                    } else {
+                      return accumulator + 0;
+                    }
+                  },
+                  0
+                ),
+                pending: Response.data.data.data.reduce(
+                  (accumulator: number, currentValue: any) => {
+                    if (currentValue.status == "pending") {
+                      return accumulator + currentValue.amount;
+                    } else {
+                      return accumulator + 0;
+                    }
+                  },
+                  0
+                ),
+                in_process: Response.data.data.data.reduce(
+                  (accumulator: number, currentValue: any) => {
+                    if (currentValue.status == "in_process") {
+                      return accumulator + currentValue.amount;
+                    } else {
+                      return accumulator + 0;
+                    }
+                  },
+                  0
+                ),
+                hold: Response.data.data.data.reduce(
+                  (accumulator: number, currentValue: any) => {
+                    if (currentValue.status == "hold") {
+                      return accumulator + currentValue.amount;
+                    } else {
+                      return accumulator + 0;
+                    }
+                  },
+                  0
+                ),
+                initiated: Response.data.data.data.reduce(
+                  (accumulator: number, currentValue: any) => {
+                    if (currentValue.status == "initiated") {
+                      return accumulator + currentValue.amount;
+                    } else {
+                      return accumulator + 0;
+                    }
+                  },
+                  0
+                ),
+              }));
             } else {
               enqueueSnackbar(Response.data.message, { variant: "error" });
             }
@@ -452,7 +590,7 @@ export default function MyTransactions() {
         gap={1}
         mb={1}
       >
-        <Stack flexDirection={"row"} m={1} gap={1}>
+        {/* <Stack flexDirection={"row"} m={1} gap={1}>
           {filterdValue.length > 0 &&
             filterdValue.map((item: any) => {
               return (
@@ -465,6 +603,53 @@ export default function MyTransactions() {
                 )
               );
             })}
+        </Stack> */}
+
+        <Stack flexDirection={"row"} gap={2}>
+          <Label
+            variant="soft"
+            color={"success"}
+            sx={{ textTransform: "capitalize" }}
+          >
+            Success : {fIndianCurrency(sumOfTransactions?.success) || "₹" + 0}
+          </Label>
+          <Label
+            variant="soft"
+            color={"error"}
+            sx={{ textTransform: "capitalize" }}
+          >
+            Failed : {fIndianCurrency(sumOfTransactions?.failed) || "₹" + 0}
+          </Label>
+          <Label
+            variant="soft"
+            color={"warning"}
+            sx={{ textTransform: "capitalize" }}
+          >
+            Pending : {fIndianCurrency(sumOfTransactions?.pending) || "₹" + 0}
+          </Label>
+          <Label
+            variant="soft"
+            color={"info"}
+            sx={{ textTransform: "capitalize" }}
+          >
+            In Process :{" "}
+            {fIndianCurrency(sumOfTransactions?.in_process) || "₹" + 0}
+          </Label>
+          <Label
+            variant="soft"
+            color={"warning"}
+            sx={{ textTransform: "capitalize" }}
+          >
+            Hold : {fIndianCurrency(sumOfTransactions?.hold) || "₹" + 0}
+          </Label>
+          <Label
+            variant="soft"
+            color={"info"}
+            sx={{ textTransform: "capitalize" }}
+          >
+            Initiated :{" "}
+            {fIndianCurrency(sumOfTransactions?.initiated) || "₹" + 0}
+          </Label>
         </Stack>
 
         <Stack flexDirection={"row"} gap={1}>
