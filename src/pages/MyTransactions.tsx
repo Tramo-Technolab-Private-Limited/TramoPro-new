@@ -713,6 +713,7 @@ function TransactionRow({ row }: childProps) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
+
           setNewRow({ ...newRow, status: Response.data.data.status });
         } else {
           enqueueSnackbar(Response.data.message, { variant: "error" });
@@ -790,12 +791,15 @@ function TransactionRow({ row }: childProps) {
                 src={newRow?.agentDetails?.id?.selfie[0]}
               />
               <Stack>
-                <Typography variant="body2">
+                <Typography variant="body2" noWrap>
                   {newRow?.agentDetails?.id?.firstName}{" "}
                   {newRow?.agentDetails?.id?.lastName}
                 </Typography>
                 <Typography variant="body2">
                   {newRow?.agentDetails?.id?.userCode}
+                </Typography>
+                <Typography variant="body2" noWrap>
+                  {newRow?.company_name ? newRow?.company_name : "No Shop Name"}
                 </Typography>
               </Stack>
             </Stack>
@@ -813,12 +817,15 @@ function TransactionRow({ row }: childProps) {
                   src={newRow?.agentDetails?.id?.selfie[0]}
                 />
                 <Stack>
-                  <Typography variant="body2">
+                  <Typography variant="body2" noWrap>
                     {newRow?.agentDetails?.id?.firstName}{" "}
                     {newRow?.agentDetails?.id?.lastName}
                   </Typography>
                   <Typography variant="body2">
                     {newRow?.agentDetails?.id?.userCode}
+                  </Typography>
+                  <Typography variant="body2" noWrap>
+                    {newRow?.company_name}
                   </Typography>
                 </Stack>
               </Stack>
@@ -835,8 +842,8 @@ function TransactionRow({ row }: childProps) {
                     {newRow?.distributorDetails?.id?.firstName}{" "}
                     {newRow?.distributorDetails?.id?.lastName}
                   </Typography>
-                  <Typography variant="body2">
-                    {newRow?.distributorDetails?.id?.userCode}
+                  <Typography variant="body2" noWrap>
+                    {newRow?.company_name}
                   </Typography>
                 </Stack>
               </Stack>
