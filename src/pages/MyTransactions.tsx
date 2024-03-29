@@ -1183,143 +1183,156 @@ function TransactionRow({ row }: childProps) {
                   TRX Date: {fDateTime(newRow?.createdAt)}
                 </Typography>
                 {newRow?.categoryName == "MONEY TRANSFER" && (
-                <Stack>
-                  <Typography variant="subtitle1">
-                    Benificary Details
-                  </Typography>
+                  <Stack>
+                    <Typography variant="subtitle1">
+                      Benificary Details
+                    </Typography>
 
-                  <Stack flexDirection={"row"}>
-                    <Typography variant="body2">
-                      {" "}
-                      Account Holder Name:{" "}
-                    </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.beneName}
-                    </Typography>
+                    <Stack flexDirection={"row"}>
+                      <Typography variant="body2">
+                        {" "}
+                        Account Holder Name:{" "}
+                      </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.beneName}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Bank Name: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Account Number: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> IFSC : </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Bank Name: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
-                    </Typography>
-                  </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Account Number: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
-                    </Typography>
-                  </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> IFSC : </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
-                    </Typography>
-                  </Stack>
-                </Stack>
                 )}
-                  {newRow?.categoryName == "DMT2" && (
-                <Stack>
-                  <Typography variant="subtitle1">
-                    Benificary Details
-                  </Typography>
+                {newRow?.categoryName == "DMT2" && (
+                  <Stack>
+                    <Typography variant="subtitle1">
+                      Benificary Details
+                    </Typography>
 
-                  <Stack flexDirection={"row"}>
-                    <Typography variant="body2">
-                      {" "}
-                      Account Holder Name:{" "}
-                    </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.beneName}
-                    </Typography>
+                    <Stack flexDirection={"row"}>
+                      <Typography variant="body2">
+                        {" "}
+                        Account Holder Name:{" "}
+                      </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.beneName}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Bank Name: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Account Number: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> IFSC : </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Bank Name: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
-                    </Typography>
-                  </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Account Number: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
-                    </Typography>
-                  </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> IFSC : </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.ifsc}
-                    </Typography>
-                  </Stack>
-                </Stack>
                 )}
-                 {newRow?.categoryName == "RECHARGES" && (
-                <Stack>
-                  <Stack flexDirection={"row"}>
-                    <Typography variant="body2">
-                      {" "}
-                      Operator:{" "}
-                    </Typography>
-                    <Typography variant="body2">
-                      {newRow?.productName}
-                    </Typography>
+                {newRow?.categoryName == "RECHARGES" && (
+                  <Stack>
+                    <Stack flexDirection={"row"}>
+                      <Typography variant="body2"> Operator: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.operator?.key1}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Mobile Number: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.operator?.key2}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Mobile Number: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.mobileNumber}
-                    </Typography>
-                </Stack>
-                </Stack>
                 )}
                 {newRow?.categoryName == "AADHAAR PAY" && (
-                <Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Bank Name: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
-                    </Typography>
+                  <Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Bank Name: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.operator?.key1}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Account Number: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.operator?.key2}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Account Number: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
-                    </Typography>
-                  </Stack>
-                </Stack>
                 )}
-                    {newRow?.categoryName == "AEPS" && (
-                <Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Bank Name: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
-                    </Typography>
+                {newRow?.categoryName == "AEPS" && (
+                  <Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Bank Name: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.operator?.key1}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Account Number: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.operator?.key2}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Account Number: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
-                    </Typography>
-                  </Stack>
-                </Stack>
                 )}
-                    {newRow?.categoryName == "withdraw" && (
-                <Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Bank Name: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.bankName}
-                    </Typography>
+                {newRow?.categoryName == "withdraw" && (
+                  <Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Bank Name: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Account Number: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Account Number: </Typography>
-                    <Typography variant="body2">
-                      {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
-                    </Typography>
-                  </Stack>
-                </Stack>
                 )}
-                     {newRow?.categoryName == "BILL PAYMENT" && (
+                {newRow?.categoryName == "Mini Statement" && (
+                  <Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Bank Name: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.bankName}
+                      </Typography>
+                    </Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2"> Account Number: </Typography>
+                      <Typography variant="body2">
+                        {newRow?.moneyTransferBeneficiaryDetails?.accountNumber}
+                      </Typography>
+                    </Stack>
+                  </Stack>
+                )}
+                {/* {newRow?.categoryName == "BILL PAYMENT" && (
                 <Stack>
                   <Stack flexDirection={"row"} gap={1}>
                     <Typography variant="body2"> Operator Name: </Typography>
@@ -1334,16 +1347,19 @@ function TransactionRow({ row }: childProps) {
                     </Typography>
                   </Stack>
                 </Stack>
-                )}
-                         {newRow?.categoryName == "LOAN" && (
-                <Stack>
-                  <Stack flexDirection={"row"} gap={1}>
-                    <Typography variant="body2"> Loan Applied for : </Typography>
-                    <Typography variant="body2">
-                      {newRow?.productName}
-                    </Typography>
+                )} */}
+                {newRow?.categoryName == "LOAN" && (
+                  <Stack>
+                    <Stack flexDirection={"row"} gap={1}>
+                      <Typography variant="body2">
+                        {" "}
+                        Loan Applied for :{" "}
+                      </Typography>
+                      <Typography variant="body2">
+                        {newRow?.productName}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                </Stack>
                 )}
               </Grid>
             </Grid>
