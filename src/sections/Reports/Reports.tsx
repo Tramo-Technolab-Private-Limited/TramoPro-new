@@ -58,7 +58,7 @@ AWS.config.update({
 
 function HistoricalDataExport() {
   const { copy } = useCopyToClipboard();
-  const [sdata, setSdata] = React.useState("fundRequest");
+  const [sdata, setSdata] = React.useState("transactionRecords");
   const [verifyLoding, setVerifyLoading] = React.useState(false);
   const [currentPage, setCurrentPage] = React.useState<any>(1);
   const [Loading, setLoading] = React.useState(false);
@@ -95,12 +95,12 @@ function HistoricalDataExport() {
 
   const tableLabels = [
     { id: "date", label: "Date" },
-    { id: "Exportedby", label: "Exported By" },
+
     { id: "IPAddress ", label: " Req. IP " },
     { id: "Latitude ", label: "Lat, Long" },
     { id: "From", label: "From Date" },
     { id: "To", label: "To Date" },
-    { id: "reportFor", label: "Report For" },
+
     { id: "Link Status ", label: "Link Status " },
     { id: "Download link ", label: "Download link " },
   ];
@@ -239,14 +239,12 @@ function HistoricalDataExport() {
   const submitReport = (data: FormValuesProps) => {
     setApproveLoading(true);
 
-    console.log("llllllllllllllllllllllllllll");
-
     let body = {
       from_date:
         sdata !== "GST & TDS Report" ? formattedStart : `${GSTTDSDate}`,
       to_date:
         sdata !== "GST & TDS Report" ? formattedEndDate : `${GSTTDSDateEnd}`,
-
+      type_of_report: sdata,
       email: user?.email,
     };
     let token = localStorage.getItem("token");
@@ -320,8 +318,6 @@ function HistoricalDataExport() {
         if (Response.data.code == 200) {
           setTableData(Response.data.data.data);
           setPageCount(Response?.data?.data?.totalNumberOfRecords);
-
-          enqueueSnackbar(Response.data.message);
         } else {
           enqueueSnackbar(Response.data.message, { variant: "error" });
         }
@@ -372,23 +368,16 @@ function HistoricalDataExport() {
         >
           <Tab
             value="transactionRecords"
-            label="Master Transaction Report"
+            label=" Transaction Report"
             sx={{ fontSize: 18 }}
-            disabled
           />
           <Tab value="fundRequest" label="Fund Request" sx={{ fontSize: 18 }} />
-          <Tab
-            value="fundFlow"
-            label="Fund Flow"
-            sx={{ fontSize: 18 }}
-            disabled
-          />
+          <Tab value="fundFlow" label="Fund Flow" sx={{ fontSize: 18 }} />
           {/* <Tab value="AdminP&L" label="Admin P&L " sx={{ fontSize: 18 }} /> */}
           <Tab
             value="walletLedger"
             label=" Wallet Ledger"
             sx={{ fontSize: 18 }}
-            disabled
           />
           <Tab
             value="GST & TDS Report"
@@ -459,13 +448,6 @@ function HistoricalDataExport() {
                         </Stack>
                       </TableCell>
                       <TableCell>
-                        <Stack direction="row" spacing={1}>
-                          <Typography>
-                            {row?.report_generator_data?.role}{" "}
-                          </Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
                         <Stack
                           direction="row"
                           spacing={1}
@@ -497,31 +479,6 @@ function HistoricalDataExport() {
                       <TableCell>
                         <Stack direction="row" spacing={1}>
                           <Typography>{fDate(row?.to_date)} </Typography>
-                        </Stack>
-                      </TableCell>
-                      <TableCell>
-                        <Stack spacing={1}>
-                          <Typography>{row?.user_data?.userName} </Typography>
-                          {/* <Typography variant="body2">
-                            {sentenceCase(row?.user_data?.role)}
-
-                            {row?.user_data?.userCode && (
-                              <>
-                                {" "}
-                                ({row?.user_data?.userCode}
-                                <Tooltip title="Copy">
-                                  <IconButton
-                                    onClick={() =>
-                                      onCopy(row?.user_data?.userCode)
-                                    }
-                                  >
-                                    <Iconify icon="eva:copy-fill" width={15} />
-                                  </IconButton>
-                                </Tooltip>
-                                )
-                              </>
-                            )}
-                          </Typography> */}
                         </Stack>
                       </TableCell>
                       <TableCell>
