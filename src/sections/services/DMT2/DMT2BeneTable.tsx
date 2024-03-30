@@ -96,7 +96,7 @@ const Reducer = (state: any, action: any) => {
         beneVerified: true,
       };
     case "VERIFY_FETCH_FAILURE":
-      return { ...state, isLoading: false, data: {} };
+      return { ...state, isLoading: false, data: {}, beneVerified: false };
     case "GET_BENE_REQUEST":
       return { ...state, isLoading: true };
     case "GET_BENE_SUCCESS":
@@ -302,6 +302,9 @@ export default function DMT2BeneTable() {
           addbeneDispatch({
             type: "ADD_BENE_SUCCESS",
             payload: Response.data.data,
+          });
+          remitterVerifyDispatch({
+            type: "VERIFY_FETCH_FAILURE",
           });
           enqueueSnackbar(Response.data.message);
           handleClose();

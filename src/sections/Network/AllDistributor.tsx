@@ -358,7 +358,7 @@ function EcommerceBestSalesmanRow({
       <TableCell sx={{ color: "#0D571C" }}>
         <Typography>
           {" "}
-          Rs.{fIndianCurrency(row?.main_wallet_amount || "0")}
+          {fIndianCurrency(row?.main_wallet_amount || "0")}
         </Typography>
       </TableCell>
       <TableCell>{fDateTime(row.createdAt)}</TableCell>

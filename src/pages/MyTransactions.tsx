@@ -1009,8 +1009,8 @@ function TransactionRow({ row }: childProps) {
                   <Typography variant="body2">
                     {newRow?.agentDetails?.id?.userCode}
                   </Typography>
-                  <Typography variant="body2" noWrap>
-                    {newRow?.company_name}
+                  <Typography variant="body2">
+                    {newRow?.agentDetails?.id?.company_name}
                   </Typography>
                 </Stack>
               </Stack>

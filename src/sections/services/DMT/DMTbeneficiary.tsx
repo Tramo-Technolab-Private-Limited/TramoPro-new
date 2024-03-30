@@ -96,7 +96,7 @@ const Reducer = (state: any, action: any) => {
         beneVerified: true,
       };
     case "VERIFY_FETCH_FAILURE":
-      return { ...state, isLoading: false, data: {} };
+      return { ...state, isLoading: false, data: {}, beneVerified: false };
     case "GET_BENE_REQUEST":
       return { ...state, isLoading: true };
     case "GET_BENE_SUCCESS":
@@ -294,6 +294,9 @@ export default function DMTbeneficiary() {
               type: "ADD_BENE_SUCCESS",
               payload: Response.data.data,
             });
+            remitterVerifyDispatch({
+              type: "VERIFY_FETCH_FAILURE",
+            });
             enqueueSnackbar(Response.data.message);
             handleClose();
           } else {
@@ -409,8 +412,8 @@ export default function DMTbeneficiary() {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            width: "95%",
           }}
+          width={{ xs: "95%", md: 500 }}
         >
           <Card sx={{ p: 3 }}>
             <FormProvider

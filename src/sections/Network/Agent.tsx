@@ -307,7 +307,7 @@ function EcommerceBestSalesmanRow({
         {row.contact_no}
       </TableCell>
       <TableCell sx={{ color: "#0D571C" }}>
-        Rs. {fIndianCurrency(row?.main_wallet_amount || "0")}
+        {fIndianCurrency(row?.main_wallet_amount || "0")}
       </TableCell>
       <TableCell>
         <Typography variant="body2" sx={{ color: "text.secondary" }}>

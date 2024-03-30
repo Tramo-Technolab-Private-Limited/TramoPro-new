@@ -121,7 +121,7 @@ export default function FundFlow() {
       },
       clientRefId: getValues("clientRefId"),
       status: getValues("status"),
-      transactionType:getValues("transactionType"),
+      transactionType: getValues("transactionType"),
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
     };
@@ -171,7 +171,7 @@ export default function FundFlow() {
       },
       clientRefId: data.clientRefId,
       status: data.status,
-      transactionType:data.transactionType,
+      transactionType: data.transactionType,
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
     };
@@ -430,6 +430,11 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                 <Typography variant="body2">
                   {newRow?.agentDetails?.id?.userCode}
                 </Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {newRow?.agentDetails?.id?.company_name
+                    ? newRow?.agentDetails?.id?.company_name
+                    : " No Shop Name "}
+                </Typography>
               </Stack>
             </Stack>
           ) : newRow?.walletLedgerData?.from?.id ==
@@ -483,6 +488,11 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                 <Typography variant="body2">
                   {newRow?.agentDetails?.id?.userCode}
                 </Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {newRow?.agentDetails?.id?.company_name
+                    ? newRow?.agentDetails?.id?.company_name
+                    : " No Shop Name "}
+                </Typography>
               </Stack>
             </Stack>
           )}
@@ -525,8 +535,8 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                   {newRow?.agentDetails?.id?.userCode}
                 </Typography>
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  {newRow?.company_name
-                    ? newRow?.company_name
+                  {newRow?.agentDetails?.id?.company_name
+                    ? newRow?.agentDetails?.id?.company_name
                     : " No Shop Name "}
                 </Typography>
               </Stack>

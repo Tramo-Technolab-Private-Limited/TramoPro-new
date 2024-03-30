@@ -125,6 +125,7 @@ export default function DMT() {
     bgcolor: "#ffffff",
     boxShadow: 24,
     borderRadius: 2,
+    width: { xs: "95%", md: 500 },
     p: 4,
   };
 
