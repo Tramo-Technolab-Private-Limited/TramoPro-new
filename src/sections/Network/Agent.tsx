@@ -22,16 +22,18 @@ import { fDateTime } from "src/utils/formatTime";
 import useResponsive from "src/hooks/useResponsive";
 import { CustomAvatar } from "src/components/custom-avatar";
 import { fIndianCurrency } from "src/utils/formatNumber";
+import CustomPagination from "src/components/customFunctions/CustomPagination";
 import MotionModal from "src/components/animate/MotionModal";
 import FundFlow from "../FundManagement/FundFlow";
-
-import FormProvider from "src/components/hook-form/FormProvider";
-import { RHFTextField } from "src/components/hook-form";
+import FormProvider, {
+  RHFSelect,
+  RHFTextField,
+} from "../../components/hook-form";
 import { LoadingButton } from "@mui/lab";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import CustomPagination from "src/components/customFunctions/CustomPagination";
+import DirectFundTransfer from "./DirectFundTransfer";
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -60,18 +62,19 @@ type RowProps = {
   company_name: any;
 };
 
+export let handleClosefunTrans: any;
+
 export default function Agent() {
   const [appdata, setAppdata] = useState([]);
   const isMobile = useResponsive("up", "sm");
   const [open, setModalEdit] = React.useState(false);
   const [pageSize, setPageSize] = useState<any>(25);
-
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [TotalCount, setTotalCount] = useState<any>(0);
   const [openFundtrans, setFundTrans] = React.useState(false);
-  const [selectedRow, setSelectedRow] = useState<RowProps | null>(null);
+  const [selectedRow, setSelectedRow] = useState<any>();
 
-  const handleClosefunTrans = () => setFundTrans(false);
+  handleClosefunTrans = () => setFundTrans(false);
   const tableLabels: any = [
     { id: "product", label: "Name" },
     { id: "due", label: "User Code" },
@@ -115,7 +118,6 @@ export default function Agent() {
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
-
   useEffect(() => {
     ApprovedList();
   }, [currentPage, pageSize]);
@@ -123,15 +125,10 @@ export default function Agent() {
   const ApprovedList = () => {
     let body = {
       filter: {
-        userName: "",
-        userCode: "",
-        email: "",
-        mobile: "",
+        shopName: getValues("shopName"),
+        userCode: getValues("userCode"),
+        mobile: getValues("mobile"),
       },
-    };
-
-    const FundTransfer = (val: any) => {
-      setFundTrans(true);
     };
 
     let token = localStorage.getItem("token");
@@ -172,6 +169,8 @@ export default function Agent() {
 
   const FundTransfer = (val: any) => {
     setFundTrans(true);
+    setSelectedRow(val);
+    console.log("my value is ", val);
   };
   return (
     <>
@@ -261,7 +260,7 @@ export default function Agent() {
         onClose={handleClosefunTrans}
         width={{ xs: "95%", sm: 500 }}
       >
-        <FundFlow />
+        <DirectFundTransfer props={selectedRow} />
       </MotionModal>
     </>
   );
