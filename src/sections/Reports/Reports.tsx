@@ -49,6 +49,8 @@ import { sentenceCase } from "change-case";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import dayjs from "dayjs";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
+import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
+import { TableNoData } from "src/components/table";
 //aws
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -434,8 +436,7 @@ function HistoricalDataExport() {
               {verifyLoding ? (
                 <>
                   <Stack>
-                    {/* <ApiDataLoading /> */}
-                    ''
+                    <ApiDataLoading />
                   </Stack>
                 </>
               ) : (
@@ -499,6 +500,7 @@ function HistoricalDataExport() {
                   ))}
                 </TableBody>
               )}
+              <TableNoData isNotFound={!tableData.length} />
             </Table>
           </Scrollbar>
 
