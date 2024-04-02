@@ -23,7 +23,7 @@ export default function DMTRemitterDetail() {
       <Typography variant="h5">Remitter details fetch succesfully.</Typography>
       <TableContainer component={Paper}>
         <Scrollbar sx={{ scrollbarWidth: "thin" }}>
-          <Table sx={{ minWidth: 350 }} size="small" aria-label="simple table">
+          <Table  size="small" aria-label="simple table">
             <TableBody>
               <TableRow sx={{ borderBottom: "1px Solid #00000026" }}>
                 <TableCell
