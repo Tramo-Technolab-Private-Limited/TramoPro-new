@@ -1,6 +1,9 @@
+import * as Yup from "yup";
 import { memo, useContext, useEffect, useReducer, useState } from "react";
 import React from "react";
-
+// form
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
 // @mui
 import {
   Grid,
@@ -14,19 +17,16 @@ import {
   TableRow,
   TableCell,
   TableContainer,
+  CircularProgress,
   Box,
   FormHelperText,
-  InputAdornment,
+  Button,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 // components
 import { useSnackbar } from "../../../components/snackbar";
 import Iconify from "../../../components/iconify";
 import { Api } from "src/webservices";
-// form
-import * as Yup from "yup";
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFCodes,
   RHFSecureCodes,
@@ -38,6 +38,7 @@ import { Helmet } from "react-helmet-async";
 import { SubCategoryContext } from "./Recharges";
 import { CategoryContext } from "../../../pages/Services";
 import { useAuthContext } from "src/auth/useAuthContext";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 
@@ -57,9 +58,8 @@ type FormValuesProps = {
 
 const initialPlanState = {
   data: {
-    "2G": [],
     "3G/4G": [],
-    FULLTT: [],
+    COMBO: [],
     Roaming: [],
     TOPUP: [],
   },
@@ -109,7 +109,7 @@ function MobilePrepaid() {
   const [open, setModal] = React.useState(false);
   const openModal = (val: any) => {
     setModal(true);
-    tabChange("2G");
+    tabChange("3G/4G");
   };
   const handleClose = () => setModal(false);
 
@@ -123,11 +123,10 @@ function MobilePrepaid() {
 
   const [planList, setPlanList] = useState([]);
   const [tabsData, setTabsData] = useState({
-    "2G": [],
     "3G/4G": [],
+    COMBO: [],
     Roaming: [],
     TOPUP: [],
-    FULLTT: [],
   });
 
   const rechargePageSchema = Yup.object().shape({
@@ -194,15 +193,13 @@ function MobilePrepaid() {
   } = method2;
 
   const TABS = [
-    { value: "2G", label: "2G" },
     { value: "3G/4G", label: "3G/4G" },
-    { value: "FULLTT", label: "FULLTT" },
+    { value: "COMBO", label: "COMBO" },
     { value: "Roaming", label: "Roaming" },
     { value: "TOPUP", label: "TOPUP" },
   ];
 
   const circleList = [
-    // { id: 1, name: "Delhi NCR", value: "Delhi NCR" },
     { id: 1, name: "Delhi", value: "Delhi NCR" },
     { id: 2, name: "Gujarat", value: "Gujarat" },
     { id: 3, name: "Haryana", value: "Haryana" },
@@ -233,19 +230,16 @@ function MobilePrepaid() {
     { id: 20, name: "TamilNadu", value: "Tamil Nadu" },
     { id: 21, name: "UPEast", value: "UP East" },
     { id: 22, name: "UP West and Uttaranchal", value: "UP West" },
-    // { id: 22, name: "UP West", value: "UP West" },
     { id: 23, name: "WestBengal", value: "West Bengal" },
   ];
 
   function tabChange(val: any) {
     setPlanCurrentTab(val);
     if (val == "3G/4G") {
-      setPlanList(tabsData["2G"] || []);
-    } else if (val == "2G") {
       setPlanList(tabsData["3G/4G"] || []);
-    } else if (val == "FULLTT") {
-      setPlanList(tabsData.FULLTT || []);
-    } else if (val == "Roaming") {
+    } else if (val == "COMBO") {
+      setPlanList(tabsData.COMBO || []);
+    } else if (val == "Romaing") {
       setPlanList(tabsData.Roaming || []);
     } else if (val == "TOPUP") {
       setPlanList(tabsData.TOPUP || []);
@@ -263,9 +257,13 @@ function MobilePrepaid() {
   };
 
   useEffect(() => {
-    subCategoryContext &&
-      getProductFilter(categoryContext._id, subCategoryContext);
-  }, [subCategoryContext]);
+    subCategoryContext?.subcategoryId &&
+      subCategoryContext?.categoryId &&
+      getProductFilter(
+        subCategoryContext?.categoryId,
+        subCategoryContext?.subcategoryId
+      );
+  }, [subCategoryContext?.subcategoryId]);
 
   useEffect(() => {
     if (watch("mobileNumber").length === 10) {
@@ -281,18 +279,11 @@ function MobilePrepaid() {
     let token = localStorage.getItem("token");
     Api(`agents/v1/getOperator/${val}`, "GET", "", token).then(
       (Response: any) => {
-        console.log("==========>>getOperator Filter", Response);
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             setValue("operator", Response.data.data.operatorid);
             setValue("operatorName", Response.data.data.plan_operator);
             setValue("circle", Response.data.data.circle);
-            console.log("=====getOperator filter code 200", Response.data.data);
-          } else {
-            console.log(
-              "==============>>> getOperator mobile number",
-              Response.massage
-            );
           }
         }
       }
@@ -307,13 +298,9 @@ function MobilePrepaid() {
       productFor: "",
     };
     Api("product/product_Filter", "POST", body, token).then((Response: any) => {
-      console.log("==========>>product Filter", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           setOperatorList(Response.data.data);
-          console.log("=====product filter code 200", Response.data.data);
-        } else {
-          console.log("==============>>> post mobile number", Response.massage);
         }
       }
     });
@@ -324,10 +311,8 @@ function MobilePrepaid() {
     let token = localStorage.getItem("token");
     let body = {
       circle: circleList.filter((item: any) => {
-        return item.name === getValues("circle");
+        return item.value === getValues("circle");
       })[0]?.value,
-
-      // circle: getValues("circle"),
       operator: getValues("operatorName"),
     };
     Api("agents/v1/get_plan", "POST", body, token).then((Response: any) => {
@@ -377,11 +362,11 @@ function MobilePrepaid() {
               main_wallet_amount:
                 Response?.data?.data?.agentDetails?.newMainWalletBalance,
             });
-            handleClose1();
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
             rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
           }
+          handleClose1();
         } else {
           enqueueSnackbar("Failed", { variant: "error" });
           rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
@@ -435,7 +420,7 @@ function MobilePrepaid() {
               }}
             >
               {circleList.map((item: any, index: any) => (
-                <MenuItem key={item.name} value={item.name}>
+                <MenuItem key={item.value} value={item.value}>
                   {item.name}
                 </MenuItem>
               ))}
@@ -444,11 +429,9 @@ function MobilePrepaid() {
           <RHFTextField
             name="amount"
             label="Amount"
-            placeholder="amount"
+            type="number"
+            placeholder="Amount"
             InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">₹</InputAdornment>
-              ),
               endAdornment: (
                 <LoadingButton
                   variant="contained"
@@ -474,199 +457,157 @@ function MobilePrepaid() {
         </LoadingButton>
       </FormProvider>
 
-      <Modal
+      <MotionModal
         open={open}
         onClose={handleClose}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
+        width={{ xs: "95%", sm: "70%" }}
+        sx={{
+          maxHeight: "85%",
+          outline: "none",
+          background: "white",
+          overflow: "auto",
+          border: "16px 0 0 16px",
+          scrollbarWidth: "none",
+          cursor: "pointer",
+          borderRadius: "20px",
+        }}
       >
-        <Grid
-          item
-          // xs={12}
-          // md={8}
-          style={{
-            position: "relative",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "70%",
-            height: "85%",
-            outline: "none",
-            background: "white",
-            overflow: "auto",
-            border: "16px 0 0 16px",
-            scrollbarWidth: "none",
-            cursor: "pointer",
-            borderRadius: "20px",
-          }}
-        >
-          <Scrollbar sx={{ scrollbarWidth: "thin" }}>
-            <TableContainer
-              sx={{ p: 3 }}
-              style={{ borderBottom: "1px solid #BBBFBF" }}
-            >
-              <Card>
+        <Scrollbar sx={{ scrollbarWidth: "thin" }}>
+          <TableContainer>
+            {planList.length ? (
+              <>
                 <Tabs
-                  sx={{ background: "#F4F6F8" }}
+                  // sx={{ background: "#F4F6F8" }}
                   value={planCurrentTab}
+                  variant="standard"
                   onChange={(event, newValue) => tabChange(newValue)}
                 >
                   {TABS.map((tab) => (
-                    <Tab
-                      key={tab.value}
-                      sx={{ mx: 3 }}
-                      label={tab.label}
-                      value={tab.value}
-                    />
+                    <Tab key={tab.value} label={tab.label} value={tab.value} />
                   ))}
                 </Tabs>
-              </Card>
-
-              <Grid>
-                {planList.map((item: any, index: any) => (
-                  <TableContainer
-                    sx={{ px: 1 }}
-                    style={{ borderBottom: "1px solid #BBBFBF" }}
-                    key={index}
-                  >
-                    <Stack
-                      flexDirection={"row"}
-                      justifyContent={"space-between"}
-                      onClick={() => {
-                        setValue("amount", item.rs);
-                        handleClose();
-                      }}
+                <Grid>
+                  {planList.map((item: any, index: any) => (
+                    <TableContainer
+                      style={{ borderBottom: "1px solid #BBBFBF" }}
+                      key={index}
                     >
-                      <TableCell
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
+                      <Stack
+                        flexDirection={"row"}
+                        justifyContent={"space-between"}
+                        onClick={() => {
+                          setValue("amount", item.rs);
+                          handleClose();
                         }}
-                        sx={{ px: 0 }}
-                        key={index}
                       >
-                        Validity: {item.validity}
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          boxShadow: "0px 1px 10px #BBBFBF",
-                          borderRadius: "15px",
-                        }}
-                        sx={{ px: 2, py: 0, my: 2 }}
-                        key={index}
-                      >
-                        <Iconify
-                          width={15}
-                          icon="material-symbols:currency-rupee"
-                        />
-                        {item.rs}
-                      </TableCell>
-                    </Stack>
-                    <TableRow style={{ textAlign: "justify" }} key={index}>
-                      {item.desc}
-                    </TableRow>
-                  </TableContainer>
-                ))}
-              </Grid>
-            </TableContainer>
-          </Scrollbar>
-        </Grid>
-      </Modal>
-      <Modal
-        open={open1}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+                        <TableCell
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                          sx={{ px: 0 }}
+                          key={index}
+                        >
+                          Validity: {item.validity}
+                        </TableCell>
+                        <TableCell
+                          style={{
+                            boxShadow: "0px 1px 10px #BBBFBF",
+                            borderRadius: "15px",
+                          }}
+                          sx={{ px: 2, py: 0, my: 2 }}
+                          key={index}
+                        >
+                          <Iconify
+                            width={15}
+                            icon="material-symbols:currency-rupee"
+                          />
+                          {item.rs}
+                        </TableCell>
+                      </Stack>
+                      <TableRow style={{ textAlign: "justify" }} key={index}>
+                        {item.desc}
+                      </TableRow>
+                    </TableContainer>
+                  ))}
+                </Grid>
+              </>
+            ) : (
+              <Typography variant="h4" textAlign={"center"}>
+                {" "}
+                No Plans Found{" "}
+              </Typography>
+            )}
+            <Stack flexDirection={"row"} justifyContent={"end"} my={2}></Stack>
+          </TableContainer>
+        </Scrollbar>
+        <Button variant="contained" size="small" onClick={handleClose}>
+          Close
+        </Button>
+      </MotionModal>
+      <MotionModal open={open1} width={{ xs: "95%", md: 500 }}>
         <FormProvider methods={method2} onSubmit={handleOtpSubmit(formSubmit)}>
-          <Box
-            sx={style}
-            style={{ borderRadius: "20px" }}
-            width={{ xs: "100%", sm: 450 }}
-            minWidth={350}
+          <Typography variant="h4" textAlign={"center"}>
+            Confirm Details
+          </Typography>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Amount</Typography>
+            <Typography variant="body1">{getValues("amount")}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Operator</Typography>
+            <Typography variant="body1">{getValues("operatorName")}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">circle</Typography>
+            <Typography variant="body1">{getValues("circle")}</Typography>
+          </Stack>
+          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+            <Typography variant="subtitle1">Mobile Number</Typography>
+            <Typography variant="body1">{getValues("mobileNumber")}</Typography>
+          </Stack>
+          <Stack
+            alignItems={"center"}
+            justifyContent={"space-between"}
+            mt={2}
+            gap={2}
           >
-            <Typography variant="h4" textAlign={"center"}>
-              Confirm Details
-            </Typography>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Amount</Typography>
-              <Typography variant="body1">{getValues("amount")}</Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Operator</Typography>
-              <Typography variant="body1">
-                {getValues("operatorName")}
-              </Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">circle</Typography>
-              <Typography variant="body1">{getValues("circle")}</Typography>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              justifyContent={"space-between"}
-              mt={2}
-            >
-              <Typography variant="subtitle1">Mobile Number</Typography>
-              <Typography variant="body1">
-                {getValues("mobileNumber")}
-              </Typography>
-            </Stack>
-            <Stack
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              mt={2}
-              gap={2}
-            >
-              <Typography variant="h4">Confirm NPIN</Typography>
-              <RHFSecureCodes
-                keyName="otp"
-                inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-                type="password"
-              />
+            <Typography variant="h4">Confirm NPIN</Typography>
+            <RHFSecureCodes
+              keyName="otp"
+              inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+            />
 
-              {(!!error2.otp1 ||
-                !!error2.otp2 ||
-                !!error2.otp3 ||
-                !!error2.otp4 ||
-                !!error2.otp5 ||
-                !!error2.otp6) && (
-                <FormHelperText error sx={{ px: 2 }}>
-                  Code is required
-                </FormHelperText>
-              )}
-            </Stack>
-            <Stack flexDirection={"row"} gap={1} mt={2}>
-              <LoadingButton
-                type="submit"
-                variant="contained"
-                loading={rechargeState.isLoading}
-              >
-                Confirm
-              </LoadingButton>
-              <LoadingButton
-                variant="contained"
-                color="warning"
-                onClick={handleClose1}
-              >
-                Close
-              </LoadingButton>
-            </Stack>
-            {/* )} */}
-          </Box>
+            {(!!error2.otp1 ||
+              !!error2.otp2 ||
+              !!error2.otp3 ||
+              !!error2.otp4 ||
+              !!error2.otp5 ||
+              !!error2.otp6) && (
+              <FormHelperText error sx={{ px: 2 }}>
+                Code is required
+              </FormHelperText>
+            )}
+          </Stack>
+          <Stack flexDirection={"row"} gap={1} mt={2}>
+            <LoadingButton
+              type="submit"
+              variant="contained"
+              loading={rechargeState.isLoading}
+            >
+              Confirm
+            </LoadingButton>
+            <LoadingButton
+              variant="contained"
+              color="warning"
+              onClick={handleClose1}
+            >
+              Close
+            </LoadingButton>
+          </Stack>
+          {/* )} */}
         </FormProvider>
-      </Modal>
+      </MotionModal>
     </>
   );
 }
