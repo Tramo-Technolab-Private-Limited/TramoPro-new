@@ -216,12 +216,12 @@ function NewFundRequest({ getRaisedRequest }: props) {
     formState: { errors, isSubmitting },
   } = methods;
 
-  console.log(
-    errors?.filePath?.type == "required" && errors?.filePath?.message
-  );
-
   //upload file
   const handleFile = (e: any) => {
+    if (e.target.files[0].size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -292,7 +292,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
             getRaisedRequest();
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -322,7 +322,6 @@ function NewFundRequest({ getRaisedRequest }: props) {
   }, [watch("amount")]);
 
   const calculateFee = (type: any, value: any, option: any) => {
-    console.log(value, option);
     let amount: any = getValues("amount");
 
     if (option == "flat") setValue("feeCalc", value);

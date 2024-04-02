@@ -68,13 +68,13 @@ export default function AuthLoginForm() {
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
-  useEffect(() => requestPermission(), [])
+  useEffect(() => requestPermission(), []);
 
   const onSubmit = async (data: FormValuesProps) => {
     let body = {
       username: data.email.toLocaleLowerCase(),
       password: data.password,
-      FCM_token: sessionStorage.getItem('fcm')
+      FCM_token: sessionStorage.getItem("fcm"),
     };
     try {
       await Api(`auth/login_in`, "POST", body, "").then((Response: any) => {
@@ -91,10 +91,10 @@ export default function AuthLoginForm() {
             );
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         } else {
-          enqueueSnackbar("Server Error");
+          enqueueSnackbar("Server Error", { variant: "error" });
         }
       });
     } catch (error) {

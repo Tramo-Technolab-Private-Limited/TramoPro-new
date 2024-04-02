@@ -237,6 +237,10 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
 
   //upload file
   const handleFile = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -310,7 +314,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
           getRaisedRequest();
           enqueueSnackbar(Response.data.message);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
         handleClose();
       }

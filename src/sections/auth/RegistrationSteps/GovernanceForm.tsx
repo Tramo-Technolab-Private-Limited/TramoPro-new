@@ -235,7 +235,7 @@ export default function GovernanceForm(props: any) {
               setVerifyDetail(true);
               setLoading(false);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
               setLoading(false);
             }
           }
@@ -256,6 +256,7 @@ export default function GovernanceForm(props: any) {
     if (radioVal !== "") {
       let body = {
         business_name: data.BusinessName,
+        address: data.BusinessName,
         state_jurisdiction: data.stateJurisdiction,
         taxpayer_type: data.taxpayerType,
         district: data.district,
@@ -293,7 +294,7 @@ export default function GovernanceForm(props: any) {
               constitutionType: radioVal,
             });
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       });
@@ -331,7 +332,7 @@ export default function GovernanceForm(props: any) {
               isGST: !valueTabs,
             });
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       });

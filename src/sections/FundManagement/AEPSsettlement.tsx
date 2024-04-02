@@ -16,6 +16,7 @@ import FormProvider, {
   RHFTextField,
   RHFCodes,
   RHFSelect,
+  RHFSecureCodes,
 } from "src/components/hook-form";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
@@ -62,7 +63,7 @@ export default function AEPSsettlement() {
           if (Response.data.data.length)
             setUserBankList(Response.data.data[0].bankAccounts);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -220,7 +221,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
           if (Response.data.code == 200) {
             setEligibleSettlementAmount(Response.data.data);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -252,7 +253,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
             reset(defaultValues);
             setValue("accountNumber", defaultAccountNumber);
             setValue("ifsc", defaultIfsc);
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
           }
@@ -355,7 +356,7 @@ const SettlementToBank = ({ userBankList }: childProps) => {
                         </Typography>
                         {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
                       </Stack>
-                      <RHFCodes
+                      <RHFSecureCodes
                         keyName="otp"
                         inputs={[
                           "otp1",
@@ -505,7 +506,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
             setEligibleSettlementAmount(Response.data.data);
             // enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
       }
@@ -534,7 +535,7 @@ const SettlementToMainWallet = ({ userBankList }: childProps) => {
             handleClose();
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setIsSubmitLoading(false);
         } else {

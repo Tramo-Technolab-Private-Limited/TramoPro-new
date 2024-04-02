@@ -310,6 +310,10 @@ function PersonalIdentification(props: any) {
   };
 
   const aadharFrontupload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     let token = localStorage.getItem("token");
     setAadharFlie1(true);
     console.log("aadhar file", e.target.files[0]);
@@ -356,6 +360,10 @@ function PersonalIdentification(props: any) {
   });
 
   const aadharBackupload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieBack(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -399,6 +407,10 @@ function PersonalIdentification(props: any) {
   });
 
   const panUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     let token = localStorage.getItem("token");
     setAadharFliePan(true);
     new Compressor(e.target.files[0], {
@@ -442,6 +454,10 @@ function PersonalIdentification(props: any) {
   });
 
   const uploadCheque = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieCheque(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -488,6 +504,10 @@ function PersonalIdentification(props: any) {
   });
 
   const selfieUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieSelfie(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -532,6 +552,10 @@ function PersonalIdentification(props: any) {
   });
 
   const uploadshop = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieShop(true);
 
     let token = localStorage.getItem("token");
@@ -1712,7 +1736,10 @@ function ConstitutionIdentification() {
   }, []);
 
   const gstCertificateUpload = (e: any) => {
-    console.log("gst");
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
 
     setAadharFlieMSME(true);
     let token = localStorage.getItem("token");
@@ -1759,6 +1786,10 @@ function ConstitutionIdentification() {
   });
 
   const otherCertificateUpload = () => {
+    if (otherCertificateFile?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setSuccessOtherCertificate("wait");
     let token = localStorage.getItem("token");
     let formData = new FormData();
@@ -1782,6 +1813,10 @@ function ConstitutionIdentification() {
   };
 
   const businessProofUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieBusPrf(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -1814,6 +1849,10 @@ function ConstitutionIdentification() {
   };
 
   const businessPanUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     console.log("bpan");
     setAadharFlieBusPan(true);
     let token = localStorage.getItem("token");
@@ -1857,6 +1896,10 @@ function ConstitutionIdentification() {
   });
 
   const partnershipDeedUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFliepDeed(true);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -1902,6 +1945,10 @@ function ConstitutionIdentification() {
   });
 
   const boardResolutionUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     console.log("brdr");
     setAadharFlieBrdRes(true);
     let token = localStorage.getItem("token");
@@ -1948,6 +1995,10 @@ function ConstitutionIdentification() {
   });
 
   const COIUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieCOI(false);
     console.log("coi");
     let token = localStorage.getItem("token");
@@ -1991,6 +2042,10 @@ function ConstitutionIdentification() {
   });
 
   const MOAUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     console.log("moa");
     setAadharFlieMOA(false);
     let token = localStorage.getItem("token");
@@ -2034,6 +2089,10 @@ function ConstitutionIdentification() {
   });
 
   const AOAUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieAOA(false);
     console.log("aoa");
     let token = localStorage.getItem("token");
@@ -2079,6 +2138,10 @@ function ConstitutionIdentification() {
   });
 
   const consentLetterUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFlieNominatedPartner(false);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {
@@ -2124,6 +2187,10 @@ function ConstitutionIdentification() {
   });
 
   const DPINUpload = (e: any) => {
+    if (e.target.files[0]?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setAadharFliePartnerIdentity(false);
     let token = localStorage.getItem("token");
     new Compressor(e.target.files[0], {

@@ -55,7 +55,7 @@ export default function (props: any) {
   const tableLabels = [
     { id: "Date", label: "Date & Time" },
     { id: "amount", label: "Amount" },
-    { id: "modeType", label: "ModeType" },
+    { id: "modeType", label: "Mode Type" },
     { id: "Charge", label: "Charge" },
     { id: "Commission", label: "Commission" },
     { id: " deposit_type", label: " Deposit Type" },
@@ -143,7 +143,7 @@ export default function (props: any) {
             setSdata(Response.data.data);
           } else {
             console.log("======getRaisedRequests=======>" + Response);
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setIsLoading(false);
         } else {
@@ -202,8 +202,6 @@ export default function (props: any) {
     },
   }));
 
-
-
   const SearchData = (data: FormValuesProps) => {
     setSdata([]);
     let token = localStorage.getItem("token");
@@ -232,7 +230,7 @@ export default function (props: any) {
             setSdata(Response.data.data);
           } else {
             console.log("======getRaisedRequests=======>" + Response);
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setIsLoading(false);
         } else {
@@ -260,47 +258,49 @@ export default function (props: any) {
       ) : (
         <Grid item xs={16} md={12} lg={12}>
           <FormProvider methods={methods} onSubmit={handleSubmit(SearchData)}>
-            <Stack direction="row" gap={2} mt={2} mb={2}>
+            <Stack direction="row" gap={1} mt={2} mb={2}>
               <Stack>
-              <Stack direction={"row"} gap={1}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DatePicker
-                    label="Start date"
-                    inputFormat="DD/MM/YYYY"
-                    value={watch("startDate")}
-                    maxDate={new Date()}
-                    onChange={(newValue: any) =>
-                      setValue("startDate", newValue)
-                    }
-                    renderInput={(params: any) => (
-                      <TextField
-                        {...params}
-                        size={"small"}
-                        sx={{ width: 150 }}
-                      />
-                    )}
-                  />
-                  <DatePicker
-                    label="End date"
-                    inputFormat="DD/MM/YYYY"
-                    value={watch("endDate")}
-                    minDate={watch("startDate")}
-                    maxDate={
-                      watch("startDate")
-                        ? dayjs(watch("startDate")).add(31, "days").toDate()
-                        : null
-                    }
-                    onChange={(newValue: any) => setValue("endDate", newValue)}
-                    renderInput={(params: any) => (
-                      <TextField
-                        {...params}
-                        size={"small"}
-                        sx={{ width: 150 }}
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-              </Stack>
+                <Stack direction={"row"} gap={1}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="Start date"
+                      inputFormat="DD/MM/YYYY"
+                      value={watch("startDate")}
+                      maxDate={new Date()}
+                      onChange={(newValue: any) =>
+                        setValue("startDate", newValue)
+                      }
+                      renderInput={(params: any) => (
+                        <TextField
+                          {...params}
+                          size={"small"}
+                          sx={{ width: 200 }}
+                        />
+                      )}
+                    />
+                    <DatePicker
+                      label="End date"
+                      inputFormat="DD/MM/YYYY"
+                      value={watch("endDate")}
+                      minDate={watch("startDate")}
+                      maxDate={
+                        watch("startDate")
+                          ? dayjs(watch("startDate")).add(31, "days").toDate()
+                          : null
+                      }
+                      onChange={(newValue: any) =>
+                        setValue("endDate", newValue)
+                      }
+                      renderInput={(params: any) => (
+                        <TextField
+                          {...params}
+                          size={"small"}
+                          sx={{ width: 200 }}
+                        />
+                      )}
+                    />
+                  </LocalizationProvider>
+                </Stack>
               </Stack>
               <RHFSelect
                 name="Paymentmode"
@@ -377,7 +377,10 @@ export default function (props: any) {
                   >
                     <StyledTableCell>
                       <Typography variant="body1">
-                        {fDateTime(row?.createdAt)}
+                        createdAt{fDateTime(row?.createdAt)}
+                      </Typography>
+                      <Typography variant="body1">
+                        updatedAt{fDateTime(row?.actionDate)}
                       </Typography>
                     </StyledTableCell>
 
@@ -432,7 +435,8 @@ export default function (props: any) {
                       <Label
                         variant="soft"
                         color={
-                          (row.status.toLowerCase() === "failed" && "error") ||
+                          (row.status.toLowerCase() === "rejected" &&
+                            "error") ||
                           ((row.status.toLowerCase() === "pending" ||
                             row.status.toLowerCase() === "in_process") &&
                             "warning") ||

@@ -125,6 +125,7 @@ export default function DMT() {
     bgcolor: "#ffffff",
     boxShadow: 24,
     borderRadius: 2,
+    width: { xs: "95%", md: 500 },
     p: 4,
   };
 
@@ -154,9 +155,9 @@ export default function DMT() {
               SendOTP(data.mobileNumber);
               openEditModal2();
             }
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "warning" });
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         } else {
           remitterDispatch({ type: "REMITTER_NOT_FOUND" });
@@ -176,7 +177,7 @@ export default function DMT() {
           enqueueSnackbar(Response.data.message);
           console.log("==============>>> sendOtp data 200", Response.data.data);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           console.log(
             "==============>>> sendOtp message",
             Response.data.message
@@ -207,9 +208,9 @@ export default function DMT() {
               SendOTP(val);
               openEditModal2();
             }
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "warning" });
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         } else {
           remitterDispatch({ type: "SERVER_ERROR" });
@@ -234,12 +235,8 @@ export default function DMT() {
         <title>Money Transfer |{process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-        <Grid
-          container
-          spacing={2}
-          sx={{ maxHeight: window.innerHeight - 250 }}
-        >
-          <Grid item sm={4}>
+        <Grid container spacing={2}>
+          <Grid item sm={3}>
             <Box
               rowGap={2}
               columnGap={2}
@@ -282,7 +279,7 @@ export default function DMT() {
             </Typography>
             {remitter.remitterfetch && <DMTRemitterDetail />}
           </Grid>
-          <Grid item xs={12} sm={8}>
+          <Grid item xs={12} sm={9}>
             {remitter.remitterfetch && <DMTbeneficiary />}
           </Grid>
         </Grid>
@@ -372,7 +369,7 @@ const OtpSubmissionForRegistrantion = ({
               Response.data.data.message
             );
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
             setIsLoading(false);
             console.log(
               "==============>>> register remmiter message",
@@ -477,7 +474,7 @@ const NewRegistration = ({ mobilenumber, handleNewRegistaion }: any) => {
           setIsLoading(false);
           handleNewRegistaion("SUCCESS");
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
           setIsLoading(false);
           handleNewRegistaion("FAIL");
         }

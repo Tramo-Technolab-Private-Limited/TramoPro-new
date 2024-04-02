@@ -96,7 +96,7 @@ const Reducer = (state: any, action: any) => {
         beneVerified: true,
       };
     case "VERIFY_FETCH_FAILURE":
-      return { ...state, isLoading: false, data: {} };
+      return { ...state, isLoading: false, data: {}, beneVerified: false };
     case "GET_BENE_REQUEST":
       return { ...state, isLoading: true };
     case "GET_BENE_SUCCESS":
@@ -204,7 +204,7 @@ export default function DMTbeneficiary() {
           });
         } else {
           getbeneDispatch({ type: "GET_BENE_FAILURE" });
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -258,7 +258,7 @@ export default function DMTbeneficiary() {
               });
             } else {
               remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }
@@ -291,14 +291,17 @@ export default function DMTbeneficiary() {
             type: "ADD_BENE_SUCCESS",
             payload: Response.data.data,
           });
+          remitterVerifyDispatch({
+            type: "VERIFY_FETCH_FAILURE",
+          });
           enqueueSnackbar(Response.data.message);
           handleClose();
         } else {
           addbeneDispatch({ type: "ADD_BENE_FAILURE" });
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       } else {
-        enqueueSnackbar("Internal server error");
+        enqueueSnackbar("Internal server error", { variant: "error" });
         addbeneDispatch({ type: "ADD_BENE_FAILURE" });
       }
     });
@@ -320,7 +323,7 @@ export default function DMTbeneficiary() {
   }
   return (
     <>
-      <Grid sx={{ maxHeight: window.innerHeight - 170 }}>
+      <Grid>
         {getBene.isLoading ? (
           <ApiDataLoading />
         ) : (
@@ -337,8 +340,8 @@ export default function DMTbeneficiary() {
               <Scrollbar
                 sx={
                   isMobile
-                    ? { maxHeight: window.innerHeight - 250 }
-                    : { maxHeight: window.innerHeight - 440 }
+                    ? { maxHeight: window.innerHeight - 170 }
+                    : { maxHeight: window.innerHeight - 470 }
                 }
               >
                 <Table
@@ -587,11 +590,11 @@ const BeneList = React.memo(
                 main_wallet_amount: user?.main_wallet_amount - 3,
               });
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
             setVarifyStatus(true);
           } else {
-            enqueueSnackbar("Internal server error");
+            enqueueSnackbar("Internal server error", { variant: "error" });
             setVarifyStatus(true);
           }
         }
@@ -606,7 +609,7 @@ const BeneList = React.memo(
             if (Response.data.code == 200) {
               enqueueSnackbar(Response.data.message);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }
@@ -629,7 +632,7 @@ const BeneList = React.memo(
               setDeleteOtp("");
               deleteBene(row._id);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
             setIsLoading(false);
           } else {

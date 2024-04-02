@@ -216,7 +216,7 @@ export default function MyStats(props: any) {
   return (
     <>
       <MotionContainer>
-        <m.div variants={varZoom().in}>
+        <m.div>
           <Helmet>
             <title> My Stats | {process.env.REACT_APP_COMPANY_NAME} </title>
           </Helmet>

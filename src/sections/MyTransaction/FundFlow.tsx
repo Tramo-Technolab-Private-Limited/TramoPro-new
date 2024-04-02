@@ -51,6 +51,7 @@ type FormValuesProps = {
   clientRefId: string;
   startDate: Date | null;
   endDate: Date | null;
+  transactionType: string;
 };
 
 export default function FundFlow() {
@@ -68,6 +69,7 @@ export default function FundFlow() {
   });
 
   const defaultValues = {
+    transactionType: "",
     category: "",
     status: "",
     clientRefId: "",
@@ -119,7 +121,7 @@ export default function FundFlow() {
       },
       clientRefId: getValues("clientRefId"),
       status: getValues("status"),
-      transactionType: "",
+      transactionType: getValues("transactionType"),
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
     };
@@ -132,7 +134,7 @@ export default function FundFlow() {
             setPageCount(Response.data.data.totalNumberOfRecords);
             enqueueSnackbar(Response.data.message);
           } else {
-            enqueueSnackbar(Response.data.message);
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
           setLoading(false);
         } else {
@@ -169,10 +171,9 @@ export default function FundFlow() {
       },
       clientRefId: data.clientRefId,
       status: data.status,
-      transactionType: "",
+      transactionType: data.transactionType,
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
-
     };
     Api(`transaction/fund_flow_transaction`, "POST", body, token).then(
       (Response: any) => {
@@ -220,6 +221,18 @@ export default function FundFlow() {
               spacing={2}
               style={{ padding: "0 25px", marginBottom: "10px" }}
             >
+              <RHFSelect
+                name="transactionType"
+                label="Transaction Type"
+                placeholder="transaction Type"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
+                }}
+              >
+                <MenuItem value={"credit"}>Credit</MenuItem>
+                <MenuItem value={"debit"}>Debit</MenuItem>
+              </RHFSelect>
               <RHFSelect
                 name="status"
                 label="Status"
@@ -382,7 +395,7 @@ const TransactionRow = React.memo(({ row }: childProps) => {
         {/* From */}
         <TableCell>
           {newRow?.walletLedgerData?.from?.id ==
-            newRow?.adminDetails.id?._id ? (
+          newRow?.adminDetails.id?._id ? (
             <Stack flexDirection={"row"} gap={1}>
               <CustomAvatar
                 name={newRow?.adminDetails?.id?.email}
@@ -416,6 +429,11 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                 </Typography>
                 <Typography variant="body2">
                   {newRow?.agentDetails?.id?.userCode}
+                </Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {newRow?.agentDetails?.id?.company_name
+                    ? newRow?.agentDetails?.id?.company_name
+                    : " No Shop Name "}
                 </Typography>
               </Stack>
             </Stack>
@@ -470,6 +488,11 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                 <Typography variant="body2">
                   {newRow?.agentDetails?.id?.userCode}
                 </Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {newRow?.agentDetails?.id?.company_name
+                    ? newRow?.agentDetails?.id?.company_name
+                    : " No Shop Name "}
+                </Typography>
               </Stack>
             </Stack>
           )}
@@ -511,6 +534,11 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                 <Typography variant="body2">
                   {newRow?.agentDetails?.id?.userCode}
                 </Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {newRow?.agentDetails?.id?.company_name
+                    ? newRow?.agentDetails?.id?.company_name
+                    : " No Shop Name "}
+                </Typography>
               </Stack>
             </Stack>
           ) : newRow?.walletLedgerData?.to?.id ==
@@ -529,11 +557,16 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                 <Typography variant="body2">
                   {newRow?.distributorDetails?.id?.userCode}
                 </Typography>
+                <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                  {newRow?.company_name
+                    ? newRow?.company_name
+                    : " No Shop Name "}
+                </Typography>
               </Stack>
             </Stack>
           ) : (
             newRow?.walletLedgerData?.to?.id ==
-            newRow.masterDistributorDetails.id?._id && (
+              newRow.masterDistributorDetails.id?._id && (
               <Stack flexDirection={"row"} gap={1}>
                 <CustomAvatar
                   name={newRow?.masterDistributorDetails?.id?.firstName}
@@ -547,6 +580,11 @@ const TransactionRow = React.memo(({ row }: childProps) => {
                   </Typography>
                   <Typography variant="body2">
                     {newRow?.masterDistributorDetails?.id?.userCode}
+                  </Typography>
+                  <Typography variant="body2" sx={{ color: "text.secondary" }}>
+                    {newRow?.company_name
+                      ? newRow?.company_name
+                      : " No Shop Name "}
                   </Typography>
                 </Stack>
               </Stack>

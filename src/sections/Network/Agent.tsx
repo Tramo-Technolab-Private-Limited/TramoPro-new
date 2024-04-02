@@ -11,6 +11,7 @@ import {
   Typography,
   TableContainer,
   Pagination,
+  Button,
 } from "@mui/material";
 // components
 import { Api } from "src/webservices";
@@ -22,15 +23,17 @@ import useResponsive from "src/hooks/useResponsive";
 import { CustomAvatar } from "src/components/custom-avatar";
 import { fIndianCurrency } from "src/utils/formatNumber";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
+import MotionModal from "src/components/animate/MotionModal";
+import FundFlow from "../FundManagement/FundFlow";
 import FormProvider, {
   RHFSelect,
   RHFTextField,
 } from "../../components/hook-form";
-
 import { LoadingButton } from "@mui/lab";
-import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import DirectFundTransfer from "./DirectFundTransfer";
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -56,14 +59,32 @@ type RowProps = {
   role: string;
   createdAt: string;
   selfie: any;
+  company_name: any;
 };
+
+export let handleClosefunTrans: any;
 
 export default function Agent() {
   const [appdata, setAppdata] = useState([]);
   const isMobile = useResponsive("up", "sm");
+  const [open, setModalEdit] = React.useState(false);
   const [pageSize, setPageSize] = useState<any>(25);
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [TotalCount, setTotalCount] = useState<any>(0);
+  const [openFundtrans, setFundTrans] = React.useState(false);
+  const [selectedRow, setSelectedRow] = useState<any>();
+
+  handleClosefunTrans = () => setFundTrans(false);
+  const tableLabels: any = [
+    { id: "product", label: "Name" },
+    { id: "due", label: "User Code" },
+    { id: "mobileNumber", label: "Mobile Number & email" },
+    { id: "main_wallet_amount", label: "Current Balance" },
+    { id: "maxComm", label: "Member Since" },
+    { id: "schemeId", label: "Scheme Id" },
+    { id: "status", label: "Status" },
+    { id: "fundtrans", label: "Fund Transfer", align: "center" },
+  ];
 
   type FormValuesProps = {
     status: string;
@@ -97,17 +118,6 @@ export default function Agent() {
     handleSubmit,
     formState: { isSubmitting },
   } = methods;
-
-  const tableLabels: any = [
-    { id: "product", label: "Name" },
-    { id: "due", label: "User Code" },
-    { id: "mobileNumber", label: "Mobile Number & email" },
-    { id: "main_wallet_amount", label: "Current Balance" },
-    { id: "maxComm", label: "Member Since" },
-    { id: "schemeId", label: "Scheme Id" },
-    { id: "status", label: "Status" },
-  ];
-
   useEffect(() => {
     ApprovedList();
   }, [currentPage, pageSize]);
@@ -115,10 +125,9 @@ export default function Agent() {
   const ApprovedList = () => {
     let body = {
       filter: {
-        userName: "",
-        userCode: "",
-        email: "",
-        mobile: "",
+        shopName: getValues("shopName"),
+        userCode: getValues("userCode"),
+        mobile: getValues("mobile"),
       },
     };
 
@@ -158,6 +167,11 @@ export default function Agent() {
     setCurrentPage(value);
   };
 
+  const FundTransfer = (val: any) => {
+    setFundTrans(true);
+    setSelectedRow(val);
+    console.log("my value is ", val);
+  };
   return (
     <>
       <Stack>
@@ -197,12 +211,16 @@ export default function Agent() {
           <Scrollbar
             sx={{ maxHeight: window.innerHeight - (isMobile ? 140 : 50) }}
           >
-            <Table sx={{ minWidth: 720, mb: 10 }}>
+            <Table sx={{ minWidth: 720 }}>
               <TableHeadCustom headLabel={tableLabels} />
 
               <TableBody>
                 {appdata.map((row) => (
-                  <EcommerceBestSalesmanRow key={row} row={row} />
+                  <EcommerceBestSalesmanRow
+                    key={row}
+                    row={row}
+                    FundTransfer={FundTransfer}
+                  />
                 ))}
               </TableBody>
             </Table>
@@ -237,6 +255,13 @@ export default function Agent() {
           setCurrentPage(1);
         }}
       />
+      <MotionModal
+        open={openFundtrans}
+        onClose={handleClosefunTrans}
+        width={{ xs: "95%", sm: 500 }}
+      >
+        <DirectFundTransfer props={selectedRow} />
+      </MotionModal>
     </>
   );
 }
@@ -245,9 +270,13 @@ export default function Agent() {
 
 type EcommerceBestSalesmanRowProps = {
   row: RowProps;
+  FundTransfer: (row: RowProps) => void;
 };
-// sd
-function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
+
+function EcommerceBestSalesmanRow({
+  row,
+  FundTransfer,
+}: EcommerceBestSalesmanRowProps) {
   return (
     <TableRow>
       <TableCell sx={{ padding: "0px" }}>
@@ -262,6 +291,9 @@ function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
             <Typography variant="subtitle2"> {row.firstName} </Typography>
             <Typography variant="body2" sx={{ color: "text.secondary" }}>
               {row.email}
+            </Typography>
+            <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              {row?.company_name ? row?.company_name : " No Shop Name "}
             </Typography>
           </Box>
         </Stack>
@@ -283,6 +315,11 @@ function EcommerceBestSalesmanRow({ row }: EcommerceBestSalesmanRowProps) {
       </TableCell>
       <TableCell>{row.schemeId}</TableCell>
       <TableCell align="right">{row.verificationStatus}</TableCell>
+      <TableCell align="center">
+        <Button variant="contained" onClick={() => FundTransfer(row)}>
+          Fund Transfer
+        </Button>
+      </TableCell>
     </TableRow>
   );
 }

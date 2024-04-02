@@ -22,6 +22,7 @@ import { PATH_AUTH } from "../../routes/paths";
 import { useSnackbar } from "../../components/snackbar";
 import FormProvider, {
   RHFCodes,
+  RHFSecureCodes,
   RHFTextField,
 } from "../../components/hook-form";
 import Iconify from "../../components/iconify";
@@ -132,7 +133,7 @@ export default function CreateNpin() {
               UpdateUserDetail({ isNPIN: true });
               navigate(PATH_DASHBOARD.root);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           }
         }
@@ -152,7 +153,7 @@ export default function CreateNpin() {
           <Typography variant="subtitle1" sx={{ mb: 0 }}>
             TPIN
           </Typography>
-          <RHFCodes
+          <RHFSecureCodes
             keyName="code"
             inputs={["code1", "code2", "code3", "code4", "code5", "code6"]}
             type="password"
@@ -170,7 +171,7 @@ export default function CreateNpin() {
           <Typography variant="subtitle1" sx={{ mb: 0 }}>
             Confirm TPIN
           </Typography>
-          <RHFCodes
+          <RHFSecureCodes
             keyName="otp"
             inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
             type="password"

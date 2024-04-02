@@ -28,6 +28,7 @@ import { useSnackbar } from "../../../components/snackbar";
 import { Api } from "src/webservices";
 import FormProvider, {
   RHFCodes,
+  RHFSecureCodes,
   RHFSelect,
   RHFTextField,
 } from "../../../components/hook-form";
@@ -323,7 +324,7 @@ function VerifyNPIN({ data, handleClose }: any) {
                   Response?.data?.data?.agentDetails?.newMainWalletBalance,
               });
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
               console.log(
                 "==============>>> post mobile number",
                 Response.data.message
@@ -370,10 +371,9 @@ function VerifyNPIN({ data, handleClose }: any) {
             gap={2}
           >
             <Typography variant="h4">Confirm NPIN</Typography>
-            <RHFCodes
+            <RHFSecureCodes
               keyName="otp"
               inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-              type="password"
             />
 
             {(!!error2.otp1 ||
@@ -452,7 +452,7 @@ function FetchDetail({ data }: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });

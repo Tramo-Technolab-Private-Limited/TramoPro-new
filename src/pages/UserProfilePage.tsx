@@ -161,12 +161,12 @@ export default function UserProfilePage() {
       icon: <Iconify icon="ic:round-account-box" />,
       component: <Profile info={_userAbout} posts={_userFeeds} />,
     },
-    {
-      value: "My Network",
-      label: "My Network",
-      icon: <Iconify icon="eva:heart-fill" />,
-      component: <ProfileFollowers followers={_userFollowers} />,
-    },
+    // {
+    //   value: "My Network",
+    //   label: "My Network",
+    //   icon: <Iconify icon="eva:heart-fill" />,
+    //   component: <ProfileFollowers followers={_userFollowers} />,
+    // },
     // {
     //   value: 'friends',
     //   label: 'Friends',
@@ -360,6 +360,7 @@ export default function UserProfilePage() {
             transform: "translate(-50%, -50%)",
             bgcolor: "#ffffff",
             boxShadow: 24,
+            width: { xs: "95%", md: 600 },
             p: 4,
             borderRadius: "20px",
           }}

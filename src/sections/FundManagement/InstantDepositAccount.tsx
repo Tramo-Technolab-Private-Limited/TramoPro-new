@@ -311,7 +311,7 @@ export default function InstantDepositAccount() {
         enqueueSnackbar(Response.data.message);
       } else {
         console.log("======BankList=======>" + Response);
-        enqueueSnackbar(Response?.data?.message);
+        enqueueSnackbar(Response?.data?.message, { variant: "error" });
       }
     });
   };
@@ -388,7 +388,7 @@ export default function InstantDepositAccount() {
           setCustomerReg("Create Virtual Account");
         } else {
           console.log("======BankList=======>" + Response);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     );
@@ -404,7 +404,7 @@ export default function InstantDepositAccount() {
           enqueueSnackbar(Response.data.message);
         } else {
           console.log("======BankList=======>" + Response);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     );
@@ -458,6 +458,10 @@ export default function InstantDepositAccount() {
   };
 
   const uploadDoc = () => {
+    if (uploadFile?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setSuccess("wait");
     let doc = uploadFile;
     console.log("===file", uploadFile);

@@ -123,8 +123,8 @@ export default function VerifyCode(props: any) {
               enqueueSnackbar(Response.data.message);
               props.callback(true);
             } else {
-              enqueueSnackbar(Response.data.message);
-              enqueueSnackbar("Wrong OTP!");
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+              enqueueSnackbar("Wrong OTP!", { variant: "error" });
             }
           }
         }

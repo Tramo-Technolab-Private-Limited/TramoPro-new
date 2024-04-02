@@ -328,7 +328,7 @@ export default function AuthRegisterForm(props: any) {
           setResendotpEmail(true);
           setClearForm(false);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -356,7 +356,7 @@ export default function AuthRegisterForm(props: any) {
           setTimer(60);
           setResendOtp(true);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -375,7 +375,7 @@ export default function AuthRegisterForm(props: any) {
           setTimerEmail(60);
           setResendotpEmail(true);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -405,7 +405,7 @@ export default function AuthRegisterForm(props: any) {
           );
         } else {
           setLoading(false);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       } else {
         setLoading(false);
@@ -437,7 +437,7 @@ export default function AuthRegisterForm(props: any) {
           createUser();
         } else {
           setVerifyLoad(false);
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
     });
@@ -471,7 +471,7 @@ export default function AuthRegisterForm(props: any) {
           initialize();
           setVerifyLoad(false);
         } else {
-          enqueueSnackbar(Response.data.message);
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
         if (Response.data.code == 400) {
           setVerifyLoad(false);

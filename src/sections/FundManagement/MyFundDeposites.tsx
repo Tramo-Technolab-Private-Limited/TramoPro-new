@@ -184,6 +184,10 @@ function MyFundDeposits() {
   };
 
   const uploadDoc = () => {
+    if (uploadFile?.size > Math.pow(1024, 5))
+      return enqueueSnackbar("File size should be less than 5MB", {
+        variant: "error",
+      });
     setSuccess("wait");
     let doc = uploadFile;
     let token = localStorage.getItem("token");
@@ -248,7 +252,7 @@ function MyFundDeposits() {
               setDocUrl("");
               enqueueSnackbar(Response.data.message);
             } else {
-              enqueueSnackbar(Response.data.message);
+              enqueueSnackbar(Response.data.message, { variant: "error" });
               setVerifyLoading(false);
             }
           }
