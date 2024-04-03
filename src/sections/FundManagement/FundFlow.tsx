@@ -384,20 +384,9 @@ function FundFlow() {
                                 setFilteredUser([]);
                               }}
                             >
-                              <CustomAvatar
-                                src={item?.selfie[0]}
-                                alt={item?.firstName}
-                                name={item?.firstName}
-                              />
                               <Stack>
                                 <Typography variant="body2">
-                                  {item.firstName} {item.lastName}{" "}
-                                </Typography>{" "}
-                                <Typography variant="body2">
-                                  {item.userCode}
-                                </Typography>{" "}
-                                <Typography variant="body2">
-                                  {item.email}
+                                  {item.firstName} {item.lastName}{" "} ({item.userCode})
                                 </Typography>{" "}
                               </Stack>
                             </Stack>
