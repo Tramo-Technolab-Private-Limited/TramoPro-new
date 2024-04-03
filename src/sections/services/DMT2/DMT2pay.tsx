@@ -182,13 +182,13 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             if (Response.data.code == 200) {
               Response.data.response.map((element: any) => {
                 enqueueSnackbar(element.message);
+                TextToSpeak(element.message);
                 UpdateUserDetail({
                   main_wallet_amount:
                     element?.data?.agentDetails?.newMainWalletBalance,
                 });
               });
               setTransactionDetail(Response.data.response);
-              TextToSpeak(Response.data.message);
               handleClose();
               handleOpen1();
               setCount(5);
