@@ -710,6 +710,7 @@ const UploadPan = React.memo(({ data, setStep }: any) => {
         enqueueSnackbar("Failed", {
           variant: "error",
         });
+        setIsSubmitLoading(false);
       }
     });
   };
