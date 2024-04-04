@@ -941,6 +941,7 @@ const DynamicForm = ({ data, setStep }: any) => {
 
   const {
     setValue,
+    getValues,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = methods;
@@ -1042,12 +1043,17 @@ const DynamicForm = ({ data, setStep }: any) => {
                 disabled
                 // onChange={(e) => setValue(item?.field, e.target.value)}
               />
-              <RHFSlider
-                name={`loanApplicationDetails.${item?.field}`}
-                min={item?.lowerBound}
-                max={item?.upperBound}
-                step={item?.lowerBound}
-              />
+              <Stack flexDirection={"row"} gap={0.5}>
+                <RHFSlider
+                  name={`loanApplicationDetails.${item?.field}`}
+                  min={item?.lowerBound}
+                  max={item?.upperBound}
+                  step={item?.lowerBound}
+                />
+                <Typography>
+                  {getValues(`loanApplicationDetails.${item?.field}`)}
+                </Typography>
+              </Stack>
             </Stack>
           );
         })}
