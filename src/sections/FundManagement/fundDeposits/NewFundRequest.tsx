@@ -107,12 +107,12 @@ type props = {
 };
 
 function NewFundRequest({ getRaisedRequest }: props) {
+  const { user } = useAuthContext();
   const bankListContext = useContext(BankAccountContext);
   const [amountMinMaxValidation, setAmountMinMaxValidation] = useState({
     min: 0,
     max: 0,
   });
-  const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [paymentModes, setPaymentModes] = useState<any>([]);
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
@@ -387,7 +387,41 @@ function NewFundRequest({ getRaisedRequest }: props) {
                     setValue("amount", 0);
                   }}
                 >
-                  {item.modeName}
+                  {item.modeName} (
+                  {item.transactionFeeType +
+                    " " +
+                    (item.transactionFeeOption?.[
+                      user?.role == "agent"
+                        ? "for_Agent"
+                        : user?.role == "distributor"
+                        ? "for_Distributor"
+                        : user?.role == "m_distributor"
+                        ? "for_M_Distributor"
+                        : "for_API_user"
+                    ] == "flat"
+                      ? "Rs."
+                      : "") +
+                    item.transactionFeeValue?.[
+                      user?.role == "agent"
+                        ? "for_Agent"
+                        : user?.role == "distributor"
+                        ? "for_Distributor"
+                        : user?.role == "m_distributor"
+                        ? "for_M_Distributor"
+                        : "for_API_user"
+                    ] +
+                    (item.transactionFeeOption?.[
+                      user?.role == "agent"
+                        ? "for_Agent"
+                        : user?.role == "distributor"
+                        ? "for_Distributor"
+                        : user?.role == "m_distributor"
+                        ? "for_M_Distributor"
+                        : "for_API_user"
+                    ] == "flat"
+                      ? ""
+                      : "%")}
+                  )
                 </MenuItem>
               );
             })}
