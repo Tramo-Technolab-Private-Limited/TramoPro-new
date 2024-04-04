@@ -99,42 +99,21 @@ export default function DTH() {
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
-
-  const TABS = [
-    {
-      value: "3G/4G",
-      label: "3G/4G",
-    },
-    {
-      value: "COMBO",
-      label: "COMBO",
-    },
-    {
-      value: "Romaing",
-      label: "Romaing",
-    },
-    {
-      value: "TOPUP",
-      label: "TOPUP",
-    },
-  ];
-
-  const circleList = [
-    { id: 1, name: "Delhi NCR" },
-    { id: 2, name: "Uttar Pradesh" },
-    { id: 3, name: "UP West and Uttaranchal" },
-  ];
-
   useEffect(() => {
-    getProductFilter();
-  }, []);
+    subCategoryContext?.subcategoryId &&
+      subCategoryContext?.categoryId &&
+      getProductFilter(
+        subCategoryContext?.categoryId,
+        subCategoryContext?.subcategoryId
+      );
+  }, [subCategoryContext?.subcategoryId]);
 
-  const getProductFilter = () => {
+  const getProductFilter = (cateId: string, subCateId: string) => {
     let token = localStorage.getItem("token");
     let body = {
-      category: categoryContext._id,
-      subcategory: subCategoryContext,
-      productFor: " ",
+      category: cateId,
+      subcategory: subCateId,
+      productFor: "",
     };
     Api("product/product_Filter", "POST", body, token).then((Response: any) => {
       console.log("==========>>product Filter", Response);
