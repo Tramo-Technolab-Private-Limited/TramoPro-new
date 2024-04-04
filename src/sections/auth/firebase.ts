@@ -11,6 +11,8 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_MEASUREMENT,
 };
 
+console.log("env credentials", process.env);
+
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
@@ -23,7 +25,7 @@ export const requestPermission = () => {
         .then((currentToken) => {
           if (currentToken) {
             console.log("===============Client Token==>", currentToken);
-            sessionStorage.setItem('fcm', currentToken)
+            sessionStorage.setItem("fcm", currentToken);
           } else {
             console.log("Failed to generate the app registration token.");
           }
@@ -40,11 +42,10 @@ export const requestPermission = () => {
   });
 };
 
-
 export const onMessageListener = () =>
   new Promise((resolve) => {
     onMessage(messaging, (payload) => {
-      console.log('onmessage',payload)
+      console.log("onmessage", payload);
       resolve(payload);
     });
   });
