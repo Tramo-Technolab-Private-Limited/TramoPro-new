@@ -35,6 +35,7 @@ import { convertToWords } from "src/components/customFunctions/ToWords";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 
@@ -208,16 +209,8 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
 
   return (
     <>
-      <Modal
-        open={open2}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={style}
-          style={{ borderRadius: "20px" }}
-          width={{ xs: "100%", sm: 400 }}
-        >
+      <MotionModal open={open2} width={{ xs: "95%", sm: 500 }}>
+        <Box>
           <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
             <Stack justifyContent={"space-between"} mb={2}>
               <Stack gap={1}>
@@ -318,32 +311,18 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             </Typography>
           </FormProvider>
         </Box>
-      </Modal>
-      <Modal
-        open={open}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      </MotionModal>
+      <MotionModal open={open} width={{ xs: "95%", sm: 500 }}>
         {checkNPIN ? (
           txn ? (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              width={"fit-content"}
-            >
-              <Icon
-                icon="eos-icons:bubble-loading"
-                color="red"
-                fontSize={300}
-                style={{ padding: 25 }}
-              />
-            </Box>
+            <Icon
+              icon="eos-icons:bubble-loading"
+              color="red"
+              fontSize={300}
+              style={{ padding: 25 }}
+            />
           ) : errorMsg ? (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              width={{ xs: "100%", sm: 400 }}
-            >
+            <Box>
               <Stack flexDirection={"column"} alignItems={"center"}>
                 <Typography variant="h3">Transaction Failed</Typography>
                 <Icon
@@ -387,12 +366,7 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             ></Box>
           )
         ) : (
-          <Box
-            sx={style}
-            style={{ borderRadius: "20px" }}
-            width={{ xs: "100%", sm: 450 }}
-            minWidth={350}
-          >
+          <Box>
             <Typography variant="h4" textAlign={"center"}>
               Confirm Details
             </Typography>
@@ -510,7 +484,7 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             )}
           </Box>
         )}
-      </Modal>
+      </MotionModal>
       <Modal
         open={open1}
         onClose={handleClose1}
