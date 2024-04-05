@@ -55,7 +55,7 @@ export default function DMTpay({
   const { availableLimitForMoneyTransfer } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const { UpdateUserDetail, initialize } = useAuthContext();
+  const { initialize } = useAuthContext();
   const [mode, setMode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -142,10 +142,7 @@ export default function DMTpay({
             enqueueSnackbar(Response.data.message);
             setTransactionDetail(Response.data.data);
             TextToSpeak(Response.data.message);
-            UpdateUserDetail({
-              main_wallet_amount:
-                Response?.data?.data?.agentDetails?.newMainWalletBalance,
-            });
+            initialize();
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
             setErrorMsg(Response.data.message);

@@ -72,7 +72,7 @@ var localTime: any;
 
 export default function AEPS(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, initialize } = useAuthContext();
   const theme = useTheme();
   const [CurrentTab, setCurrentTab] = useState("");
   const [paymentType, setPymentType] = useState([]);
@@ -404,10 +404,7 @@ export default function AEPS(props: any) {
               Response.data.data.data.transactionAmount +
                 " Successfully Transfered"
             );
-            UpdateUserDetail({
-              main_wallet_amount:
-                Response?.data?.data?.agentDetails?.newMainWalletBalance,
-            });
+            initialize();
           } else {
             setFailedMessage(Response.data.message);
             handleOpenError();
@@ -467,6 +464,7 @@ export default function AEPS(props: any) {
               handleOpenError();
               setFailedMessage(Response.data.data.message);
             }
+            initialize();
             handleOpenResponse();
             setStatement(Response.data.data.data.miniStatementStructureModel);
             setResAmount(Response.data.data.data.balanceAmount);

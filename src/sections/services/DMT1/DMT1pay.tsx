@@ -51,6 +51,7 @@ type FormValuesProps = {
 //--------------------------------------------------------------------
 
 export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
+  const { user, initialize } = useAuthContext();
   const { dmt1RemitterAvailableLimit } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
@@ -182,10 +183,7 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
             if (Response.data.code == 200) {
               Response.data.response.map((element: any) => {
                 enqueueSnackbar(element.message);
-                UpdateUserDetail({
-                  main_wallet_amount:
-                    element?.data?.agentDetails?.newMainWalletBalance,
-                });
+                initialize();
               });
               setTransactionDetail(Response.data.response);
               TextToSpeak(Response.data.message);

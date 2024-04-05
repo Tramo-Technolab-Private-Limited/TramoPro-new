@@ -29,6 +29,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import useResponsive from "src/hooks/useResponsive";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
+import { init } from "i18next";
 
 type FormValuesProps = {
   operator: {
@@ -65,6 +66,7 @@ const style = {
 
 function Bbps_One() {
   const { enqueueSnackbar } = useSnackbar();
+  const { user, initialize } = useAuthContext();
 
   const [categoryListOne, setCategoryListOne] = useState<any>([]);
   const [categoryListTwo, setCategoryListTwo] = useState<any>([]);
@@ -614,7 +616,7 @@ const BbpsBillPayment = ({
   handleToReset,
 }: any) => {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, initialize } = useAuthContext();
   const [isParentValid, setIsParentValid] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -715,10 +717,7 @@ const BbpsBillPayment = ({
           if (Response.status == 200) {
             if (Response.data.code == 200) {
               if (Response.data.data.status == "success") {
-                UpdateUserDetail({
-                  main_wallet_amount:
-                    Response?.data?.data?.agentDetails?.newMainWalletBalance,
-                });
+                initialize();
               }
               TextToSpeak(Response.data.message);
               enqueueSnackbar(Response.data.message);

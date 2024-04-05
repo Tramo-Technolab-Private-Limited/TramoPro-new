@@ -189,21 +189,12 @@ export default function UserProfilePage() {
     // },
   ];
 
-  udata.role == "agent" && TABS.pop();
-
   return (
     <>
       <Helmet>
         <title> User: Profile | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
 
-      <CustomBreadcrumbs
-        heading="Profile"
-        links={[
-          { name: "Dashboard", href: PATH_DASHBOARD.root },
-          { name: user?.displayName },
-        ]}
-      />
       <Card
         sx={{
           mb: 3,
@@ -235,7 +226,6 @@ export default function UserProfilePage() {
             },
           }}
         >
-          <Button onClick={openModal}>certificate</Button>
           {TABS.map((tab) => (
             <Tab
               key={tab.value}
@@ -244,6 +234,7 @@ export default function UserProfilePage() {
               label={tab.label}
             />
           ))}
+          <Button onClick={openModal}>certificate</Button>
         </Tabs>
       </Card>
       {TABS.map(
@@ -252,101 +243,7 @@ export default function UserProfilePage() {
             <Box key={tab.value}> {tab.component} </Box>
           )
       )}
-      <Card
-        sx={{
-          position: "absolute",
-          top: "85%",
-          right: "70px",
-          mb: 3,
-          height: 470,
-          width: "50vw",
-          gap: "20px",
-        }}
-      >
-        {" "}
-        <Grid>
-          <Grid style={{ display: "flex", flexWrap: "wrap" }}>
-            <Grid style={{ width: "20%", margin: "10px" }}>
-              <Image
-                src={user?.selfie[0].length && AwsDocSign(user?.selfie[0])}
-                alt=""
-                style={{ width: "100%", height: "100%" }}
-              />
-              <Typography align="center">Agent Image</Typography>
-            </Grid>
 
-            <Grid style={{ width: "20%", margin: "10px" }}>
-              <img
-                src={user?.PANFile && AwsDocSign(user?.PANFile)}
-                alt=""
-                style={{ width: "100%", height: "100%" }}
-              />
-              <Typography align="center">PAN Image</Typography>
-            </Grid>
-
-            <Grid style={{ width: "20%", margin: "10px" }}>
-              <img
-                src={user?.img && AwsDocSign(user?.img)}
-                alt=""
-                style={{ width: "100%", height: "100%" }}
-              />
-              <Typography align="center">Agent Image</Typography>
-            </Grid>
-
-            <Grid style={{ width: "20%", margin: "10px" }}>
-              <img
-                src={user?.PANFile && AwsDocSign(user?.PANFile)}
-                alt=""
-                style={{ width: "100%", height: "100%" }}
-              />
-              <Typography align="center">PAN Image</Typography>
-            </Grid>
-            <Grid style={{ width: "20%", margin: "15px" }}>
-              <img
-                src={user?.aadharFileUrl && AwsDocSign(user?.aadharFileUrl)}
-                alt="aadharFileUrl"
-                style={{ width: "100%", height: "100%" }}
-              />
-              <Typography align="center">Aadhar Front</Typography>
-            </Grid>
-
-            <Grid style={{ width: "20%", margin: "15px" }}>
-              <img
-                src={user?.aadharBackUrl && AwsDocSign(user?.aadharBackUrl)}
-                alt="aadharBackUrl"
-                style={{ width: "100%", height: "100%" }}
-              />
-              <Typography align="center">Aadhar Back </Typography>
-            </Grid>
-          </Grid>
-        </Grid>
-        <Grid
-          style={{
-            width: "20%",
-            margin: "10px",
-            marginTop: "40px",
-            display: "flex",
-            gap: 5,
-          }}
-        >
-          <Image
-            src={user?.shopImage[0]?.length && AwsDocSign(user?.shopImage[0])}
-            alt="shopImage"
-            style={{ width: "100%", height: "100%" }}
-          />
-          <Image
-            src={user?.shopImage[1]?.length && AwsDocSign(user?.shopImage[1])}
-            alt="shopImage"
-            style={{ width: "100%", height: "100%" }}
-          />
-          <Image
-            src={user?.shopImage[2]?.length && AwsDocSign(user?.shopImage[2])}
-            alt="shopImage"
-            style={{ width: "100%", height: "100%" }}
-          />
-        </Grid>
-        <Typography align="center">Shop Images</Typography>
-      </Card>
       <Modal
         open={modalOpen}
         aria-labelledby="modal-modal-title"

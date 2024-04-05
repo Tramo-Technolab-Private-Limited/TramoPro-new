@@ -99,14 +99,12 @@ export default function DTH() {
     handleSubmit,
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
+
   useEffect(() => {
-    subCategoryContext?.subcategoryId &&
-      subCategoryContext?.categoryId &&
-      getProductFilter(
-        subCategoryContext?.categoryId,
-        subCategoryContext?.subcategoryId
-      );
-  }, [subCategoryContext?.subcategoryId]);
+    subCategoryContext &&
+      categoryContext?._id &&
+      getProductFilter(categoryContext?._id, subCategoryContext);
+  }, [subCategoryContext]);
 
   const getProductFilter = (cateId: string, subCateId: string) => {
     let token = localStorage.getItem("token");
@@ -232,7 +230,7 @@ export default function DTH() {
 }
 
 function VerifyNPIN({ data, handleClose }: any) {
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, initialize } = useAuthContext();
   const { DTHNumber, amount, circle, operatorid, productName } = data;
   const { enqueueSnackbar } = useSnackbar();
   const [confirm, setConfirm] = React.useState(false);
@@ -298,10 +296,7 @@ function VerifyNPIN({ data, handleClose }: any) {
                 "==============>>> post mobile data message",
                 Response.data.message
               );
-              UpdateUserDetail({
-                main_wallet_amount:
-                  Response?.data?.data?.agentDetails?.newMainWalletBalance,
-              });
+              initialize();
             } else {
               enqueueSnackbar(Response.data.message, { variant: "error" });
               console.log(

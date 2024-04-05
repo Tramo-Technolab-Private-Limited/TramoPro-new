@@ -1,28 +1,16 @@
 // @mui
 import { styled } from "@mui/material/styles";
 import { Box, Typography } from "@mui/material";
-// utils
-import { bgBlur } from "../../utils/cssStyles";
 // auth
 import { useAuthContext } from "../../auth/useAuthContext";
+//utils
+import { bgBlur } from "../../utils/cssStyles";
+
 // components
 import Image from "../../components/image";
 import { CustomAvatar } from "../../components/custom-avatar";
+import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
 // ----------------------------------------------------------------------
-
-const StyledRoot = styled("div")(({ theme }) => ({
-  "&:before": {
-    ...bgBlur({
-      color: theme.palette.primary.darker,
-    }),
-    top: 0,
-    zIndex: 9,
-    content: "''",
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-  },
-}));
 
 const StyledInfo = styled("div")(({ theme }) => ({
   left: 0,
@@ -43,14 +31,28 @@ const StyledInfo = styled("div")(({ theme }) => ({
 
 export default function ProfileCover({ cover }: any) {
   const { user } = useAuthContext();
+  const StyledRoot = styled("div")(({ theme }) => ({
+    "&:before": {
+      ...bgBlur({
+        imgUrl: `${AwsDocSign(user?.shopImage[0])}`,
+      }),
+      filter: "blur(4px)",
+      top: 0,
+      zIndex: 9,
+      content: "''",
+      width: "100%",
+      height: "100%",
+      position: "absolute",
+      backgroundSize: "cover",
+    },
+  }));
+
   return (
     <StyledRoot>
       <StyledInfo>
         <CustomAvatar
-          // src={user?.photoURL}
           src={user?.selfie[0]}
           alt={user?.displayName}
-          // name={user?.displayName}
           name={`${user?.firstName} ${user?.lastName}`}
           sx={{
             mx: "auto",
@@ -66,25 +68,38 @@ export default function ProfileCover({ cover }: any) {
           sx={{
             ml: { md: 3 },
             mt: { xs: 1, md: 0 },
-            color: "common.white",
+            // color: "common.white",
             textAlign: { xs: "center", md: "left" },
           }}
         >
-          <Typography variant="h4">{`${user?.firstName} ${user?.lastName}`}</Typography>
-
-          <Typography sx={{ opacity: 0.72 }}>
-            {user?.role == "agent"
-              ? "Agent"
-              : user?.role == "distributor"
-              ? "Distributor"
-              : "Master Distributor"}
+          <Typography
+            variant="h4"
+            sx={{ color: (theme) => theme.palette.common.white }}
+          >{`${user?.company_name}`}</Typography>
+          <Typography
+            variant="h6"
+            sx={{ color: (theme) => theme.palette.common.white }}
+          >
+            {`${user?.firstName} ${user?.lastName}`}{" "}
+            <Typography
+              component={"span"}
+              sx={{ color: (theme) => theme.palette.common.white }}
+            >
+              ({" "}
+              {user?.role == "agent"
+                ? "Agent"
+                : user?.role == "distributor"
+                ? "Distributor"
+                : "Master Distributor"}{" "}
+              )
+            </Typography>
           </Typography>
         </Box>
       </StyledInfo>
 
       <Image
         alt="cover"
-        src={cover}
+        src={user?.shopImage[0]}
         sx={{
           top: 0,
           left: 0,

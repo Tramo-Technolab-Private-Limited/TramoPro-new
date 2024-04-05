@@ -56,6 +56,7 @@ export default function DirectFundTransfer(props: any) {
     remarks: "",
   };
 
+  const { initialize } = useAuthContext();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -121,13 +122,7 @@ export default function DirectFundTransfer(props: any) {
           if (Response.status == 200) {
             if (Response.data.code == 200) {
               enqueueSnackbar(Response.data.message);
-              getValues("transactionType") === "debit"
-                ? UpdateUserDetail({
-                    main_wallet_amount: user?.main_wallet_amount + +body.amount,
-                  })
-                : UpdateUserDetail({
-                    main_wallet_amount: user?.main_wallet_amount - +body.amount,
-                  });
+              initialize();
 
               setSuccessMsg(Response.data.message);
 

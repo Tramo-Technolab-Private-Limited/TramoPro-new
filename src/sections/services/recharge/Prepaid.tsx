@@ -21,6 +21,7 @@ import {
   Box,
   FormHelperText,
   Button,
+  useTheme,
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 // components
@@ -39,6 +40,7 @@ import { SubCategoryContext } from "./Recharges";
 import { CategoryContext } from "../../../pages/Services";
 import { useAuthContext } from "src/auth/useAuthContext";
 import MotionModal from "src/components/animate/MotionModal";
+import { Icon } from "@iconify/react";
 
 // ----------------------------------------------------------------------
 
@@ -93,10 +95,12 @@ const Reducer = (state: any, action: any) => {
 };
 
 function MobilePrepaid() {
-  const { user, UpdateUserDetail } = useAuthContext();
+  const theme = useTheme();
+  const { user, initialize } = useAuthContext();
+  const [isOperatorFetchLoading, setIsOperatorFetchLoading] = useState(false);
   const { enqueueSnackbar } = useSnackbar();
-  const subCategoryContext: any = useContext(SubCategoryContext);
   const categoryContext: any = useContext(CategoryContext);
+  const subCategoryContext: any = useContext(SubCategoryContext);
   const [planState, planDispatch] = useReducer(Reducer, initialPlanState);
   const [rechargeState, rechargeDispatch] = useReducer(
     Reducer,
@@ -158,7 +162,7 @@ function MobilePrepaid() {
     watch,
     setValue,
     handleSubmit,
-    formState: { errors, isSubmitting, isSubmitSuccessful },
+    formState: { errors, isSubmitting, isValid },
   } = methods;
 
   const OtpSchema = Yup.object().shape({
@@ -257,13 +261,10 @@ function MobilePrepaid() {
   };
 
   useEffect(() => {
-    subCategoryContext?.subcategoryId &&
-      subCategoryContext?.categoryId &&
-      getProductFilter(
-        subCategoryContext?.categoryId,
-        subCategoryContext?.subcategoryId
-      );
-  }, [subCategoryContext?.subcategoryId]);
+    subCategoryContext &&
+      categoryContext?._id &&
+      getProductFilter(categoryContext?._id, subCategoryContext);
+  }, [subCategoryContext]);
 
   useEffect(() => {
     if (watch("mobileNumber").length === 10) {
@@ -277,6 +278,7 @@ function MobilePrepaid() {
 
   const getRechargePlan = (val: string) => {
     let token = localStorage.getItem("token");
+    setIsOperatorFetchLoading(true);
     Api(`agents/v1/getOperator/${val}`, "GET", "", token).then(
       (Response: any) => {
         if (Response.status == 200) {
@@ -284,7 +286,10 @@ function MobilePrepaid() {
             setValue("operator", Response.data.data.operatorid);
             setValue("operatorName", Response.data.data.plan_operator);
             setValue("circle", Response.data.data.circle);
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "warning" });
           }
+          setIsOperatorFetchLoading(false);
         }
       }
     );
@@ -358,10 +363,7 @@ function MobilePrepaid() {
               type: "RECHARGE_FETCH_SUCCESS",
               payload: Response.data.data,
             });
-            UpdateUserDetail({
-              main_wallet_amount:
-                Response?.data?.data?.agentDetails?.newMainWalletBalance,
-            });
+            initialize();
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
             rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
@@ -384,12 +386,28 @@ function MobilePrepaid() {
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Typography variant="h4">Recharge your mobile</Typography>
         <Stack gap={2} mt={2}>
-          <RHFTextField
-            type="number"
-            name="mobileNumber"
-            label="Mobile Number"
-            placeholder="Mobile Number"
-          />
+          <Stack sx={{ position: "relative" }}>
+            <RHFTextField
+              type="number"
+              name="mobileNumber"
+              label="Mobile Number"
+              placeholder="Mobile Number"
+              disabled={isOperatorFetchLoading}
+            />
+            {isOperatorFetchLoading && (
+              <Icon
+                icon="eos-icons:loading"
+                color={theme.palette.primary.main}
+                style={{
+                  position: "absolute",
+                  right: 10,
+                  top: 5,
+                  height: 25,
+                  width: 25,
+                }}
+              />
+            )}
+          </Stack>
           <Stack flexDirection={"row"} gap={1}>
             <RHFSelect
               name="operator"
@@ -399,6 +417,7 @@ function MobilePrepaid() {
                 native: false,
                 sx: { textTransform: "capitalize" },
               }}
+              disabled={isOperatorFetchLoading}
             >
               {operatorList.map((item: any, index: any) => (
                 <MenuItem
@@ -414,6 +433,7 @@ function MobilePrepaid() {
               name="circle"
               label="Circle"
               placeholder="Circle"
+              disabled={isOperatorFetchLoading}
               SelectProps={{
                 native: false,
                 sx: { textTransform: "capitalize" },
@@ -431,6 +451,7 @@ function MobilePrepaid() {
             label="Amount"
             type="number"
             placeholder="Amount"
+            disabled={isOperatorFetchLoading}
             InputProps={{
               endAdornment: (
                 <LoadingButton
@@ -439,6 +460,7 @@ function MobilePrepaid() {
                   loading={planState.isLoading}
                   onClick={openModal}
                   sx={{ whiteSpace: "nowrap" }}
+                  disabled={isOperatorFetchLoading}
                 >
                   Browse Plan
                 </LoadingButton>
@@ -452,6 +474,7 @@ function MobilePrepaid() {
           type="submit"
           variant="contained"
           sx={{ mt: 5 }}
+          disabled={!isValid || isOperatorFetchLoading}
         >
           Submit
         </LoadingButton>
