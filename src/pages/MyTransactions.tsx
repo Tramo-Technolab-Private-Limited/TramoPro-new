@@ -70,6 +70,7 @@ import dayjs from "dayjs";
 import { fDateFormatForApi } from "src/utils/formatTime";
 import MotionModal from "src/components/animate/MotionModal";
 import { convertToWords } from "src/components/customFunctions/ToWords";
+import DownloadIcon from "@mui/icons-material/Download";
 
 // ----------------------------------------------------------------------
 
@@ -792,8 +793,12 @@ export default function MyTransactions() {
                 >
                   Apply
                 </LoadingButton>
-                <Button variant="contained" onClick={ExportData}>
-                  Export
+                <Button
+                  variant="contained"
+                  onClick={ExportData}
+                  startIcon={<DownloadIcon />}
+                >
+                  Download
                 </Button>
               </Stack>
             </Stack>
