@@ -295,6 +295,7 @@ export default function DMT2BeneTable() {
       console.log("==============>>> verify beneficiary Response", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
+          enqueueSnackbar(Response.data.message);
           getbeneDispatch({
             type: "GET_BENE_SUCCESS",
             payload: [...getBene.data, Response.data.data],
