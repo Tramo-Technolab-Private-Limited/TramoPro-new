@@ -283,6 +283,7 @@ export default function DMTbeneficiary() {
     Api("DMT1/beneficiary", "POST", body, token).then((Response: any) => {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
+          enqueueSnackbar(Response.data.message);
           getbeneDispatch({
             type: "GET_BENE_SUCCESS",
             payload: [...getBene.data, Response.data.data],
