@@ -91,7 +91,7 @@ export const MyBankAccount = Loadable(
   lazy(() => import("../sections/FundManagement/MyBankAccount"))
 );
 export const AEPSsettlement = Loadable(
-  lazy(() => import("../sections/FundManagement/AEPSsettlement"))
+  lazy(() => import("../sections/FundManagement/aepsSettlement/AEPSsettlement"))
 );
 export const MyFundRequest = Loadable(
   lazy(() => import("../sections/FundManagement/MyFundRequest"))

@@ -168,7 +168,7 @@ export default function MyBankAccount() {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           if (Response.data.data.length) {
-            // setUserBankList(Response?.data?.data[0]?.bankAccounts);
+            setUserBankList(Response?.data?.data[0]?.bankAccounts);
             setSelectBank(Response?.data?.data[0]?.bankAccounts[0]);
           }
         } else {
