@@ -11,7 +11,31 @@ const packagePath = `${__dirname}/../package.json`;
 
 // Function to update lastUpdated field in package.json
 const updateLastUpdated = () => {
-  const currentDate = format(new Date(), "dd MMM yyyy, pp"); // Get current date and time in IST
+  var currentTime = new Date();
+  var currentOffset = currentTime.getTimezoneOffset();
+  var ISTOffset = 330; // IST offset UTC +5:30
+  var ISTTime = new Date(
+    currentTime.getTime() + (ISTOffset + currentOffset) * 60000
+  );
+
+  // ISTTime now represents the time in IST coordinates
+
+  var dateIST = ISTTime.getDate();
+  var monthIST = ISTTime.getMonth();
+  var yearIST = ISTTime.getFullYear();
+
+  var hoursIST = ISTTime.getHours();
+  var minutesIST = ISTTime.getMinutes();
+  var secondsIST = ISTTime.getSeconds();
+
+  const currentDate =
+    `${dateIST}/${monthIST}/${yearIST}` +
+    " " +
+    hoursIST +
+    ":" +
+    minutesIST +
+    ":" +
+    secondsIST; // Get current date and time in IST
   const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8")); // Read package.json
   packageJson.lastUpdated = currentDate; // Update lastUpdated field
   fs.writeFileSync(packagePath, JSON.stringify(packageJson, null, 2)); // Write updated package.json
