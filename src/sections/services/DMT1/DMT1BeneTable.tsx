@@ -225,7 +225,7 @@ export default function DMTbeneficiary() {
             }),
           });
           openEditModal();
-          enqueueSnackbar(Response.data.message);
+          // enqueueSnackbar(Response.data.message);
         } else {
           getbeneDispatch({ type: "GET_BANK_FAILURE" });
         }
