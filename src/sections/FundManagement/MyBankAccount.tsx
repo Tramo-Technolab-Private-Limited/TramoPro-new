@@ -208,6 +208,7 @@ export default function MyBankAccount() {
       };
       Api(`user/KYC/bank_acc_verify`, "POST", body, token).then(
         (Response: any) => {
+          
           console.log("======bank_acc_verify=Response====>" + Response);
           if (Response.status == 200) {
             if (Response.data.code == 200) {

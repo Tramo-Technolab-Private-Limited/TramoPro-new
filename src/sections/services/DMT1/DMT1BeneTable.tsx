@@ -240,29 +240,34 @@ export default function DMTbeneficiary() {
       ifsc: getValues("ifsc"),
       accountNumber: getValues("accountNumber"),
       bankName: getValues("bankName"),
+      remitterMobile: remitterContext.remitterMobile,
     };
-    (await trigger(["ifsc", "accountNumber", "bankName"])) &&
-      Api("DMT1/beneficiary/verify", "POST", body, token).then(
-        (Response: any) => {
-          if (Response.status == 200) {
-            if (Response.data.code == 200) {
-              remitterVerifyDispatch({
-                type: "VERIFY_FETCH_SUCCESS",
-                payload: Response.data.data,
-              });
-              enqueueSnackbar(Response.data.message);
-              setValue("beneName", Response.data.name);
-              setValue("isBeneVerified", true);
-              UpdateUserDetail({
-                main_wallet_amount: user?.main_wallet_amount - 3,
-              });
+    (await trigger(["ifsc", "accountNumber", "bankName"]))
+      ? Api("DMT1/beneficiary/verify", "POST", body, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.code == 200) {
+                remitterVerifyDispatch({
+                  type: "VERIFY_FETCH_SUCCESS",
+                  payload: Response.data.data,
+                });
+                enqueueSnackbar(Response.data.message);
+                setValue("beneName", Response.data.name);
+                setValue("isBeneVerified", true);
+                UpdateUserDetail({
+                  main_wallet_amount: user?.main_wallet_amount - 3,
+                });
+              } else {
+                remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
+                enqueueSnackbar(Response.data.message, { variant: "error" });
+              }
             } else {
               remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
-              enqueueSnackbar(Response.data.message, { variant: "error" });
+              enqueueSnackbar("Failed", { variant: "error" });
             }
           }
-        }
-      );
+        )
+      : remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
   };
 
   const addBeneficiary = (data: FormValuesProps) => {
@@ -576,6 +581,7 @@ const BeneList = React.memo(
       let token = localStorage.getItem("token");
       let body = {
         beneficiaryId: val,
+        remitterMobile: remitterNumber,
       };
       Api("DMT1/beneficiary/verify", "POST", body, token).then(
         (Response: any) => {
