@@ -228,7 +228,7 @@ export default function DMT2BeneTable() {
             }),
           });
           openEditModal();
-          enqueueSnackbar(Response.data.message);
+          // enqueueSnackbar(Response.data.message);
         } else {
           getbeneDispatch({ type: "GET_BANK_FAILURE" });
         }
