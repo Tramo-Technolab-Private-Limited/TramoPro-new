@@ -198,9 +198,7 @@ export default function FundFlow() {
   };
 
   const tableLabels = [
-    { id: "Date&Time", label: "Date & Time" },
-    { id: "TransactionType", label: "Transaction Type" },
-    { id: "Client Ref Id", label: "Client Ref Id" },
+    { id: "Date&Time", label: "Fund Flow Details" },
     { id: "From", label: "From/To" },
     // { id: "to", label: "To" },
     { id: "amount", label: "Amount" },
@@ -212,7 +210,7 @@ export default function FundFlow() {
       <Helmet>
         <title> Transactions | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
-      <Stack>
+      <Stack mb={1}>
         <FormProvider
           methods={methods}
           onSubmit={handleSubmit(filterTransaction)}
@@ -367,16 +365,12 @@ const TransactionRow = React.memo(({ row }: childProps) => {
   return (
     <>
       <TableRow hover key={newRow._id}>
-        {/* Date & Time */}
-        <TableCell sx={{ whiteSpace: "nowrap" }}>
-          {fDateTime(newRow?.createdAt)}
-        </TableCell>
-        {/* transaction Type */}
-        <TableCell>
-          <Typography variant="body2">{newRow?.transactionType} </Typography>
-        </TableCell>
         {/* client ref id */}
         <TableCell>
+          <Typography variant="body2" noWrap>
+            {fDateTime(newRow?.createdAt)}{" "}
+          </Typography>
+          <Typography variant="body2">{newRow?.transactionType} </Typography>
           <Typography variant="body2">
             {newRow?.clientRefId}{" "}
             <Tooltip title="Copy" placement="top">
