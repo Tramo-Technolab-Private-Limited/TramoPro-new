@@ -1274,7 +1274,9 @@ function TransactionRow({ row }: childProps) {
                   flexDirection="column"
                   justifyContent="end"
                 >
-                  {newRow?.categoryName?.toLowerCase() == "money transfer" && (
+                  {(newRow?.categoryName?.toLowerCase() == "money transfer" ||
+                    newRow?.categoryName?.toLowerCase() == "dmt1" ||
+                    newRow?.categoryName?.toLowerCase() == "dmt2") && (
                     <React.Fragment>
                       <Typography variant="subtitle1">
                         Sender Details
@@ -1327,8 +1329,9 @@ function TransactionRow({ row }: childProps) {
                   alignItems="start"
                 >
                   <Stack alignItems="end">
-                    {newRow?.categoryName?.toLowerCase() ==
-                      "money transfer" && (
+                    {(newRow?.categoryName?.toLowerCase() == "money transfer" ||
+                      newRow?.categoryName?.toLowerCase() == "dmt1" ||
+                      newRow?.categoryName?.toLowerCase() == "dmt2") && (
                       <React.Fragment>
                         <Typography variant="subtitle1">
                           Benificary Details
@@ -1446,6 +1449,14 @@ function TransactionRow({ row }: childProps) {
                       <TableCell sx={{ borderRight: "1px solid #c5c4c4" }}>
                         Transaction Id
                       </TableCell>
+                      {(newRow?.categoryName?.toLowerCase() ==
+                        "money transfer" ||
+                        newRow?.categoryName?.toLowerCase() == "dmt1" ||
+                        newRow?.categoryName?.toLowerCase() == "dmt2") && (
+                        <TableCell sx={{ borderRight: "1px solid #c5c4c4" }}>
+                          Mode
+                        </TableCell>
+                      )}
                       <TableCell sx={{ borderRight: "1px solid #c5c4c4" }}>
                         Service
                       </TableCell>
@@ -1468,6 +1479,14 @@ function TransactionRow({ row }: childProps) {
                       <TableCell sx={{ borderRight: "1px solid #c5c4c4" }}>
                         {newRow?.clientRefId}
                       </TableCell>
+                      {(newRow?.categoryName?.toLowerCase() ==
+                        "money transfer" ||
+                        newRow?.categoryName?.toLowerCase() == "dmt1" ||
+                        newRow?.categoryName?.toLowerCase() == "dmt2") && (
+                        <TableCell sx={{ borderRight: "1px solid #c5c4c4" }}>
+                          {newRow?.modeOfPayment}
+                        </TableCell>
+                      )}
                       <TableCell sx={{ borderRight: "1px solid #c5c4c4" }}>
                         {newRow?.productName}
                       </TableCell>
