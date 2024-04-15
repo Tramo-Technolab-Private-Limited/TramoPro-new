@@ -45,6 +45,7 @@ import { CustomAvatar } from "src/components/custom-avatar";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import useResponsive from "src/hooks/useResponsive";
+import { fCurrency } from "src/utils/formatNumber";
 // ----------------------------------------------------------------------
 type FormValuesProps = {
   transactionType: string;
@@ -55,6 +56,7 @@ type FormValuesProps = {
 };
 
 export default function FundFlow() {
+  const { user } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const isMobile = useResponsive("up", "sm");
   const [Loading, setLoading] = useState(false);
@@ -63,6 +65,10 @@ export default function FundFlow() {
   const [pageCount, setPageCount] = useState<any>(0);
   const [sdata, setSdata] = useState([]);
   const [pageSize, setPageSize] = useState<any>(25);
+  const [stats, setStats] = useState({
+    debit: 0,
+    credit: 0,
+  });
 
   const txnSchema = Yup.object().shape({
     status: Yup.string(),
@@ -135,6 +141,29 @@ export default function FundFlow() {
             setPageCount(Response.data.data.totalNumberOfRecords);
 
             enqueueSnackbar(Response.data.message);
+            setStats((prevState) => ({
+              ...prevState,
+              debit: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (user?._id == currentValue?.walletLedgerData?.from?.id) {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+              credit: Response.data.data.data.reduce(
+                (accumulator: number, currentValue: any) => {
+                  if (user?._id != currentValue?.walletLedgerData?.from?.id) {
+                    return accumulator + currentValue.amount;
+                  } else {
+                    return accumulator + 0;
+                  }
+                },
+                0
+              ),
+            }));
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
           }
@@ -185,6 +214,19 @@ export default function FundFlow() {
             setSdata(Response.data.data.data);
             setPageCount(Response.data.data.totalNumberOfRecords);
             enqueueSnackbar(Response.data.message);
+
+            const debit = Response.data.data.data.reduce(
+              (accumulator: number, currentValue: any) => {
+                if (user?._id == currentValue?.walletLedgerData?.from?.id) {
+                  return accumulator + currentValue.amount;
+                } else {
+                  return accumulator + 0;
+                }
+              },
+              0
+            );
+
+            console.log("debit", debit);
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
           }
@@ -215,7 +257,20 @@ export default function FundFlow() {
           methods={methods}
           onSubmit={handleSubmit(filterTransaction)}
         >
-          <Stack flexDirection={"row"} justifyContent={"end"} gap={1}>
+          <Stack
+            flexDirection={"row"}
+            justifyContent={"end"}
+            gap={1}
+            alignItems={"center"}
+          >
+            <Stack flexDirection={"row"} gap={1}>
+              <Label variant="soft" color="error">
+                {`Total Debit: ${fCurrency(stats.debit)}`}
+              </Label>
+              <Label variant="soft" color="success">
+                {`Total Credit: ${fCurrency(stats.credit)}`}
+              </Label>
+            </Stack>
             <RHFSelect
               name="transactionType"
               label="Transaction Type"
