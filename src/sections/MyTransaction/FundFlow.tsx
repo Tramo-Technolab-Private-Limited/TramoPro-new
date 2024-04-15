@@ -14,6 +14,7 @@ import {
   Tooltip,
   IconButton,
   TextField,
+  Button,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
@@ -46,6 +47,7 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import useResponsive from "src/hooks/useResponsive";
 import { fCurrency } from "src/utils/formatNumber";
+import MotionModal from "src/components/animate/MotionModal";
 // ----------------------------------------------------------------------
 type FormValuesProps = {
   transactionType: string;
@@ -69,6 +71,9 @@ export default function FundFlow() {
     debit: 0,
     credit: 0,
   });
+  const [open, setOpen] = React.useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
 
   const txnSchema = Yup.object().shape({
     status: Yup.string(),
@@ -239,6 +244,12 @@ export default function FundFlow() {
     );
   };
 
+  const handleReset = () => {
+    reset(defaultValues);
+    setSdata([]);
+    getTransaction();
+  };
+
   const tableLabels = [
     { id: "Date&Time", label: "Fund Flow Details" },
     { id: "From", label: "From/To" },
@@ -252,102 +263,127 @@ export default function FundFlow() {
       <Helmet>
         <title> Transactions | {process.env.REACT_APP_COMPANY_NAME} </title>
       </Helmet>
-      <Stack mb={1}>
-        <FormProvider
-          methods={methods}
-          onSubmit={handleSubmit(filterTransaction)}
-        >
-          <Stack
-            flexDirection={"row"}
-            justifyContent={"end"}
-            gap={1}
-            alignItems={"center"}
+      <Stack flexDirection={"row"} gap={1} justifyContent={"space-between"}>
+        <Stack flexDirection={"row"} gap={1}>
+          <Label variant="soft" color="error">
+            {`Total Debit: ${fCurrency(stats.debit)}`}
+          </Label>
+          <Label variant="soft" color="success">
+            {`Total Credit: ${fCurrency(stats.credit)}`}
+          </Label>
+        </Stack>
+        <Stack flexDirection={"row"} gap={1} mb={1}>
+          <Button variant="contained" onClick={handleReset}>
+            <Iconify icon="bx:reset" color={"common.white"} mr={1} />
+            Reset
+          </Button>
+          <Button variant="contained" onClick={handleOpen}>
+            <Iconify
+              icon="icon-park-outline:filter"
+              color={"common.white"}
+              mr={1}
+            />{" "}
+            Filter
+          </Button>
+        </Stack>
+      </Stack>
+      <MotionModal
+        open={open}
+        onClose={handleClose}
+        width={{ xs: "95%", sm: 500 }}
+      >
+        {/* <Box> */}
+        <Stack mb={1}>
+          <FormProvider
+            methods={methods}
+            onSubmit={handleSubmit(filterTransaction)}
           >
-            <Stack flexDirection={"row"} gap={1}>
-              <Label variant="soft" color="error">
-                {`Total Debit: ${fCurrency(stats.debit)}`}
-              </Label>
-              <Label variant="soft" color="success">
-                {`Total Credit: ${fCurrency(stats.credit)}`}
-              </Label>
-            </Stack>
-            <RHFSelect
-              name="transactionType"
-              label="Transaction Type"
-              placeholder="transaction Type"
-              SelectProps={{
-                native: false,
-                sx: { textTransform: "capitalize" },
-              }}
-            >
-              <MenuItem value={"credit"}>Credit</MenuItem>
-              <MenuItem value={"debit"}>Debit</MenuItem>
-            </RHFSelect>
-            <RHFSelect
-              name="status"
-              label="Status"
-              SelectProps={{
-                native: false,
-                sx: { textTransform: "capitalize" },
-              }}
-            >
-              <MenuItem value="">None</MenuItem>
-              <MenuItem value="success">Success</MenuItem>
-              <MenuItem value="failed">Failed</MenuItem>
-              <MenuItem value="pending">Pending</MenuItem>
-              <MenuItem value="in_process">In process</MenuItem>
-              <MenuItem value="hold">Hold</MenuItem>
-              <MenuItem value="initiated">Initiated</MenuItem>
-            </RHFSelect>
-            <RHFTextField name="clientRefId" label="Client Ref Id" />
-            <Stack flexDirection={"row"} gap={1}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Start date"
-                  inputFormat="DD/MM/YYYY"
-                  value={watch("startDate")}
-                  maxDate={new Date()}
-                  onChange={(newValue: any) => setValue("startDate", newValue)}
-                  renderInput={(params: any) => (
-                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
-                  )}
-                />
-                <DatePicker
-                  label="End date"
-                  inputFormat="DD/MM/YYYY"
-                  value={watch("endDate")}
-                  minDate={watch("startDate")}
-                  maxDate={new Date()}
-                  onChange={(newValue: any) => setValue("endDate", newValue)}
-                  renderInput={(params: any) => (
-                    <TextField {...params} size={"small"} sx={{ width: 150 }} />
-                  )}
-                />
-              </LocalizationProvider>
-            </Stack>
-            <Stack flexDirection={"row"} gap={1}>
-              <LoadingButton
-                variant="contained"
-                type="submit"
-                loading={isSubmitting}
-              >
-                Search
-              </LoadingButton>
-              <LoadingButton
-                variant="contained"
-                onClick={() => {
-                  reset(defaultValues);
-                  onChangeEndDate(null);
-                  onChangeStartDate(null);
-                  getTransaction();
+            <Stack gap={1} m={1}>
+              <RHFSelect
+                name="transactionType"
+                label="Transaction Type"
+                placeholder="transaction Type"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
                 }}
               >
-                Clear
-              </LoadingButton>
+                <MenuItem value={"credit"}>Credit</MenuItem>
+                <MenuItem value={"debit"}>Debit</MenuItem>
+              </RHFSelect>
+              <RHFSelect
+                name="status"
+                label="Status"
+                SelectProps={{
+                  native: false,
+                  sx: { textTransform: "capitalize" },
+                }}
+              >
+                <MenuItem value="">None</MenuItem>
+                <MenuItem value="success">Success</MenuItem>
+                <MenuItem value="failed">Failed</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="in_process">In process</MenuItem>
+                <MenuItem value="hold">Hold</MenuItem>
+                <MenuItem value="initiated">Initiated</MenuItem>
+              </RHFSelect>
+              <RHFTextField name="clientRefId" label="Client Ref Id" />
+              <Stack flexDirection={"row"} gap={1}>
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                  <DatePicker
+                    label="Start date"
+                    inputFormat="DD/MM/YYYY"
+                    value={watch("startDate")}
+                    maxDate={new Date()}
+                    onChange={(newValue: any) =>
+                      setValue("startDate", newValue)
+                    }
+                    renderInput={(params: any) => (
+                      <TextField
+                        {...params}
+                        size={"small"}
+                        sx={{ width: 150 }}
+                      />
+                    )}
+                  />
+                  <DatePicker
+                    label="End date"
+                    inputFormat="DD/MM/YYYY"
+                    value={watch("endDate")}
+                    minDate={watch("startDate")}
+                    maxDate={new Date()}
+                    onChange={(newValue: any) => setValue("endDate", newValue)}
+                    renderInput={(params: any) => (
+                      <TextField
+                        {...params}
+                        size={"small"}
+                        sx={{ width: 150 }}
+                      />
+                    )}
+                  />
+                </LocalizationProvider>
+              </Stack>
+              <Stack flexDirection={"row"} gap={1}>
+                <LoadingButton variant="contained" onClick={handleClose}>
+                  Cancel
+                </LoadingButton>
+                <LoadingButton variant="contained" onClick={handleReset}>
+                  <Iconify icon="bx:reset" color={"common.white"} mr={1} />{" "}
+                  Reset
+                </LoadingButton>
+                <LoadingButton
+                  variant="contained"
+                  type="submit"
+                  loading={isSubmitting}
+                >
+                  Apply
+                </LoadingButton>
+              </Stack>
             </Stack>
-          </Stack>
-        </FormProvider>
-      </Stack>
+          </FormProvider>
+        </Stack>
+        {/* </Box> */}
+      </MotionModal>
       <Grid item xs={12} md={6} lg={8}>
         {Loading ? (
           <ApiDataLoading />
