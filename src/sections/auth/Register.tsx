@@ -43,14 +43,14 @@ export default function Register() {
           Register in {process.env.REACT_APP_COMPANY_NAME}
         </Typography>
 
-        <Tooltip title={method} placement="left">
+        {/* <Tooltip title={method} placement="left">
           <Box
             component="img"
             alt={method}
             src={`/assets/icons/auth/ic_${method}.png`}
             sx={{ width: 32, height: 32, position: "absolute", right: 0 }}
           />
-        </Tooltip>
+        </Tooltip> */}
       </Stack>
 
       <AuthRegisterForm />
