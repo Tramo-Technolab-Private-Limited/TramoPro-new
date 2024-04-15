@@ -51,6 +51,7 @@ import dayjs from "dayjs";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import { TableNoData } from "src/components/table";
+import CheckStatusIcon from "./CheckStatusIcon";
 //aws
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -414,6 +415,21 @@ function HistoricalDataExport() {
         </Tabs>
       </Stack>
       <Stack direction="row" spacing={2} m={1} justifyContent="flex-end">
+        {tableData.find(
+          (row: any) => row.report_generator_data.status !== "Pending"
+        ) && (
+          <>
+            <Tooltip title="Refresh" placement="top">
+              <IconButton
+                onClick={getTransaction}
+                color="primary"
+                aria-label="check transaction status"
+              >
+                <CheckStatusIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
         <LoadingButton variant="contained" size="medium" onClick={handleOpen}>
           New Request
         </LoadingButton>
