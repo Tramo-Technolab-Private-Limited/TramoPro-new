@@ -27,6 +27,7 @@ import {
   Container,
   Chip,
   TableHead,
+  CircularProgress,
 } from "@mui/material";
 import { Helmet } from "react-helmet-async";
 import * as Yup from "yup";
@@ -1179,13 +1180,35 @@ function TransactionRow({ row }: childProps) {
             </IconButton>
             {newRow.status !== "success" && newRow.status !== "failed" && (
               <Tooltip title="Check Status" placement="top">
-                <IconButton
-                  onClick={() => !loading && CheckTransactionStatus(newRow)}
-                  color="primary"
-                  aria-label="check transaction status"
-                >
-                  <img src={autorenew} alt="Check Status" />
-                </IconButton>
+                <div style={{ position: "relative" }}>
+                  <IconButton
+                    disabled={loading}
+                    onClick={() => CheckTransactionStatus(newRow)}
+                    color="primary"
+                    aria-label="check transaction status"
+                  >
+                    {loading ? (
+                      <Grid
+                        style={{
+                          position: "absolute",
+                          top: "50%",
+                          left: "50%",
+                          transform: "translate(-50%, -50%)",
+                        }}
+                      >
+                        <CircularProgress
+                          size={20}
+                          thickness={4}
+                        />
+                      </Grid>
+                    ) : (
+                      <Image
+                      src={autorenew}
+                      alt="Receipt Icon"
+                    />
+                    )}
+                  </IconButton>
+                </div>
               </Tooltip>
             )}
             {user?.role === "agent" &&
