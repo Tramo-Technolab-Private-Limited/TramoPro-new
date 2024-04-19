@@ -43,7 +43,18 @@ export default function ProfileAbout() {
           <Typography variant="body2">
             Shop at &nbsp;
             <Link component="span" variant="subtitle2" color="text.primary">
-              {`${user?.shopAddress} ${user?.locality} ${user?.city} ${user?.district} ${user?.state} ${user?.postalCode}`}
+              {`${user?.shopAddress}`}
+            </Link>
+          </Typography>
+        </Stack>
+
+        
+        <Stack direction="row">
+          <StyledIcon icon="eva:email-fill" />
+          <Typography variant="body2">
+            Mobile No &nbsp;
+            <Link component="span" variant="subtitle2" color="text.primary">
+              {`${user?.contact_no}`}
             </Link>
           </Typography>
         </Stack>
