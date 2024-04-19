@@ -35,6 +35,8 @@ import { convertToWords } from "src/components/customFunctions/ToWords";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
+import TransactionModal from "src/components/customFunctions/TrasactionModal";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 
@@ -51,6 +53,7 @@ type FormValuesProps = {
 //--------------------------------------------------------------------
 
 export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
+  const { user, initialize } = useAuthContext();
   const { dmt2RemitterAvailableLimit } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
@@ -60,7 +63,7 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
   const [errorMsg, setErrorMsg] = useState("");
   const [checkNPIN, setCheckNPIN] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const [count, setCount] = useState<any>(null);
+  // const [count, setCount] = useState<any>(null);
   const [transactionDetail, setTransactionDetail] = useState([]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -143,18 +146,18 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
     formState: { errors, isSubmitting },
   } = methods;
 
-  useEffect(() => {
-    if (count !== null) {
-      if (count > 0) {
-        const timer = setInterval(() => {
-          setCount((prevCount: any) => prevCount - 1);
-        }, 1000);
-        return () => clearInterval(timer);
-      } else {
-        window.location.reload();
-      }
-    }
-  }, [count]);
+  // useEffect(() => {
+  //   if (count !== null) {
+  //     if (count > 0) {
+  //       const timer = setInterval(() => {
+  //         setCount((prevCount: any) => prevCount - 1);
+  //       }, 1000);
+  //       return () => clearInterval(timer);
+  //     } else {
+  //       window.location.reload();
+  //     }
+  //   }
+  // }, [count]);
 
   const transaction = (data: FormValuesProps) => {
     let token = localStorage.getItem("token");
@@ -182,16 +185,13 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             if (Response.data.code == 200) {
               Response.data.response.map((element: any) => {
                 enqueueSnackbar(element.message);
-                UpdateUserDetail({
-                  main_wallet_amount:
-                    element?.data?.agentDetails?.newMainWalletBalance,
-                });
+                TextToSpeak(element.message);
+                initialize();
               });
               setTransactionDetail(Response.data.response);
-              TextToSpeak(Response.data.message);
               handleClose();
               handleOpen1();
-              setCount(5);
+              // setCount(5);
               setTxn(false);
               setErrorMsg("");
             } else {
@@ -210,16 +210,8 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
 
   return (
     <>
-      <Modal
-        open={open2}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={style}
-          style={{ borderRadius: "20px" }}
-          width={{ xs: "100%", sm: 400 }}
-        >
+      <MotionModal open={open2} width={{ xs: "95%", sm: 500 }}>
+        <Box>
           <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
             <Stack justifyContent={"space-between"} mb={2}>
               <Stack gap={1}>
@@ -320,32 +312,18 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             </Typography>
           </FormProvider>
         </Box>
-      </Modal>
-      <Modal
-        open={open}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
+      </MotionModal>
+      <MotionModal open={open} width={{ xs: "95%", sm: 500 }}>
         {checkNPIN ? (
           txn ? (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              width={"fit-content"}
-            >
-              <Icon
-                icon="eos-icons:bubble-loading"
-                color="red"
-                fontSize={300}
-                style={{ padding: 25 }}
-              />
-            </Box>
+            <Icon
+              icon="eos-icons:bubble-loading"
+              color="red"
+              fontSize={300}
+              style={{ padding: 25 }}
+            />
           ) : errorMsg ? (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              width={{ xs: "100%", sm: 400 }}
-            >
+            <Box>
               <Stack flexDirection={"column"} alignItems={"center"}>
                 <Typography variant="h3">Transaction Failed</Typography>
                 <Icon
@@ -389,12 +367,7 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             ></Box>
           )
         ) : (
-          <Box
-            sx={style}
-            style={{ borderRadius: "20px" }}
-            width={{ xs: "100%", sm: 450 }}
-            minWidth={350}
-          >
+          <Box>
             <Typography variant="h4" textAlign={"center"}>
               Confirm Details
             </Typography>
@@ -512,80 +485,17 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
             )}
           </Box>
         )}
-      </Modal>
-      <Modal
-        open={open1}
-        onClose={handleClose1}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style} style={{ borderRadius: "20px" }} width={"fit-content"}>
-          <Box
-            sx={style}
-            style={{ borderRadius: "20px" }}
-            p={2}
-            width={{ xs: "100%", sm: "fit-content" }}
-          >
-            <Stack
-              sx={{ border: "1.5px dashed #000000" }}
-              p={3}
-              borderRadius={2}
-            >
-              <Table
-                stickyHeader
-                aria-label="sticky table"
-                style={{ borderBottom: "1px solid #dadada" }}
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Client ref Id
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Created At
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Amount
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      status
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {transactionDetail.map((item: any) => (
-                    <TableRow key={item.data._id}>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {item.data.clientRefId || "NA"}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {fDateTime(item?.data?.createdAt)}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {item.data.amount && "₹"} {item.data.amount || "NA"}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {item.data.status || "NA"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              gap={1}
-              mt={1}
-              justifyContent={"center"}
-            >
-              {/* <Button variant="contained" onClick={handleClose1} size="small">
-                Download Receipt
-              </Button> */}
-              <Button variant="contained">Close({count})</Button>
-            </Stack>
-          </Box>
-        </Box>
-      </Modal>
+      </MotionModal>
+      <TransactionModal
+        isTxnOpen={open1}
+        handleTxnModal={() => {
+          setOpen1(false);
+          setErrorMsg("");
+          setMode("");
+        }}
+        errorMsg={errorMsg}
+        transactionDetail={transactionDetail}
+      />
     </>
   );
 }
