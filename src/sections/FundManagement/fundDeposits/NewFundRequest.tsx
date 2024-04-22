@@ -122,6 +122,7 @@ function NewFundRequest({ getRaisedRequest }: props) {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const Yup = require("yup");
   const fundRequestSchema = Yup.object().shape({
     bank_details: Yup.object().shape({
       bank_name: Yup.string().required("Please select Bank"),
@@ -129,7 +130,14 @@ function NewFundRequest({ getRaisedRequest }: props) {
     paymentModeId: Yup.string().required("Please select Mode"),
     amount: Yup.number()
       .typeError("That doesn't look like an Amount")
-      .positive("An Amount can't start with a minus")
+      .test((value: any, context: any) => {
+        return value &&
+          value >= 1 &&
+          context.originalValue &&
+          context.originalValue.startsWith("0")
+          ? false
+          : true;
+      })
       .min(
         +amountMinMaxValidation.min,
         `Please enter minimum ${fIndianCurrency(amountMinMaxValidation.min)}`
@@ -474,16 +482,21 @@ function NewFundRequest({ getRaisedRequest }: props) {
               maxDate={new Date()}
               minDate={dayjs(new Date()).subtract(4, "day") as any}
               onChange={(newValue: any) => setValue("date", newValue)}
+             
               renderInput={(params: any) => (
                 <RHFTextField
                   name="date"
                   type="date"
                   size="small"
                   autoComplete="off"
+                  onKeyDown={(e: any) => {
+                    e.preventDefault();
+                    return false;
+                  }}  
                   onPaste={(e: any) => {
                     e.preventDefault();
                     return false;
-                  }}
+                  }}  
                   {...params}
                 />
               )}
