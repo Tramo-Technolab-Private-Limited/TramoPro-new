@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as Yup from "yup";
 import { LoadingButton } from "@mui/lab";
 import { useForm } from "react-hook-form";
@@ -47,6 +47,7 @@ import WithdrawAttendance from "./WithdrawAttendance";
 import DownloadIcon from "src/assets/icons/DownloadIcon";
 import MenuPopover from "src/components/menu-popover/MenuPopover";
 import Iconify from "src/components/iconify/Iconify";
+import ReactToPrint from "react-to-print";
 
 // ----------------------------------------------------------------------
 
@@ -72,6 +73,7 @@ var localTime: any;
 
 export default function AEPS(props: any) {
   const { enqueueSnackbar } = useSnackbar();
+  const componentRef = useRef<any>();
   const { user, initialize } = useAuthContext();
   const theme = useTheme();
   const [CurrentTab, setCurrentTab] = useState("");
@@ -285,8 +287,8 @@ export default function AEPS(props: any) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           setPymentType(Response.data.data);
-          setCurrentTab(Response.data.data[0].productName);
-          setProductId(Response.data.data[0]._id);
+          setCurrentTab(Response.data.data[0]?.productName);
+          setProductId(Response.data.data[0]?._id);
         } else {
           enqueueSnackbar(Response?.data?.message);
         }
@@ -1034,45 +1036,68 @@ export default function AEPS(props: any) {
             style={{ borderRadius: "20px" }}
             width={{ sm: "100%", md: "60%" }}
           >
+            <Stack flexDirection={"row"} justifyContent={"flex-end"} mx={1}>
+              <Tooltip title="Close" onClick={handleCloseResponse}>
+                <IconButton>
+                  <Iconify icon="carbon:close-outline" />
+                </IconButton>
+              </Tooltip>
+              <ReactToPrint
+                trigger={() => (
+                  <Tooltip title="Print">
+                    <IconButton>
+                      <Iconify icon="eva:printer-fill" />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                content={() => componentRef.current}
+                onAfterPrint={handleCloseResponse}
+              />
+            </Stack>
             <Scrollbar sx={{ maxHeight: 500 }}>
-              {statement.length ? (
-                <TableContainer sx={{ overflow: "unset" }}>
-                  {resAmount && (
-                    <Typography variant="h2" textAlign={"center"}>
-                      Balance: {resAmount}
-                    </Typography>
-                  )}
-                  <Table>
-                    <TableHeadCustom headLabel={tableHead} />
-                    <TableBody>
-                      {statement.map((row: any, index: number) =>
-                        row.date ? (
-                          <TableRow key={row._id}>
-                            <TableCell>{row.date}</TableCell>
-                            <TableCell>{row.narration}</TableCell>
-                            <TableCell>{row.txnType}</TableCell>
-                            <TableCell
-                              style={
-                                row.txnType == "Cr"
-                                  ? { color: "green" }
-                                  : { color: "red" }
-                              }
-                            >
-                              {row.txnType == "Cr" ? "+" : "-"} {row.amount}
-                            </TableCell>
-                          </TableRow>
-                        ) : (
-                          <TableRow key={index}>{row}</TableRow>
-                        )
-                      )}
-                    </TableBody>
-                  </Table>
-                </TableContainer>
-              ) : (
-                <Typography variant="h3" noWrap>
-                  Statement Not Available
-                </Typography>
-              )}
+              <Grid
+                ref={componentRef}
+                sx={{ p: 3, width: { xs: 800, md: "100%" } }}
+              >
+                {statement.length ? (
+                  <TableContainer sx={{ overflow: "unset" }}>
+                    {resAmount && (
+                      <Typography variant="h2" textAlign={"center"}>
+                        Balance: {resAmount}
+                      </Typography>
+                    )}
+                    <Table>
+                      <TableHeadCustom headLabel={tableHead} />
+                      <TableBody>
+                        {statement.map((row: any, index: number) =>
+                          row.date ? (
+                            <TableRow key={row._id}>
+                              <TableCell>{row.date}</TableCell>
+                              <TableCell>{row.narration}</TableCell>
+                              <TableCell>{row.txnType}</TableCell>
+                              <TableCell
+                                style={
+                                  row.txnType == "Cr"
+                                    ? { color: "green" }
+                                    : { color: "red" }
+                                }
+                              >
+                                {row.txnType == "Cr" ? "+" : "-"} {row.amount}
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            <TableRow key={index}>{row}</TableRow>
+                          )
+                        )}
+                      </TableBody>
+                    </Table>
+                  </TableContainer>
+                ) : (
+                  <Typography variant="h3" noWrap>
+                    Statement Not Available
+                  </Typography>
+                )}
+              </Grid>
               <Button
                 variant="contained"
                 onClick={handleCloseResponse}
