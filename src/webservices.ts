@@ -28,8 +28,22 @@ export function UploadFile(url: any, body: any, token: any) {
     });
 }
 
-export function Api(url: any, apiMethod: any, body: any, token: any) {
+export async function Api(url: any, apiMethod: any, body: any, token: any) {
   let userAgent: any = navigator.userAgent;
+  let ip = null;
+  let location: any = await new Promise((resolve, reject) => {
+    navigator.geolocation.getCurrentPosition(resolve, reject);
+  });
+
+  console.log(location, "location");
+  await fetch("https://api.ipify.org?format=json")
+    .then((response) => response.json())
+    .then((data) => {
+      ip = data.ip;
+    });
+
+  // Wrap the geolocation call in a new Promise.
+
   var init: any =
     apiMethod === "GET"
       ? {
@@ -38,9 +52,9 @@ export function Api(url: any, apiMethod: any, body: any, token: any) {
             //  'Authorization': token
             "Content-Type": "application/json",
             token: token ? token : null,
-            latitude: localStorage.getItem("lat"),
-            longitude: localStorage.getItem("long"),
-            ip: localStorage.getItem("ip")?.toString(),
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            ip: ip,
             "user-Agent": userAgent,
             devicetype: userAgent.match(/Android/i)
               ? "android"
@@ -54,9 +68,9 @@ export function Api(url: any, apiMethod: any, body: any, token: any) {
           headers: {
             token: token ? token : null,
             "Content-Type": "application/json",
-            latitude: localStorage.getItem("lat"),
-            longitude: localStorage.getItem("long"),
-            ip: localStorage.getItem("ip")?.toString(),
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+            ip: ip,
             "user-Agent": userAgent,
             devicetype: userAgent.match(/Android/i)
               ? "android"
