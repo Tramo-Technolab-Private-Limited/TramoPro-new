@@ -14,7 +14,7 @@ import EditIcon from "src/assets/icons/EditIcon";
 import Label from "src/components/label/Label";
 import { TableHeadCustom } from "src/components/table";
 import { fIndianCurrency } from "src/utils/formatNumber";
-import { fDate } from "src/utils/formatTime";
+import { fDate, fDateTime } from "src/utils/formatTime";
 import { fundRequestProps } from "./types";
 import { format } from "date-fns";
 import MotionModal from "src/components/animate/MotionModal";
@@ -22,7 +22,7 @@ import UpdateFundRequest from "./UpdateFundRequest";
 import dayjs from "dayjs";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { useNavigate } from "react-router";
-import { PATH_DASHBOARD } from 'src/routes/paths';
+import { PATH_DASHBOARD } from "src/routes/paths";
 import { LoadingButton } from "@mui/lab";
 
 type props = {
@@ -34,6 +34,7 @@ function FundDepositeTable({ tableData, getRaisedRequest }: props) {
   const navigate = useNavigate();
   const tableLabels = [
     { id: "frid", label: "FRID" },
+    { id: "date", label: " Date" },
     { id: "depositor", label: "Deposited To" },
     { id: "Ref", label: "UTR/Payment Reference Number" },
     { id: "RequestType", label: "Request Mode" },
@@ -45,34 +46,35 @@ function FundDepositeTable({ tableData, getRaisedRequest }: props) {
 
   return (
     <>
-    <Stack direction={"row"} justifyContent={'space-between'} mb={2}>
-    <Typography variant="h5">Last 5 Transaction &#9660;</Typography>
-    <LoadingButton onClick={() => navigate(PATH_DASHBOARD.fundmanagement.myfundrequest)}
-    variant='contained'
-    sx={{width:'200px'}}
-    >
-      View All Transaction
-    </LoadingButton>
-  </Stack>
-    <Card>
-      <TableContainer sx={{ overflow: "unset" }}>
-        <Scrollbar>
-          <Table sx={{ minWidth: 720 }}>
-            <TableHeadCustom headLabel={tableLabels} />
+      <Stack direction={"row"} justifyContent={"space-between"} mb={2}>
+        <Typography variant="h5">Last 5 Transaction &#9660;</Typography>
+        <LoadingButton
+          onClick={() => navigate(PATH_DASHBOARD.fundmanagement.myfundrequest)}
+          variant="contained"
+          sx={{ width: "200px" }}
+        >
+          View All Transaction
+        </LoadingButton>
+      </Stack>
+      <Card>
+        <TableContainer sx={{ overflow: "unset" }}>
+          <Scrollbar>
+            <Table sx={{ minWidth: 720 }}>
+              <TableHeadCustom headLabel={tableLabels} />
 
-            <TableBody>
-              {tableData.map((row: any) => (
-                <FundRequestTable
-                  key={row._id}
-                  row={row}
-                  getRaisedRequest={getRaisedRequest}
-                />
-              ))}
-            </TableBody>
-          </Table>
-        </Scrollbar>
-      </TableContainer>
-    </Card>
+              <TableBody>
+                {tableData.map((row: any) => (
+                  <FundRequestTable
+                    key={row._id}
+                    row={row}
+                    getRaisedRequest={getRaisedRequest}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </Scrollbar>
+        </TableContainer>
+      </Card>
     </>
   );
 }
@@ -108,6 +110,16 @@ const FundRequestTable = ({ row, getRaisedRequest }: any) => {
     <TableRow key={row?._id} hover>
       <TableCell>
         <Typography variant="body2">{row?.fund_request_Id}</Typography>
+      </TableCell>
+      <TableCell>
+        <Stack direction={"row"} gap={1}>
+          <Typography variant="subtitle2">Created At :</Typography>
+          <Typography variant="body1">{fDateTime(row?.createdAt)}</Typography>
+        </Stack>
+        <Stack direction={"row"} gap={1}>
+          <Typography variant="subtitle2">Updated At:</Typography>
+          <Typography variant="body1">{fDateTime(row?.actionDate)}</Typography>
+        </Stack>
       </TableCell>
       <TableCell>
         <Typography variant="body2">

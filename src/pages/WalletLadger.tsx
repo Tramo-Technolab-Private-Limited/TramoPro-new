@@ -62,6 +62,7 @@ type FormValuesProps = {
   endDate: Date | null;
   clientRefId: string;
   walletType: string;
+  walletId: string;
 };
 
 type RowProps = {
@@ -94,6 +95,7 @@ export default function WalletLadger() {
 
   const agenttableLabels = [
     { id: "date", label: "Date/Time  " },
+    { id: "walletId", label: "Wallet ID" },
     { id: "Remark/TransactionType", label: "Remark/TransactionType" },
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
@@ -104,6 +106,7 @@ export default function WalletLadger() {
   ];
   const distributortableLabels = [
     { id: "date", label: "Date/Time  " },
+    { id: "walletId", label: "Wallet ID" },
     { id: "Remark/TransactionType", label: "Remark/TransactionType" },
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
@@ -114,6 +117,7 @@ export default function WalletLadger() {
   ];
   const MDtableLabels = [
     { id: "date", label: "Date/Time " },
+    { id: "walletId", label: "Wallet ID" },
     { id: "Remark/TransactionType", label: "Remark/TransactionType" },
     { id: "productName", label: "Product " },
     { id: "amount", label: "Transaction Amount" },
@@ -142,6 +146,7 @@ export default function WalletLadger() {
     startDate: null,
     endDate: null,
     clientRefId: "",
+    walletId: "",
     walletType: "",
   };
   const methods = useForm<FormValuesProps>({
@@ -164,13 +169,14 @@ export default function WalletLadger() {
   const getTransactional = () => {
     let token = localStorage.getItem("token");
     setSendLoading(true);
-
+    handleClose();
     let body = {
       pageInitData: {
         pageSize: pageSize,
         currentPage: currentPage,
       },
       clientRefId: getValues("clientRefId") || "",
+      walletId: getValues("walletId") || "",
       startDate: fDateFormatForApi(getValues("startDate")),
       endDate: fDateFormatForApi(getValues("endDate")),
     };
@@ -182,6 +188,7 @@ export default function WalletLadger() {
           setWalletCount(Response.data.data.totalNumberOfRecords);
           enqueueSnackbar(Response.data.message);
           setSendLoading(false);
+          reset(defaultValues);
         } else {
           enqueueSnackbar(Response.data.message, { variant: "error" });
           setSendLoading(false);
@@ -189,7 +196,6 @@ export default function WalletLadger() {
       }
     });
   };
-
 
   const handleReset = () => {
     reset(defaultValues);
@@ -204,7 +210,7 @@ export default function WalletLadger() {
       </Helmet>
 
       <Stack sx={{ maxHeight: window.innerHeight - 220 }}>
-      <Stack flexDirection={"row"} gap={1} mb={1} justifyContent={"right"}>
+        <Stack flexDirection={"row"} gap={1} mb={1} justifyContent={"right"}>
           <Button variant="contained" onClick={handleReset}>
             <Iconify icon="bx:reset" color={"common.white"} mr={1} />
             Reset
@@ -225,59 +231,77 @@ export default function WalletLadger() {
         >
           {/* <Box> */}
           <Stack mb={1}>
-          <FormProvider
-          methods={methods}
-          onSubmit={handleSubmit(getTransactional)}
-        >
-          <Stack m={1} gap={1}>
-            <RHFTextField
-              name="clientRefId"
-              placeholder={"Client Ref Id"}
-              fullWidth            />
-            <Stack flexDirection={"row"} gap={1}>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DatePicker
-                  label="Start date"
-                  inputFormat="DD/MM/YYYY"
-                  value={watch("startDate")}
-                  maxDate={new Date()}
-                  onChange={(newValue: any) => setValue("startDate", newValue)}
-                  renderInput={(params: any) => (
-                    <TextField {...params} size={"small"} sx={{ width: 250 }} />
-                  )}
+            <FormProvider
+              methods={methods}
+              onSubmit={handleSubmit(getTransactional)}
+            >
+              <Stack m={1} gap={1}>
+                <RHFTextField
+                  name="clientRefId"
+                  placeholder={"Client Ref Id"}
+                  fullWidth
                 />
-                <DatePicker
-                  label="End date"
-                  inputFormat="DD/MM/YYYY"
-                  value={watch("endDate")}
-                  minDate={watch("startDate")}
-                  maxDate={new Date()}
-                  onChange={(newValue: any) => setValue("endDate", newValue)}
-                  renderInput={(params: any) => (
-                    <TextField {...params} size={"small"} sx={{ width: 250 }} />
-                  )}
+                <RHFTextField
+                  name="walletId"
+                  placeholder={"Wallet ID"}
+                  fullWidth
                 />
-              </LocalizationProvider>
-            </Stack>
-            <Stack flexDirection={"row"} gap={1}>
-                <LoadingButton variant="contained" onClick={handleClose}>
-                  Cancel
-                </LoadingButton>
-                <LoadingButton variant="contained" onClick={handleReset}>
-                  <Iconify icon="bx:reset" color={"common.white"} mr={1} />{" "}
-                  Reset
-                </LoadingButton>
-                <LoadingButton
-                  variant="contained"
-                  type="submit"
-                  loading={isSubmitting}
-                >
-                  Apply
-                </LoadingButton>
+                <Stack flexDirection={"row"} gap={1}>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DatePicker
+                      label="Start date"
+                      inputFormat="DD/MM/YYYY"
+                      value={watch("startDate")}
+                      maxDate={new Date()}
+                      onChange={(newValue: any) =>
+                        setValue("startDate", newValue)
+                      }
+                      renderInput={(params: any) => (
+                        <TextField
+                          {...params}
+                          size={"small"}
+                          sx={{ width: 250 }}
+                        />
+                      )}
+                    />
+                    <DatePicker
+                      label="End date"
+                      inputFormat="DD/MM/YYYY"
+                      value={watch("endDate")}
+                      minDate={watch("startDate")}
+                      maxDate={new Date()}
+                      onChange={(newValue: any) =>
+                        setValue("endDate", newValue)
+                      }
+                      renderInput={(params: any) => (
+                        <TextField
+                          {...params}
+                          size={"small"}
+                          sx={{ width: 250 }}
+                        />
+                      )}
+                    />
+                  </LocalizationProvider>
+                </Stack>
+                <Stack flexDirection={"row"} gap={1}>
+                  <LoadingButton variant="contained" onClick={handleClose}>
+                    Cancel
+                  </LoadingButton>
+                  <LoadingButton variant="contained" onClick={handleReset}>
+                    <Iconify icon="bx:reset" color={"common.white"} mr={1} />{" "}
+                    Reset
+                  </LoadingButton>
+                  <LoadingButton
+                    variant="contained"
+                    type="submit"
+                    loading={isSubmitting}
+                  >
+                    Apply
+                  </LoadingButton>
+                </Stack>
               </Stack>
+            </FormProvider>
           </Stack>
-        </FormProvider>
-      </Stack>
           {/* </Box> */}
         </MotionModal>
 
@@ -439,6 +463,9 @@ const LadgerRow = ({ row }: any) => {
               ? fDateTime(row?.createdAt)
               : fDateTime(row?.createdAt)}
           </Typography>
+        </StyledTableCell>
+        <StyledTableCell>
+          <Typography variant="body2">{row?.walletId}</Typography>
         </StyledTableCell>
         <StyledTableCell>
           {row?.transaction?.productName && (
