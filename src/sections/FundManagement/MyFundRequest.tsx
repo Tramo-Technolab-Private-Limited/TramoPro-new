@@ -378,37 +378,51 @@ export default function (props: any) {
                     <StyledTableCell>
                       <Stack direction={"row"} gap={1}>
                         <Typography variant="subtitle1">
-                          Created At :
+                          Deposit At :
                         </Typography>
-                        <Typography variant="body1">
-                          {fDateTime(row?.createdAt)}
+                        <Typography noWrap variant="body2">
+                          {fDate(row?.date_of_deposit)}
+                        </Typography>
+                      </Stack>
+                      <Stack direction={"row"} gap={1}>
+                        <Typography variant="subtitle1">Created At:</Typography>
+                        <Typography variant="body2">
+                          {fDateTime(row?.actionDate)}
                         </Typography>
                       </Stack>
                       <Stack direction={"row"} gap={1}>
                         <Typography variant="subtitle1">Updated At:</Typography>
-                        <Typography variant="body1">
+                        <Typography variant="body2">
                           {fDateTime(row?.actionDate)}
                         </Typography>
                       </Stack>
                     </StyledTableCell>
 
                     <StyledTableCell>
-                      <Typography variant="body1">Rs. {row?.amount}</Typography>
+                      <Typography variant="body2">
+                        {`${
+                          row?.bankId?.bank_details?.bank_name
+                        } (Ending with ${row?.bankId?.bank_details?.account_number.slice(
+                          row?.bankId?.bank_details?.account_number.length - 4
+                        )})`}
+                      </Typography>
+
+                      <Typography variant="body2">Rs. {row?.amount}</Typography>
                     </StyledTableCell>
                     <StyledTableCell>
-                      <Typography variant="body1">
+                      <Typography variant="body2">
                         {row?.modeId?.transfer_mode_name}
                       </Typography>
                     </StyledTableCell>
 
                     <StyledTableCell>
-                      <Typography variant="body1" textAlign={"center"}>
+                      <Typography variant="body2" textAlign={"center"}>
                         {!isNaN(row?.Charge) ? "Rs. " + row?.Charge : "-"}
                       </Typography>
                     </StyledTableCell>
 
                     <StyledTableCell>
-                      <Typography variant="body1" textAlign={"center"}>
+                      <Typography variant="body2" textAlign={"center"}>
                         {!isNaN(row?.Commission)
                           ? "Rs. " + fIndianCurrency(row?.Commission || "0")
                           : "-"}
@@ -416,19 +430,19 @@ export default function (props: any) {
                     </StyledTableCell>
 
                     <StyledTableCell>
-                      <Typography variant="body1">
+                      <Typography variant="body2">
                         {row?.deposit_type}
                       </Typography>
                     </StyledTableCell>
 
                     <StyledTableCell>
-                      <Typography variant="body1">
+                      <Typography variant="body2">
                         {row?.transactional_details?.mobile}
                       </Typography>
                     </StyledTableCell>
 
                     <StyledTableCell>
-                      <Typography variant="body1">
+                      <Typography variant="body2">
                         {row?.transactional_details?.branch}
                       </Typography>
                     </StyledTableCell>

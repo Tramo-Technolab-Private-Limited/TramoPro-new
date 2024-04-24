@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { useSnackbar } from "notistack";
 import {
+  Alert,
   Box,
   Button,
   FormHelperText,
@@ -29,6 +30,7 @@ import { useNavigate } from "react-router-dom";
 import { PATH_DASHBOARD } from "src/routes/paths";
 import { DialogAnimate } from "src/components/animate";
 import { watch } from "fs";
+import LoadingScreen from "src/components/loading-screen/LoadingScreen";
 
 type FormValuesProps = {
   bankDetail: {
@@ -49,10 +51,10 @@ export default React.memo(function SettlementToBank() {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { initialize } = useAuthContext();
+  const [load, setLoad] = useState(false);
   const [eligibleSettlementAmount, setEligibleSettlementAmount] =
     useState<any>();
   const [transferTo, setTransferTo] = useState<boolean | null>(null);
-  const [userBankList, setUserBankList] = useState([]);
   const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
 
   const [open, setOpen] = useState(false);
@@ -111,6 +113,7 @@ export default React.memo(function SettlementToBank() {
   }, []);
 
   const BankList = () => {
+    setLoad(true);
     let token = localStorage.getItem("token");
     Api(`user/user_bank_list`, "GET", "", token).then((Response: any) => {
       if (Response.status == 200) {
@@ -126,6 +129,7 @@ export default React.memo(function SettlementToBank() {
               variant: "error",
             });
           }
+          setLoad(false);
         } else {
           enqueueSnackbar(Response.data.message, { variant: "error" });
         }
@@ -184,6 +188,9 @@ export default React.memo(function SettlementToBank() {
     );
   };
 
+  if (load) {
+    return <LoadingScreen />;
+  }
   if (!watch("bankDetail.ifsc")?.length) {
     return (
       <Stack
@@ -194,9 +201,19 @@ export default React.memo(function SettlementToBank() {
           mt: 20,
         }}
       >
-        <LoadingButton variant="contained" onClick={goTomybankaccount}>
-          Add New Bank Account
-        </LoadingButton>
+        <Stack gap={1}>
+          <LoadingButton
+            variant="contained"
+            onClick={goTomybankaccount}
+            sx={{ alignSelf: "center" }}
+          >
+            Add New Bank Account
+          </LoadingButton>
+          <Alert severity="warning">
+            Note: if you already add a bank. Please choose a default bank
+            account from your existing banks.
+          </Alert>
+        </Stack>
       </Stack>
     );
   }

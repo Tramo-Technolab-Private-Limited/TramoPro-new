@@ -27,6 +27,7 @@ import _ from "lodash";
 import { LoadingButton } from "@mui/lab";
 import DMTRemitterDetail from "./DMTRemitterDetail";
 import DMTbeneficiary from "./DMTbeneficiary";
+import RHFMobileNumber from "src/components/hook-form/RHFMobileNumber";
 
 // ----------------------------------------------------------------------
 
@@ -155,9 +156,6 @@ export default function DMT() {
               SendOTP(data.mobileNumber);
               openEditModal2();
             }
-            enqueueSnackbar(Response.data.message, { variant: "warning" });
-          } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         } else {
           remitterDispatch({ type: "REMITTER_NOT_FOUND" });

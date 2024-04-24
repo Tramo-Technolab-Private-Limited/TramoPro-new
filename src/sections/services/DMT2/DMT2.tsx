@@ -150,7 +150,6 @@ export default function DMT2() {
                 reSendOTP(data.mobileNumber);
                 openEditModal2();
               }
-              enqueueSnackbar(Response.data.message, { variant: "warning" });
             } else {
               enqueueSnackbar(Response.data.message, { variant: "error" });
             }
@@ -203,7 +202,6 @@ export default function DMT2() {
             reSendOTP(val);
             openEditModal2();
           }
-          enqueueSnackbar(Response.data.message, { variant: "warning" });
         } else {
           enqueueSnackbar(Response.data.message, { variant: "error" });
         }
@@ -455,7 +453,6 @@ const NewRegistration = ({ mobilenumber, handleNewRegistaion }: any) => {
       console.log("==============>>> register remmiter Response", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.message);
           setIsLoading(false);
           handleNewRegistaion("SUCCESS");
         } else {

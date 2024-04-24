@@ -149,9 +149,6 @@ export default function DMT1() {
                 SendOTP(data.mobileNumber);
                 openEditModal2();
               }
-              enqueueSnackbar(Response.data.message, { variant: "warning" });
-            } else {
-              enqueueSnackbar(Response.data.message, { variant: "error" });
             }
           } else {
             remitterDispatch({ type: "REMITTER_NOT_FOUND" });

@@ -1137,9 +1137,7 @@ function TransactionRow({ row }: childProps) {
           <StyledTableCell sx={{ whiteSpace: "nowrap" }}>
             <Typography variant="body2">
               GST :{" "}
-              {fIndianCurrency(
-                (user?.role == "agent" && newRow?.agentDetails?.GST) || "0"
-              )}
+              {fIndianCurrency((user?.role == "agent" && newRow?.GST) || "0")}
             </Typography>
             <Typography variant="body2">
               TDS :{" "}
