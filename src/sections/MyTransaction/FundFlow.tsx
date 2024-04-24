@@ -199,6 +199,7 @@ export default function FundFlow() {
   const filterTransaction = (data: FormValuesProps) => {
     setCurrentPage(1);
     setLoading(true);
+    handleClose();
     let token = localStorage.getItem("token");
     let body = {
       pageInitData: {
@@ -219,7 +220,7 @@ export default function FundFlow() {
             setSdata(Response.data.data.data);
             setPageCount(Response.data.data.totalNumberOfRecords);
             enqueueSnackbar(Response.data.message);
-
+            reset(defaultValues);
             const debit = Response.data.data.data.reduce(
               (accumulator: number, currentValue: any) => {
                 if (user?._id == currentValue?.walletLedgerData?.from?.id) {
