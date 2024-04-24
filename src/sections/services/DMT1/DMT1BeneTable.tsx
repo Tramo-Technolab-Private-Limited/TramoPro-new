@@ -174,7 +174,7 @@ export default function DMTbeneficiary() {
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(DMTSchema),
     defaultValues,
-    mode: "all",
+    mode: "onSubmit",
   });
 
   const {
@@ -335,12 +335,17 @@ export default function DMTbeneficiary() {
         ) : (
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             <Stack justifyContent={"end"} flexDirection={"row"} mb={1}>
-              <Button variant="contained" size="medium" onClick={getBankList}>
+              <LoadingButton
+                variant="contained"
+                size="medium"
+                onClick={getBankList}
+                loading={getBank.isLoading}
+              >
                 <span style={{ paddingRight: "5px", fontSize: "14px" }}>
                   +{" "}
                 </span>{" "}
                 Add New Beneficiary
-              </Button>
+              </LoadingButton>
             </Stack>
             <TableContainer component={Paper}>
               <Scrollbar
