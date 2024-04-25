@@ -226,9 +226,9 @@ export default function DMT2() {
       <Helmet>
         <title>Money Transfer | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
-      <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-        <Grid container spacing={2} width={"100%"}>
-          <Grid item sm={3}>
+      <Grid container spacing={2} width={"100%"}>
+        <Grid item sm={3}>
+          <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
             <Box
               rowGap={2}
               columnGap={2}
@@ -268,13 +268,13 @@ export default function DMT2() {
                 click here
               </a>
             </Typography>
-            {remitter.remitterfetch && <DMT2RemitterDetail />}
-          </Grid>
-          <Grid item sm={9} sx={{ width: "100%" }}>
-            {remitter.remitterfetch && <DMT2BeneTable />}
-          </Grid>
+          </FormProvider>
+          {remitter.remitterfetch && <DMT2RemitterDetail />}
         </Grid>
-      </FormProvider>
+        <Grid item sm={9} sx={{ width: "100%" }}>
+          {remitter.remitterfetch && <DMT2BeneTable />}
+        </Grid>
+      </Grid>
       <Modal
         open={open1}
         aria-labelledby="modal-modal-title"

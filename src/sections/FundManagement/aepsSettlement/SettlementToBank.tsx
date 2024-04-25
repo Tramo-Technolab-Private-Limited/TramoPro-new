@@ -68,9 +68,11 @@ export default React.memo(function SettlementToBank() {
       .min(1000)
       .max(Number(eligibleSettlementAmount))
       .typeError("Amount is required"),
-    accountNumber: transferTo
-      ? Yup.string()
-      : Yup.string().required("Bank account is required"),
+    bankDetail: Yup.object().shape({
+      ifsc: Yup.string(),
+      accountNumber: Yup.string(),
+      bankName: Yup.string(),
+    }),
     otp1: Yup.string().required(),
     otp2: Yup.string().required(),
     otp3: Yup.string().required(),
@@ -80,7 +82,11 @@ export default React.memo(function SettlementToBank() {
   });
   const defaultValues = {
     amount: "",
-    accountNumber: "",
+    bankDetail: {
+      ifsc: "",
+      accountNumber: "",
+      bankName: "",
+    },
     ifsc: "",
     otp1: "",
     otp2: "",

@@ -36,6 +36,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 import MotionModal from "src/components/animate/MotionModal";
+import TransactionModal from "src/components/customFunctions/TrasactionModal";
 
 // ----------------------------------------------------------------------
 
@@ -52,11 +53,10 @@ type FormValuesProps = {
 //--------------------------------------------------------------------
 
 export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
-  const { user, initialize } = useAuthContext();
   const { dmt2RemitterAvailableLimit } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const { UpdateUserDetail } = useAuthContext();
+  const { initialize } = useAuthContext();
   const [txn, setTxn] = useState(true);
   const [mode, setMode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
@@ -145,18 +145,18 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
     formState: { errors, isSubmitting },
   } = methods;
 
-  useEffect(() => {
-    if (count !== null) {
-      if (count > 0) {
-        const timer = setInterval(() => {
-          setCount((prevCount: any) => prevCount - 1);
-        }, 1000);
-        return () => clearInterval(timer);
-      } else {
-        window.location.reload();
-      }
-    }
-  }, [count]);
+  // useEffect(() => {
+  //   if (count !== null) {
+  //     if (count > 0) {
+  //       const timer = setInterval(() => {
+  //         setCount((prevCount: any) => prevCount - 1);
+  //       }, 1000);
+  //       return () => clearInterval(timer);
+  //     } else {
+  //       window.location.reload();
+  //     }
+  //   }
+  // }, [count]);
 
   const transaction = (data: FormValuesProps) => {
     let token = localStorage.getItem("token");
@@ -187,21 +187,25 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
                 TextToSpeak(element.message);
                 initialize();
               });
-              setTransactionDetail(Response.data.response);
-              handleClose();
+              setTransactionDetail(
+                Response.data.response.map((item: any) => item.data)
+              );
               handleOpen1();
-              setCount(5);
+              handleClose();
+              // setCount(5);
               setTxn(false);
               setErrorMsg("");
             } else {
               enqueueSnackbar(Response.data.message, { variant: "error" });
               setErrorMsg(Response.data.message);
+              setTxn(false);
             }
-            clearPayout();
+            // clearPayout();
           } else {
             setCheckNPIN(false);
             enqueueSnackbar(Response, { variant: "error" });
-            clearPayout();
+            // clearPayout();
+            setTxn(false);
           }
         });
     }
@@ -209,108 +213,107 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
 
   return (
     <>
-      <MotionModal open={open2} width={{ xs: "95%", sm: 500 }}>
-        <Box>
-          <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
-            <Stack justifyContent={"space-between"} mb={2}>
-              <Stack gap={1}>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2">Beneficiary Name</Typography>
-                  <Typography variant="subtitle2">{beneName}</Typography>
-                </Stack>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2"> Bank Name</Typography>
-                  <Typography variant="subtitle2">{bankName}</Typography>
-                </Stack>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2"> Account Number</Typography>
-                  <Typography variant="subtitle2">{accountNumber}</Typography>
-                </Stack>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2">IFSC</Typography>
-                  <Typography variant="subtitle2">{ifsc}</Typography>
-                </Stack>
+      <MotionModal open={open2} width={{ xs: "95%", sm: 400 }}>
+        <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
+          <Stack justifyContent={"space-between"} mb={2}>
+            <Stack gap={1}>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2">Beneficiary Name</Typography>
+                <Typography variant="subtitle2">{beneName}</Typography>
               </Stack>
-
-              <RHFTextField
-                sx={{ marginTop: "20px", maxWidth: "500px" }}
-                aria-autocomplete="none"
-                name="payAmount"
-                label="Enter Amount"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">₹</InputAdornment>
-                  ),
-                }}
-              />
-              <FormControl style={{ display: "flex" }}>
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  value={mode}
-                  onChange={(event, value) => setMode(value)}
-                  name="radiobuttonsgroup"
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    marginTop: "10px",
-                  }}
-                >
-                  <FormControlLabel
-                    sx={{ color: "inherit" }}
-                    name="NEFT"
-                    value="1"
-                    control={<Radio />}
-                    label="NEFT"
-                  />
-                  <FormControlLabel
-                    value="2"
-                    name="IMPS"
-                    control={<Radio />}
-                    label="IMPS"
-                  />
-                </RadioGroup>
-              </FormControl>
-              <Stack flexDirection={"row"} gap={1}>
-                <Button
-                  onClick={() => {
-                    handleClose2();
-                    handleOpen();
-                  }}
-                  variant="contained"
-                  sx={{ mt: 1 }}
-                  disabled={
-                    !mode ||
-                    !(+watch("payAmount") > 5000
-                      ? +watch("payAmount") % 100 === 0
-                        ? true
-                        : false
-                      : +watch("payAmount") < 100
-                      ? false
-                      : true) ||
-                    !(+watch("payAmount") > dmt2RemitterAvailableLimit
-                      ? false
-                      : true)
-                  }
-                >
-                  Pay Now
-                </Button>
-                <Button
-                  onClick={() => {
-                    handleClose2();
-                    clearPayout();
-                  }}
-                  variant="contained"
-                  sx={{ mt: 1 }}
-                >
-                  Cancel
-                </Button>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2"> Bank Name</Typography>
+                <Typography variant="subtitle2">{bankName}</Typography>
+              </Stack>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2"> Account Number</Typography>
+                <Typography variant="subtitle2">{accountNumber}</Typography>
+              </Stack>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2">IFSC</Typography>
+                <Typography variant="subtitle2">{ifsc}</Typography>
               </Stack>
             </Stack>
-            <Typography textAlign="end">
-              {convertToWords(+watch("payAmount"))}
-            </Typography>
-          </FormProvider>
-        </Box>
+
+            <RHFTextField
+              sx={{ marginTop: "20px", maxWidth: "500px" }}
+              aria-autocomplete="none"
+              name="payAmount"
+              label="Enter Amount"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">₹</InputAdornment>
+                ),
+              }}
+            />
+            <FormControl style={{ display: "flex" }}>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                value={mode}
+                onChange={(event, value) => setMode(value)}
+                name="radiobuttonsgroup"
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  marginTop: "10px",
+                  marginLeft: "15px",
+                }}
+              >
+                <FormControlLabel
+                  sx={{ color: "inherit" }}
+                  name="NEFT"
+                  value="1"
+                  control={<Radio />}
+                  label="NEFT"
+                />
+                <FormControlLabel
+                  value="2"
+                  name="IMPS"
+                  control={<Radio />}
+                  label="IMPS"
+                />
+              </RadioGroup>
+            </FormControl>
+            <Stack flexDirection={"row"} gap={1}>
+              <Button
+                onClick={() => {
+                  handleClose2();
+                  handleOpen();
+                }}
+                variant="contained"
+                sx={{ mt: 1 }}
+                disabled={
+                  !mode ||
+                  !(+watch("payAmount") > 5000
+                    ? +watch("payAmount") % 100 === 0
+                      ? true
+                      : false
+                    : +watch("payAmount") < 100
+                    ? false
+                    : true) ||
+                  !(+watch("payAmount") > dmt2RemitterAvailableLimit
+                    ? false
+                    : true)
+                }
+              >
+                Pay Now
+              </Button>
+              <Button
+                onClick={() => {
+                  handleClose2();
+                  clearPayout();
+                }}
+                variant="contained"
+                sx={{ mt: 1 }}
+              >
+                Cancel
+              </Button>
+            </Stack>
+          </Stack>
+          <Typography textAlign="end">
+            {convertToWords(+watch("payAmount"))}
+          </Typography>
+        </FormProvider>
       </MotionModal>
       <MotionModal open={open} width={{ xs: "95%", sm: 500 }}>
         {checkNPIN ? (
@@ -322,7 +325,7 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
               style={{ padding: 25 }}
             />
           ) : errorMsg ? (
-            <Box>
+            <>
               <Stack flexDirection={"column"} alignItems={"center"}>
                 <Typography variant="h3">Transaction Failed</Typography>
                 <Icon
@@ -357,14 +360,8 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
                   Close
                 </Button>
               </Stack>
-            </Box>
-          ) : (
-            <Box
-              sx={style}
-              style={{ borderRadius: "20px" }}
-              width={{ xs: "100%", sm: 400 }}
-            ></Box>
-          )
+            </>
+          ) : null
         ) : (
           <Box>
             <Typography variant="h4" textAlign={"center"}>
@@ -453,8 +450,8 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
                       variant="contained"
                       color="warning"
                       onClick={() => {
-                        handleClose();
-                        clearPayout();
+                        // handleClose();
+                        // clearPayout();
                         reset(defaultValues);
                       }}
                     >
@@ -485,79 +482,20 @@ export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
           </Box>
         )}
       </MotionModal>
-      <Modal
-        open={open1}
-        onClose={handleClose1}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box sx={style} style={{ borderRadius: "20px" }} width={"fit-content"}>
-          <Box
-            sx={style}
-            style={{ borderRadius: "20px" }}
-            p={2}
-            width={{ xs: "100%", sm: "fit-content" }}
-          >
-            <Stack
-              sx={{ border: "1.5px dashed #000000" }}
-              p={3}
-              borderRadius={2}
-            >
-              <Table
-                stickyHeader
-                aria-label="sticky table"
-                style={{ borderBottom: "1px solid #dadada" }}
-              >
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Client ref Id
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Created At
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      Amount
-                    </TableCell>
-                    <TableCell sx={{ fontWeight: 800, textAlign: "center" }}>
-                      status
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {transactionDetail.map((item: any) => (
-                    <TableRow key={item.data._id}>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {item.data.clientRefId || "NA"}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {fDateTime(item?.data?.createdAt)}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {item.data.amount && "₹"} {item.data.amount || "NA"}
-                      </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>
-                        {item.data.status || "NA"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Stack>
-            <Stack
-              flexDirection={"row"}
-              gap={1}
-              mt={1}
-              justifyContent={"center"}
-            >
-              {/* <Button variant="contained" onClick={handleClose1} size="small">
-                Download Receipt
-              </Button> */}
-              <Button variant="contained">Close({count})</Button>
-            </Stack>
-          </Box>
-        </Box>
-      </Modal>
+      <MotionModal open={open1} width={{ xs: "95%", md: 720 }}>
+        <Stack flexDirection={"row"} gap={1} mt={1} justifyContent={"center"}>
+          <TransactionModal
+            isTxnOpen={open1}
+            handleTxnModal={() => {
+              setOpen1(false);
+              setErrorMsg("");
+              setMode("");
+            }}
+            errorMsg={errorMsg}
+            transactionDetail={transactionDetail}
+          />
+        </Stack>
+      </MotionModal>
     </>
   );
 }

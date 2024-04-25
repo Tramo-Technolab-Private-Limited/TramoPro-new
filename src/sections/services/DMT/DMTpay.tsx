@@ -31,6 +31,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 import TransactionModal from "src/components/customFunctions/TrasactionModal";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 
@@ -55,20 +56,22 @@ export default function DMTpay({
   const { availableLimitForMoneyTransfer } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const { initialize } = useAuthContext();
+  const { UpdateUserDetail, initialize } = useAuthContext();
   const [mode, setMode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
-  const [isTxnOpen, setIsTxnOpen] = useState(false);
-  const [transactionDetail, setTransactionDetail] = useState({
-    status: "",
-  });
+  const [transactionDetail, setTransactionDetail] = useState<any>([]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     reset(defaultValues);
   };
+
+  //recipt modal
+  const [open1, setOpen1] = useState(false);
+  const handleOpen1 = () => setOpen1(true);
+  const handleClose1 = () => setOpen1(false);
 
   const style = {
     position: "absolute" as "absolute",
@@ -140,7 +143,7 @@ export default function DMTpay({
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             enqueueSnackbar(Response.data.message);
-            setTransactionDetail(Response.data.data);
+            setTransactionDetail([{ ...Response.data.data }]);
             TextToSpeak(Response.data.message);
             initialize();
           } else {
@@ -148,7 +151,7 @@ export default function DMTpay({
             setErrorMsg(Response.data.message);
           }
           handleClose();
-          setIsTxnOpen(true);
+          handleOpen1();
         } else {
           enqueueSnackbar(Response, { variant: "error" });
         }
@@ -161,205 +164,190 @@ export default function DMTpay({
   return (
     <>
       {/* transactional user confirm */}
-      <Modal
-        open={isOpen}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={style}
-          style={{ borderRadius: "20px" }}
-          width={{ xs: "100%", sm: 400 }}
-        >
-          <FormProvider methods={methods} onSubmit={handleSubmit(onsubmit)}>
-            <Stack justifyContent={"space-between"} mb={2}>
-              <Stack gap={1}>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2">Beneficiary Name</Typography>
-                  <Typography variant="subtitle2">{beneName}</Typography>
-                </Stack>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2"> Bank Name</Typography>
-                  <Typography variant="subtitle2">{bankName}</Typography>
-                </Stack>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2"> Account Number</Typography>
-                  <Typography variant="subtitle2">{accountNumber}</Typography>
-                </Stack>
-                <Stack flexDirection={"row"} justifyContent={"space-between"}>
-                  <Typography variant="subtitle2">IFSC</Typography>
-                  <Typography variant="subtitle2">{ifsc}</Typography>
-                </Stack>
+      <MotionModal open={isOpen} width={{ xs: "95%", sm: 400 }}>
+        <FormProvider methods={methods} onSubmit={handleSubmit(onsubmit)}>
+          <Stack justifyContent={"space-between"} mb={2}>
+            <Stack gap={1}>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2">Beneficiary Name</Typography>
+                <Typography variant="subtitle2">{beneName}</Typography>
               </Stack>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2"> Bank Name</Typography>
+                <Typography variant="subtitle2">{bankName}</Typography>
+              </Stack>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2"> Account Number</Typography>
+                <Typography variant="subtitle2">{accountNumber}</Typography>
+              </Stack>
+              <Stack flexDirection={"row"} justifyContent={"space-between"}>
+                <Typography variant="subtitle2">IFSC</Typography>
+                <Typography variant="subtitle2">{ifsc}</Typography>
+              </Stack>
+            </Stack>
 
-              <RHFTextField
-                sx={{ marginTop: "20px", maxWidth: "500px" }}
-                aria-autocomplete="none"
-                name="payAmount"
-                label="Enter Amount"
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">₹</InputAdornment>
-                  ),
+            <RHFTextField
+              sx={{ marginTop: "20px", maxWidth: "500px" }}
+              aria-autocomplete="none"
+              name="payAmount"
+              type="number"
+              label="Enter Amount"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">₹</InputAdornment>
+                ),
+              }}
+            />
+            <Typography variant="caption">
+              {convertToWords(+watch("payAmount"))}
+            </Typography>
+            <FormControl style={{ display: "flex" }}>
+              <RadioGroup
+                aria-labelledby="demo-radio-buttons-group-label"
+                value={mode}
+                onChange={(event, value) => setMode(value)}
+                name="radiobuttonsgroup"
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  marginTop: "10px",
+                  marginLeft: "2px",
                 }}
-              />
-              <Typography variant="caption">
-                {convertToWords(+watch("payAmount"))}
-              </Typography>
-              <FormControl style={{ display: "flex" }}>
-                <RadioGroup
-                  aria-labelledby="demo-radio-buttons-group-label"
-                  value={mode}
-                  onChange={(event, value) => setMode(value)}
-                  name="radiobuttonsgroup"
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    marginTop: "10px",
-                  }}
-                >
-                  <FormControlLabel
-                    sx={{ color: "inherit" }}
-                    name="NEFT"
-                    value="NEFT"
-                    control={<Radio />}
-                    label="NEFT"
-                  />
-                  <FormControlLabel
-                    value="IMPS"
-                    name="IMPS"
-                    control={<Radio />}
-                    label="IMPS"
-                  />
-                </RadioGroup>
-              </FormControl>
-              <Stack flexDirection={"row"} gap={1}>
-                <Button
-                  onClick={() => {
-                    handleTxnClose();
-                    handleOpen();
-                  }}
-                  variant="contained"
-                  sx={{ mt: 1 }}
-                  disabled={
-                    !mode ||
-                    !(+watch("payAmount") > 99 ? true : false) ||
-                    !(+watch("payAmount") > availableLimitForMoneyTransfer
-                      ? false
-                      : true)
-                  }
-                >
-                  Pay Now
-                </Button>
-                <Button
-                  onClick={() => {
-                    handleTxnClose();
-                  }}
-                  variant="contained"
-                  sx={{ mt: 1 }}
-                >
-                  Cancel
-                </Button>
-              </Stack>
+              >
+                <FormControlLabel
+                  sx={{ color: "inherit" }}
+                  name="NEFT"
+                  value="NEFT"
+                  control={<Radio />}
+                  label="NEFT"
+                />
+                <FormControlLabel
+                  value="IMPS"
+                  name="IMPS"
+                  control={<Radio />}
+                  label="IMPS"
+                />
+              </RadioGroup>
+            </FormControl>
+            <Stack flexDirection={"row"} gap={1}>
+              <Button
+                onClick={() => {
+                  handleTxnClose();
+                  handleOpen();
+                }}
+                variant="contained"
+                sx={{ mt: 1 }}
+                disabled={
+                  !mode ||
+                  !(+watch("payAmount") > 99 ? true : false) ||
+                  !(+watch("payAmount") > availableLimitForMoneyTransfer
+                    ? false
+                    : true)
+                }
+              >
+                Pay Now
+              </Button>
+              <Button
+                onClick={() => {
+                  handleTxnClose();
+                }}
+                variant="contained"
+                sx={{ mt: 1 }}
+              >
+                Cancel
+              </Button>
             </Stack>
-          </FormProvider>
-        </Box>
-      </Modal>
+          </Stack>
+        </FormProvider>
+      </MotionModal>
 
-      <Modal
-        open={open}
-        aria-labelledby="modal-modal-title"
-        aria-describedby="modal-modal-description"
-      >
-        <Box
-          sx={style}
-          style={{ borderRadius: "20px" }}
-          width={{ xs: "100%", sm: 450 }}
-          minWidth={350}
-        >
-          <Typography variant="h4" textAlign={"center"}>
-            Confirm Details
-          </Typography>
-          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
-            <Typography variant="subtitle1">Beneficiary Name</Typography>
-            <Typography variant="body1">{beneName}</Typography>
-          </Stack>
-          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
-            <Typography variant="subtitle1">Bank Name</Typography>
-            <Typography variant="body1">{bankName}</Typography>
-          </Stack>
-          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
-            <Typography variant="subtitle1">Account Number</Typography>
-            <Typography variant="body1">{accountNumber}</Typography>
-          </Stack>
-          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
-            <Typography variant="subtitle1">IFSC code</Typography>
-            <Typography variant="body1">{ifsc}</Typography>
-          </Stack>
-          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
-            <Typography variant="subtitle1">Mobile Number</Typography>
-            <Typography variant="body1">{mobileNumber || "-"}</Typography>
-          </Stack>
-          <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
-            <Typography variant="subtitle1">Transaction Amount</Typography>
-            <Typography variant="body1">₹{getValues("payAmount")}</Typography>
-          </Stack>
-          <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
-            <Stack
-              alignItems={"center"}
-              justifyContent={"space-between"}
-              mt={2}
-              gap={2}
-            >
-              <Typography variant="h4">Confirm NPIN</Typography>
-              <RHFSecureCodes
-                keyName="otp"
-                inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-              />
+      <MotionModal open={open} width={{ xs: "95%", sm: 500 }}>
+        <Typography variant="h4" textAlign={"center"}>
+          Confirm Details
+        </Typography>
+        <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+          <Typography variant="subtitle1">Beneficiary Name</Typography>
+          <Typography variant="body1">{beneName}</Typography>
+        </Stack>
+        <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+          <Typography variant="subtitle1">Bank Name</Typography>
+          <Typography variant="body1">{bankName}</Typography>
+        </Stack>
+        <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+          <Typography variant="subtitle1">Account Number</Typography>
+          <Typography variant="body1">{accountNumber}</Typography>
+        </Stack>
+        <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+          <Typography variant="subtitle1">IFSC code</Typography>
+          <Typography variant="body1">{ifsc}</Typography>
+        </Stack>
+        <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+          <Typography variant="subtitle1">Mobile Number</Typography>
+          <Typography variant="body1">{mobileNumber || "-"}</Typography>
+        </Stack>
+        <Stack flexDirection={"row"} justifyContent={"space-between"} mt={2}>
+          <Typography variant="subtitle1">Transaction Amount</Typography>
+          <Typography variant="body1">₹{getValues("payAmount")}</Typography>
+        </Stack>
+        <FormProvider methods={methods} onSubmit={handleSubmit(transaction)}>
+          <Stack
+            alignItems={"center"}
+            justifyContent={"space-between"}
+            mt={2}
+            gap={2}
+          >
+            <Typography variant="h4">Confirm NPIN</Typography>
+            <RHFSecureCodes
+              keyName="otp"
+              inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
+            />
 
-              {(!!errors.otp1 ||
-                !!errors.otp2 ||
-                !!errors.otp3 ||
-                !!errors.otp4 ||
-                !!errors.otp5 ||
-                !!errors.otp6) && (
-                <FormHelperText error sx={{ px: 2 }}>
-                  Code is required
-                </FormHelperText>
-              )}
-              <Stack flexDirection={"row"} gap={1} mt={2}>
-                <LoadingButton
-                  variant="contained"
-                  type="submit"
-                  loading={isSubmitting}
-                >
-                  Continue
-                </LoadingButton>
-                <Button
-                  variant="contained"
-                  color="warning"
-                  onClick={() => {
-                    handleClose();
-                  }}
-                >
-                  Close
-                </Button>
-              </Stack>
+            {(!!errors.otp1 ||
+              !!errors.otp2 ||
+              !!errors.otp3 ||
+              !!errors.otp4 ||
+              !!errors.otp5 ||
+              !!errors.otp6) && (
+              <FormHelperText error sx={{ px: 2 }}>
+                Code is required
+              </FormHelperText>
+            )}
+            <Stack flexDirection={"row"} gap={1} mt={2}>
+              <LoadingButton
+                variant="contained"
+                type="submit"
+                loading={isSubmitting}
+              >
+                Continue
+              </LoadingButton>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => {
+                  handleClose();
+                }}
+              >
+                Close
+              </Button>
             </Stack>
-          </FormProvider>
-        </Box>
-      </Modal>
+          </Stack>
+        </FormProvider>
+      </MotionModal>
 
-      <TransactionModal
-        isTxnOpen={isTxnOpen}
-        handleTxnModal={() => {
-          setIsTxnOpen(false);
-          setErrorMsg("");
-          setMode("");
-        }}
-        errorMsg={errorMsg}
-        transactionDetail={transactionDetail}
-      />
+      <MotionModal open={open1} width={{ xs: "95%", md: 720 }}>
+        <Stack flexDirection={"row"} gap={1} mt={1} justifyContent={"center"}>
+          <TransactionModal
+            isTxnOpen={open1}
+            handleTxnModal={() => {
+              setOpen1(false);
+              setErrorMsg("");
+              setMode("");
+            }}
+            errorMsg={errorMsg}
+            transactionDetail={transactionDetail}
+          />
+        </Stack>
+      </MotionModal>
     </>
   );
 }

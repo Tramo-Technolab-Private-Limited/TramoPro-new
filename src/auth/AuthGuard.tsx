@@ -24,6 +24,10 @@ export default function AuthGuard({ children }: AuthGuardProps) {
     null
   );
 
+  if (location == null) {
+    return <LoadingScreen />;
+  }
+
   if (logOut) {
     return <Navigate to={"/login"} />;
   }
