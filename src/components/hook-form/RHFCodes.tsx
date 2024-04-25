@@ -57,6 +57,22 @@ export default function RHFCodes({
     handleChange(event);
   };
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const { maxLength, value, name }: any = event.target;
+
+    const fieldIndex = name.replace(keyName, "");
+
+    const fieldIntIndex = Number(fieldIndex);
+
+    const prevfield: HTMLElement | null = document.querySelector(
+      `input[name=${keyName}${fieldIntIndex - 1}]`
+    );
+
+    if (event.key === "Backspace" && value === "" && fieldIndex > 0) {
+      prevfield?.focus();
+    }
+  };
+
   useEventListener("paste", handlePaste, codesRef);
 
   return (
@@ -71,11 +87,14 @@ export default function RHFCodes({
               {...field}
               size="small"
               error={!!error}
+              aria-autocomplete="none"
+              autoComplete="off"
               // autoFocus={index === 0}
               placeholder="-"
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 handleChangeWithNextField(event, field.onChange);
               }}
+              onKeyDown={handleKeyDown}
               onFocus={(event) => event.currentTarget.select()}
               InputProps={{
                 sx: {
