@@ -394,7 +394,14 @@ const OtpSubmissionForRegistrantion = ({
           <LoadingButton variant="contained" type="submit" loading={isLoading}>
             Confirm
           </LoadingButton>
-          <Button variant="contained" color="warning" onClick={handleClose2}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => {
+              handleClose2();
+              reset(defaultValues);
+            }}
+          >
             Close
           </Button>
         </Stack>

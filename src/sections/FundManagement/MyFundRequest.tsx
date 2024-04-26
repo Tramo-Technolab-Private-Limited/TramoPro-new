@@ -378,20 +378,24 @@ export default function (props: any) {
                     <StyledTableCell>
                       <Stack direction={"row"} gap={1}>
                         <Typography variant="subtitle1">
-                          Deposit At :
+                          Created Date:
                         </Typography>
                         <Typography noWrap variant="body2">
+                          {fDateTime(row?.createdAt)}
+                        </Typography>
+                      </Stack>
+                      <Stack direction={"row"} gap={1}>
+                        <Typography variant="subtitle1">
+                          Deposit Date:
+                        </Typography>
+                        <Typography variant="body2">
                           {fDate(row?.date_of_deposit)}
                         </Typography>
                       </Stack>
                       <Stack direction={"row"} gap={1}>
-                        <Typography variant="subtitle1">Created At:</Typography>
-                        <Typography variant="body2">
-                          {fDateTime(row?.actionDate)}
+                        <Typography variant="subtitle1">
+                          Updated Date:
                         </Typography>
-                      </Stack>
-                      <Stack direction={"row"} gap={1}>
-                        <Typography variant="subtitle1">Updated At:</Typography>
                         <Typography variant="body2">
                           {fDateTime(row?.actionDate)}
                         </Typography>
