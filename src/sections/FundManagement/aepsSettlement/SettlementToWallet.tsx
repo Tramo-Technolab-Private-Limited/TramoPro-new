@@ -361,7 +361,7 @@ export default React.memo(function SettlementToWallet() {
                 </Table>
               )}
             </Scrollbar>
-            <CustomPagination
+            {/* <CustomPagination
               page={currentPage - 1}
               count={txnCount}
               onPageChange={(
@@ -377,7 +377,7 @@ export default React.memo(function SettlementToWallet() {
                 setPageSize(parseInt(event.target.value));
                 setCurrentPage(1);
               }}
-            />
+            /> */}
           </Card>
         </Grid>
       </Grid>
