@@ -38,6 +38,7 @@ import Iconify from "src/components/iconify";
 import Label from "src/components/label/Label";
 import { sentenceCase } from "change-case";
 import { useNavigate } from "react-router";
+import { fCurrency } from "src/utils/formatNumber";
 
 type FormValuesProps = {
   transactionType: string;
@@ -392,6 +393,12 @@ function FundFlow() {
                                 </Typography>{" "}
                                 <Typography variant="body2">
                                   {item.email}
+                                </Typography>{" "}
+                                <Typography variant="body2">
+                                 Main Balance : {fCurrency(item.main_wallet_amount)}
+                                </Typography>{" "}
+                                <Typography variant="body2">
+                                 AEPS Balance : {fCurrency(item.AEPS_wallet_amount)}
                                 </Typography>{" "}
                               </Stack>
                             </Stack>
