@@ -27,17 +27,12 @@ import { useSnackbar } from "notistack";
 import Lottie from "lottie-react";
 import fingerScan from "../../../components/JsonAnimations/fingerprint-scan.json";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { CaptureDevice } from "../../../utils/CaptureDevice";
 
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
-  code1: string;
-  code2: string;
-  code3: string;
-  code4: string;
-  code5: string;
-  code6: string;
-  code7: string;
+  otp: string;
   state: string;
   bankName: string;
   deviceName: string;
@@ -104,22 +99,10 @@ export default function RegistrationAeps(props: any) {
 
   //VerifyOtp Validation
   const VerifyOtpSchema = Yup.object().shape({
-    code1: Yup.string().required("code is required"),
-    code2: Yup.string().required("code is required"),
-    code3: Yup.string().required("code is required"),
-    code4: Yup.string().required("code is required"),
-    code5: Yup.string().required("code is required"),
-    code6: Yup.string().required("code is required"),
-    code7: Yup.string().required("code is required"),
+    otp: Yup.string().required("code is required"),
   });
   const VerifyOtpDefaultValues = {
-    code1: "",
-    code2: "",
-    code3: "",
-    code4: "",
-    code5: "",
-    code6: "",
-    code7: "",
+    otp: "",
     remark: "",
   };
   const VerifyOtpmethods = useForm<FormValuesProps>({
@@ -194,7 +177,7 @@ export default function RegistrationAeps(props: any) {
             enqueueSnackbar(Response.data.message);
             UpdateUserDetail({
               fingPayAPESRegistrationStatus: true,
-              main_wallet_amount: user?.main_wallet_amount - 200,
+              main_wallet_amount: user?.main_wallet_amount - 0,
             });
           } else {
             enqueueSnackbar(Response.data.message, { variant: "error" });
@@ -209,32 +192,30 @@ export default function RegistrationAeps(props: any) {
   const sendOtp = async () => {
     try {
       let token = localStorage.getItem("token");
+      let location: any = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject);
+      });
       let body = {
-        latitude: localStorage.getItem("lat"),
-        longitude: localStorage.getItem("long"),
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
       };
-      if (body.latitude && body.longitude) {
-        await Api("aeps/aeps_otp", "POST", body, token).then(
-          (Response: any) => {
-            if (Response.data.code == 200) {
-              if (Response.data.data.status == true) {
-                enqueueSnackbar(Response.data.data.message);
-                setPrimaryKey(Response.data.data.data.primaryKeyId);
-                setEncodeFPTxnId(Response.data.data.data.encodeFPTxnId);
-                handleOpen();
-              }
-            } else {
-              enqueueSnackbar(Response.data.data.message, { variant: "error" });
-              console.log(
-                "==============>>> fatch beneficiary message",
-                Response.data.message
-              );
-            }
+
+      await Api("aeps/aeps_otp", "POST", body, token).then((Response: any) => {
+        if (Response.data.code == 200) {
+          if (Response.data.data.status == true) {
+            enqueueSnackbar(Response.data.data.message);
+            setPrimaryKey(Response.data.data.data.primaryKeyId);
+            setEncodeFPTxnId(Response.data.data.data.encodeFPTxnId);
+            handleOpen();
           }
-        );
-      } else {
-        enqueueSnackbar("Please allow Location to continue");
-      }
+        } else {
+          enqueueSnackbar(Response.data.data.message, { variant: "error" });
+          console.log(
+            "==============>>> fatch beneficiary message",
+            Response.data.message
+          );
+        }
+      });
     } catch (err) {
       console.log(err);
     }
@@ -269,14 +250,7 @@ export default function RegistrationAeps(props: any) {
     let id = user?._id;
     let body = {
       merchantLoginId: id,
-      otp:
-        data.code1 +
-        data.code2 +
-        data.code3 +
-        data.code4 +
-        data.code5 +
-        data.code6 +
-        data.code7,
+      otp: data.otp,
       primaryKeyId: primaryKey,
       encodeFPTxnId: encodeFPTxnId,
     };
@@ -618,36 +592,13 @@ export default function RegistrationAeps(props: any) {
             <Box
               sx={style}
               style={{ borderRadius: "20px" }}
-              width={{ xs: "100%", sm: "60%" }}
+              width={{ xs: "100%", md: 370 }}
             >
               <Stack spacing={3}>
                 <Typography variant="subtitle2" textAlign={"center"}>
                   Mobile Verification Code &nbsp;
                 </Typography>
-                <RHFCodes
-                  keyName="code"
-                  inputs={[
-                    "code1",
-                    "code2",
-                    "code3",
-                    "code4",
-                    "code5",
-                    "code6",
-                    "code7",
-                  ]}
-                />
-
-                {(!!VerifyOtpErrors.code1 ||
-                  !!VerifyOtpErrors.code2 ||
-                  !!VerifyOtpErrors.code3 ||
-                  !!VerifyOtpErrors.code4 ||
-                  !!VerifyOtpErrors.code5 ||
-                  !!VerifyOtpErrors.code6 ||
-                  !!VerifyOtpErrors.code7) && (
-                  <FormHelperText error sx={{ px: 2 }}>
-                    Code is required
-                  </FormHelperText>
-                )}
+                <RHFTextField name="otp" label="OTP" placeholder="OTP" />
 
                 <Stack>
                   <LoadingButton

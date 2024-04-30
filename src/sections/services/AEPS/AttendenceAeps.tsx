@@ -25,7 +25,12 @@ import { useSnackbar } from "notistack";
 import Lottie from "lottie-react";
 import fingerScan from "../../../components/JsonAnimations/fingerprint-scan.json";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { Navigate, useNavigate } from "react-router";
 import { fDateTime } from "src/utils/formatTime";
+import { CaptureDevice } from "src/utils/CaptureDevice";
+import { fetchLocation } from "src/utils/fetchLocation";
+import MotionModal from "src/components/animate/MotionModal";
+import { LoadingButton } from "@mui/lab";
 
 // ----------------------------------------------------------------------
 
@@ -37,8 +42,10 @@ type FormValuesProps = {
 };
 
 export default function AttendenceAeps(props: any) {
+  const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail, initialize } = useAuthContext();
+  const [scanLoading, setScanLoading] = useState(false);
   const theme = useTheme();
   const [message, setMessage] = useState("");
   const [arrofObj, setarrofObj] = useState<any>([]);
@@ -92,72 +99,57 @@ export default function AttendenceAeps(props: any) {
 
   useEffect(() => {
     if (arrofObj.length > 0) {
-      Attendence();
+      // Attendence();
     }
   }, [arrofObj.length]);
 
   //   ********************************jquery start here for capture device ***************************
 
-  const Attendence = () => {
-    handleOpenLoading();
-    let token = localStorage.getItem("token");
-    let body = {
-      serviceType: props.attendance,
-      latitude: localStorage.getItem("lat"),
-      longitude: localStorage.getItem("long"),
-      requestRemarks: getValues("remark"),
-      nationalBankIdentificationNumber: "",
-      captureResponse: {
-        errCode: arrofObj[0].errcode,
-        errInfo: arrofObj[0].errinfo,
-        fCount: arrofObj[0].fcount,
-        fType: arrofObj[0].ftype,
-        iCount: arrofObj[0].icount,
-        iType: null,
-        pCount: arrofObj[0].pcount,
-        pType: "0",
-        nmPoints: arrofObj[0].nmpoint,
-        qScore: arrofObj[0].qscore,
-        dpID: arrofObj[0].dpid,
-        rdsID: arrofObj[0].rdsid,
-        rdsVer: arrofObj[0].rdsver,
-        dc: arrofObj[0].dc,
-        mi: arrofObj[0].mi,
-        mc: arrofObj[0].mc,
-        ci: arrofObj[0].ci,
-        sessionKey: arrofObj[0].skey.textContent,
-        hmac: arrofObj[0].hmac.textContent,
-        PidDatatype: arrofObj[0].piddatatype,
-        Piddata: arrofObj[0].piddata.textContent,
-      },
-    };
-    Api("aeps/presence", "POST", body, token).then((Response: any) => {
-      console.log("==============>>>fatch beneficiary Response", Response);
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.data.message);
-          // props.attendance == "AP"
-          //   ? UpdateUserDetail({ attendanceAP: true })
-          //   : UpdateUserDetail({
-          //       attendanceAEPS: true,
-          //     });
-          initialize();
-
-          setMessage(Response.data.message);
-        } else if (Response.data.responseCode == 410) {
-          enqueueSnackbar(Response.data.err.message, { variant: "error" });
-          setMessage(Response.data.responseMessage);
+  const attendance = async (data: FormValuesProps) => {
+    handleOpen();
+    const { error, success }: any = await CaptureDevice(data.deviceName);
+    handleClose();
+    if (!success) {
+      enqueueSnackbar(error);
+      setMessage(error);
+      handleOpen();
+      return;
+    }
+    await fetchLocation();
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        attendanceType: "Daily",
+        serviceType: props.attendance,
+        latitude: localStorage.getItem("lat"),
+        longitude: localStorage.getItem("long"),
+        requestRemarks: getValues("remark"),
+        nationalBankIdentificationNumber: "",
+        captureResponse: success,
+      };
+      await Api("aeps/presence", "POST", body, token).then((Response: any) => {
+        console.log("==============>>>fatch beneficiary Response", Response);
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.data.message);
+            initialize();
+            setMessage(Response.data.message);
+          } else if (Response.data.responseCode == 410) {
+            enqueueSnackbar(Response.data.err.message, { variant: "error" });
+            setMessage(Response.data.responseMessage);
+            handleOpen();
+          } else {
+            enqueueSnackbar(Response.data.data.message, { variant: "error" });
+            setMessage(Response.data.data.message);
+            handleOpen();
+          }
         } else {
-          enqueueSnackbar(Response.data.data.message, { variant: "error" });
-          setMessage(Response.data.data.message);
+          setMessage("Failed");
         }
-        handleClose();
-        handleCloseLoading();
-      } else {
-        handleCloseLoading();
-        handleClose();
-      }
-    });
+      });
+    } catch (Err) {
+      console.log(Err);
+    }
   };
 
   const capture = (data: FormValuesProps) => {
@@ -308,7 +300,7 @@ export default function AttendenceAeps(props: any) {
       <Helmet>
         <title>AEPS Attendance | {process.env.REACT_APP_COMPANY_NAME}</title>
       </Helmet>
-      <FormProvider methods={methods} onSubmit={handleSubmit(capture)}>
+      <FormProvider methods={methods} onSubmit={handleSubmit(attendance)}>
         <Stack
           width={{ xs: "100%", sm: 450 }}
           margin={"auto"}
@@ -338,24 +330,40 @@ export default function AttendenceAeps(props: any) {
             <MenuItem value={"MANTRA"}>MANTRA</MenuItem>
             <MenuItem value={"SECUGEN"}>SECUGEN</MenuItem>
           </RHFSelect>
-          {/* <RHFTextField
-            name="remark"
-            label="Remark"
-            placeholder="Remark"
-            sx={{ width: "90%", margin: "auto" }}
-          /> */}
+
           <Stack>
-            <Button
+            <LoadingButton
               variant="contained"
               type="submit"
+              loading={isSubmitting}
               sx={{ width: "fit-content", margin: "auto" }}
             >
               Scan fingure to continue
-            </Button>
+            </LoadingButton>
           </Stack>
         </Stack>
       </FormProvider>
-      <Modal
+
+      <MotionModal open={open} width={{ xs: "95%", md: 500 }}>
+        {isSubmitting && <Lottie animationData={fingerScan} />}
+        {message && (
+          <>
+            <Stack flexDirection={"column"} alignItems={"center"}>
+              <Typography variant="h4">Attendence Status</Typography>
+            </Stack>
+            <Typography variant="h4" textAlign={"center"} color={"#9e9e9ef0"}>
+              {message}
+            </Typography>
+            <Stack flexDirection={"row"} justifyContent={"center"}>
+              <Button variant="contained" onClick={handleClose} sx={{ mt: 2 }}>
+                Close
+              </Button>
+            </Stack>
+          </>
+        )}
+      </MotionModal>
+
+      {/* <Modal
         open={open}
         onClose={handleClose}
         aria-labelledby="modal-modal-title"
@@ -388,10 +396,10 @@ export default function AttendenceAeps(props: any) {
             </Stack>
           </Box>
         )}
-      </Modal>
+      </Modal> */}
 
       {/* Loading Modal */}
-      <Modal
+      {/* <Modal
         open={openLoading}
         aria-labelledby="modal-modal-title"
         aria-describedby="modal-modal-description"
@@ -405,7 +413,7 @@ export default function AttendenceAeps(props: any) {
             />
           </Stack>
         </Box>
-      </Modal>
+      </Modal> */}
     </>
   );
 }
