@@ -52,7 +52,7 @@
     "@mui/styled-engine-sc": "^6.0.0-alpha.9",
     "@mui/x-data-grid": "^5.17.7",
     "@mui/x-date-pickers": "^5.0.4",
-    "apexcharts": "^3.45.0",
+    "apexcharts": "^3.49.0",
     "autosuggest-highlight": "^3.3.4",
     "aws-sdk": "^2.1521.0",
     "axios": "^1.1.2",
