@@ -57,7 +57,7 @@ export default function DMTpay({
   const { availableLimitForMoneyTransfer } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const { UpdateUserDetail, initialize } = useAuthContext();
+  const { initialize } = useAuthContext();
   const [mode, setMode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 
@@ -353,5 +353,3 @@ export default function DMTpay({
     </>
   );
 }
-
-// ----------------------------------------------------------------------

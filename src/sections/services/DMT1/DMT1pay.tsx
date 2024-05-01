@@ -54,6 +54,7 @@ type FormValuesProps = {
 //--------------------------------------------------------------------
 
 export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
+  const { user, initialize } = useAuthContext();
   const { dmt1RemitterAvailableLimit } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
@@ -63,7 +64,7 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
   const [errorMsg, setErrorMsg] = useState("");
   const [checkNPIN, setCheckNPIN] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const [count, setCount] = useState<any>(null);
+  // const [count, setCount] = useState<any>(null);
   const [transactionDetail, setTransactionDetail] = useState([]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
@@ -541,5 +542,3 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
     </>
   );
 }
-
-// ----------------------------------------------------------------------

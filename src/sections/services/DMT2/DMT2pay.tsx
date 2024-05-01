@@ -54,16 +54,16 @@ type FormValuesProps = {
 //--------------------------------------------------------------------
 
 export default function DMT2pay({ clearPayout, remitter, beneficiary }: any) {
+  const { user, initialize } = useAuthContext();
   const { dmt2RemitterAvailableLimit } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const { initialize } = useAuthContext();
   const [txn, setTxn] = useState(true);
   const [mode, setMode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [checkNPIN, setCheckNPIN] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const [count, setCount] = useState<any>(null);
+  // const [count, setCount] = useState<any>(null);
   const [transactionDetail, setTransactionDetail] = useState([]);
   const [open, setOpen] = useState(false);
   const handleOpen = () => setOpen(true);
