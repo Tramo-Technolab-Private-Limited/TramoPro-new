@@ -41,6 +41,7 @@ import ApiDataLoading from "../../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import useResponsive from "src/hooks/useResponsive";
+import { fetchLocation } from "src/utils/fetchLocation";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -236,6 +237,7 @@ export default function DMTbeneficiary() {
   };
 
   const verifyBene = async () => {
+    await fetchLocation();
     let token = localStorage.getItem("token");
     remitterVerifyDispatch({ type: "VERIFY_FETCH_REQUEST" });
     let body = {
@@ -245,7 +247,7 @@ export default function DMTbeneficiary() {
       remitterMobile: remitterContext.remitterMobile,
     };
     (await trigger(["ifsc", "accountNumber", "bankName"]))
-      ? Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
+      ? await Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.code == 200) {
@@ -272,7 +274,7 @@ export default function DMTbeneficiary() {
       : remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
   };
 
-  const addBeneficiary = (data: FormValuesProps) => {
+  const addBeneficiary = async (data: FormValuesProps) => {
     addbeneDispatch({ type: "ADD_BENE_REQUEST" });
     let token = localStorage.getItem("token");
     let body = {
@@ -287,7 +289,8 @@ export default function DMTbeneficiary() {
       isBeneVerified: data.isBeneVerified,
       // bankId: data.bankId,
     };
-    Api("moneyTransfer/beneficiary", "POST", body, token).then(
+    await fetchLocation();
+    await Api("moneyTransfer/beneficiary", "POST", body, token).then(
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
@@ -586,14 +589,15 @@ const BeneList = React.memo(
       setDeleteOtp("");
     };
 
-    const verifyBene = (val: string) => {
+    const verifyBene = async (val: string) => {
       setVarifyStatus(false);
       let token = localStorage.getItem("token");
       let body = {
         beneficiaryId: val,
         remitterMobile: remitterNumber,
       };
-      Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
+      await fetchLocation();
+      await Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
         (Response: any) => {
           if (Response.status == 200) {
             if (Response.data.code == 200) {

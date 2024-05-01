@@ -15,6 +15,7 @@ import { Api } from "../../webservices";
 import { useSnackbar } from "notistack";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -209,7 +210,7 @@ export default function NPinReset(props: any) {
       const body = {
         nPin: data.npin,
       };
-
+      await fetchLocation();
       await Api(`auth/create_Npin`, "POST", body, token).then(
         (Response: any) => {
           console.log("=============>" + JSON.stringify(Response));

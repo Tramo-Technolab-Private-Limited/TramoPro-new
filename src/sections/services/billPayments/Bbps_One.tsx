@@ -30,6 +30,7 @@ import useResponsive from "src/hooks/useResponsive";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 import { init } from "i18next";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 type FormValuesProps = {
   operator: {
@@ -243,6 +244,7 @@ function Bbps_One() {
         }),
         productId: data.operator._id,
       };
+      await fetchLocation();
       await Api(`bbps/fetchBill`, "POST", body, token).then((Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
@@ -712,6 +714,7 @@ const BbpsBillPayment = ({
           getValues("otp5") +
           getValues("otp6"),
       };
+      await fetchLocation();
       await Api("bbps/transaction", "POST", body, token).then(
         (Response: any) => {
           if (Response.status == 200) {

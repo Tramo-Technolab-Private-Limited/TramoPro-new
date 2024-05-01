@@ -28,6 +28,7 @@ import { LoadingButton } from "@mui/lab";
 import DMTRemitterDetail from "./DMTRemitterDetail";
 import DMTbeneficiary from "./DMTbeneficiary";
 import RHFMobileNumber from "src/components/hook-form/RHFMobileNumber";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -346,7 +347,7 @@ const OtpSubmissionForRegistrantion = ({
     formState: { errors, isSubmitting },
   } = methods;
 
-  const verifyOtp = (data: FormValuesProps) => {
+  const verifyOtp = async (data: FormValuesProps) => {
     setIsLoading(true);
     let token = localStorage.getItem("token");
     let body = {
@@ -354,7 +355,8 @@ const OtpSubmissionForRegistrantion = ({
       otp:
         data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
     };
-    Api("moneyTransfer/remitter/verifyOTP", "POST", body, token).then(
+    await fetchLocation();
+    await Api("moneyTransfer/remitter/verifyOTP", "POST", body, token).then(
       (Response: any) => {
         console.log("==============>>> register remmiter Response", Response);
         if (Response.status == 200) {
@@ -461,7 +463,7 @@ const NewRegistration = ({ mobilenumber, handleNewRegistaion }: any) => {
     formState: { errors, isSubmitting },
   } = methods;
 
-  const addRemmiter = (data: FormValuesProps) => {
+  const addRemmiter = async (data: FormValuesProps) => {
     setIsLoading(true);
     let token = localStorage.getItem("token");
     let body = {
@@ -471,20 +473,23 @@ const NewRegistration = ({ mobilenumber, handleNewRegistaion }: any) => {
       occupation: data.remitterOccupation,
       email: data.remitterEmail || "",
     };
-    Api("moneyTransfer/remitter", "POST", body, token).then((Response: any) => {
-      console.log("==============>>> register remmiter Response", Response);
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.message);
-          setIsLoading(false);
-          handleNewRegistaion("SUCCESS");
-        } else {
-          enqueueSnackbar(Response.data.message, { variant: "error" });
-          setIsLoading(false);
-          handleNewRegistaion("FAIL");
+    await fetchLocation();
+    await Api("moneyTransfer/remitter", "POST", body, token).then(
+      (Response: any) => {
+        console.log("==============>>> register remmiter Response", Response);
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.message);
+            setIsLoading(false);
+            handleNewRegistaion("SUCCESS");
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "error" });
+            setIsLoading(false);
+            handleNewRegistaion("FAIL");
+          }
         }
       }
-    });
+    );
   };
 
   return (

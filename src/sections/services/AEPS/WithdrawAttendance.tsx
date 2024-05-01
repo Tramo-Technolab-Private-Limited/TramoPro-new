@@ -26,6 +26,7 @@ import Lottie from "lottie-react";
 import fingerScan from "../../../components/JsonAnimations/fingerprint-scan.json";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fDateTime } from "src/utils/formatTime";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -98,7 +99,7 @@ export default function WithdrawAttendance(props: any) {
 
   //   ********************************jquery start here for capture device ***************************
 
-  const Attendence = () => {
+  const Attendence = async () => {
     handleOpenLoading();
     let token = localStorage.getItem("token");
     let body = {
@@ -131,7 +132,8 @@ export default function WithdrawAttendance(props: any) {
         Piddata: arrofObj[0].piddata.textContent,
       },
     };
-    Api("aeps/presence", "POST", body, token).then((Response: any) => {
+    await fetchLocation();
+    await Api("aeps/presence", "POST", body, token).then((Response: any) => {
       console.log("==============>>>fatch beneficiary Response", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {

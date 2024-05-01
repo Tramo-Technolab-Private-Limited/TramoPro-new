@@ -23,6 +23,7 @@ import Typography from "@mui/material/Typography";
 import { Grid, MenuItem } from "@mui/material";
 import { useSnackbar } from "notistack";
 import ConfirmDialog from "src/components/confirm-dialog/ConfirmDialog";
+import { fetchLocation } from "src/utils/fetchLocation";
 export default function DirectFundTransfer(props: any) {
   const style = {
     position: "absolute" as "absolute",
@@ -90,7 +91,7 @@ export default function DirectFundTransfer(props: any) {
     formState: { errors, isSubmitting, isValid },
   } = methods;
 
-  const confirmTransaction = (data: FormValuesProps) => {
+  const confirmTransaction = async (data: FormValuesProps) => {
     setIsLoading(true);
     let token = localStorage.getItem("token");
     try {
@@ -116,7 +117,8 @@ export default function DirectFundTransfer(props: any) {
         remarks: getValues("remarks"),
         txnId: "",
       };
-      Api(`agent/downline_fund_flow`, "POST", body, token).then(
+      await fetchLocation();
+      await Api(`agent/downline_fund_flow`, "POST", body, token).then(
         (Response: any) => {
           console.log("======get_CategoryList==response=====>" + Response);
           if (Response.status == 200) {

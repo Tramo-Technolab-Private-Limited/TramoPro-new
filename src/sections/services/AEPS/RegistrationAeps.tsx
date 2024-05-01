@@ -28,6 +28,7 @@ import Lottie from "lottie-react";
 import fingerScan from "../../../components/JsonAnimations/fingerprint-scan.json";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { CaptureDevice } from "../../../utils/CaptureDevice";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -170,6 +171,7 @@ export default function RegistrationAeps(props: any) {
         Latitude: localStorage.getItem("lat"),
         Longitude: localStorage.getItem("long"),
       };
+      await fetchLocation();
       await Api("aeps/aeps_acc", "POST", body, token).then((Response: any) => {
         console.log("==============>>>fatch beneficiary Response", Response);
         if (Response.status == 200) {
@@ -244,7 +246,7 @@ export default function RegistrationAeps(props: any) {
     });
   };
 
-  const verifyOtpToMerchant = (data: FormValuesProps) => {
+  const verifyOtpToMerchant = async (data: FormValuesProps) => {
     setOtpVerify(false);
     let token = localStorage.getItem("token");
     let id = user?._id;
@@ -254,22 +256,25 @@ export default function RegistrationAeps(props: any) {
       primaryKeyId: primaryKey,
       encodeFPTxnId: encodeFPTxnId,
     };
-    Api("aeps/aeps_otp_verify", "POST", body, token).then((Response: any) => {
-      console.log("==============>>>fatch beneficiary Response", Response);
-      if (Response.data.code == 200) {
-        if (Response.data.data.status) {
-          enqueueSnackbar(Response.data.message);
-          reset(defaultValues);
-          capture();
+    await fetchLocation();
+    await Api("aeps/aeps_otp_verify", "POST", body, token).then(
+      (Response: any) => {
+        console.log("==============>>>fatch beneficiary Response", Response);
+        if (Response.data.code == 200) {
+          if (Response.data.data.status) {
+            enqueueSnackbar(Response.data.message);
+            reset(defaultValues);
+            capture();
+          }
+        } else {
+          enqueueSnackbar(Response.data.message, { variant: "error" });
+          setOtpVerify(true);
         }
-      } else {
-        enqueueSnackbar(Response.data.message, { variant: "error" });
-        setOtpVerify(true);
       }
-    });
+    );
   };
 
-  const merchantKYC = () => {
+  const merchantKYC = async () => {
     handleOpenLoading();
     let token = localStorage.getItem("token");
     let body = {
@@ -302,7 +307,8 @@ export default function RegistrationAeps(props: any) {
         Piddata: arrofObj[0].piddata.textContent,
       },
     };
-    Api("aeps/bio_ekyc", "POST", body, token).then((Response: any) => {
+    await fetchLocation();
+    await Api("aeps/bio_ekyc", "POST", body, token).then((Response: any) => {
       console.log("==============>>>fatch beneficiary Response", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {

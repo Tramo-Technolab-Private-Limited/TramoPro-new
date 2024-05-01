@@ -433,7 +433,6 @@ const ConfirmDetails = ({ handleClose, resetForm, ...other }: childProps) => {
       return;
     }
     try {
-      await fetchLocation();
       let token = localStorage.getItem("token");
       let body = {
         latitude: localStorage.getItem("lat"),
@@ -445,7 +444,7 @@ const ConfirmDetails = ({ handleClose, resetForm, ...other }: childProps) => {
         amount: amount,
         captureResponse: success,
       };
-
+      await fetchLocation();
       await Api("aeps/aadhaar_pay_LTS", "POST", body, token).then(
         (Response: any) => {
           if (Response.status == 200) {

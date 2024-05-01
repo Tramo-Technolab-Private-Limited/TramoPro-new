@@ -65,6 +65,7 @@ import { fIndianCurrency } from "src/utils/formatNumber";
 import { CustomAvatar } from "src/components/custom-avatar";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import Label from "src/components/label/Label";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 const VisuallyHiddenInput = styled("input")({
   clip: "rect(0 0 0 0)",
@@ -225,6 +226,7 @@ function Loan() {
       let body = {
         mobileNumber: "+91-" + data.mobileNumber,
       };
+      await fetchLocation();
       await Api("app/loan/easy_loan_step1", "POST", body, token).then(
         (Response: any) => {
           if (Response.status == 200) {
@@ -262,7 +264,7 @@ function Loan() {
     );
   };
   // step 2
-  const verifyOtp = () => {
+  const verifyOtp = async () => {
     setIsVerifyLoading(true);
     let token = localStorage.getItem("token");
     let body = {
@@ -276,7 +278,8 @@ function Loan() {
         getValues("code6"),
       productId: subCurrentTab,
     };
-    Api("app/loan/easy_loan_step2", "POST", body, token).then(
+    await fetchLocation();
+    await Api("app/loan/easy_loan_step2", "POST", body, token).then(
       (Response: any) => {
         console.log("==========>>product Filter", Response);
         if (Response.status == 200) {
@@ -729,7 +732,7 @@ const UploadPan = React.memo(({ data, setStep }: any) => {
         pinCode: data.profileDetails.pinCode + "",
         user_token: user_token,
       };
-
+      await fetchLocation();
       await Api(
         "app/loan/easy_loan_step4/" + clientRefId,
         "POST",
@@ -950,35 +953,39 @@ const DynamicForm = ({ data, setStep }: any) => {
   }, []);
 
   //getFormValues
-  const getDynamicForm = () => {
+  const getDynamicForm = async () => {
     let token = localStorage.getItem("token");
     let body = {
       user_token: user_token,
     };
-    Api("app/loan/easy_loan_step5/" + clientRefId, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            setFormValues(Response.data.data);
+    await fetchLocation();
+    await Api(
+      "app/loan/easy_loan_step5/" + clientRefId,
+      "POST",
+      body,
+      token
+    ).then((Response: any) => {
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          setFormValues(Response.data.data);
 
-            Response.data.data.reqdFields.map((item: any) => {
-              setFormValuesValidation((prevState: any) => ({
-                ...prevState,
-                [item.field]: Yup.string().required("field is required"),
-              }));
-              setDefaultFormValues((prevState: any) => ({
-                ...prevState,
-                [item.field]: "",
-              }));
-            });
+          Response.data.data.reqdFields.map((item: any) => {
+            setFormValuesValidation((prevState: any) => ({
+              ...prevState,
+              [item.field]: Yup.string().required("field is required"),
+            }));
+            setDefaultFormValues((prevState: any) => ({
+              ...prevState,
+              [item.field]: "",
+            }));
+          });
 
-            enqueueSnackbar(Response.data.message);
-          } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
-          }
+          enqueueSnackbar(Response.data.message);
+        } else {
+          enqueueSnackbar(Response.data.message, { variant: "error" });
         }
       }
-    );
+    });
   };
 
   const onSubmit = async (data: dynamicFormValuesProps) => {
@@ -989,18 +996,22 @@ const DynamicForm = ({ data, setStep }: any) => {
           ...data.loanApplicationDetails,
         },
       };
-      Api("app/loan/easy_loan_step6/" + clientRefId, "POST", body, token).then(
-        (Response: any) => {
-          if (Response.status == 200) {
-            if (Response.data.code == 200) {
-              enqueueSnackbar(Response.data.message);
-              setStep(1);
-            } else {
-              enqueueSnackbar(Response.data.message, { variant: "error" });
-            }
+      await fetchLocation();
+      await Api(
+        "app/loan/easy_loan_step6/" + clientRefId,
+        "POST",
+        body,
+        token
+      ).then((Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.message);
+            setStep(1);
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
         }
-      );
+      });
     } catch (err) {
       console.log(err);
     }

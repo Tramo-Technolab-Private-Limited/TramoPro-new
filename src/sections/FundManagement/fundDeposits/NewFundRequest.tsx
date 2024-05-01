@@ -41,6 +41,7 @@ import React from "react";
 import CloseIcon from "src/assets/icons/CloseIcon";
 import MotionModal from "src/components/animate/MotionModal";
 import { fIndianCurrency } from "src/utils/formatNumber";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -290,8 +291,8 @@ function NewFundRequest({ getRaisedRequest }: props) {
       request_to: "ADMIN",
       transactionSlip: data.filePath,
     };
-
-    Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
+    await fetchLocation();
+    await Api(`agent/fundManagement/raiseRequest`, "POST", body, token).then(
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
@@ -482,7 +483,6 @@ function NewFundRequest({ getRaisedRequest }: props) {
               maxDate={new Date()}
               minDate={dayjs(new Date()).subtract(4, "day") as any}
               onChange={(newValue: any) => setValue("date", newValue)}
-             
               renderInput={(params: any) => (
                 <RHFTextField
                   name="date"
@@ -492,11 +492,11 @@ function NewFundRequest({ getRaisedRequest }: props) {
                   onKeyDown={(e: any) => {
                     e.preventDefault();
                     return false;
-                  }}  
+                  }}
                   onPaste={(e: any) => {
                     e.preventDefault();
                     return false;
-                  }}  
+                  }}
                   {...params}
                 />
               )}

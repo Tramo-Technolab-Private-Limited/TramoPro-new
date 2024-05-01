@@ -32,6 +32,7 @@ import { fDateTime } from "src/utils/formatTime";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 import TransactionModal from "src/components/customFunctions/TrasactionModal";
 import MotionModal from "src/components/animate/MotionModal";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -138,6 +139,7 @@ export default function DMTpay({
       nPin:
         data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
     };
+    await fetchLocation();
     await Api("moneytransfer/transaction", "POST", body, token).then(
       (Response: any) => {
         if (Response.status == 200) {

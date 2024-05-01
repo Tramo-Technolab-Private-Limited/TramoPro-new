@@ -36,6 +36,7 @@ import Label from "src/components/label/Label";
 import { sentenceCase } from "change-case";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import CustomPagination from "src/components/customFunctions/CustomPagination";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 type FormValuesProps = {
   amount: number | null | string;
@@ -175,7 +176,7 @@ export default React.memo(function SettlementToWallet() {
     );
   };
 
-  const settleToMainWallet = () => {
+  const settleToMainWallet = async () => {
     setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
     let body = {
@@ -188,8 +189,8 @@ export default React.memo(function SettlementToWallet() {
         getValues("otp5") +
         getValues("otp6"),
     };
-
-    Api(`settlement/to_main_wallet`, "POST", body, token).then(
+    await fetchLocation();
+    await Api(`settlement/to_main_wallet`, "POST", body, token).then(
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {

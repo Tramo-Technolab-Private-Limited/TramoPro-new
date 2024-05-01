@@ -38,6 +38,7 @@ import {
 } from "../../components/animate";
 import MotionModal from "src/components/animate/MotionModal";
 import NoBankAccount from "src/assets/icons/NoBankAccount";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 type FormValuesProps = {
@@ -197,7 +198,7 @@ export default function MyBankAccount() {
     });
   };
 
-  const addBank = (data: FormValuesProps) => {
+  const addBank = async (data: FormValuesProps) => {
     setAddBankLoading(true);
     try {
       let token = localStorage.getItem("token");
@@ -206,7 +207,8 @@ export default function MyBankAccount() {
         account_number: data?.accountNumber,
         ifsc: data?.ifsc,
       };
-      Api(`user/KYC/bank_acc_verify`, "POST", body, token).then(
+      await fetchLocation();
+      await Api(`user/KYC/bank_acc_verify`, "POST", body, token).then(
         (Response: any) => {
           console.log("======bank_acc_verify=Response====>" + Response);
           if (Response.status == 200) {
@@ -233,40 +235,43 @@ export default function MyBankAccount() {
     }
   };
 
-  const defaultBank = (accountNumber: string, ifsc: string) => {
+  const defaultBank = async (accountNumber: string, ifsc: string) => {
     setDefaultLoading(true);
     let token = localStorage.getItem("token");
     let body = {
       accountNumber: accountNumber,
       ifsc: ifsc,
     };
-    Api(`user/set_default_bank`, "POST", body, token).then((Response: any) => {
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.message);
-          setUserBankList(
-            userBankList.map((item: any) => {
-              if (
-                item.accountNumber == selectBank.accountNumber &&
-                item.ifsc == selectBank.ifsc
-              ) {
-                return { ...item, isDefaultBank: true };
-              } else {
-                return { ...item, isDefaultBank: false };
-              }
-            })
-          );
-          setDefaultLoading(false);
-          setSelectBank({ ...selectBank, isDefaultBank: true });
+    await fetchLocation();
+    await Api(`user/set_default_bank`, "POST", body, token).then(
+      (Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.message);
+            setUserBankList(
+              userBankList.map((item: any) => {
+                if (
+                  item.accountNumber == selectBank.accountNumber &&
+                  item.ifsc == selectBank.ifsc
+                ) {
+                  return { ...item, isDefaultBank: true };
+                } else {
+                  return { ...item, isDefaultBank: false };
+                }
+              })
+            );
+            setDefaultLoading(false);
+            setSelectBank({ ...selectBank, isDefaultBank: true });
+          } else {
+            setDefaultLoading(false);
+            enqueueSnackbar(Response?.data?.message, { variant: "error" });
+          }
         } else {
+          enqueueSnackbar("Failed", { variant: "error" });
           setDefaultLoading(false);
-          enqueueSnackbar(Response?.data?.message, { variant: "error" });
         }
-      } else {
-        enqueueSnackbar("Failed", { variant: "error" });
-        setDefaultLoading(false);
       }
-    });
+    );
   };
 
   const changeBankDetail = (val: string) => {

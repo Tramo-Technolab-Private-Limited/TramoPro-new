@@ -29,6 +29,7 @@ import Iconify from "../../components/iconify";
 import { Api } from "../../webservices";
 import { useState, useEffect } from "react";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { fetchLocation } from "src/utils/fetchLocation";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -123,7 +124,6 @@ export default function CreateNpin() {
           data.code5 +
           data.code6,
       };
-
       await Api(`auth/create_Npin`, "POST", body, token).then(
         (Response: any) => {
           console.log("=============>" + JSON.stringify(Response));
@@ -131,7 +131,7 @@ export default function CreateNpin() {
             if (Response.data.code == 200) {
               enqueueSnackbar(Response.data.message);
               UpdateUserDetail({ isNPIN: true });
-              navigate(PATH_DASHBOARD.root);
+              navigate(PATH_DASHBOARD.mystats);
             } else {
               enqueueSnackbar(Response.data.message, { variant: "error" });
             }
@@ -147,7 +147,7 @@ export default function CreateNpin() {
     <Stack margin={"auto"} alignItems={"center"}>
       <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
         <Typography variant="h4" textAlign={"center"} mb={3}>
-          Create Your TPIN
+          Create TPIN
         </Typography>
         <Stack spacing={3}>
           <Typography variant="subtitle1" sx={{ mb: 0 }}>
@@ -156,7 +156,6 @@ export default function CreateNpin() {
           <RHFSecureCodes
             keyName="code"
             inputs={["code1", "code2", "code3", "code4", "code5", "code6"]}
-            type="password"
           />
           {(!!errors.code1 ||
             !!errors.code2 ||
@@ -174,7 +173,6 @@ export default function CreateNpin() {
           <RHFSecureCodes
             keyName="otp"
             inputs={["otp1", "otp2", "otp3", "otp4", "otp5", "otp6"]}
-            type="password"
           />
           {(!!errors.otp1 ||
             !!errors.otp2 ||

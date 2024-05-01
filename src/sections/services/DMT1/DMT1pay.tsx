@@ -37,6 +37,7 @@ import { fDateTime } from "src/utils/formatTime";
 import { TextToSpeak } from "src/components/customFunctions/TextToSpeak";
 import TransactionModal from "src/components/customFunctions/TrasactionModal";
 import MotionModal from "src/components/animate/MotionModal";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -158,7 +159,8 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
   //   }
   // }, [count]);
 
-  const transaction = (data: FormValuesProps) => {
+  const transaction = async (data: FormValuesProps) => {
+    await fetchLocation();
     let token = localStorage.getItem("token");
     let body = {
       beneficiaryId: beneficiary._id,
@@ -175,42 +177,44 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
     }
     {
       body.nPin &&
-        Api("dmt1/transaction", "POST", body, token).then((Response: any) => {
-          console.log(
-            "==============>>> register beneficiary Response",
-            Response
-          );
-          if (Response.status == 200) {
-            if (Response.data.code == 200) {
-              Response.data.response.map((element: any) => {
-                enqueueSnackbar(element.data.message);
-                initialize();
-              });
-              setTransactionDetail(
-                Response.data.response.map((item: any) => item.data)
-              );
+        (await Api("dmt1/transaction", "POST", body, token).then(
+          (Response: any) => {
+            console.log(
+              "==============>>> register beneficiary Response",
+              Response
+            );
+            if (Response.status == 200) {
+              if (Response.data.code == 200) {
+                Response.data.response.map((element: any) => {
+                  enqueueSnackbar(element.data.message);
+                  initialize();
+                });
+                setTransactionDetail(
+                  Response.data.response.map((item: any) => item.data)
+                );
 
-              // setTransactionDetail(Response.data.data);
-              TextToSpeak(Response.data.message);
-              handleClose();
-              handleOpen1();
-              // setCount(5);
+                // setTransactionDetail(Response.data.data);
+                TextToSpeak(Response.data.message);
+                handleClose();
+                handleOpen1();
+                // setCount(5);
 
-              setTxn(false);
-              setErrorMsg("");
+                setTxn(false);
+                setErrorMsg("");
+              } else {
+                enqueueSnackbar(Response.data.message, { variant: "error" });
+                setErrorMsg(Response.data.message);
+                setTxn(false);
+              }
+              clearPayout();
             } else {
-              enqueueSnackbar(Response.data.message, { variant: "error" });
-              setErrorMsg(Response.data.message);
+              setCheckNPIN(false);
+              enqueueSnackbar(Response, { variant: "error" });
+              clearPayout();
               setTxn(false);
             }
-            clearPayout();
-          } else {
-            setCheckNPIN(false);
-            enqueueSnackbar(Response, { variant: "error" });
-            clearPayout();
-            setTxn(false);
           }
-        });
+        ));
     }
   };
 

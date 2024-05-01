@@ -39,6 +39,7 @@ import React from "react";
 import MotionModal from "src/components/animate/MotionModal";
 import CloseIcon from "src/assets/icons/CloseIcon";
 import { fIndianCurrency } from "src/utils/formatNumber";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 AWS.config.update({
   accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
@@ -301,8 +302,8 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
       request_to: "ADMIN",
       transactionSlip: data.filePath,
     };
-
-    Api(
+    await fetchLocation();
+    await Api(
       `agent/fundManagement/updateRaisedRequests/${preData._id}`,
       "POST",
       body,

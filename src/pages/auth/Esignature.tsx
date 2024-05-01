@@ -11,6 +11,7 @@ import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { STEP_DASHBOARD } from "src/routes/paths";
+import { fetchLocation } from "src/utils/fetchLocation";
 export default function NPinPage() {
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -20,7 +21,8 @@ export default function NPinPage() {
     user?.is_eAgreement_signed && navigate(STEP_DASHBOARD.verifyusernpin);
   }, []);
 
-  const redirectToGoogle = () => {
+  const redirectToGoogle = async () => {
+    await fetchLocation();
     setVerifyLoading(true);
     window.location.href = user?.eAgreement_URL;
   };

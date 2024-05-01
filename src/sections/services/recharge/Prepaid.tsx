@@ -41,6 +41,7 @@ import { CategoryContext } from "../../../pages/Services";
 import { useAuthContext } from "src/auth/useAuthContext";
 import MotionModal from "src/components/animate/MotionModal";
 import { Icon } from "@iconify/react";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -311,7 +312,7 @@ function MobilePrepaid() {
     });
   };
 
-  const browsePlan = () => {
+  const browsePlan = async () => {
     planDispatch({ type: "PLAN_FETCH_REQUEST" });
     let token = localStorage.getItem("token");
     let body = {
@@ -320,31 +321,34 @@ function MobilePrepaid() {
       })[0]?.value,
       operator: getValues("operatorName"),
     };
-    Api("agents/v1/get_plan", "POST", body, token).then((Response: any) => {
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          planDispatch({
-            type: "PLAN_FETCH_SUCCESS",
-            payload: Response.data.data,
-          });
-          setTabsData(Response.data.data);
-          enqueueSnackbar(Response.data.message);
-        } else {
-          enqueueSnackbar(Response.data.message, { variant: "error" });
-          planDispatch({
-            type: "PLAN_FETCH_FAILURE",
-            error: Response.data.message,
-          });
+    await fetchLocation();
+    await Api("agents/v1/get_plan", "POST", body, token).then(
+      (Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            planDispatch({
+              type: "PLAN_FETCH_SUCCESS",
+              payload: Response.data.data,
+            });
+            setTabsData(Response.data.data);
+            enqueueSnackbar(Response.data.message);
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "error" });
+            planDispatch({
+              type: "PLAN_FETCH_FAILURE",
+              error: Response.data.message,
+            });
+          }
         }
       }
-    });
+    );
   };
 
   const onSubmit = (data: FormValuesProps) => {
     openModal1();
   };
 
-  const formSubmit = (data: FormValuesProps) => {
+  const formSubmit = async (data: FormValuesProps) => {
     rechargeDispatch({ type: "RECHARGE_FETCH_REQUEST" });
     let token = localStorage.getItem("token");
     let body = {
@@ -354,7 +358,8 @@ function MobilePrepaid() {
       nPin:
         data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
     };
-    Api("agents/v1/doRechargeLTS", "POST", body, token).then(
+    await fetchLocation();
+    await Api("agents/v1/doRechargeLTS", "POST", body, token).then(
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {

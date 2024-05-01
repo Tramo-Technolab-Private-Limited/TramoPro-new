@@ -53,6 +53,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import { requestPermission } from "./firebase";
 import MotionModal from "src/components/animate/MotionModal";
 import CircularWithValueLabel from "src/components/customFunctions/ProgressCircular";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -413,7 +414,7 @@ export default function AuthRegisterForm(props: any) {
     });
   };
 
-  const formSubmit = (data: FormValuesProps) => {
+  const formSubmit = async (data: FormValuesProps) => {
     setVerifyLoad(true);
     const body = {
       email_OTP:
@@ -428,8 +429,8 @@ export default function AuthRegisterForm(props: any) {
       email: formValues.email?.toLowerCase(),
       mobileNumber: formValues.mobileNumber,
     };
-
-    Api(`auth/verifyOTP`, "POST", body, "").then((Response: any) => {
+    await fetchLocation();
+    await Api(`auth/verifyOTP`, "POST", body, "").then((Response: any) => {
       console.log("=============>" + JSON.stringify(Response));
       if (Response.status == 200) {
         if (Response.data.code == 200) {

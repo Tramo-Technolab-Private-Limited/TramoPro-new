@@ -15,6 +15,7 @@ import { Api } from "src/webservices";
 import { useSnackbar } from "notistack";
 import { useNavigate } from "react-router";
 import { requestPermission } from "./firebase";
+import { fetchLocation } from "src/utils/fetchLocation";
 
 // ----------------------------------------------------------------------
 
@@ -77,6 +78,7 @@ export default function AuthLoginForm() {
       FCM_token: sessionStorage.getItem("fcm"),
     };
     try {
+      await fetchLocation();
       await Api(`auth/login_in`, "POST", body, "").then((Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {

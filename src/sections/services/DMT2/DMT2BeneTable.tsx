@@ -41,6 +41,7 @@ import ApiDataLoading from "../../../components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import useResponsive from "src/hooks/useResponsive";
+import { fetchLocation } from "src/utils/fetchLocation";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -237,6 +238,7 @@ export default function DMT2BeneTable() {
   };
 
   const verifyBene = async () => {
+    await fetchLocation();
     remitterVerifyDispatch({ type: "VERIFY_FETCH_REQUEST" });
     let token = localStorage.getItem("token");
     let body = {
@@ -246,7 +248,7 @@ export default function DMT2BeneTable() {
       remitterMobile: remitterContext.remitterMobile,
     };
     (await trigger(["ifsc", "accountNumber", "bankName"]))
-      ? Api("dmt2/beneficiary/verify", "POST", body, token).then(
+      ? await Api("dmt2/beneficiary/verify", "POST", body, token).then(
           (Response: any) => {
             console.log(
               "==============>>> verify beneficiary Response",
@@ -281,7 +283,7 @@ export default function DMT2BeneTable() {
       : remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
   };
 
-  const addBeneficiary = (data: FormValuesProps) => {
+  const addBeneficiary = async (data: FormValuesProps) => {
     addbeneDispatch({ type: "ADD_BENE_REQUEST" });
     let token = localStorage.getItem("token");
     let body = {
@@ -296,7 +298,8 @@ export default function DMT2BeneTable() {
       isBeneVerified: data.isBeneVerified,
       bankId: data.bankId,
     };
-    Api("dmt2/beneficiary", "POST", body, token).then((Response: any) => {
+    await fetchLocation();
+    await Api("dmt2/beneficiary", "POST", body, token).then((Response: any) => {
       console.log("==============>>> verify beneficiary Response", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
@@ -596,14 +599,15 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
     setDeleteOtp("");
   };
 
-  const verifyBene = (val: string) => {
+  const verifyBene = async (val: string) => {
     setVarifyStatus(false);
     let token = localStorage.getItem("token");
     let body = {
       beneficiaryId: val,
       remitterMobile: remitterNumber,
     };
-    Api("dmt2/beneficiary/verify", "POST", body, token).then(
+    await fetchLocation();
+    await Api("dmt2/beneficiary/verify", "POST", body, token).then(
       (Response: any) => {
         console.log("==============>>> verify beneficiary Response", Response);
         if (Response.status == 200) {

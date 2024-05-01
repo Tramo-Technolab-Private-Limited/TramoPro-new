@@ -36,6 +36,7 @@ import { Helmet } from "react-helmet-async";
 import { SubCategoryContext } from "./Recharges";
 import { CategoryContext } from "src/pages/Services";
 import { useAuthContext } from "src/auth/useAuthContext";
+import { fetchLocation } from "src/utils/fetchLocation";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -285,6 +286,7 @@ function VerifyNPIN({ data, handleClose }: any) {
         nPin:
           data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
       };
+      await fetchLocation();
       await Api("agents/v1/doRechargeLTS", "POST", body, token).then(
         (Response: any) => {
           if (Response.status == 200) {
