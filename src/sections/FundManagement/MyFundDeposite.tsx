@@ -1,5 +1,5 @@
-import { Box, Grid, Paper, styled } from "@mui/material";
-import React, { createContext, useEffect, useState } from "react";
+import { Grid } from "@mui/material";
+import { createContext, useEffect, useState } from "react";
 import {
   CompanyBankAccounts,
   FundDepositeTable,
@@ -8,20 +8,19 @@ import {
 } from "./fundDeposits";
 import { Api } from "src/webservices";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
-import { m, AnimatePresence } from "framer-motion";
-import {
-  MotionContainer,
-  varBounce,
-  varFade,
-  varSlide,
-} from "src/components/animate";
+import { m } from "framer-motion";
+import { MotionContainer, varFade } from "src/components/animate";
 import { fundRequestProps } from "./fundDeposits/types";
+import useResponsive from "src/hooks/useResponsive";
+import FundManagementSkeleton from "src/components/skeletons/FundManagementSkeleton";
 
 export const BankAccountContext = createContext([]);
 
 export default function MyFundDeposite() {
+  const isMobile = useResponsive("up", "sm");
   const [bankList, setBankList] = useState([]);
   const [tableData, setTableData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     getBankDeatails();
@@ -39,6 +38,7 @@ export default function MyFundDeposite() {
             console.log("======BankList=======>" + Response);
           }
         }
+        setIsLoading(false);
       }
     );
   };
@@ -69,10 +69,20 @@ export default function MyFundDeposite() {
     );
   };
 
+  if (isLoading) {
+    return <FundManagementSkeleton />;
+  }
+
   return (
     <MotionContainer>
       <BankAccountContext.Provider value={bankList}>
-        <Scrollbar sx={{ maxHeight: window.innerHeight - 120, p: 2 }}>
+        <Scrollbar
+          sx={
+            isMobile
+              ? { maxHeight: window.innerHeight - 140 }
+              : { maxHeight: window.innerHeight - 70 }
+          }
+        >
           <Grid container spacing={2} p={1}>
             <Grid item sm={12} md={4}>
               <m.div variants={varFade().inLeft} style={{ height: "100%" }}>

@@ -48,6 +48,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import useResponsive from "src/hooks/useResponsive";
 import { fCurrency } from "src/utils/formatNumber";
 import MotionModal from "src/components/animate/MotionModal";
+import { FundFlowTransactionSkeleton } from "src/components/skeletons/FundFlowTransactionSkeleton";
 // ----------------------------------------------------------------------
 type FormValuesProps = {
   transactionType: string;
@@ -88,7 +89,6 @@ export default function FundFlow() {
     startDate: null,
     endDate: null,
   };
-  console.log("defaultValues===============>", defaultValues);
 
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(txnSchema),
@@ -106,7 +106,7 @@ export default function FundFlow() {
 
   useEffect(() => {
     getTransaction();
-  }, [currentPage]);
+  }, [currentPage, pageSize]);
 
   useEffect(() => setCurrentPage(1), [superCurrentTab]);
 
@@ -386,52 +386,50 @@ export default function FundFlow() {
         {/* </Box> */}
       </MotionModal>
       <Grid item xs={12} md={6} lg={8}>
-        {Loading ? (
-          <ApiDataLoading />
-        ) : (
-          <>
-            <Scrollbar
-              sx={
-                isMobile
-                  ? { maxHeight: window.innerHeight - 204 }
-                  : { maxHeight: window.innerHeight - 170 }
-              }
+        <>
+          <Scrollbar
+            sx={
+              isMobile
+                ? { maxHeight: window.innerHeight - 204 }
+                : { maxHeight: window.innerHeight - 170 }
+            }
+          >
+            <Table
+              sx={{ minWidth: 720 }}
+              stickyHeader
+              aria-label="sticky table"
             >
-              <Table
-                sx={{ minWidth: 720 }}
-                stickyHeader
-                aria-label="sticky table"
-              >
-                <TableHeadCustom headLabel={tableLabels} />
-
-                <TableBody>
-                  {sdata.map((row: any) => (
+              <TableHeadCustom headLabel={tableLabels} />
+              <TableBody>
+                {(Loading ? [...Array(20)] : sdata).map((row: any) =>
+                  Loading ? (
+                    <FundFlowTransactionSkeleton />
+                  ) : (
                     <TransactionRow key={row._id} row={row} />
-                  ))}
-                </TableBody>
-
-                <TableNoData isNotFound={!sdata.length} />
-              </Table>
-            </Scrollbar>
-            <CustomPagination
-              page={currentPage - 1}
-              count={pageCount}
-              onPageChange={(
-                event: React.MouseEvent<HTMLButtonElement> | null,
-                newPage: number
-              ) => {
-                setCurrentPage(newPage + 1);
-              }}
-              rowsPerPage={pageSize}
-              onRowsPerPageChange={(
-                event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-              ) => {
-                setPageSize(parseInt(event.target.value));
-                setCurrentPage(1);
-              }}
-            />
-          </>
-        )}
+                  )
+                )}
+              </TableBody>
+              {!Loading && <TableNoData isNotFound={!sdata.length} />}
+            </Table>
+          </Scrollbar>
+          <CustomPagination
+            page={currentPage - 1}
+            count={pageCount}
+            onPageChange={(
+              event: React.MouseEvent<HTMLButtonElement> | null,
+              newPage: number
+            ) => {
+              setCurrentPage(newPage + 1);
+            }}
+            rowsPerPage={pageSize}
+            onRowsPerPageChange={(
+              event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+            ) => {
+              setPageSize(parseInt(event.target.value));
+              setCurrentPage(1);
+            }}
+          />
+        </>
       </Grid>
     </>
   );

@@ -72,6 +72,7 @@ import { fDateFormatForApi } from "src/utils/formatTime";
 import MotionModal from "src/components/animate/MotionModal";
 import { convertToWords } from "src/components/customFunctions/ToWords";
 import DownloadIcon from "@mui/icons-material/Download";
+import { MasterTransactionSkeleton } from "src/components/skeletons/MasterTransactionSkeleton";
 
 // ----------------------------------------------------------------------
 
@@ -809,36 +810,37 @@ export default function MyTransactions() {
 
         <Grid item xs={12} md={6} lg={8}>
           <>
-            {Loading ? (
-              <ApiDataLoading />
-            ) : (
-              <Scrollbar
-                sx={
-                  isMobile
-                    ? { maxHeight: window.innerHeight - 190 }
-                    : { maxHeight: window.innerHeight - 250 }
-                }
-              >
-                <Table size="small" aria-label="customized table" stickyHeader>
-                  <TableHeadCustom
-                    headLabel={
-                      user?.role == "m_distributor"
-                        ? tableLabels
-                        : user?.role == "distributor"
-                        ? tableLabels1
-                        : tableLabels2
-                    }
-                  />
+            <Scrollbar
+              sx={
+                isMobile
+                  ? { maxHeight: window.innerHeight - 190 }
+                  : { maxHeight: window.innerHeight - 250 }
+              }
+            >
+              <Table size="small" aria-label="customized table" stickyHeader>
+                <TableHeadCustom
+                  headLabel={
+                    user?.role == "m_distributor"
+                      ? tableLabels
+                      : user?.role == "distributor"
+                      ? tableLabels1
+                      : tableLabels2
+                  }
+                />
 
-                  <TableBody>
-                    {filterdValue.map((row: any) => (
+                <TableBody>
+                  {(Loading ? [...Array(20)] : filterdValue).map((row: any) =>
+                    Loading ? (
+                      <MasterTransactionSkeleton />
+                    ) : (
                       <TransactionRow key={row._id} row={row} />
-                    ))}
-                  </TableBody>
-                  <TableNoData isNotFound={!filterdValue.length} />
-                </Table>
-              </Scrollbar>
-            )}
+                    )
+                  )}
+                </TableBody>
+                <TableNoData isNotFound={!filterdValue.length} />
+              </Table>
+            </Scrollbar>
+
             {!Loading && (
               <CustomPagination
                 page={currentPage - 1}

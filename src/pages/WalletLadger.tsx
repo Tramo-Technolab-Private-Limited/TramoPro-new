@@ -54,6 +54,7 @@ import FormProvider, {
 } from "src/components/hook-form";
 import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import MotionModal from "src/components/animate/MotionModal";
+import { WalletLadgerSkeleton } from "src/components/skeletons/WalletLadgerSkeleton";
 
 // ----------------------------------------------------------------------
 
@@ -87,7 +88,7 @@ export default function WalletLadger() {
   const [ladgerData, setLadgerData] = useState<any>([]);
   const [pageSize, setPageSize] = useState<any>(25);
   const [currentPage, setCurrentPage] = useState<any>(1);
-  const [sendLoding, setSendLoading] = useState(false);
+  const [sendLoading, setSendLoading] = useState(false);
   const [WalletCount, setWalletCount] = useState(0);
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
@@ -305,40 +306,36 @@ export default function WalletLadger() {
           {/* </Box> */}
         </MotionModal>
 
-        {sendLoding ? (
-          <ApiDataLoading />
-        ) : (
-          <Grid item xs={12} md={6} lg={8}>
-            <TableContainer>
-              <Scrollbar sx={{ maxHeight: window.innerHeight - 200 }}>
-                <Table
-                  sx={{ minWidth: 720 }}
-                  aria-label="customized table"
-                  stickyHeader
-                  size="small"
-                >
-                  <TableHeadCustom
-                    headLabel={
-                      user?.role == "m_distributor"
-                        ? MDtableLabels
-                        : user?.role == "distributor"
-                        ? distributortableLabels
-                        : agenttableLabels
-                    }
-                  />
+        <Grid item xs={12} md={6} lg={8}>
+          <TableContainer>
+            <Scrollbar sx={{ maxHeight: window.innerHeight - 200 }}>
+              <Table aria-label="customized table" stickyHeader size="small">
+                <TableHeadCustom
+                  headLabel={
+                    user?.role == "m_distributor"
+                      ? MDtableLabels
+                      : user?.role == "distributor"
+                      ? distributortableLabels
+                      : agenttableLabels
+                  }
+                />
 
-                  <TableBody>
-                    {Array.isArray(ladgerData) &&
-                      ladgerData.map((row: any) => (
-                        <LadgerRow key={row._id} row={row} />
-                      ))}
-                  </TableBody>
+                <TableBody>
+                  {(sendLoading ? [...Array(12)] : ladgerData).map((row: any) =>
+                    sendLoading ? (
+                      <WalletLadgerSkeleton />
+                    ) : (
+                      <LadgerRow key={row._id} row={row} />
+                    )
+                  )}
+                </TableBody>
+                {!sendLoading && (
                   <TableNoData isNotFound={!ladgerData?.length} />
-                </Table>
-              </Scrollbar>
-            </TableContainer>
-          </Grid>
-        )}
+                )}
+              </Table>
+            </Scrollbar>
+          </TableContainer>
+        </Grid>
       </Stack>
 
       <CustomPagination
