@@ -175,6 +175,7 @@ function Loan() {
 
   const {
     reset,
+    trigger,
     resetField,
     watch,
     getValues,
@@ -324,6 +325,11 @@ function Loan() {
       }
     );
   };
+
+  useEffect(() => {
+    setValue("mobileNumber", getValues("mobileNumber").slice(0, 10));
+    getValues("mobileNumber").length > 0 && trigger("mobileNumber");
+  }, [watch("mobileNumber")]);
 
   return (
     <div>

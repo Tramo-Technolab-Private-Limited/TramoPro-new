@@ -59,7 +59,7 @@ type FormValuesProps = {
     tramoShortCode: string;
   };
   aadharnumber: Number | string | null;
-  mobilenumber: Number | string | null;
+  mobilenumber: string;
   amount: Number | string | null;
   categoryId: string;
 };
@@ -106,10 +106,15 @@ export default function AadharPay() {
     bankDetail: Yup.object().shape({
       bankName: Yup.string().nullable().required("Bank Name required field"),
     }),
-    mobilenumber: Yup.number()
-      .typeError("please enter valid Mobile Number")
-      .nullable()
-      .required("Mobile number is a required field"),
+    mobilenumber: Yup.string()
+      .matches(
+        /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/,
+        "Phone number is not valid"
+      )
+      .typeError("That doesn't look like a phone number")
+      .min(10, "Please enter 10 digit mobile number")
+      .max(10, "Please enter 10 digit mobile number")
+      .required("A phone number is required"),
     aadharnumber: Yup.number()
       .typeError("please enter valid Aadhaar Number")
       .nullable()
@@ -144,6 +149,9 @@ export default function AadharPay() {
   const {
     reset,
     setValue,
+    getValues,
+    watch,
+    trigger,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = methods;
@@ -227,6 +235,11 @@ export default function AadharPay() {
   //     setAttend(true);
   //   }, 0);
   // }, [user?.presenceAtForAP]);
+
+  useEffect(() => {
+    setValue("mobilenumber", getValues("mobilenumber")?.slice(0, 10));
+    getValues("mobilenumber")?.length > 0 && trigger("mobilenumber");
+  }, [watch("mobilenumber")]);
 
   useEffect(() => {
     let time = Math.floor((user?.presenceAtForAP + 150000 - Date.now()) / 1000);

@@ -113,6 +113,9 @@ export default function DMT2() {
 
   const {
     reset,
+    trigger,
+    setValue,
+    watch,
     getValues,
     handleSubmit,
     formState: { isValid, isSubmitting },
@@ -221,6 +224,11 @@ export default function DMT2() {
       handleClose1();
     }
   };
+
+  useEffect(() => {
+    setValue("mobileNumber", getValues("mobileNumber").slice(0, 10));
+    getValues("mobileNumber").length > 0 && trigger("mobileNumber");
+  }, [watch("mobileNumber")]);
 
   return (
     <RemitterContext.Provider value={remitter.data}>

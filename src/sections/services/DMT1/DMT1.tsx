@@ -1,5 +1,5 @@
 import { Helmet } from "react-helmet-async";
-import React, { useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 
@@ -113,6 +113,9 @@ export default function DMT1() {
   const {
     reset,
     getValues,
+    trigger,
+    setValue,
+    watch,
     handleSubmit,
     formState: { isValid, isSubmitting },
   } = methods;
@@ -219,6 +222,11 @@ export default function DMT1() {
       handleClose1();
     }
   };
+
+  useEffect(() => {
+    setValue("mobileNumber", getValues("mobileNumber").slice(0, 10));
+    getValues("mobileNumber").length > 0 && trigger("mobileNumber");
+  }, [watch("mobileNumber")]);
 
   return (
     <RemitterContext.Provider value={remitter.data}>

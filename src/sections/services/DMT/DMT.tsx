@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-import React, { useReducer, useState } from "react";
+import React, { useEffect, useReducer, useState } from "react";
 import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 
@@ -115,6 +115,9 @@ export default function DMT() {
   const {
     reset,
     getValues,
+    trigger,
+    watch,
+    setValue,
     handleSubmit,
     formState: { isValid, isSubmitting },
   } = methods;
@@ -227,6 +230,11 @@ export default function DMT() {
       handleClose1();
     }
   };
+
+  useEffect(() => {
+    setValue("mobileNumber", getValues("mobileNumber").slice(0, 10));
+    getValues("mobileNumber").length > 0 && trigger("mobileNumber");
+  }, [watch("mobileNumber")]);
 
   return (
     <RemitterContext.Provider value={remitter.data}>
@@ -342,6 +350,10 @@ const OtpSubmissionForRegistrantion = ({
   });
   const {
     reset,
+    trigger,
+    setValue,
+    getValues,
+    watch,
     setError,
     handleSubmit,
     formState: { errors, isSubmitting },

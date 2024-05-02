@@ -181,7 +181,7 @@ export default function DMT2BeneTable() {
 
   const {
     reset,
-    setError,
+    watch,
     setValue,
     getValues,
     trigger,
@@ -192,6 +192,11 @@ export default function DMT2BeneTable() {
   useEffect(() => {
     fatchBeneficiary(remitterContext.remitterMobile);
   }, [remitterContext]);
+
+  useEffect(() => {
+    setValue("mobileNumber", getValues("mobileNumber").slice(0, 10));
+    getValues("mobileNumber").length > 0 && trigger("mobileNumber");
+  }, [watch("mobileNumber")]);
 
   const fatchBeneficiary = (val: any) => {
     let token = localStorage.getItem("token");

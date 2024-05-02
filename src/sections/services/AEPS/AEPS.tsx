@@ -205,6 +205,7 @@ export default function AEPS(props: any) {
 
   const {
     reset,
+    trigger,
     watch,
     getValues,
     setValue,
@@ -710,6 +711,11 @@ export default function AEPS(props: any) {
       setAttend(false);
     }
   }, [localAttendance]);
+
+  useEffect(() => {
+    setValue("mobileNumber", getValues("mobileNumber")?.slice(0, 10));
+    getValues("mobileNumber")?.length > 0 && trigger("mobileNumber");
+  }, [watch("mobileNumber")]);
 
   if (isUserHaveBankAccount == null) {
     return <ApiDataLoading />;
