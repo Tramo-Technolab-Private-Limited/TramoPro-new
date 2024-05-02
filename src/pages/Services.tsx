@@ -130,7 +130,7 @@ export default function Services(props: any) {
                               <BillPayment />
                             ) : superCurrentTab.toLowerCase() ==
                               "aadhaar pay" ? (
-                              <AadharPay  />
+                              <AadharPay />
                             ) : // <ServiceUnderUpdate />
                             superCurrentTab.toLowerCase() == "matm" ? (
                               <MATM supCategory={tab} />
