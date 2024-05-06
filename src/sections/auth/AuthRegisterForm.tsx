@@ -434,9 +434,9 @@ export default function AuthRegisterForm(props: any) {
         data.code4 +
         data.code5 +
         data.code6,
-      email: data.email?.toLowerCase(),
-      mobileNumber: data.mobileNumber,
-      password: data.password,
+      email: getValues("email")?.toLowerCase(),
+      mobileNumber: getValues("mobileNumber"),
+      password: getValues("password"),
       role: value2 == "m_distributor" ? value2 : radioVal,
       refferalCode: rfcode,
       FCM_Token: sessionStorage.getItem("fcm"),
