@@ -435,7 +435,7 @@ export default function AuthRegisterForm(props: any) {
         data.code5 +
         data.code6,
       email: getValues("email")?.toLowerCase(),
-      mobileNumber: getValues("mobileNumber"),
+      mobileNumber: getValues("mobile"),
       password: getValues("password"),
       role: value2 == "m_distributor" ? value2 : radioVal,
       refferalCode: rfcode,
@@ -447,6 +447,7 @@ export default function AuthRegisterForm(props: any) {
       if (Response.status == 200) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
+          localStorage.setItem("token", Response.data.data.token);
           initialize();
         } else {
           enqueueSnackbar(Response.data.message, { variant: "error" });
