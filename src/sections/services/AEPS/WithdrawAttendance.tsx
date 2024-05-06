@@ -103,6 +103,7 @@ export default function WithdrawAttendance(props: any) {
     handleOpenLoading();
     let token = localStorage.getItem("token");
     let body = {
+      attendanceType: "TRANSACTIONAL",
       serviceType: props.attendance,
       latitude: localStorage.getItem("lat"),
       longitude: localStorage.getItem("long"),
@@ -139,12 +140,6 @@ export default function WithdrawAttendance(props: any) {
         if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.data.message);
           props.handleCloseAttendance();
-          // props.attendance == "AP"
-          //   ? UpdateUserDetail({ attendanceAP: true })
-          //   : UpdateUserDetail({
-          //       presenceAt: Date.now(),
-          //     });
-          initialize();
           setMessage(Response.data.message);
         } else if (Response.data.responseCode == 410) {
           enqueueSnackbar(Response.data.err.message, { variant: "error" });
