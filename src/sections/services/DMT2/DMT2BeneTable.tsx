@@ -138,10 +138,9 @@ export default function DMT2BeneTable() {
 
   //modal for add Beneficiary
   const [open, setModalEdit] = React.useState(false);
-  const openEditModal = () => {
-    setModalEdit(true);
-  };
+  const openEditModal = () => setModalEdit(true);
   const handleClose = () => {
+    remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
     setModalEdit(false);
     reset(defaultValues);
   };
@@ -243,8 +242,8 @@ export default function DMT2BeneTable() {
   };
 
   const verifyBene = async () => {
-    await fetchLocation();
     remitterVerifyDispatch({ type: "VERIFY_FETCH_REQUEST" });
+    await fetchLocation();
     let token = localStorage.getItem("token");
     let body = {
       ifsc: getValues("ifsc"),
@@ -605,7 +604,6 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
   };
 
   const verifyBene = async (val: string) => {
-    setVarifyStatus(false);
     let token = localStorage.getItem("token");
     let body = {
       beneficiaryId: val,
@@ -774,7 +772,10 @@ function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
               variant="contained"
               color="warning"
               loading={!varifyStatus}
-              onClick={() => verifyBene(cell._id)}
+              onClick={() => {
+                setVarifyStatus(false);
+                verifyBene(cell._id);
+              }}
             >
               Verify Now
             </LoadingButton>
