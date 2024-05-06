@@ -449,9 +449,11 @@ export default function AuthRegisterForm(props: any) {
           enqueueSnackbar(Response.data.message);
           initialize();
         } else {
-          setVerifyLoad(false);
           enqueueSnackbar(Response.data.message, { variant: "error" });
         }
+        setVerifyLoad(false);
+      } else {
+        setVerifyLoad(false);
       }
     });
   };
