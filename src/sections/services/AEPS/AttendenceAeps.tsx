@@ -119,7 +119,7 @@ export default function AttendenceAeps(props: any) {
     try {
       let token = localStorage.getItem("token");
       let body = {
-        attendanceType: "Daily",
+        attendanceType: "DAILY",
         serviceType: props.attendance,
         latitude: localStorage.getItem("lat"),
         longitude: localStorage.getItem("long"),
