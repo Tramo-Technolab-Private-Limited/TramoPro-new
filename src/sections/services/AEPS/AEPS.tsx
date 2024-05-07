@@ -55,6 +55,8 @@ import { PATH_DASHBOARD } from "src/routes/paths";
 import LoadingScreen from "src/components/loading-screen/LoadingScreen";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import { fetchLocation } from "src/utils/fetchLocation";
+import TransactionModal from "src/components/customFunctions/TrasactionModal";
+import MotionModal from "src/components/animate/MotionModal";
 
 // ----------------------------------------------------------------------
 
@@ -90,7 +92,9 @@ export default function AEPS(props: any) {
   const [resAmount, setResAmount] = useState<any>("");
   const [arrofObj, setarrofObj] = useState<any>([]);
   const [bankList, setBankList] = useState([]);
+  const [transactionDetail, setTransactionDetail] = useState<any>([]);
   const [statement, setStatement] = useState([]);
+  const [errorMsg, setErrorMsg] = useState("");
   const [trobleshootActive, setTrobleshootActive] = useState("Device Drivers");
   const [response, setResponse] = useState({
     amount: "",
@@ -145,6 +149,8 @@ export default function AEPS(props: any) {
     setOpenAttendance(false);
     initialize();
   };
+
+  const [isReceipt, setIsReceipt] = useState(false);
   const navigate = useNavigate();
   const [openPopover, setOpenPopover] = useState<HTMLElement | null>(null);
   const handleOpenPopover = (event: React.MouseEvent<HTMLElement>) => {
@@ -205,10 +211,10 @@ export default function AEPS(props: any) {
 
   const {
     reset,
-    trigger,
     watch,
     getValues,
     setValue,
+    trigger,
     handleSubmit,
     formState: { errors, isSubmitting, isValid },
   } = methods;
@@ -269,11 +275,8 @@ export default function AEPS(props: any) {
       console.log("======BankList==response=====>" + Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
-          if (Response.data.data.length) {
-            if (Response?.data?.data[0]?.bankAccounts?.length)
-              setIsUserHaveBankAccount(true);
-            else setIsUserHaveBankAccount(false);
-          }
+          if (Response.data.data.length) setIsUserHaveBankAccount(true);
+          else setIsUserHaveBankAccount(false);
         } else {
           enqueueSnackbar(Response?.data?.message, { variant: "error" });
         }
@@ -436,15 +439,26 @@ export default function AEPS(props: any) {
               Response.data.txnId.amount + " Successfully Transfered"
             );
             initialize();
-
+            setTransactionDetail([
+              { ...Response?.data?.data?.transactionDetails },
+            ]);
             handleOpenResponse();
             setResponse(Response.data.txnId);
+            setIsReceipt(true);
           } else {
             setFailedMessage(Response.data.message);
             handleOpenError();
+            setIsReceipt(true);
+            setTransactionDetail([
+              { ...Response?.data?.data?.transactionDetails },
+            ]);
           }
           setLocalAttendance(0);
           initialize();
+          setIsReceipt(true);
+          setTransactionDetail([
+            { ...Response?.data?.data?.transactionDetails },
+          ]);
           handleCloseLoading();
         } else {
           handleCloseLoading();
@@ -500,7 +514,6 @@ export default function AEPS(props: any) {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
             if (Response.data.data.status == false) {
-              handleOpenError();
               setFailedMessage(Response.data.data.message);
             }
             handleOpenResponse();
@@ -510,12 +523,10 @@ export default function AEPS(props: any) {
             enqueueSnackbar(Response.data.data.message, { variant: "warning" });
           } else {
             setFailedMessage(Response.data.message);
-            handleOpenError();
           }
           handleCloseLoading();
         } else {
           handleCloseLoading();
-          handleOpenError();
           setFailedMessage("Failed");
         }
       }
@@ -1364,6 +1375,20 @@ export default function AEPS(props: any) {
           </Box>
         </Modal>
       </RoleBasedGuard>
+      <MotionModal open={isReceipt} width={{ xs: "95%", md: 720 }}>
+        <Stack flexDirection={"row"} gap={1} mt={1} justifyContent={"center"}>
+          <TransactionModal
+            isTxnOpen={isReceipt}
+            handleTxnModal={() => {
+              setIsReceipt(false);
+              setErrorMsg("");
+              // setMode("");
+            }}
+            errorMsg={errorMsg}
+            transactionDetail={transactionDetail}
+          />
+        </Stack>
+      </MotionModal>
     </>
   );
 }
