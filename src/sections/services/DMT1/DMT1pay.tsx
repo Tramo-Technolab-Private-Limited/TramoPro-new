@@ -186,7 +186,8 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
             if (Response.status == 200) {
               if (Response.data.code == 200) {
                 Response.data.response.map((element: any) => {
-                  enqueueSnackbar(element.data.message);
+                  enqueueSnackbar(element.message);
+                  TextToSpeak(Response.message);
                   initialize();
                 });
                 setTransactionDetail(
@@ -194,7 +195,6 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
                 );
 
                 // setTransactionDetail(Response.data.data);
-                TextToSpeak(Response.data.message);
                 handleClose();
                 handleOpen1();
                 // setCount(5);
@@ -484,9 +484,13 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
                     </FormHelperText>
                   )}
                   <Stack flexDirection={"row"} gap={1} mt={2}>
-                    <Button variant="contained" type="submit">
+                    <LoadingButton
+                      variant="contained"
+                      type="submit"
+                      loading={isSubmitting}
+                    >
                       Yes, Continue
-                    </Button>
+                    </LoadingButton>
                     <Button
                       variant="contained"
                       color="warning"
