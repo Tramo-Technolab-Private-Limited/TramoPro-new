@@ -213,6 +213,8 @@ export default function DMT2BeneTable() {
           getbeneDispatch({ type: "GET_BENE_FAILURE" });
           enqueueSnackbar(Response.data.message, { variant: "error" });
         }
+      } else {
+        getbeneDispatch({ type: "GET_BENE_FAILURE" });
       }
     });
   };

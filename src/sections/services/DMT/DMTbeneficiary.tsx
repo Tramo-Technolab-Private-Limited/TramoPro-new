@@ -214,6 +214,8 @@ export default function DMTbeneficiary() {
             getbeneDispatch({ type: "GET_BENE_FAILURE" });
             enqueueSnackbar(Response.data.message, { variant: "error" });
           }
+        } else {
+          getbeneDispatch({ type: "GET_BENE_FAILURE" });
         }
       }
     );
@@ -596,7 +598,6 @@ const BeneList = React.memo(
     };
 
     const verifyBene = async (val: string) => {
-      
       let token = localStorage.getItem("token");
       let body = {
         beneficiaryId: val,
@@ -703,7 +704,8 @@ const BeneList = React.memo(
                 loading={!varifyStatus}
                 onClick={() => {
                   setVarifyStatus(false);
-                  verifyBene(cell._id)}}
+                  verifyBene(cell._id);
+                }}
               >
                 Verify Now
               </LoadingButton>

@@ -287,6 +287,7 @@ export default function TransactionModal({
               boxShadow: 4,
               p: 2,
               borderRadius: "20px",
+              minWidth: { xs: "95%", md: 720 },
             }}
             // width={{
             //   sm: "95%",
