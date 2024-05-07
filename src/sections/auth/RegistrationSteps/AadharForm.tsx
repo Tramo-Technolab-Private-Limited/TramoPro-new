@@ -43,6 +43,8 @@ import { Watch } from "@mui/icons-material";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
+  fName: string;
+  lName: string;
   aadhar: string;
   pan: string;
   otp1: string;
@@ -626,10 +628,17 @@ function PanCard(props: any) {
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail } = useAuthContext();
   const [panNumber, setPanNumber] = useState("");
+  // const [fName, setfName] = useState("");
+  // const [lName, setlName] = useState("");
   const [panAttempt, setPanAttempt] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const defaultValues = {
+    pan: user?.PANnumber ? user?.PANnumber : "",
+    fName: "",
+    lName: "",
+  };
   const PanSchema = Yup.object().shape({
     pan: Yup.string()
       .required("PAN Card Number required")
@@ -638,11 +647,9 @@ function PanCard(props: any) {
       .matches(/[A-Z]/, "Enter valid PAN")
       .max(10)
       .length(10, "Enter Valid PAN Number"),
+    fName: Yup.string().required("First Name is  required"),
+    lName: Yup.string().required("Last Name is  required"),
   });
-
-  const defaultValues = {
-    pan: user?.PANnumber ? user?.PANnumber : "",
-  };
 
   const methods = useForm<FormValuesProps>({
     mode: "onChange",
@@ -663,20 +670,21 @@ function PanCard(props: any) {
     let token = localStorage.getItem("token");
     let body = {
       PAN_Number: data.pan,
+      firstName: data.fName,
+      lastName: data.lName,
     };
     Api(`user/KYC/Verify_PAN`, "POST", body, token).then((Response: any) => {
       if (Response.data.code == 200) {
-        if (Response.data.KYCStatus.body.code == 200) {
+        if (Response.data.code == 200) {
           enqueueSnackbar(Response.data.message);
+          setLoading(false);
           setPanAttempt(Response.data.remaining_Attempts);
           UpdateUserDetail({
             getPan: true,
-            PANnumber: Response.data.KYCStatus.body.data.pan,
-            firstName: Response.data.KYCStatus.body.data.first_name,
-            lastName: Response.data.KYCStatus.body.data.last_name,
+            PANnumber: Response?.data?.KYCStatus?.body?.pan,
+            firstName: Response?.data?.KYCStatus?.body?.first_name,
+            lastName: Response?.data?.KYCStatus?.body?.last_name,
           });
-
-          setLoading(false);
         } else {
           setLoading(false);
           enqueueSnackbar(Response.data.err.message, { variant: "error" });
@@ -685,10 +693,7 @@ function PanCard(props: any) {
       } else {
         setLoading(false);
         setErrorMsg(Response.data.message);
-        enqueueSnackbar(
-          Response?.data?.message || Response.data?.err?.message,
-          { variant: "error" }
-        );
+        enqueueSnackbar(Response?.data?.message || Response.data?.err?.message);
       }
     });
   };
@@ -710,7 +715,10 @@ function PanCard(props: any) {
         mt={4}
       >
         <FormProvider methods={methods} onSubmit={handleSubmit(onSubmit)}>
-          <Stack width={{ xs: "100%", sm: "80%", md: "60%", lg: "30%" }}>
+          <Stack
+            width={{ xs: "100%", sm: "80%", md: "60%", lg: "30%" }}
+            spacing={2}
+          >
             <TextField
               error={!!errors.pan}
               size="small"
@@ -722,13 +730,25 @@ function PanCard(props: any) {
                 required: true,
               })}
             />
+            <RHFTextField
+              name="fName"
+              label="First Name"
+              type="Text"
+              disabled={user?.PANnumber}
+            />
+            <RHFTextField
+              name="lName"
+              label="Last Name"
+              type="Text"
+              disabled={user?.PANnumber}
+            />
           </Stack>
           {!!errors.pan && (
             <FormHelperText error sx={{ pl: 2 }}>
               Please enter valid Pan number
             </FormHelperText>
           )}
-          {/* <RHFTextField name="pan" label="Pan Card Number" /> */}
+
           {!user?.getPan && (
             <Stack width={"fit-content"} sx={{ mt: 2 }}>
               {loading ? (
@@ -801,10 +821,7 @@ function PanCard(props: any) {
           sx={{
             width: "40%",
             marginTop: "50px",
-            // height: '200px',
-            // backgroundSize: 'cover',
-            // boxShadow: 10,
-            // border: '20px  #F0F9FB',
+
             marginLeft: "350px",
           }}
         />
