@@ -10,6 +10,7 @@ import {
 import SuccessNew from "../../assets/dashboardIcon/Success.svg";
 import FailedNew from "../../assets/dashboardIcon/Failed.svg";
 import PendingNew from "../../assets/dashboardIcon/Pending.svg";
+import { sentenceCase } from "change-case";
 
 function CustomCard(props: any) {
   return (
@@ -22,7 +23,7 @@ function CustomCard(props: any) {
                 src={
                   props?.Status == "success"
                     ? SuccessNew
-                    : props?.Status == "failed" || props?.Status == "initiated"
+                    : props?.Status == "failed"
                     ? FailedNew
                     : props?.Status == "pending"
                     ? PendingNew
@@ -31,40 +32,42 @@ function CustomCard(props: any) {
               />
             </Stack>
             <Typography gutterBottom variant="h5" color="000000">
-              {props?.Status}
+              {sentenceCase(props?.Status)}
             </Typography>
           </Stack>
           <Typography variant="caption">Transaction Vol.</Typography>
           <Typography variant="h6" color="000000">
             ₹ {props.amount}
           </Typography>
-          <Stack
-            style={{
-              position: "absolute",
-              bottom: 0,
-              left: 0,
-              width: "100%",
-              backgroundColor:
-                props?.Status == "success"
-                  ? "#36B37E"
-                  : props?.Status == "failed" || props?.Status == "initiated"
-                  ? "#FF5630"
-                  : props?.Status == "pending"
-                  ? "#FFAB00"
-                  : "",
-              padding: "4px",
-              color: "white",
-            }}
-          >
+          <Stack mt={1}>
             <Stack
-              direction="row"
-              justifyContent="space-between"
-              sx={{ paddingLeft: 2, paddingRight: 2 }}
+              style={{
+                position: "absolute",
+                bottom: 0,
+                left: 0,
+                width: "100%",
+                backgroundColor:
+                  props?.Status == "success"
+                    ? "#36B37E"
+                    : props?.Status == "failed" || props?.Status == "initiated"
+                    ? "#FF5630"
+                    : props?.Status == "pending"
+                    ? "#FFAB00"
+                    : "",
+                padding: 3,
+                color: "white",
+              }}
             >
-              <Typography variant="caption">Transaction Count</Typography>
-              <Typography variant="overline">
-                {props.noOfTransaction}
-              </Typography>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                sx={{ paddingLeft: 3, paddingRight: 3 }}
+              >
+                <Typography variant="caption" mt={0.5}>
+                  Transaction Count
+                </Typography>
+                <Typography variant="h6">{props.noOfTransaction}</Typography>
+              </Stack>
             </Stack>
           </Stack>
         </CardContent>

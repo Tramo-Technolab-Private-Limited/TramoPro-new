@@ -25,7 +25,8 @@ function AmountCustomCard(props: any) {
               }}
               color="000000"
             >
-              ₹ {props.Amount}
+              {/* ₹ */}
+              {props.Amount}
             </Typography>
           </Stack>
           <Stack>{props?.icon}</Stack>

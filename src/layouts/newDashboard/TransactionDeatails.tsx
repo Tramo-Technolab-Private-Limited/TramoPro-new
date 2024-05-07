@@ -16,6 +16,7 @@ import Incurred from "../../assets/dashboardIcon/Incurred.svg";
 import CustomCard from "./CustomCard";
 import AmountCustomCard from "./AmountCustomCard";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
+import { fIndianCurrency } from "src/utils/formatNumber";
 function TransactionDeatails() {
   const [value, setValue] = useState("daily");
   const [transaction, setTransactions] = useState<any>([]);
@@ -148,21 +149,22 @@ function TransactionDeatails() {
                 <Grid item xs={12} sm={6} md={4}>
                   <AmountCustomCard
                     amountType="Wallet Top Up"
-                    Amount="40,00,00,000"
+                    Amount="40,000"
                     icon={<img src={WalletTop} />}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
                   <AmountCustomCard
                     amountType="Total Commission Earned"
-                    Amount={totalCommission?.totalCommission}
+                    Amount={fIndianCurrency(totalCommission?.totalCommission)}
                     icon={<img src={Earned} />}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6} md={4}>
                   <AmountCustomCard
                     amountType="Charges Incurred"
-                    Amount={totalCharge?.totalCharges}
+                    // Amount={totalCharge?.totalCharges}
+                    Amount="40,000"
                     icon={<img src={Incurred} />}
                   />
                 </Grid>
