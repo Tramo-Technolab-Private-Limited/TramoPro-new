@@ -22,7 +22,6 @@ import { Helmet } from "react-helmet-async";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useSnackbar } from "notistack";
 import { useForm } from "react-hook-form";
-import { Api } from "src/webservices";
 
 import { fDate, fDateFormatForApi, fDateTime } from "src/utils/formatTime";
 
@@ -42,9 +41,11 @@ import { fIndianCurrency } from "src/utils/formatNumber";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
+import { useAuthContext } from "src/auth/useAuthContext";
 // ----------------------------------------------------------------------
 
 export default function (props: any) {
+  const { Api, UploadFileApi } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [sdata, setSdata] = useState([]);
   const [pageSize, setPageSize] = useState(20);

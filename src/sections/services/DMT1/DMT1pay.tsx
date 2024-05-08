@@ -21,7 +21,7 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 // import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
@@ -54,7 +54,7 @@ type FormValuesProps = {
 //--------------------------------------------------------------------
 
 export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
-  const { user, initialize } = useAuthContext();
+  const { user, Api, initialize } = useAuthContext();
   const { dmt1RemitterAvailableLimit } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
@@ -186,7 +186,8 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
             if (Response.status == 200) {
               if (Response.data.code == 200) {
                 Response.data.response.map((element: any) => {
-                  enqueueSnackbar(element.data.message);
+                  enqueueSnackbar(element.message);
+                  TextToSpeak(Response.message);
                   initialize();
                 });
                 setTransactionDetail(
@@ -194,7 +195,6 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
                 );
 
                 // setTransactionDetail(Response.data.data);
-                TextToSpeak(Response.data.message);
                 handleClose();
                 handleOpen1();
                 // setCount(5);
@@ -484,9 +484,13 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
                     </FormHelperText>
                   )}
                   <Stack flexDirection={"row"} gap={1} mt={2}>
-                    <Button variant="contained" type="submit">
+                    <LoadingButton
+                      variant="contained"
+                      type="submit"
+                      loading={isSubmitting}
+                    >
                       Yes, Continue
-                    </Button>
+                    </LoadingButton>
                     <Button
                       variant="contained"
                       color="warning"

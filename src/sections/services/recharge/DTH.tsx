@@ -25,7 +25,7 @@ import {
 import { LoadingButton } from "@mui/lab";
 
 import { useSnackbar } from "../../../components/snackbar";
-import { Api } from "src/webservices";
+
 import FormProvider, {
   RHFCodes,
   RHFSecureCodes,
@@ -55,6 +55,7 @@ type FormValuesProps = {
 };
 
 export default function DTH() {
+  const { Api } = useAuthContext();
   const subCategoryContext: any = useContext(SubCategoryContext);
   const categoryContext: any = useContext(CategoryContext);
 
@@ -231,7 +232,7 @@ export default function DTH() {
 }
 
 function VerifyNPIN({ data, handleClose }: any) {
-  const { user, initialize } = useAuthContext();
+  const { user, Api, initialize } = useAuthContext();
   const { DTHNumber, amount, circle, operatorid, productName } = data;
   const { enqueueSnackbar } = useSnackbar();
   const [confirm, setConfirm] = React.useState(false);
@@ -392,6 +393,7 @@ function VerifyNPIN({ data, handleClose }: any) {
 }
 
 function FetchDetail({ data }: any) {
+  const { Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
 
   const Schema = Yup.object().shape({

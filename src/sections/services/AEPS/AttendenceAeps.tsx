@@ -15,7 +15,7 @@ import {
   Modal,
   useTheme,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFTextField,
@@ -44,7 +44,7 @@ type FormValuesProps = {
 export default function AttendenceAeps(props: any) {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail, initialize } = useAuthContext();
+  const { user, UpdateUserDetail, initialize, Api } = useAuthContext();
   const [scanLoading, setScanLoading] = useState(false);
   const theme = useTheme();
   const [message, setMessage] = useState("");
@@ -119,7 +119,7 @@ export default function AttendenceAeps(props: any) {
     try {
       let token = localStorage.getItem("token");
       let body = {
-        attendanceType: "Daily",
+        attendanceType: "DAILY",
         serviceType: props.attendance,
         latitude: localStorage.getItem("lat"),
         longitude: localStorage.getItem("long"),
@@ -349,7 +349,7 @@ export default function AttendenceAeps(props: any) {
         {message && (
           <>
             <Stack flexDirection={"column"} alignItems={"center"}>
-              <Typography variant="h4">Attendence Status</Typography>
+              <Typography variant="h4">Attendance Status</Typography>
             </Stack>
             <Typography variant="h4" textAlign={"center"} color={"#9e9e9ef0"}>
               {message}

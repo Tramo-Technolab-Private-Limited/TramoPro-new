@@ -28,7 +28,7 @@ import UploadIcon from "src/assets/icons/UploadIcon";
 import { convertToWords } from "src/components/customFunctions/ToWords";
 import { useAuthContext } from "src/auth/useAuthContext";
 import dayjs from "dayjs";
-import { Api, UploadFile } from "src/webservices";
+
 //image compressor
 import Compressor from "compressorjs";
 import { useSnackbar } from "notistack";
@@ -108,7 +108,7 @@ type props = {
 
 function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
   const bankListContext = useContext(BankAccountContext);
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const [amountMinMaxValidation, setAmountMinMaxValidation] = useState({
     min: preData.bankId.min_Deposit_Amount || 0,
     max: preData.bankId.max_Deposit_Amount || 0,
@@ -251,7 +251,7 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "others");
-        await UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        await UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {

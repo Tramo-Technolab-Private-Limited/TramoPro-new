@@ -26,7 +26,7 @@ import FormProvider, {
   RHFAutocomplete,
 } from "src/components/hook-form";
 import React from "react";
-import { Api } from "src/webservices";
+
 import { LoadingButton } from "@mui/lab";
 import { Icon } from "@iconify/react";
 import { AnimatePresence, m } from "framer-motion";
@@ -39,6 +39,7 @@ import {
 import MotionModal from "src/components/animate/MotionModal";
 import NoBankAccount from "src/assets/icons/NoBankAccount";
 import { fetchLocation } from "src/utils/fetchLocation";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 // ----------------------------------------------------------------------
 type FormValuesProps = {
@@ -100,6 +101,7 @@ const IOSSwitch = styled((props: SwitchProps) => (
 }));
 
 export default function MyBankAccount() {
+  const { Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
   const [currentTab, setCurrentTab] = useState("active");

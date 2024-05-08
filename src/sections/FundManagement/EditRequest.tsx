@@ -28,14 +28,13 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import * as Yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
-import { Api } from "src/webservices";
+
 import { LoadingButton } from "@mui/lab";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { Upload } from "src/components/upload";
 import { useSnackbar } from "notistack";
 import React from "react";
-import { UploadFile } from "src/webservices";
 
 // import FormProvider, { RHFTextField, RHFSelect } from '../../../components/hook-form';
 import FormProvider, {
@@ -43,6 +42,7 @@ import FormProvider, {
   RHFSelect,
 } from "../../components/hook-form";
 import dayjs, { Dayjs } from "dayjs";
+import { useAuthContext } from "src/auth/useAuthContext";
 type FormValuesProps = {
   branch: string;
   trxID: string;
@@ -56,6 +56,7 @@ type FormValuesProps = {
 };
 
 function EditRequest(props: any) {
+  const { Api, UploadFileApi } = useAuthContext();
   const [uploadFile, setUploadFile] = useState<any>();
   const [success, setSuccess] = useState("upload");
   const { enqueueSnackbar } = useSnackbar();
@@ -205,7 +206,7 @@ function EditRequest(props: any) {
     let formData = new FormData();
     formData.append("document", doc);
     formData.append("directoryName", "others");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
+    UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
         // console.log("=====token===aadharFront===", token)
         console.log(

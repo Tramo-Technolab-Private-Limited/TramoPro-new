@@ -30,7 +30,7 @@ const StyledInfo = styled("div")(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function ProfileCover({ cover }: any) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const StyledRoot = styled("div")(({ theme }) => ({
     "&:before": {
       ...bgBlur({

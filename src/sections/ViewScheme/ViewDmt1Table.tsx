@@ -35,7 +35,7 @@ interface Props extends CardProps {
 }
 
 export default function ViewDmt1able({ comData, ...other }: Props) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   const tableLabels1 = [
     { id: "min", label: "Min. Slab" },

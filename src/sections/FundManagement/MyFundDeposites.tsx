@@ -32,13 +32,13 @@ import {
 import { useForm, Controller } from "react-hook-form";
 import { Upload } from "src/components/upload";
 import { useSnackbar } from "notistack";
-import { UploadFile } from "src/webservices";
+
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 import FormProvider, { RHFTextField } from "../../components/hook-form";
 import dayjs, { Dayjs } from "dayjs";
-import { Api } from "src/webservices";
+
 import React from "react";
 import InstantDepositAccount from "./InstantDepositAccount";
 import AllBankDetails from "./AllBankDetails";
@@ -48,6 +48,7 @@ import neodeposit from "../../assets/icons/neodeposit.svg";
 import { convertToWords } from "src/components/customFunctions/ToWords";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import TrasactionModal from "src/components/customFunctions/TrasactionModal";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 type FormValuesProps = {
   rupee: string;
@@ -58,6 +59,7 @@ type FormValuesProps = {
 };
 
 function MyFundDeposits() {
+  const { user, UploadFileApi, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [success, setSuccess] = useState("upload");
 
@@ -194,7 +196,7 @@ function MyFundDeposits() {
     let formData = new FormData();
     formData.append("document", doc);
     formData.append("directoryName", "others");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
+    UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
         // console.log("=====token===aadharFront===", token)
         console.log(

@@ -15,7 +15,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 // ----------------------------------------------------------------------
 
 function NavHorizontal() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   return (
     <AppBar

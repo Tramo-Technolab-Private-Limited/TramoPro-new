@@ -31,7 +31,7 @@ interface Props extends CardProps {
   comData: any;
 }
 export default function ViewBBPSTable({ comData, ...other }: Props) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const tableLabels1 = [
     { id: "min", label: "Min. Slab" },
     { id: "max", label: "Max. Slab" },

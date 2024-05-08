@@ -6,17 +6,19 @@ import {
   InstantDepositAccounts,
   NewFundRequest,
 } from "./fundDeposits";
-import { Api } from "src/webservices";
+
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import { m } from "framer-motion";
 import { MotionContainer, varFade } from "src/components/animate";
 import { fundRequestProps } from "./fundDeposits/types";
 import useResponsive from "src/hooks/useResponsive";
 import FundManagementSkeleton from "src/components/skeletons/FundManagementSkeleton";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 export const BankAccountContext = createContext([]);
 
 export default function MyFundDeposite() {
+  const { Api } = useAuthContext();
   const isMobile = useResponsive("up", "sm");
   const [bankList, setBankList] = useState([]);
   const [tableData, setTableData] = useState([]);

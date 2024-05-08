@@ -2,7 +2,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
-import { Api } from "src/webservices";
+
 import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import Modal from "@mui/material/Modal";
@@ -57,7 +57,7 @@ export default function DirectFundTransfer(props: any) {
     remarks: "",
   };
 
-  const { initialize } = useAuthContext();
+  const { user, Api, UploadFileApi, initialize } = useAuthContext();
   const [open, setOpen] = React.useState(false);
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
@@ -77,7 +77,6 @@ export default function DirectFundTransfer(props: any) {
   };
   const onSubmit = () => handleOpenDetails();
 
-  const { user, UpdateUserDetail } = useAuthContext();
   const methods = useForm<FormValuesProps>({
     resolver: yupResolver(accountValidate),
     defaultValues,

@@ -38,7 +38,7 @@ import {
   ProfileGallery,
   ProfileFollowers,
 } from "../sections/profile";
-import { Api } from "src/webservices";
+
 import TramoCertificate from "../assets/icons/Tramo-Certificate-3.png";
 import { AwsDocSign } from "../components/customFunctions/AwsDocSign";
 import jsPDF from "jspdf";
@@ -49,7 +49,7 @@ import Image from "src/components/image/Image";
 export default function UserProfilePage() {
   const { themeStretch } = useSettingsContext();
 
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   const [searchFriends, setSearchFriends] = useState("");
 

@@ -26,7 +26,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 // _mock_
 import FormProvider, {
@@ -122,7 +122,7 @@ const Reducer = (state: any, action: any) => {
 };
 
 export default function DMTbeneficiary() {
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const isMobile = useResponsive("up", "sm");
   const remitterContext: any = useContext(RemitterContext);
@@ -214,6 +214,8 @@ export default function DMTbeneficiary() {
             getbeneDispatch({ type: "GET_BENE_FAILURE" });
             enqueueSnackbar(Response.data.message, { variant: "error" });
           }
+        } else {
+          getbeneDispatch({ type: "GET_BENE_FAILURE" });
         }
       }
     );
@@ -575,7 +577,7 @@ export default function DMTbeneficiary() {
 
 const BeneList = React.memo(
   ({ row, callback, remitterNumber, deleteBene, pay }: any) => {
-    const { user, UpdateUserDetail } = useAuthContext();
+    const { user, UpdateUserDetail, Api } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const theme = useTheme();
     const [isLoading, setIsLoading] = useState(false);
@@ -596,7 +598,6 @@ const BeneList = React.memo(
     };
 
     const verifyBene = async (val: string) => {
-      
       let token = localStorage.getItem("token");
       let body = {
         beneficiaryId: val,
@@ -703,7 +704,8 @@ const BeneList = React.memo(
                 loading={!varifyStatus}
                 onClick={() => {
                   setVarifyStatus(false);
-                  verifyBene(cell._id)}}
+                  verifyBene(cell._id);
+                }}
               >
                 Verify Now
               </LoadingButton>

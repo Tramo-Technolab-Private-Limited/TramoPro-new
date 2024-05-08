@@ -30,7 +30,7 @@ import { convertToWords } from "./ToWords";
 // import HandleClose from "./TrasactionModal";
 
 function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
-  const { user } = useAuthContext();
+  const { user, Api } = useAuthContext();
   const [modalOpen, setModalOpen] = useState(true);
   const [convienienceFee, setConvienienceFee] = useState(0);
   const [textFieldValue, setTextFieldValue] = useState("");
@@ -120,7 +120,7 @@ function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
                 <Stack alignItems="end">
                   <Logo />
                   <Typography variant="body2">
-                    TRX Date: {fDateTime(newRow?.createdAt)}
+                    TRX Date: {fDateTime(newRow[0]?.createdAt)}
                   </Typography>
                 </Stack>
               </Grid>
@@ -155,7 +155,7 @@ function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
                     </Typography>
                   </React.Fragment>
                 )}
-                {newRow?.categoryName?.toLowerCase() == "bill payment" && (
+                {newRow[0]?.categoryName?.toLowerCase() == "bill payment" && (
                   <React.Fragment>
                     <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
                       Payer Mobile Number :{" "}
@@ -166,13 +166,13 @@ function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
                     </Typography>
                   </React.Fragment>
                 )}
-                {newRow?.categoryName?.toLowerCase() == "aeps" && (
+                {newRow[0]?.categoryName?.toLowerCase() == "aeps" && (
                   <React.Fragment>
                     <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
                       Withdrawal Customer Mobile Number :{" "}
                       <span style={{ fontWeight: 500 }}>
                         {" "}
-                        {newRow?.mobileNumber}
+                        {newRow[0]?.mobileNumber}
                       </span>
                     </Typography>
                   </React.Fragment>
@@ -229,7 +229,7 @@ function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
                       </Typography>
                     </React.Fragment>
                   )}
-                  {newRow?.categoryName?.toLowerCase() == "bill payment" && (
+                  {newRow[0]?.categoryName?.toLowerCase() == "bill payment" && (
                     <React.Fragment>
                       <Typography variant="subtitle1">
                         Operator Detail
@@ -238,40 +238,42 @@ function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
                         Operator Name :{" "}
                         <span style={{ fontWeight: 500 }}>
                           {" "}
-                          {newRow?.operator?.key1}
+                          {newRow[0]?.operator?.key1}
                         </span>
                       </Typography>
                       <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
                         CA Number :{" "}
                         <span style={{ fontWeight: 500 }}>
                           {" "}
-                          {newRow?.operator?.key2}
+                          {newRow[0]?.operator?.key2}
                         </span>
                       </Typography>
                     </React.Fragment>
                   )}
-                  {newRow?.categoryName?.toLowerCase() == "aeps" && (
-                    <React.Fragment>
-                      <Typography variant="subtitle1">
-                        Customer Detail
-                      </Typography>
-                      <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
-                        Bank Name :{" "}
-                        <span style={{ fontWeight: 500 }}>
-                          {" "}
-                          {newRow?.operator?.key1}
-                        </span>
-                      </Typography>
-                      <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
-                        Account Number :{" "}
-                        <span style={{ fontWeight: 500 }}>
-                          {" "}
-                          {newRow?.operator?.key2}
-                        </span>
-                      </Typography>
-                    </React.Fragment>
-                  )}
-                  {newRow?.categoryName?.toLowerCase() == "recharges" && (
+                  {newRow[0]?.categoryName?.toLowerCase() == "aeps" ||
+                    (newRow[0]?.categoryName?.toLowerCase() ==
+                      "aadhaar pay" && (
+                      <React.Fragment>
+                        <Typography variant="subtitle1">
+                          Customer Detail
+                        </Typography>
+                        <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
+                          Bank Name :{" "}
+                          <span style={{ fontWeight: 500 }}>
+                            {" "}
+                            {newRow[0]?.operator?.key1}
+                          </span>
+                        </Typography>
+                        <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
+                          Aadhaar Number :{" "}
+                          <span style={{ fontWeight: 500 }}>
+                            {" "}
+                            {newRow[0]?.operator?.key2}
+                          </span>
+                        </Typography>
+                      </React.Fragment>
+                    ))}
+                  {newRow[0]?.categoryName?.toLowerCase() == "recharges" && (
                     <React.Fragment>
                       <Typography variant="subtitle1">
                         Operator Detail
@@ -280,14 +282,14 @@ function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
                         Operator :{" "}
                         <span style={{ fontWeight: 500 }}>
                           {" "}
-                          {newRow?.operator?.key1}
+                          {newRow[0]?.operator?.key1}
                         </span>
                       </Typography>
                       <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
                         Mobile Number :{" "}
                         <span style={{ fontWeight: 500 }}>
                           {" "}
-                          {newRow?.operator?.key2}
+                          {newRow[0]?.operator?.key2}
                         </span>
                       </Typography>
                     </React.Fragment>

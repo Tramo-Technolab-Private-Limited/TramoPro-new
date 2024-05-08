@@ -42,4 +42,6 @@ export type JWTContextType = {
   loginWithGithub?: () => void;
   loginWithTwitter?: () => void;
   initialize: () => Promise<void>;
+  Api: any;
+  UploadFileApi: any;
 };

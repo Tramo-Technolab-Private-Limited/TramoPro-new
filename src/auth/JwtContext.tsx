@@ -14,7 +14,6 @@ import {
   AuthUserType,
   JWTContextType,
 } from "./types";
-import { Api } from "src/webservices";
 import { useNavigate } from "react-router";
 import { fetchLocation } from "src/utils/fetchLocation";
 
@@ -111,6 +110,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: false,
+      isInitialized: true,
       logOut: true,
       user: null,
     };
@@ -129,6 +129,7 @@ type AuthProviderProps = {
 };
 
 export function AuthProvider({ children }: AuthProviderProps) {
+  const siteUrl = process.env.REACT_APP_BASE_URL;
   const [state, dispatch] = useReducer(reducer, initialState);
   const [location, setLocation] = useState<boolean | null>(null);
 
@@ -250,6 +251,91 @@ export function AuthProvider({ children }: AuthProviderProps) {
     });
   };
 
+  //api
+  const Api = async (url: any, apiMethod: any, body: any, token: any) => {
+    const init: any =
+      apiMethod === "GET"
+        ? {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              token: token ? token : null,
+              latitude: localStorage.getItem("lat"),
+              longitude: localStorage.getItem("long"),
+              ip: localStorage.getItem("ip")?.toString(),
+              "user-Agent": localStorage.getItem("user-Agent"),
+              devicetype: localStorage.getItem("devicetype"),
+            },
+          }
+        : {
+            method: apiMethod,
+            headers: {
+              "Content-Type": "application/json",
+              token: token ? token : null,
+              latitude: localStorage.getItem("lat"),
+              longitude: localStorage.getItem("long"),
+              ip: localStorage.getItem("ip")?.toString(),
+              "user-Agent": localStorage.getItem("user-Agent"),
+              devicetype: localStorage.getItem("devicetype"),
+            },
+            body: JSON.stringify(body),
+          };
+
+    return fetch(siteUrl + url, init)
+      .then((res) =>
+        res.json().then((data) => {
+          var apiData = {
+            status: res.status,
+            data: data,
+          };
+          if (apiData.data.code == 410) {
+            dispatch({
+              type: Types.LOGOUT,
+            });
+            return;
+          }
+          return apiData;
+        })
+      )
+      .catch((err) => {
+        return "error";
+      });
+  };
+
+  const UploadFileApi = async (url: any, body: any, token: any) => {
+    const init: any = {
+      method: "POST",
+      headers: {
+        token: token ? token : null,
+        latitude: localStorage.getItem("lat"),
+        longitude: localStorage.getItem("long"),
+        ip: localStorage.getItem("ip")?.toString(),
+        "user-Agent": localStorage.getItem("user-Agent"),
+        devicetype: localStorage.getItem("devicetype"),
+      },
+      body: body,
+    };
+    return fetch(siteUrl + url, init)
+      .then((res) =>
+        res.json().then((data) => {
+          var apiData = {
+            status: res.status,
+            data: data,
+          };
+          if (apiData.data.code == 410) {
+            dispatch({
+              type: Types.LOGOUT,
+            });
+            return;
+          }
+          return apiData;
+        })
+      )
+      .catch((err) => {
+        return "error";
+      });
+  };
+
   // LOGOUT
   const logout = async () => {
     localStorage.removeItem("token");
@@ -272,6 +358,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         logout,
         register,
         UpdateUserDetail,
+        Api,
+        UploadFileApi,
       }}
     >
       {children}

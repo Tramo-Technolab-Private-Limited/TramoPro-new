@@ -35,7 +35,7 @@ interface Props {
 }
 
 export default function ProfilePostCard({ post }: Props) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   const commentInputRef = useRef<HTMLInputElement>(null);
 

@@ -30,7 +30,7 @@ import Label from "src/components/label/Label";
 import { TableHeadCustom, TableNoData } from "src/components/table";
 import React from "react";
 import Iconify from "src/components/iconify/Iconify";
-import { Api } from "src/webservices";
+
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import CustomPagination from "../components/customFunctions/CustomPagination";
 import ApiDataLoading from "../components/customFunctions/ApiDataLoading";
@@ -83,7 +83,7 @@ interface Props extends CardProps {
   tableLabels: any;
 }
 export default function WalletLadger() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [ladgerData, setLadgerData] = useState<any>([]);
   const [pageSize, setPageSize] = useState<any>(25);
@@ -358,7 +358,7 @@ export default function WalletLadger() {
 }
 
 const LadgerRow = ({ row }: any) => {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const { copy } = useCopyToClipboard();
   const { enqueueSnackbar } = useSnackbar();
 
