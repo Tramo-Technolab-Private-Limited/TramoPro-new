@@ -12,7 +12,7 @@ type Props = {
 };
 
 export default function ProfileFollowers({ followers }: Props) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   return (
     <>

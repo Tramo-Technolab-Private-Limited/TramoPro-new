@@ -11,7 +11,7 @@ import FormProvider, {
   RHFTextField,
 } from "../../components/hook-form";
 import * as React from "react";
-import { Api } from "../../webservices";
+
 import { useSnackbar } from "notistack";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import { useAuthContext } from "src/auth/useAuthContext";
@@ -40,7 +40,7 @@ type FormValuesProps = {
 
 export default function NPinReset(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   const [verifyLoad, setVerifyLoad] = useState(false);
   const [gOTP, setgOTP] = useState(false);

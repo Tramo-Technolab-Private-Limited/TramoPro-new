@@ -27,7 +27,7 @@ import PersonalLoanIcon from "src/assets/icons/loan/PersonalLoanIcon";
 import BusinessLoanIcon from "src/assets/icons/loan/BusinessLoanIcon";
 import HomeLoanIcon from "src/assets/icons/loan/HomeLoanIcon";
 import GoldLoanIcon from "src/assets/icons/loan/GoldLoanIcon";
-import { Api, UploadFile } from "src/webservices";
+
 import { CategoryContext } from "src/pages/Services";
 import Compressor from "compressorjs";
 
@@ -125,6 +125,7 @@ type LoanTxnTable = {
 
 function Loan() {
   const { enqueueSnackbar } = useSnackbar();
+  const { Api, UploadFileApi } = useAuthContext();
   const isMobile = useResponsive("up", "sm");
   const categoryContext: any = useContext(CategoryContext);
   const [currentTab, setCurrentTab] = useState("");
@@ -609,6 +610,7 @@ export default Loan;
 
 const UploadPan = React.memo(({ data, setStep }: any) => {
   const { user_token, clientRefId } = data;
+  const { Api, UploadFileApi } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [isPanVerify, setIsPanVerify] = useState(false);
@@ -674,7 +676,7 @@ const UploadPan = React.memo(({ data, setStep }: any) => {
     let formData = new FormData();
     formData.append("panFront", e.target.files[0]);
     formData.append("user_token", data.user_token);
-    await UploadFile(
+    await UploadFileApi(
       `app/loan/easy_loan_step3/${data.clientRefId}`,
       formData,
       token
@@ -918,6 +920,7 @@ const UploadPan = React.memo(({ data, setStep }: any) => {
 
 const DynamicForm = ({ data, setStep }: any) => {
   const { enqueueSnackbar } = useSnackbar();
+  const { Api, UploadFileApi } = useAuthContext();
   const { user_token, clientRefId, loanSubCategory } = data;
   const [formValues, setFormValues] = useState<any>({});
   const [formValuesProps, setFormValuesProps] = useState<any>({});
@@ -1084,6 +1087,7 @@ const DynamicForm = ({ data, setStep }: any) => {
 
 const LoanTransactionTable = () => {
   let token = localStorage.getItem("token");
+  const { Api, UploadFileApi } = useAuthContext();
   const isMobile = useResponsive("up", "sm");
   const { enqueueSnackbar } = useSnackbar();
   const [Loading, setLoading] = useState(false);

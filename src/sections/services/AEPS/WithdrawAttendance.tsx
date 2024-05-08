@@ -15,7 +15,7 @@ import {
   Modal,
   useTheme,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFTextField,
@@ -39,7 +39,7 @@ type FormValuesProps = {
 
 export default function WithdrawAttendance(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail, initialize } = useAuthContext();
+  const { user, UpdateUserDetail, initialize, Api } = useAuthContext();
   const theme = useTheme();
   const [message, setMessage] = useState("");
   const [arrofObj, setarrofObj] = useState<any>([]);
@@ -381,7 +381,7 @@ export default function WithdrawAttendance(props: any) {
             width={{ xs: "100%", sm: 400 }}
           >
             <Stack flexDirection={"column"} alignItems={"center"}>
-              <Typography variant="h3">Attendence Status</Typography>
+              <Typography variant="h3">Attendance Status</Typography>
             </Stack>
             <Typography variant="h4" textAlign={"center"} color={"#9e9e9ef0"}>
               {message}

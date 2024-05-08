@@ -31,7 +31,7 @@ type Props = {
 export default function Header({ onOpenNav }: Props) {
   const theme = useTheme();
 
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   const { themeLayout } = useSettingsContext();
 

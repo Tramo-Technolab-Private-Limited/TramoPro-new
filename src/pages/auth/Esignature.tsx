@@ -5,7 +5,7 @@ import { Typography, Stack, useTheme } from "@mui/material";
 import SetNpinForm from "./CreateNpin";
 import { Button } from "@mui/material";
 import { useState, useEffect } from "react";
-import { Api } from "src/webservices";
+
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import { LoadingButton } from "@mui/lab";
@@ -14,7 +14,7 @@ import { STEP_DASHBOARD } from "src/routes/paths";
 import { fetchLocation } from "src/utils/fetchLocation";
 export default function NPinPage() {
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const [verifyLoding, setVerifyLoading] = useState(false);
 
   useEffect(() => {

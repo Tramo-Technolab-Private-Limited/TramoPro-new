@@ -28,7 +28,7 @@ import FormProvider, {
   RHFCodes,
 } from "../../../components/hook-form";
 import { useSnackbar } from "notistack";
-import { Api } from "src/webservices";
+
 import StepConnector, {
   stepConnectorClasses,
 } from "@mui/material/StepConnector";
@@ -57,7 +57,7 @@ type FormValuesProps = {
 
 export default function AadharForm(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const [activeStep, setActiveStep] = useState<any>(0);
   const [otpSendSuccess, setOtpSendSuccess] = useState(false);
   const [resendotp, setResendOtp] = useState(false);
@@ -626,7 +626,7 @@ export default function AadharForm(props: any) {
 
 function PanCard(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const [panNumber, setPanNumber] = useState("");
   // const [fName, setfName] = useState("");
   // const [lName, setlName] = useState("");

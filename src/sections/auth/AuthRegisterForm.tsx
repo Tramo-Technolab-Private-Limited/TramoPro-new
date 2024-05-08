@@ -41,7 +41,7 @@ import * as React from "react";
 import Tab from "@mui/material/Tab";
 import TabContext from "@mui/lab/TabContext";
 import TabList from "@mui/lab/TabList";
-import { Api } from "../../webservices";
+
 import { useSnackbar } from "../../components/snackbar";
 import ApiDataLoading from "src/components/customFunctions/ApiDataLoading";
 import TermAndCondition from "./TermAndConditions/TermAndCondition";
@@ -114,7 +114,7 @@ function a11yProps(index: number) {
 
 export default function AuthRegisterForm(props: any) {
   const navigate = useNavigate();
-  const { UpdateUserDetail, initialize } = useAuthContext();
+  const { Api, initialize } = useAuthContext();
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
   const [open, setModalEdit] = React.useState(false);
@@ -317,7 +317,7 @@ export default function AuthRegisterForm(props: any) {
       email: data.email.toLowerCase(),
       mobileNumber: data.mobile,
     };
-    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+    Api(`auth/send-user-otp`, "POST", body, "").then((Response: any) => {
       console.log("=============>" + JSON.stringify(Response));
       if (Response.status == 200) {
         if (Response.data.code == 200) {
@@ -350,7 +350,7 @@ export default function AuthRegisterForm(props: any) {
       email: email.toLowerCase(),
       mobileNumber: mobile,
     };
-    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+    Api(`auth/send-user-otp`, "POST", body, "").then((Response: any) => {
       console.log("=============>" + JSON.stringify(Response));
       if (Response.status == 200) {
         if (Response.data.code == 200) {
@@ -369,7 +369,7 @@ export default function AuthRegisterForm(props: any) {
       email: email.toLowerCase(),
       mobileNumber: mobile,
     };
-    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+    Api(`auth/send-user-otp`, "POST", body, "").then((Response: any) => {
       console.log("=============>" + JSON.stringify(Response));
       if (Response.status == 200) {
         if (Response.data.code == 200) {

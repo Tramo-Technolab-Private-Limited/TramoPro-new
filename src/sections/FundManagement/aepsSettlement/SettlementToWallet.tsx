@@ -23,7 +23,7 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
-import { Api } from "src/webservices";
+
 import NPinReset from "../../Settings/NPinReset";
 import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
@@ -50,7 +50,7 @@ type FormValuesProps = {
 
 export default React.memo(function SettlementToWallet() {
   const { enqueueSnackbar } = useSnackbar();
-  const { initialize } = useAuthContext();
+  const { user, Api, initialize } = useAuthContext();
   const [eligibleSettlementAmount, setEligibleSettlementAmount] = useState("");
   const [resetNpin, setResetNpin] = useState(false);
   const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
@@ -387,7 +387,7 @@ export default React.memo(function SettlementToWallet() {
 });
 
 function TransactionRow({ row }: any) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   const [newRow, setNewRow] = useState(row);
 

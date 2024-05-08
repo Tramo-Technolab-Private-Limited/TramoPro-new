@@ -40,7 +40,7 @@ import Iconify from "src/components/iconify";
 import React from "react";
 import { useSettingsContext } from "src/components/settings";
 import Label from "src/components/label";
-import { Api } from "src/webservices";
+
 import MyNetworkTable from "./MyNetworkTable";
 import { useAuthContext } from "src/auth/useAuthContext";
 // ----------------------------------------------------------------------
@@ -64,7 +64,7 @@ interface Props extends CardProps {
 }
 export default function MyNetwrokFunds() {
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const { themeStretch } = useSettingsContext();
   const [clardata, setclardata] = useState([]);
   const [appdata, setAppdata] = useState([]);

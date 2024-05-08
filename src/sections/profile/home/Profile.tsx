@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function Profile({ info, posts }: Props) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const isMobile = useResponsive("up", "sm");
 
   return (

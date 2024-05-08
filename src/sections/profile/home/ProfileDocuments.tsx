@@ -5,7 +5,7 @@ import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
 import Image from "src/components/image/Image";
 
 export default function ProfileDocuments() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   return (
     <React.Fragment>

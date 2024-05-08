@@ -16,7 +16,7 @@ import {
   Stack,
   FormHelperText,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 // import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
@@ -57,7 +57,7 @@ export default function DMTpay({
   const { availableLimitForMoneyTransfer } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();
-  const { initialize } = useAuthContext();
+  const { user, Api, initialize } = useAuthContext();
   const [mode, setMode] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
 

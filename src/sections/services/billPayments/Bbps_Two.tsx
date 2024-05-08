@@ -13,9 +13,10 @@ import {
   MenuItem,
   InputLabel,
 } from "@mui/material";
-import { Api } from "src/webservices";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 function Bbps_Two(props: any) {
+  const { Api } = useAuthContext();
   const [superCurrentTab, setSuperCurrentTab] = useState("");
   const [vlist, setVlist] = useState([]);
   const [operators, setOperators] = useState<any>([]);

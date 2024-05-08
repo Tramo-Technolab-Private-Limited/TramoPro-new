@@ -5,7 +5,7 @@ import AgentDashboard from "src/layouts/newDashboard/agentDashbord/AgentDashboar
 import { useAuthContext } from "src/auth/useAuthContext";
 import DistributorDashboard from "src/layouts/newDashboard/DistribitorDashboard/DistributorDashboard";
 function MyStats() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   return (
     <>
       <Stack>

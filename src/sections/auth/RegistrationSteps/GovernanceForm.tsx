@@ -24,7 +24,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import Tabs from "@mui/material/Tabs";
-import { Api } from "src/webservices";
+
 import { Icon } from "@iconify/react";
 import Image from "src/components/image/Image";
 import GSTImage from "src/assets/Onboarding/GSTImage.png";
@@ -60,7 +60,7 @@ function a11yProp2(index: number) {
 export default function GovernanceForm(props: any) {
   const { enqueueSnackbar } = useSnackbar();
   const theme = useTheme();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const [gstDeatil, setGstDetail] = React.useState({
     company_name: "",
     state_jurisdiction: "",

@@ -14,7 +14,7 @@ import {
   MenuItem,
   FormHelperText,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFTextField,
@@ -27,6 +27,7 @@ import { LoadingButton } from "@mui/lab";
 import DMT1RemitterDetail from "./DMT1RemitterDetail";
 import DMT1beneficiary from "./DMT1BeneTable";
 import { fetchLocation } from "src/utils/fetchLocation";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 // ----------------------------------------------------------------------
 
@@ -75,6 +76,7 @@ const Reducer = (state: any, action: any) => {
 };
 
 export default function DMT1() {
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [remitter, remitterDispatch] = useReducer(Reducer, initialRemitter);
 
@@ -317,6 +319,7 @@ const OtpSubmissionForRegistrantion = ({
   callback,
   handleClose2,
 }: any) => {
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -428,6 +431,7 @@ const OtpSubmissionForRegistrantion = ({
 };
 
 const NewRegistration = ({ mobilenumber, handleNewRegistaion }: any) => {
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [isLoading, setIsLoading] = useState(false);
 

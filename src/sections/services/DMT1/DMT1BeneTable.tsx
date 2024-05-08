@@ -26,7 +26,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 // _mock_
 import FormProvider, {
@@ -122,7 +122,7 @@ const Reducer = (state: any, action: any) => {
 };
 
 export default function DMTbeneficiary() {
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const isMobile = useResponsive("up", "sm");
   const remitterContext: any = useContext(RemitterContext);
@@ -573,7 +573,7 @@ export default function DMTbeneficiary() {
 
 const BeneList = React.memo(
   ({ row, callback, remitterNumber, deleteBene, pay }: any) => {
-    const { user, UpdateUserDetail } = useAuthContext();
+    const { user, UpdateUserDetail, Api } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
     const theme = useTheme();
     const [isLoading, setIsLoading] = useState(false);

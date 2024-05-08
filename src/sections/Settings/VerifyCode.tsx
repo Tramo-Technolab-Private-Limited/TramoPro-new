@@ -21,7 +21,7 @@ import FormProvider, {
   RHFTextField,
 } from "../../components/hook-form";
 import Iconify from "../../components/iconify";
-import { Api } from "../../webservices";
+
 import { useState } from "react";
 import { useAuthContext } from "src/auth/useAuthContext";
 // ----------------------------------------------------------------------
@@ -45,7 +45,7 @@ type FormValuesProps = {
 
 export default function VerifyCode(props: any) {
   const navigate = useNavigate();
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const [msg, setMsg] = useState("Enter Your OTP");
   const [showPassword, setShowPassword] = useState(false);
   const { enqueueSnackbar } = useSnackbar();

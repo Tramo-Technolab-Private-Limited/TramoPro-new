@@ -12,7 +12,7 @@ import {
   MenuItem,
   FormHelperText,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFTextField,
@@ -67,7 +67,7 @@ type FormValuesProps = {
 var localTime: any;
 
 export default function AadharPay() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi, initialize } = useAuthContext();
   const [attendanceTimeout, setAttendanceTimeout] = useState(0);
 
   const [postData, setPostData] = useState<any>({
@@ -396,7 +396,7 @@ const ConfirmDetails = ({ handleClose, resetForm, ...other }: childProps) => {
   }: any = other;
 
   const { enqueueSnackbar } = useSnackbar();
-  const { user, initialize } = useAuthContext();
+  const { user, Api, initialize } = useAuthContext();
   const [scanLoading, setScanLoading] = useState(false);
 
   const NPINSchema = Yup.object().shape({

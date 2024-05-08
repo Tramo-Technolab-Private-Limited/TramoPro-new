@@ -23,10 +23,11 @@ import { PATH_DASHBOARD } from "src/routes/paths";
 
 import { Link as RouterLink, useNavigate, useLocation } from "react-router-dom";
 import React from "react";
-import { Api } from "src/webservices";
+
 import { useSnackbar } from "notistack";
 import { fDateTime } from "src/utils/formatTime";
 import { CustomAvatar } from "src/components/custom-avatar";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 // ----------------------------------------------------------------------
 
@@ -97,6 +98,7 @@ type MyNetworkTableRowProps = {
 };
 // sd
 function MyNetworkTableRow({ row, gopro }: MyNetworkTableRowProps) {
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [open, setOpen] = React.useState(false);
   const handleOpen = (val: any) => setOpen(true);
