@@ -317,7 +317,7 @@ export default function AuthRegisterForm(props: any) {
       email: data.email.toLowerCase(),
       mobileNumber: data.mobile,
     };
-    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+    Api(`auth/send-user-otp`, "POST", body, "").then((Response: any) => {
       console.log("=============>" + JSON.stringify(Response));
       if (Response.status == 200) {
         if (Response.data.code == 200) {
@@ -350,7 +350,7 @@ export default function AuthRegisterForm(props: any) {
       email: email.toLowerCase(),
       mobileNumber: mobile,
     };
-    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+    Api(`auth/send-user-otp`, "POST", body, "").then((Response: any) => {
       console.log("=============>" + JSON.stringify(Response));
       if (Response.status == 200) {
         if (Response.data.code == 200) {
@@ -369,7 +369,7 @@ export default function AuthRegisterForm(props: any) {
       email: email.toLowerCase(),
       mobileNumber: mobile,
     };
-    Api(`auth/sendOTP`, "POST", body, "").then((Response: any) => {
+    Api(`auth/send-user-otp`, "POST", body, "").then((Response: any) => {
       console.log("=============>" + JSON.stringify(Response));
       if (Response.status == 200) {
         if (Response.data.code == 200) {
