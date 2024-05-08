@@ -27,7 +27,7 @@ import FormProvider, {
   RHFTextField,
 } from "../../components/hook-form";
 import Iconify from "../../components/iconify";
-import { Api } from "../../webservices";
+
 import { Fragment, useEffect, useState } from "react";
 import ResetPassLayout from "src/layouts/reset/ResetPassLayout";
 import { useAuthContext } from "src/auth/useAuthContext";
@@ -52,6 +52,7 @@ type FormValuesProps = {
 
 export default function AuthVerifyCodeForm() {
   const navigate = useNavigate();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { state } = useLocation();
   const { method } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);

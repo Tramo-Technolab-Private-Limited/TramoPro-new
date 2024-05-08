@@ -33,14 +33,14 @@ import { Helmet } from "react-helmet-async";
 import { _ecommerceBestSalesman } from "src/_mock/arrays";
 import { useSnackbar } from "notistack";
 import React from "react";
-import { Api } from "src/webservices";
+
 import Scrollbar from "src/components/scrollbar";
 import { LoadingButton } from "@mui/lab";
 import { TableHeadCustom } from "src/components/table";
 import { Upload } from "src/components/upload";
 import * as Yup from "yup";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { UploadFile } from "src/webservices";
+
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
@@ -51,6 +51,7 @@ import moment from "moment";
 import EditRequest from "./EditRequest";
 import { AwsDocSign } from "src/components/customFunctions/AwsDocSign";
 import { FileUpload } from "@mui/icons-material";
+import { useAuthContext } from "src/auth/useAuthContext";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -67,6 +68,7 @@ type FormValuesProps = {
 
 export default function (props: any) {
   const { enqueueSnackbar } = useSnackbar();
+  const { Api, UploadFileApi } = useAuthContext();
   const [uploadFile, setUploadFile] = useState<any>();
   const [currentPage, setCurrentPage] = useState<any>(1);
   const [sdata, setSdata] = useState([]);
@@ -313,7 +315,7 @@ export default function (props: any) {
     let formData = new FormData();
     formData.append("document", doc);
     formData.append("directoryName", "others");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
+    UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
         console.log(
           "=====uploadAadharfrontResponse========>" + JSON.stringify(Response)

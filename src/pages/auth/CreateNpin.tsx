@@ -26,7 +26,7 @@ import FormProvider, {
   RHFTextField,
 } from "../../components/hook-form";
 import Iconify from "../../components/iconify";
-import { Api } from "../../webservices";
+
 import { useState, useEffect } from "react";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { fetchLocation } from "src/utils/fetchLocation";
@@ -51,7 +51,7 @@ type FormValuesProps = {
 
 export default function CreateNpin() {
   const navigate = useNavigate();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const [msg, setMsg] = useState("Create Your NPIN");
   const { enqueueSnackbar } = useSnackbar();
 

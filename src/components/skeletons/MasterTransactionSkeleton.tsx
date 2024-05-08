@@ -2,7 +2,7 @@ import { Skeleton, Stack, TableCell, TableRow } from "@mui/material";
 import { useAuthContext } from "src/auth/useAuthContext";
 
 export const MasterTransactionSkeleton = () => {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   return (
     <TableRow>
       {/* Date & Time */}

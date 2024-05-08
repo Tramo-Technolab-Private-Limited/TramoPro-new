@@ -16,7 +16,7 @@ import {
   FormHelperText,
   useTheme,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFTextField,
@@ -42,7 +42,7 @@ type FormValuesProps = {
 
 export default function RegistrationAeps(props: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const theme = useTheme();
   const [otpVerify, setOtpVerify] = useState(true);
   const [encodeFPTxnId, setEncodeFPTxnId] = useState("");

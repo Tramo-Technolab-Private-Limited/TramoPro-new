@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Api } from "src/webservices";
+
 import {
   Card,
   Stack,
@@ -27,7 +27,7 @@ import useResponsive from "src/hooks/useResponsive";
 // ----------------------------------------------------------------------
 
 export default function LoanSchemePage() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const isMobile = useResponsive("up", "sm");
   const [tableData, setTableData] = useState({
     _id: "",

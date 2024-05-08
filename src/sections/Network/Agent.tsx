@@ -15,7 +15,7 @@ import {
   MenuItem,
 } from "@mui/material";
 // components
-import { Api } from "src/webservices";
+
 import Scrollbar from "../../components/scrollbar";
 import { TableHeadCustom } from "../../components/table";
 import React, { useEffect, useState } from "react";
@@ -36,6 +36,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import DirectFundTransfer from "./DirectFundTransfer";
 import Iconify from "src/components/iconify";
+import { useAuthContext } from "src/auth/useAuthContext";
 // ----------------------------------------------------------------------
 
 type RowProps = {
@@ -67,6 +68,7 @@ type RowProps = {
 export let handleClosefunTrans: any;
 
 export default function Agent() {
+  const { Api } = useAuthContext();
   const [appdata, setAppdata] = useState([]);
   const isMobile = useResponsive("up", "sm");
   const [tempData, setTempData] = useState<any>([]);

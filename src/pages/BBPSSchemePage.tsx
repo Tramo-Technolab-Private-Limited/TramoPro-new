@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { Api } from "src/webservices";
+
 import {
   Button,
   Divider,
@@ -39,7 +39,7 @@ type FormValuesProps = {
 
 export default function BBPSSchemePage() {
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const isMobile = useResponsive("up", "sm");
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);

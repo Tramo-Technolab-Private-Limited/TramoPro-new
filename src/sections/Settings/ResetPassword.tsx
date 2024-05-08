@@ -8,7 +8,6 @@ import { LoadingButton } from "@mui/lab";
 import FormProvider, { RHFTextField } from "../../components/hook-form";
 import { Typography } from "@mui/material";
 
-import { Api } from "../../webservices";
 import { useSnackbar } from "notistack";
 import { useAuthContext } from "src/auth/useAuthContext";
 
@@ -20,7 +19,7 @@ type FormValuesProps = {
 };
 
 export default function ResetPassword(props: any) {
-  const { user } = useAuthContext();
+  const { user, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const ResetPasswordSchema = Yup.object().shape({
     email: Yup.string()

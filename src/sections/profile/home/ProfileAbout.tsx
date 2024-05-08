@@ -18,7 +18,7 @@ const StyledIcon = styled(Iconify)(({ theme }) => ({
 // ----------------------------------------------------------------------
 
 export default function ProfileAbout() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   return (
     <Card>
@@ -48,7 +48,6 @@ export default function ProfileAbout() {
           </Typography>
         </Stack>
 
-        
         <Stack direction="row">
           <StyledIcon icon="eva:email-fill" />
           <Typography variant="body2">

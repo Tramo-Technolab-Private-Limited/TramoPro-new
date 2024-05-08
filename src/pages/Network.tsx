@@ -8,7 +8,7 @@ import RoleBasedGuard from "src/auth/RoleBasedGuard";
 //--------------------------------------------------------------------
 
 export default function Network() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   return (
     <RoleBasedGuard hasContent roles={["distributor", "m_distriutor"]}>

@@ -11,7 +11,6 @@ import { PATH_AUTH } from "../../routes/paths";
 import FormProvider, { RHFTextField } from "../../components/hook-form";
 import { Link, Stack, Typography, Button, Tooltip, Box } from "@mui/material";
 
-import { Api } from "../../webservices";
 import { useState } from "react";
 import ResetPassLayout from "src/layouts/reset/ResetPassLayout";
 import { useAuthContext } from "src/auth/useAuthContext";
@@ -26,6 +25,7 @@ type FormValuesProps = {
 
 export default function ResetPassword() {
   const navigate = useNavigate();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const { method } = useAuthContext();
 

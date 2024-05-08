@@ -47,7 +47,7 @@ import VideoLabelIcon from "@mui/icons-material/VideoLabel";
 import AWS from "aws-sdk";
 import { Icon } from "@iconify/react";
 // ----------------------------------------------------------------------
-import { Api, UploadFile } from "src/webservices";
+
 import { useAuthContext } from "src/auth/useAuthContext";
 import { PATH_AUTH, STEP_DASHBOARD } from "src/routes/paths";
 import Image from "src/components/image/Image";
@@ -72,7 +72,7 @@ const s3 = new AWS.S3();
 export default function FinalVerificationForm(props: any) {
   const navigate = useNavigate();
   const [activeStep, setActiveStep] = useState<any>(0);
-  const { user, logout } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   useEffect(() => {
     if (user?.finalStatus == "approved" && user?.isNPIN == false) {
@@ -193,7 +193,7 @@ export default function FinalVerificationForm(props: any) {
 function PersonalIdentification(props: any) {
   const navigate = useNavigate();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api, UploadFileApi } = useAuthContext();
 
   // aadhaar card front
 
@@ -324,7 +324,7 @@ function PersonalIdentification(props: any) {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "AadharFront");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -372,7 +372,7 @@ function PersonalIdentification(props: any) {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "AadharBack");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -419,7 +419,7 @@ function PersonalIdentification(props: any) {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "Pancard");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -466,7 +466,7 @@ function PersonalIdentification(props: any) {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "Cheque");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             console.log("=====upload doc========>" + JSON.stringify(Response));
 
@@ -516,7 +516,7 @@ function PersonalIdentification(props: any) {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "governance");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -565,7 +565,7 @@ function PersonalIdentification(props: any) {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "governance");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             console.log("=====upload shop========>" + JSON.stringify(Response));
             if (Response.status == 200) {
@@ -1572,7 +1572,8 @@ function PersonalIdentification(props: any) {
 
 function ConstitutionIdentification() {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail, initialize, logout } = useAuthContext();
+  const { user, UpdateUserDetail, initialize, logout, Api, UploadFileApi } =
+    useAuthContext();
 
   //Gst Certificate
 
@@ -1749,7 +1750,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "gstCertificate");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -1795,7 +1796,7 @@ function ConstitutionIdentification() {
     let formData = new FormData();
     formData.append("document", otherCertificateFile);
     formData.append("directoryName", "gstCertificate");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
+    UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
         if (Response.status == 200) {
           if (Response.data.status == "success") {
@@ -1825,7 +1826,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "businessProof");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -1862,7 +1863,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "businessPan");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -1908,7 +1909,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "partnershipDeed");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -1958,7 +1959,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "boardResolution");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -2008,7 +2009,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "COI");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -2055,7 +2056,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "MOA");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -2102,7 +2103,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "AOA");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -2150,7 +2151,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "COI");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {
@@ -2199,7 +2200,7 @@ function ConstitutionIdentification() {
         let formData = new FormData();
         formData.append("document", compressedResult);
         formData.append("directoryName", "COI");
-        UploadFile(`upload/upload_agent_doc`, formData, token).then(
+        UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
           (Response: any) => {
             if (Response.status == 200) {
               if (Response.data.status == "success") {

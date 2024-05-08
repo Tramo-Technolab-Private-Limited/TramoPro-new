@@ -26,7 +26,7 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 // import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
@@ -125,7 +125,7 @@ const Reducer = (state: any, action: any) => {
 
 export default function DMT2BeneTable() {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const remitterContext: any = useContext(RemitterContext);
   const isMobile = useResponsive("up", "sm");
   const [remitterVerify, remitterVerifyDispatch] = useReducer(
@@ -586,7 +586,7 @@ export default function DMT2BeneTable() {
 
 function BeneList({ row, callback, remitterNumber, deleteBene }: any) {
   const { enqueueSnackbar } = useSnackbar();
-  const { user, UpdateUserDetail } = useAuthContext();
+  const { user, UpdateUserDetail, Api } = useAuthContext();
   const theme = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [cell, setCell] = useState(row);

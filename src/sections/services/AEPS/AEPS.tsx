@@ -29,7 +29,7 @@ import {
   Alert,
 } from "@mui/material";
 import { TableHeadCustom } from "../../../components/table";
-import { Api } from "src/webservices";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
   RHFTextField,
@@ -85,7 +85,7 @@ var localTime: any;
 export default function AEPS(props: any) {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
-  const { user, initialize } = useAuthContext();
+  const { user, Api, initialize } = useAuthContext();
   const componentRef = useRef<any>();
   const [isDeviceScan, setIsDeviceScan] = useState(false);
   const [isApiLoading, setIsApiLoading] = useState(false);

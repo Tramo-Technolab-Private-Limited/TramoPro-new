@@ -14,7 +14,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 // ----------------------------------------------------------------------
 
 export default function NavMini() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   return (
     <Box
       component="nav"

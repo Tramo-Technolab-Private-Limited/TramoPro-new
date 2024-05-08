@@ -18,7 +18,7 @@ import { LoadingButton } from "@mui/lab";
 // components
 import { useSnackbar } from "../../components/snackbar";
 import FormProvider, { RHFCodes } from "../../components/hook-form";
-import { Api } from "../../webservices";
+
 import { useState, useEffect } from "react";
 import { PATH_DASHBOARD, STEP_DASHBOARD } from "src/routes/paths";
 import { useAuthContext } from "src/auth/useAuthContext";
@@ -42,7 +42,7 @@ type FormValuesProps = {
 
 export default function NpinOtp(props: any) {
   const pathname = useLocation();
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const searchParams = new URLSearchParams(pathname.search);
   const eventVal = searchParams.get("event");
   const navigate = useNavigate();

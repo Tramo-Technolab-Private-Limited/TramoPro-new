@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 
 // components
-import { Api } from "src/webservices";
+
 import Scrollbar from "../../components/scrollbar";
 import { TableHeadCustom } from "../../components/table";
 import React, { useEffect, useState, useCallback } from "react";
@@ -45,6 +45,7 @@ import MotionModal from "src/components/animate/MotionModal";
 import FundFlow from "../FundManagement/FundFlow";
 import DirectFundTransfer from "./DirectFundTransfer";
 import Iconify from "src/components/iconify";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 // ----------------------------------------------------------------------
 
@@ -78,6 +79,7 @@ type RowProps = {
 export let handleClosefunTransDist: any;
 
 export default function AllDistributor() {
+  const { Api } = useAuthContext();
   const [appdata, setAppdata] = useState([]);
   const isMobile = useResponsive("up", "sm");
   const [tempData, setTempData] = useState<any>([]);
@@ -154,42 +156,41 @@ export default function AllDistributor() {
     formState: { isSubmitting },
   } = methods;
 
+  useEffect(() => {
+    if (getValues("User")?.length > 2) searchFromUser(getValues("User"));
+  }, [watch("User")]);
 
-    useEffect(() => {
-      if (getValues("User")?.length > 2) searchFromUser(getValues("User"));
-    }, [watch("User")]);
-
-    const openEditModal = (val: any) => {
-      setSelectedRow(val);
-      setModalEdit(true);
-      let body = {
-        filter: {
-          userName: "",
-          userCode: "",
-          email: "",
-          mobile: "",
-        },
-      };
-  
-      let token = localStorage.getItem("token");
-      Api(
-        `agent/get_Distributors_All_Agents?distId=${val._id}&page=${currentPageAgent}&limit=${pageSizeAgent}`,
-        "POST",
-        body,
-        token
-      ).then((Response: any) => {
-        console.log("==============Agent Details=====>", Response.data.data);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            setTotalCountAgnet(Response?.data?.count);
-            setSelectAgent(Response.data.data);
-            console.log("=========Agent====>", Response.data.data);
-          } else {
-            console.log("======Agent List=======>" + Response);
-          }
-        }
-      });
+  const openEditModal = (val: any) => {
+    setSelectedRow(val);
+    setModalEdit(true);
+    let body = {
+      filter: {
+        userName: "",
+        userCode: "",
+        email: "",
+        mobile: "",
+      },
     };
+
+    let token = localStorage.getItem("token");
+    Api(
+      `agent/get_Distributors_All_Agents?distId=${val._id}&page=${currentPageAgent}&limit=${pageSizeAgent}`,
+      "POST",
+      body,
+      token
+    ).then((Response: any) => {
+      console.log("==============Agent Details=====>", Response.data.data);
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          setTotalCountAgnet(Response?.data?.count);
+          setSelectAgent(Response.data.data);
+          console.log("=========Agent====>", Response.data.data);
+        } else {
+          console.log("======Agent List=======>" + Response);
+        }
+      }
+    });
+  };
 
   const tableLabels: any = [
     { id: "product", label: "Name" },
@@ -198,7 +199,7 @@ export default function AllDistributor() {
     { id: "main_wallet_amount", label: "Current Balance" },
     { id: "maxComm", label: "Member Since" },
     { id: "schemeId", label: "Scheme Id" },
-    { id: "status", label: "Balance"},
+    { id: "status", label: "Balance" },
     { id: "fundtrans", label: "Fund Transfer", align: "center" },
   ];
 
@@ -289,7 +290,7 @@ export default function AllDistributor() {
   return (
     <>
       <Stack>
-      <Stack flexDirection={"row"} gap={1} justifyContent={"right"} mb={1}>
+        <Stack flexDirection={"row"} gap={1} justifyContent={"right"} mb={1}>
           <Button variant="contained" onClick={handleReset}>
             <Iconify icon="bx:reset" color={"common.white"} mr={1} />
             Reset
@@ -309,7 +310,10 @@ export default function AllDistributor() {
           width={{ xs: "95%", sm: 500 }}
         >
           {/* <Box> */}
-          <FormProvider methods={methods} onSubmit={handleSubmit(allDistributor)}>
+          <FormProvider
+            methods={methods}
+            onSubmit={handleSubmit(allDistributor)}
+          >
             <RHFSelect
               fullWidth
               name="usersearchby"
@@ -319,7 +323,7 @@ export default function AllDistributor() {
               // InputLabelProps={{ shrink: true }}
               SelectProps={{
                 native: false,
-                sx: { textTransform: "capitalize",mb:"10px" },
+                sx: { textTransform: "capitalize", mb: "10px" },
               }}
             >
               <MenuItem value={"userCode"}>User Code</MenuItem>
@@ -336,28 +340,28 @@ export default function AllDistributor() {
                   placeholder={"Type here..."}
                 />
                 <Stack flexDirection={"row"} mt={5}>
-                <LoadingButton
-                  variant="contained"
-                  type="submit"
-                  loading={isSubmitting}
-                  onClick={()=> {
-                   setAppdata(tempData) 
-                   handleClose1()
-                   reset(defaultValues)
-                  }}
-                >
-                  Search
-                </LoadingButton>
-                <LoadingButton
-              variant="contained"
-              onClick={() => {
-                reset(defaultValues);
-                allDistributor();
-              }}
-            >
-              Clear
-            </LoadingButton>
-            </Stack>
+                  <LoadingButton
+                    variant="contained"
+                    type="submit"
+                    loading={isSubmitting}
+                    onClick={() => {
+                      setAppdata(tempData);
+                      handleClose1();
+                      reset(defaultValues);
+                    }}
+                  >
+                    Search
+                  </LoadingButton>
+                  <LoadingButton
+                    variant="contained"
+                    onClick={() => {
+                      reset(defaultValues);
+                      allDistributor();
+                    }}
+                  >
+                    Clear
+                  </LoadingButton>
+                </Stack>
                 <Stack
                   sx={{
                     position: "absolute",
@@ -382,7 +386,7 @@ export default function AllDistributor() {
                             }}
                             onClick={() => {
                               setUserList([]);
-                              setTempData( [{...item}])
+                              setTempData([{ ...item }]);
                               setValue(
                                 "User",
                                 `${item.firstName} ${item.lastName}`
@@ -557,8 +561,12 @@ function EcommerceBestSalesmanRow({
         <TableCell>{fDateTime(row.createdAt)}</TableCell>
         <TableCell>{row.schemeId}</TableCell>
         <TableCell align="left">
-          <Typography>Main Balance : {fIndianCurrency(row?.main_wallet_amount || "0")}</Typography>
-          <Typography>AEPS Balance : {fIndianCurrency(row?.AEPS_wallet_amount  || "0" )}</Typography>
+          <Typography>
+            Main Balance : {fIndianCurrency(row?.main_wallet_amount || "0")}
+          </Typography>
+          <Typography>
+            AEPS Balance : {fIndianCurrency(row?.AEPS_wallet_amount || "0")}
+          </Typography>
         </TableCell>
         <TableCell align="left">
           <Button variant="contained" onClick={() => FundTransfer(row)}>

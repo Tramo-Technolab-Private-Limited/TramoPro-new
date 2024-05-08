@@ -26,7 +26,6 @@ import * as Yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Upload } from "src/components/upload";
-import { UploadFile } from "src/webservices";
 
 import { Box, CardProps, Typography } from "@mui/material";
 import FormProvider, {
@@ -34,7 +33,7 @@ import FormProvider, {
   RHFSelect,
 } from "src/components/hook-form";
 import React from "react";
-import { Api } from "src/webservices";
+
 import { useSnackbar } from "notistack";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import punjab_national_bank from "../../assets/icons/punjab_national_bank.svg";
@@ -66,7 +65,7 @@ const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 export default function AllBankDetails() {
   const { enqueueSnackbar } = useSnackbar();
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const { copy } = useCopyToClipboard();
   const [ABank, setAbank] = React.useState([]);
   const [dBank, setDbank] = React.useState([]);
@@ -381,7 +380,7 @@ export default function AllBankDetails() {
     let formData = new FormData();
     formData.append("document", doc);
     formData.append("directoryName", "others");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
+    UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
         // console.log("=====token===aadharFront===", token)
         console.log(

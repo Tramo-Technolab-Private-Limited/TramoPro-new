@@ -26,11 +26,10 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Label from "src/components/label/Label";
 import { Upload } from "src/components/upload";
-import { UploadFile } from "src/webservices";
 
 import { Box, CardProps, Typography } from "@mui/material";
 import React from "react";
-import { Api } from "src/webservices";
+
 import { Icon } from "@iconify/react";
 import { useSnackbar } from "notistack";
 import neodeposit from "../../assets/icons/neodeposit.svg";
@@ -55,7 +54,7 @@ interface Props extends CardProps {}
 const label = { inputProps: { "aria-label": "Checkbox demo" } };
 
 export default function InstantDepositAccount() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const { enqueueSnackbar } = useSnackbar();
   const [ABank, setAbank] = React.useState([]);
   const [dBank, setDbank] = React.useState([]);
@@ -469,7 +468,7 @@ export default function InstantDepositAccount() {
     let formData = new FormData();
     formData.append("document", doc);
     formData.append("directoryName", "others");
-    UploadFile(`upload/upload_agent_doc`, formData, token).then(
+    UploadFileApi(`upload/upload_agent_doc`, formData, token).then(
       (Response: any) => {
         // console.log("=====token===aadharFront===", token)
         console.log(

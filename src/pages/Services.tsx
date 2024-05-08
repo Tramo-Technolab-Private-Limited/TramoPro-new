@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import React, { useEffect, useState } from "react";
 import { Tab, Tabs, Box, Grid, Stack } from "@mui/material";
-import { Api } from "src/webservices";
+
 import {
   AEPS,
   DMT,
@@ -29,7 +29,7 @@ import RoleBasedGuard from "src/auth/RoleBasedGuard";
 export const CategoryContext = React.createContext({});
 
 export default function Services(props: any) {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const [categoryList, setCategoryList] = useState([]);
   const [superCurrentTab, setSuperCurrentTab] = useState("");
   const [isLoading, setIsLoading] = useState(false);

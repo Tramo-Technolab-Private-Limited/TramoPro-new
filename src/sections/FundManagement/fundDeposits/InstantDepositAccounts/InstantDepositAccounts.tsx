@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { LoadingButton } from "@mui/lab";
-import { Api } from "src/webservices";
+
 import { useSnackbar } from "notistack";
 import demoQR from "../../../assets/icons/demoqr.svg";
 import Image from "src/components/image/Image";
@@ -23,7 +23,7 @@ import useCopyToClipboard from "src/hooks/useCopyToClipboard";
 import Iconify from "src/components/iconify/Iconify";
 
 function InstantDepositAccounts() {
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
   const { copy } = useCopyToClipboard();
   const { enqueueSnackbar } = useSnackbar();
   const [registerVAloading, setRegisterVAloading] = useState(false);

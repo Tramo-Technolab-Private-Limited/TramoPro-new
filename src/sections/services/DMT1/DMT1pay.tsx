@@ -21,7 +21,7 @@ import {
   TableCell,
   TableBody,
 } from "@mui/material";
-import { Api } from "src/webservices";
+
 // import { useForm } from 'react-hook-form';
 import { yupResolver } from "@hookform/resolvers/yup";
 import FormProvider, {
@@ -54,7 +54,7 @@ type FormValuesProps = {
 //--------------------------------------------------------------------
 
 export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
-  const { user, initialize } = useAuthContext();
+  const { user, Api, initialize } = useAuthContext();
   const { dmt1RemitterAvailableLimit } = remitter;
   const { bankName, accountNumber, mobileNumber, beneName, ifsc } = beneficiary;
   const { enqueueSnackbar } = useSnackbar();

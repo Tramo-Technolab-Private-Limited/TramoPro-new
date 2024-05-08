@@ -22,7 +22,7 @@ export default function RoleBasedGuard({
   children,
 }: RoleBasedGuardProp) {
   // Logic here to get current user role
-  const { user } = useAuthContext();
+  const { user, Api, UploadFileApi } = useAuthContext();
 
   // const currentRole = 'user';
   const currentRole = user?.role; // admin;

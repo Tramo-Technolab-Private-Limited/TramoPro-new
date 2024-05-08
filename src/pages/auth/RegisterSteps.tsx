@@ -23,7 +23,7 @@ import GovernanceForm from "../../sections/auth/RegistrationSteps/GovernanceForm
 import AadharForm from "../../sections/auth/RegistrationSteps/AadharForm";
 import FinalVerificationForm from "../../sections/auth/RegistrationSteps/FinalVerificationForm";
 import StepsLayout from "src/layouts/steps/StepsLayout";
-import { Api } from "../../webservices";
+
 import { useAuthContext } from "src/auth/useAuthContext";
 import { STEP_DASHBOARD } from "src/routes/paths";
 import { Check, Circle } from "@mui/icons-material";
