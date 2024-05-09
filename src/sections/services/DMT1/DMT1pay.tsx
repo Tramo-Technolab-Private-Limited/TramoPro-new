@@ -160,61 +160,67 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
   // }, [count]);
 
   const transaction = async (data: FormValuesProps) => {
-    await fetchLocation();
-    let token = localStorage.getItem("token");
-    let body = {
-      beneficiaryId: beneficiary._id,
-      amount: data.payAmount,
-      remitterId: remitter._id,
-      mode: +mode,
-      note1: "",
-      note2: "",
-      nPin:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
-    };
-    {
-      body.nPin && setCheckNPIN(true);
-    }
-    {
-      body.nPin &&
-        (await Api("dmt1/transaction", "POST", body, token).then(
-          (Response: any) => {
-            console.log(
-              "==============>>> register beneficiary Response",
-              Response
-            );
-            if (Response.status == 200) {
-              if (Response.data.code == 200) {
-                Response.data.response.map((element: any) => {
-                  enqueueSnackbar(element.message);
-                  TextToSpeak(Response.message);
-                  initialize();
-                });
-                setTransactionDetail(
-                  Response.data.response.map((item: any) => item.data)
-                );
+    try {
+      await fetchLocation();
+      let token = localStorage.getItem("token");
+      let body = {
+        beneficiaryId: beneficiary._id,
+        amount: data.payAmount,
+        remitterId: remitter._id,
+        mode: +mode,
+        note1: "",
+        note2: "",
+        nPin:
+          data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
+      };
+      {
+        body.nPin && setCheckNPIN(true);
+      }
+      {
+        body.nPin &&
+          (await Api("dmt1/transaction", "POST", body, token).then(
+            (Response: any) => {
+              console.log(
+                "==============>>> register beneficiary Response",
+                Response
+              );
+              if (Response.status == 200) {
+                if (Response.data.code == 200) {
+                  Response.data.response.map((element: any) => {
+                    enqueueSnackbar(element.message);
+                    TextToSpeak(Response.message);
+                    initialize();
+                  });
+                  setTransactionDetail(
+                    Response.data.response.map((item: any) => item.data)
+                  );
 
-                // setTransactionDetail(Response.data.data);
-                handleClose();
-                handleOpen1();
-                // setCount(5);
+                  // setTransactionDetail(Response.data.data);
+                  handleClose();
+                  handleOpen1();
+                  // setCount(5);
 
-                setTxn(false);
-                setErrorMsg("");
+                  setTxn(false);
+                  setErrorMsg("");
+                } else {
+                  enqueueSnackbar(Response.data.message, { variant: "error" });
+                  setErrorMsg(Response.data.message);
+                  setTxn(false);
+                }
+                clearPayout();
               } else {
-                enqueueSnackbar(Response.data.message, { variant: "error" });
-                setErrorMsg(Response.data.message);
+                setCheckNPIN(false);
+                enqueueSnackbar(Response, { variant: "error" });
+                clearPayout();
                 setTxn(false);
               }
-              clearPayout();
-            } else {
-              setCheckNPIN(false);
-              enqueueSnackbar(Response, { variant: "error" });
-              clearPayout();
-              setTxn(false);
             }
-          }
-        ));
+          ));
+      }
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
 

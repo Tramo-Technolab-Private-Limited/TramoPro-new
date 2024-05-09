@@ -242,8 +242,10 @@ function Loan() {
           }
         }
       );
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
   // step 1 - resend otp
@@ -268,63 +270,72 @@ function Loan() {
   // step 2
   const verifyOtp = async () => {
     setIsVerifyLoading(true);
-    let token = localStorage.getItem("token");
-    let body = {
-      mobileNumber: "+91-" + getValues("mobileNumber"),
-      otp:
-        getValues("code1") +
-        getValues("code2") +
-        getValues("code3") +
-        getValues("code4") +
-        getValues("code5") +
-        getValues("code6"),
-      productId: subCurrentTab,
-    };
-    await fetchLocation();
-    await Api("app/loan/easy_loan_step2", "POST", body, token).then(
-      (Response: any) => {
-        console.log("==========>>product Filter", Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            handleClose();
-            setIsOtpVerify(true);
-            setValue("clientRefId", Response.data.data.clientRefId);
-            setValue("loanToken", Response.data.data.user_token);
-            if (Response.data.data.userData.panVerified) {
-              console.log(
-                "==========>>Response.data.data.userData",
-                Response.data.data.userData?.docs?.panNo
-              );
-              setValue(
-                "profileDetails.panNo",
-                Response.data.data.userData?.docs?.panNo
-              );
-              setValue("profileDetails.name", Response.data.data.userData.name);
-              setValue(
-                "profileDetails.address",
-                Response.data.data.userData.address
-              );
-              setValue("profileDetails.dob", Response.data.data.userData.dob);
-              setValue(
-                "profileDetails.gender",
-                Response.data.data.userData.gender
-              );
-              setValue(
-                "profileDetails.maritalStatus",
-                Response.data.data.userData.maritalStatus
-              );
-              setValue(
-                "profileDetails.pinCode",
-                Response.data.data.userData.pinCode
-              );
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        mobileNumber: "+91-" + getValues("mobileNumber"),
+        otp:
+          getValues("code1") +
+          getValues("code2") +
+          getValues("code3") +
+          getValues("code4") +
+          getValues("code5") +
+          getValues("code6"),
+        productId: subCurrentTab,
+      };
+      await fetchLocation();
+      await Api("app/loan/easy_loan_step2", "POST", body, token).then(
+        (Response: any) => {
+          console.log("==========>>product Filter", Response);
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              handleClose();
+              setIsOtpVerify(true);
+              setValue("clientRefId", Response.data.data.clientRefId);
+              setValue("loanToken", Response.data.data.user_token);
+              if (Response.data.data.userData.panVerified) {
+                console.log(
+                  "==========>>Response.data.data.userData",
+                  Response.data.data.userData?.docs?.panNo
+                );
+                setValue(
+                  "profileDetails.panNo",
+                  Response.data.data.userData?.docs?.panNo
+                );
+                setValue(
+                  "profileDetails.name",
+                  Response.data.data.userData.name
+                );
+                setValue(
+                  "profileDetails.address",
+                  Response.data.data.userData.address
+                );
+                setValue("profileDetails.dob", Response.data.data.userData.dob);
+                setValue(
+                  "profileDetails.gender",
+                  Response.data.data.userData.gender
+                );
+                setValue(
+                  "profileDetails.maritalStatus",
+                  Response.data.data.userData.maritalStatus
+                );
+                setValue(
+                  "profileDetails.pinCode",
+                  Response.data.data.userData.pinCode
+                );
+              }
+              setStep(2);
+              setTimer(0);
             }
-            setStep(2);
-            setTimer(0);
           }
+          setIsVerifyLoading(false);
         }
-        setIsVerifyLoading(false);
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   useEffect(() => {
@@ -758,8 +769,10 @@ const UploadPan = React.memo(({ data, setStep }: any) => {
           setErrorMsg(Response.data.error.errorDescription);
         }
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
 
@@ -964,37 +977,43 @@ const DynamicForm = ({ data, setStep }: any) => {
   //getFormValues
   const getDynamicForm = async () => {
     let token = localStorage.getItem("token");
-    let body = {
-      user_token: user_token,
-    };
-    await fetchLocation();
-    await Api(
-      "app/loan/easy_loan_step5/" + clientRefId,
-      "POST",
-      body,
-      token
-    ).then((Response: any) => {
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          setFormValues(Response.data.data);
+    try {
+      let body = {
+        user_token: user_token,
+      };
+      await fetchLocation();
+      await Api(
+        "app/loan/easy_loan_step5/" + clientRefId,
+        "POST",
+        body,
+        token
+      ).then((Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            setFormValues(Response.data.data);
 
-          Response.data.data.reqdFields.map((item: any) => {
-            setFormValuesValidation((prevState: any) => ({
-              ...prevState,
-              [item.field]: Yup.string().required("field is required"),
-            }));
-            setDefaultFormValues((prevState: any) => ({
-              ...prevState,
-              [item.field]: "",
-            }));
-          });
+            Response.data.data.reqdFields.map((item: any) => {
+              setFormValuesValidation((prevState: any) => ({
+                ...prevState,
+                [item.field]: Yup.string().required("field is required"),
+              }));
+              setDefaultFormValues((prevState: any) => ({
+                ...prevState,
+                [item.field]: "",
+              }));
+            });
 
-          enqueueSnackbar(Response.data.message);
-        } else {
-          enqueueSnackbar(Response.data.message, { variant: "error" });
+            enqueueSnackbar(Response.data.message);
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "error" });
+          }
         }
+      });
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    });
+    }
   };
 
   const onSubmit = async (data: dynamicFormValuesProps) => {
@@ -1021,8 +1040,10 @@ const DynamicForm = ({ data, setStep }: any) => {
           }
         }
       });
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
 

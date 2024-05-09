@@ -101,60 +101,66 @@ export default function WithdrawAttendance(props: any) {
 
   const Attendence = async () => {
     handleOpenLoading();
-    let token = localStorage.getItem("token");
-    let body = {
-      attendanceType: "TRANSACTIONAL",
-      serviceType: props.attendance,
-      latitude: localStorage.getItem("lat"),
-      longitude: localStorage.getItem("long"),
-      requestRemarks: getValues("remark"),
-      nationalBankIdentificationNumber: "",
-      captureResponse: {
-        errCode: arrofObj[0].errcode,
-        errInfo: arrofObj[0].errinfo,
-        fCount: arrofObj[0].fcount,
-        fType: arrofObj[0].ftype,
-        iCount: arrofObj[0].icount,
-        iType: null,
-        pCount: arrofObj[0].pcount,
-        pType: "0",
-        nmPoints: arrofObj[0].nmpoint,
-        qScore: arrofObj[0].qscore,
-        dpID: arrofObj[0].dpid,
-        rdsID: arrofObj[0].rdsid,
-        rdsVer: arrofObj[0].rdsver,
-        dc: arrofObj[0].dc,
-        mi: arrofObj[0].mi,
-        mc: arrofObj[0].mc,
-        ci: arrofObj[0].ci,
-        sessionKey: arrofObj[0].skey.textContent,
-        hmac: arrofObj[0].hmac.textContent,
-        PidDatatype: arrofObj[0].piddatatype,
-        Piddata: arrofObj[0].piddata.textContent,
-      },
-    };
-    await fetchLocation();
-    await Api("aeps/presence", "POST", body, token).then((Response: any) => {
-      console.log("==============>>>fatch beneficiary Response", Response);
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.data.message);
-          props.handleCloseAttendance();
-          setMessage(Response.data.message);
-        } else if (Response.data.responseCode == 410) {
-          enqueueSnackbar(Response.data.err.message, { variant: "error" });
-          setMessage(Response.data.responseMessage);
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        attendanceType: "TRANSACTIONAL",
+        serviceType: props.attendance,
+        latitude: localStorage.getItem("lat"),
+        longitude: localStorage.getItem("long"),
+        requestRemarks: getValues("remark"),
+        nationalBankIdentificationNumber: "",
+        captureResponse: {
+          errCode: arrofObj[0].errcode,
+          errInfo: arrofObj[0].errinfo,
+          fCount: arrofObj[0].fcount,
+          fType: arrofObj[0].ftype,
+          iCount: arrofObj[0].icount,
+          iType: null,
+          pCount: arrofObj[0].pcount,
+          pType: "0",
+          nmPoints: arrofObj[0].nmpoint,
+          qScore: arrofObj[0].qscore,
+          dpID: arrofObj[0].dpid,
+          rdsID: arrofObj[0].rdsid,
+          rdsVer: arrofObj[0].rdsver,
+          dc: arrofObj[0].dc,
+          mi: arrofObj[0].mi,
+          mc: arrofObj[0].mc,
+          ci: arrofObj[0].ci,
+          sessionKey: arrofObj[0].skey.textContent,
+          hmac: arrofObj[0].hmac.textContent,
+          PidDatatype: arrofObj[0].piddatatype,
+          Piddata: arrofObj[0].piddata.textContent,
+        },
+      };
+      await fetchLocation();
+      await Api("aeps/presence", "POST", body, token).then((Response: any) => {
+        console.log("==============>>>fatch beneficiary Response", Response);
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.data.message);
+            props.handleCloseAttendance();
+            setMessage(Response.data.message);
+          } else if (Response.data.responseCode == 410) {
+            enqueueSnackbar(Response.data.err.message, { variant: "error" });
+            setMessage(Response.data.responseMessage);
+          } else {
+            enqueueSnackbar(Response.data.data.message, { variant: "error" });
+            setMessage(Response.data.data.message);
+          }
+          handleClose();
+          handleCloseLoading();
         } else {
-          enqueueSnackbar(Response.data.data.message, { variant: "error" });
-          setMessage(Response.data.data.message);
+          handleCloseLoading();
+          handleClose();
         }
-        handleClose();
-        handleCloseLoading();
-      } else {
-        handleCloseLoading();
-        handleClose();
+      });
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    });
+    }
   };
 
   const capture = (data: FormValuesProps) => {

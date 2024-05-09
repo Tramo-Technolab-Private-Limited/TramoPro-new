@@ -339,40 +339,49 @@ export default function AEPS(props: any) {
       enqueueSnackbar(error);
       setIsApiLoading(false);
     } else {
-      let token = localStorage.getItem("token");
-      let body = {
-        latitude: localStorage.getItem("lat"),
-        longitude: localStorage.getItem("long"),
-        requestRemarks: remark,
-        nationalBankIdentificationNumber: getValues("bank.iinno"),
-        bankName: getValues("bank.bankName"),
-        adhaarNumber: getValues("aadharNumber"),
-        productId: productId,
-        categoryId: categoryId,
-        captureResponse: success,
-      };
-      await fetchLocation();
-      await Api("aeps/get_balance", "POST", body, token).then(
-        (Response: any) => {
-          console.log("==============>>>fatch beneficiary Response", Response);
-          if (Response.status == 200) {
-            if (Response.data.code == 200) {
-              enqueueSnackbar(Response.data.data.message);
-              setResAmount(Response.data.data.data.balanceAmount);
-              handleCloseConfirmDetail();
-              handleOpenResponse();
+      try {
+        let token = localStorage.getItem("token");
+        let body = {
+          latitude: localStorage.getItem("lat"),
+          longitude: localStorage.getItem("long"),
+          requestRemarks: remark,
+          nationalBankIdentificationNumber: getValues("bank.iinno"),
+          bankName: getValues("bank.bankName"),
+          adhaarNumber: getValues("aadharNumber"),
+          productId: productId,
+          categoryId: categoryId,
+          captureResponse: success,
+        };
+        await fetchLocation();
+        await Api("aeps/get_balance", "POST", body, token).then(
+          (Response: any) => {
+            console.log(
+              "==============>>>fatch beneficiary Response",
+              Response
+            );
+            if (Response.status == 200) {
+              if (Response.data.code == 200) {
+                enqueueSnackbar(Response.data.data.message);
+                setResAmount(Response.data.data.data.balanceAmount);
+                handleCloseConfirmDetail();
+                handleOpenResponse();
+              } else {
+                setFailedMessage(Response.data.message);
+                handleCloseConfirmDetail();
+                handleOpenError();
+              }
             } else {
-              setFailedMessage(Response.data.message);
-              handleCloseConfirmDetail();
+              setFailedMessage("failed");
               handleOpenError();
             }
-          } else {
-            setFailedMessage("failed");
-            handleOpenError();
+            setIsApiLoading(false);
           }
-          setIsApiLoading(false);
+        );
+      } catch (error) {
+        if (error.code == 1) {
+          enqueueSnackbar(`${error.message} !`, { variant: "error" });
         }
-      );
+      }
     }
   };
 
@@ -385,49 +394,58 @@ export default function AEPS(props: any) {
       enqueueSnackbar(error);
       setIsApiLoading(false);
     } else {
-      let token = localStorage.getItem("token");
-      let id = user?._id;
-      let body = {
-        merchantLoginId: id,
-        latitude: localStorage.getItem("lat"),
-        longitude: localStorage.getItem("long"),
-        requestRemarks: remark,
-        contact_no: getValues("mobileNumber"),
-        nationalBankIdentificationNumber: getValues("bank.iinno"),
-        bankName: getValues("bank.bankName"),
-        adhaarNumber: getValues("aadharNumber"),
-        amount: Number(getValues("amount")),
-        productId: productId,
-        categoryId: categoryId,
-        captureResponse: success,
-      };
-      await fetchLocation();
-      await Api("aeps/cash_withdrawal_LTS", "POST", body, token).then(
-        (Response: any) => {
-          console.log("==============>>>fatch beneficiary Response", Response);
-          if (Response.status == 200) {
-            if (Response.data.code == 200) {
-              if (Response.data.data.status == false) {
+      try {
+        let token = localStorage.getItem("token");
+        let id = user?._id;
+        let body = {
+          merchantLoginId: id,
+          latitude: localStorage.getItem("lat"),
+          longitude: localStorage.getItem("long"),
+          requestRemarks: remark,
+          contact_no: getValues("mobileNumber"),
+          nationalBankIdentificationNumber: getValues("bank.iinno"),
+          bankName: getValues("bank.bankName"),
+          adhaarNumber: getValues("aadharNumber"),
+          amount: Number(getValues("amount")),
+          productId: productId,
+          categoryId: categoryId,
+          captureResponse: success,
+        };
+        await fetchLocation();
+        await Api("aeps/cash_withdrawal_LTS", "POST", body, token).then(
+          (Response: any) => {
+            console.log(
+              "==============>>>fatch beneficiary Response",
+              Response
+            );
+            if (Response.status == 200) {
+              if (Response.data.code == 200) {
+                if (Response.data.data.status == false) {
+                  setFailedMessage(Response.data.message);
+                }
+                enqueueSnackbar(Response.data.message);
+                initialize();
+                setTransactionDetail([Response?.data?.txnId]);
+                handleOpenResponse();
+                handleCloseConfirmDetail();
+              } else {
                 setFailedMessage(Response.data.message);
+                handleCloseConfirmDetail();
+                handleOpenError();
               }
-              enqueueSnackbar(Response.data.message);
-              initialize();
-              setTransactionDetail([Response?.data?.txnId]);
-              handleOpenResponse();
-              handleCloseConfirmDetail();
+              setLocalAttendance(0);
             } else {
-              setFailedMessage(Response.data.message);
-              handleCloseConfirmDetail();
+              setFailedMessage("Failed");
               handleOpenError();
             }
-            setLocalAttendance(0);
-          } else {
-            setFailedMessage("Failed");
-            handleOpenError();
+            setIsApiLoading(false);
           }
-          setIsApiLoading(false);
+        );
+      } catch (error) {
+        if (error.code == 1) {
+          enqueueSnackbar(`${error.message} !`, { variant: "error" });
         }
-      );
+      }
     }
   };
 
@@ -440,47 +458,56 @@ export default function AEPS(props: any) {
       enqueueSnackbar(error);
       setIsApiLoading(false);
     } else {
-      await fetchLocation();
-      let token = localStorage.getItem("token");
-      let body = {
-        latitude: localStorage.getItem("lat"),
-        longitude: localStorage.getItem("long"),
-        requestRemarks: remark,
-        nationalBankIdentificationNumber: getValues("bank.iinno"),
-        bankName: getValues("bank.bankName"),
-        adhaarNumber: getValues("aadharNumber"),
-        productId: productId,
-        categoryId: categoryId,
-        captureResponse: success,
-      };
-      await Api("aeps/get_mini_statement", "POST", body, token).then(
-        (Response: any) => {
-          console.log("==============>>>fatch beneficiary Response", Response);
-          if (Response.status == 200) {
-            if (Response.data.code == 200) {
-              if (Response.data.data.status == false) {
-                setFailedMessage(Response.data.Message);
+      try {
+        await fetchLocation();
+        let token = localStorage.getItem("token");
+        let body = {
+          latitude: localStorage.getItem("lat"),
+          longitude: localStorage.getItem("long"),
+          requestRemarks: remark,
+          nationalBankIdentificationNumber: getValues("bank.iinno"),
+          bankName: getValues("bank.bankName"),
+          adhaarNumber: getValues("aadharNumber"),
+          productId: productId,
+          categoryId: categoryId,
+          captureResponse: success,
+        };
+        await Api("aeps/get_mini_statement", "POST", body, token).then(
+          (Response: any) => {
+            console.log(
+              "==============>>>fatch beneficiary Response",
+              Response
+            );
+            if (Response.status == 200) {
+              if (Response.data.code == 200) {
+                if (Response.data.data.status == false) {
+                  setFailedMessage(Response.data.Message);
+                  handleCloseConfirmDetail();
+                  handleOpenError();
+                  return;
+                }
+                handleOpenResponse();
+                setStatement(
+                  Response.data.data?.data?.miniStatementStructureModel
+                );
+                setResAmount(Response.data.data?.data?.balanceAmount);
+              } else {
+                setFailedMessage(Response.data.data.data.errorMessage);
                 handleCloseConfirmDetail();
                 handleOpenError();
-                return;
               }
-              handleOpenResponse();
-              setStatement(
-                Response.data.data?.data?.miniStatementStructureModel
-              );
-              setResAmount(Response.data.data?.data?.balanceAmount);
             } else {
-              setFailedMessage(Response.data.data.data.errorMessage);
-              handleCloseConfirmDetail();
+              setFailedMessage("Failed");
               handleOpenError();
             }
-          } else {
-            setFailedMessage("Failed");
-            handleOpenError();
+            setIsApiLoading(false);
           }
-          setIsApiLoading(false);
+        );
+      } catch (error) {
+        if (error.code == 1) {
+          enqueueSnackbar(`${error.message} !`, { variant: "error" });
         }
-      );
+      }
     }
   };
 

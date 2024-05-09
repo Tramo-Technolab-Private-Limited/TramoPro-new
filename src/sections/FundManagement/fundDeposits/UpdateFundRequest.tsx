@@ -289,38 +289,44 @@ function UpdateFundRequest({ preData, handleClose, getRaisedRequest }: props) {
 
   const onSubmit = async (data: FormValuesProps) => {
     let token = localStorage.getItem("token");
-    let body = {
-      bankId: data.bank_details._id,
-      modeId: data.paymentModeId,
-      amount: data.amount,
-      date_of_deposit: dayjs(data.date).format("DD/MM/YYYY"),
-      transactional_details: {
-        branch: data.branchName,
-        trxId: data.txnId,
-        mobile: data.mobileNumber,
-      },
-      remark: data.remarks,
-      request_to: "ADMIN",
-      transactionSlip: data.filePath,
-    };
-    await fetchLocation();
-    await Api(
-      `agent/fundManagement/updateRaisedRequests/${preData._id}`,
-      "POST",
-      body,
-      token
-    ).then((Response: any) => {
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          reset(defaultValues);
-          getRaisedRequest();
-          enqueueSnackbar(Response.data.message);
-        } else {
-          enqueueSnackbar(Response.data.message, { variant: "error" });
+    try {
+      let body = {
+        bankId: data.bank_details._id,
+        modeId: data.paymentModeId,
+        amount: data.amount,
+        date_of_deposit: dayjs(data.date).format("DD/MM/YYYY"),
+        transactional_details: {
+          branch: data.branchName,
+          trxId: data.txnId,
+          mobile: data.mobileNumber,
+        },
+        remark: data.remarks,
+        request_to: "ADMIN",
+        transactionSlip: data.filePath,
+      };
+      await fetchLocation();
+      await Api(
+        `agent/fundManagement/updateRaisedRequests/${preData._id}`,
+        "POST",
+        body,
+        token
+      ).then((Response: any) => {
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            reset(defaultValues);
+            getRaisedRequest();
+            enqueueSnackbar(Response.data.message);
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "error" });
+          }
+          handleClose();
         }
-        handleClose();
+      });
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    });
+    }
   };
 
   //calculate fee

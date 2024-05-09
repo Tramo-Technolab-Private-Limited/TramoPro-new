@@ -232,48 +232,56 @@ export default function MyBankAccount() {
           }
         }
       );
-    } catch (err) {
-      console.log("bank_acc_verify=error", err);
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
 
   const defaultBank = async (accountNumber: string, ifsc: string) => {
     setDefaultLoading(true);
     let token = localStorage.getItem("token");
-    let body = {
-      accountNumber: accountNumber,
-      ifsc: ifsc,
-    };
-    await fetchLocation();
-    await Api(`user/set_default_bank`, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            setUserBankList(
-              userBankList.map((item: any) => {
-                if (
-                  item.accountNumber == selectBank.accountNumber &&
-                  item.ifsc == selectBank.ifsc
-                ) {
-                  return { ...item, isDefaultBank: true };
-                } else {
-                  return { ...item, isDefaultBank: false };
-                }
-              })
-            );
-            setDefaultLoading(false);
-            setSelectBank({ ...selectBank, isDefaultBank: true });
+    try {
+      let body = {
+        accountNumber: accountNumber,
+        ifsc: ifsc,
+      };
+      await fetchLocation();
+      await Api(`user/set_default_bank`, "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              setUserBankList(
+                userBankList.map((item: any) => {
+                  if (
+                    item.accountNumber == selectBank.accountNumber &&
+                    item.ifsc == selectBank.ifsc
+                  ) {
+                    return { ...item, isDefaultBank: true };
+                  } else {
+                    return { ...item, isDefaultBank: false };
+                  }
+                })
+              );
+              setDefaultLoading(false);
+              setSelectBank({ ...selectBank, isDefaultBank: true });
+            } else {
+              setDefaultLoading(false);
+              enqueueSnackbar(Response?.data?.message, { variant: "error" });
+            }
           } else {
+            enqueueSnackbar("Failed", { variant: "error" });
             setDefaultLoading(false);
-            enqueueSnackbar(Response?.data?.message, { variant: "error" });
           }
-        } else {
-          enqueueSnackbar("Failed", { variant: "error" });
-          setDefaultLoading(false);
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   const changeBankDetail = (val: string) => {

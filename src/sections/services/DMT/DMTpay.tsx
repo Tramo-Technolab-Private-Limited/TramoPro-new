@@ -129,36 +129,42 @@ export default function DMTpay({
 
   const transaction = async (data: FormValuesProps) => {
     let token = localStorage.getItem("token");
-    let body = {
-      beneficiaryId: beneficiary._id,
-      amount: data.payAmount,
-      remitterId: remitter._id,
-      mode: mode,
-      note1: "",
-      note2: "",
-      nPin:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
-    };
-    await fetchLocation();
-    await Api("moneytransfer/transaction", "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            setTransactionDetail([{ ...Response.data.data }]);
-            TextToSpeak(Response.data.message);
-            initialize();
+    try {
+      let body = {
+        beneficiaryId: beneficiary._id,
+        amount: data.payAmount,
+        remitterId: remitter._id,
+        mode: mode,
+        note1: "",
+        note2: "",
+        nPin:
+          data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
+      };
+      await fetchLocation();
+      await Api("moneytransfer/transaction", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              setTransactionDetail([{ ...Response.data.data }]);
+              TextToSpeak(Response.data.message);
+              initialize();
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+              setErrorMsg(Response.data.message);
+            }
+            handleClose();
+            handleOpen1();
           } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
-            setErrorMsg(Response.data.message);
+            enqueueSnackbar(Response, { variant: "error" });
           }
-          handleClose();
-          handleOpen1();
-        } else {
-          enqueueSnackbar(Response, { variant: "error" });
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   const onsubmit = () => {};

@@ -231,7 +231,9 @@ export default function NPinReset(props: any) {
         }
       );
     } catch (error) {
-      console.error(error);
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
 

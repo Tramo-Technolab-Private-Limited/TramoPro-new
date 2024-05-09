@@ -237,39 +237,45 @@ export default React.memo(function SettlementToBank() {
   const settleToBank = async () => {
     setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
-    let body = {
-      amount: String(getValues("amount")),
-      accountNumber: getValues("bankDetail.accountNumber"),
-      ifsc: getValues("bankDetail.ifsc"),
-      nPin:
-        getValues("otp1") +
-        getValues("otp2") +
-        getValues("otp3") +
-        getValues("otp4") +
-        getValues("otp5") +
-        getValues("otp6"),
-    };
-    await fetchLocation();
-    await Api(`settlement/to_bank_account`, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            initialize();
-            reset(defaultValues);
-            BankList();
-            enqueueSnackbar(Response.data.message);
+    try {
+      let body = {
+        amount: String(getValues("amount")),
+        accountNumber: getValues("bankDetail.accountNumber"),
+        ifsc: getValues("bankDetail.ifsc"),
+        nPin:
+          getValues("otp1") +
+          getValues("otp2") +
+          getValues("otp3") +
+          getValues("otp4") +
+          getValues("otp5") +
+          getValues("otp6"),
+      };
+      await fetchLocation();
+      await Api(`settlement/to_bank_account`, "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              initialize();
+              reset(defaultValues);
+              BankList();
+              enqueueSnackbar(Response.data.message);
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+            }
+            handleClose();
+            setIsSubmitLoading(false);
           } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
+            handleClose();
+            enqueueSnackbar("Failed", { variant: "error" });
+            setIsSubmitLoading(false);
           }
-          handleClose();
-          setIsSubmitLoading(false);
-        } else {
-          handleClose();
-          enqueueSnackbar("Failed", { variant: "error" });
-          setIsSubmitLoading(false);
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   if (load) {
