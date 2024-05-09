@@ -14,7 +14,6 @@ import {
   AuthUserType,
   JWTContextType,
 } from "./types";
-
 import { useNavigate } from "react-router";
 import { fetchLocation } from "src/utils/fetchLocation";
 
@@ -111,6 +110,7 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: false,
+      isInitialized: true,
       logOut: true,
       user: null,
     };
@@ -134,13 +134,36 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [location, setLocation] = useState<boolean | null>(true);
 
   const initialize = useCallback(async () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-      if (position.coords.latitude && position.coords.longitude) {
-        setLocation(true);
-      } else {
-        setLocation(false);
-      }
-    });
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position: any) => {
+          let userAgent: any = navigator.userAgent;
+          localStorage.setItem("userAgent", userAgent);
+          localStorage.setItem(
+            "deviceType",
+            userAgent.match(/Android/i)
+              ? "android"
+              : userAgent.match(/mac/i)
+              ? "macbook"
+              : "windows"
+          );
+          fetch("https://api.ipify.org?format=json")
+            .then((response) => response?.json())
+            .then((data) => {
+              localStorage.setItem("ip", data?.ip);
+            });
+          localStorage.setItem("lat", position.coords.latitude);
+          localStorage.setItem("long", position.coords.longitude);
+          setLocation(true);
+        },
+        (error) => {
+          setLocation(false);
+        }
+      );
+    } else {
+      setLocation(false);
+      console.error("Geolocation is not supported by this browser.");
+    }
 
     try {
       const token =
@@ -190,6 +213,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           },
         });
       }
+      await fetchLocation();
     } catch (error) {
       dispatch({
         type: Types.LOGOUT,
