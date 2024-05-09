@@ -424,39 +424,45 @@ export default function AuthRegisterForm(props: any) {
       rfcode = "D_" + formValues.refCode;
     }
 
-    const body = {
-      email_OTP:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
-      mobile_OTP:
-        data.code1 +
-        data.code2 +
-        data.code3 +
-        data.code4 +
-        data.code5 +
-        data.code6,
-      email: getValues("email")?.toLowerCase(),
-      mobileNumber: getValues("mobile"),
-      password: getValues("password"),
-      role: value2 == "m_distributor" ? value2 : radioVal,
-      refferalCode: rfcode,
-      FCM_Token: sessionStorage.getItem("fcm"),
-    };
-    await fetchLocation();
-    await Api(`auth/verifyOTP`, "POST", body, "").then((Response: any) => {
-      console.log("=============>" + JSON.stringify(Response));
-      if (Response.status == 200) {
-        if (Response.data.code == 200) {
-          enqueueSnackbar(Response.data.message);
-          localStorage.setItem("token", Response.data.data.token);
-          initialize();
+    try {
+      const body = {
+        email_OTP:
+          data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
+        mobile_OTP:
+          data.code1 +
+          data.code2 +
+          data.code3 +
+          data.code4 +
+          data.code5 +
+          data.code6,
+        email: getValues("email")?.toLowerCase(),
+        mobileNumber: getValues("mobile"),
+        password: getValues("password"),
+        role: value2 == "m_distributor" ? value2 : radioVal,
+        refferalCode: rfcode,
+        FCM_Token: sessionStorage.getItem("fcm"),
+      };
+      await fetchLocation();
+      await Api(`auth/verifyOTP`, "POST", body, "").then((Response: any) => {
+        console.log("=============>" + JSON.stringify(Response));
+        if (Response.status == 200) {
+          if (Response.data.code == 200) {
+            enqueueSnackbar(Response.data.message);
+            localStorage.setItem("token", Response.data.data.token);
+            initialize();
+          } else {
+            enqueueSnackbar(Response.data.message, { variant: "error" });
+          }
+          setVerifyLoad(false);
         } else {
-          enqueueSnackbar(Response.data.message, { variant: "error" });
+          setVerifyLoad(false);
         }
-        setVerifyLoad(false);
-      } else {
-        setVerifyLoad(false);
+      });
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    });
+    }
   };
 
   useEffect(() => requestPermission(), []);

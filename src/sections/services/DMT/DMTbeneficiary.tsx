@@ -246,17 +246,22 @@ export default function DMTbeneficiary() {
 
   const verifyBene = async () => {
     remitterVerifyDispatch({ type: "VERIFY_FETCH_REQUEST" });
-    await fetchLocation();
-    let token = localStorage.getItem("token");
-    let body = {
-      ifsc: getValues("ifsc"),
-      accountNumber: getValues("accountNumber"),
-      bankName: getValues("bankName"),
-      remitterMobile: remitterContext.remitterMobile,
-    };
-    (await trigger(["ifsc", "accountNumber", "bankName"]))
-      ? await Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
-          (Response: any) => {
+    try {
+      await fetchLocation();
+      let token = localStorage.getItem("token");
+      let body = {
+        ifsc: getValues("ifsc"),
+        accountNumber: getValues("accountNumber"),
+        bankName: getValues("bankName"),
+        remitterMobile: remitterContext.remitterMobile,
+      };
+      (await trigger(["ifsc", "accountNumber", "bankName"]))
+        ? await Api(
+            "moneyTransfer/beneficiary/verify",
+            "POST",
+            body,
+            token
+          ).then((Response: any) => {
             if (Response.status == 200) {
               if (Response.data.code == 200) {
                 remitterVerifyDispatch({
@@ -277,55 +282,65 @@ export default function DMTbeneficiary() {
               remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
               enqueueSnackbar("Failed", { variant: "error" });
             }
-          }
-        )
-      : remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
+          })
+        : remitterVerifyDispatch({ type: "VERIFY_FETCH_FAILURE" });
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
+    }
   };
 
   const addBeneficiary = async (data: FormValuesProps) => {
     addbeneDispatch({ type: "ADD_BENE_REQUEST" });
-    let token = localStorage.getItem("token");
-    let body = {
-      remitterMobile: remitterContext.remitterMobile,
-      beneficiaryName: data.beneName,
-      ifsc: data.ifsc,
-      accountNumber: data.accountNumber,
-      beneficiaryMobile: data.mobileNumber,
-      beneficiaryEmail: data.email,
-      relationship: data.remitterRelation,
-      bankName: data.bankName,
-      isBeneVerified: data.isBeneVerified,
-      // bankId: data.bankId,
-    };
-    await fetchLocation();
-    await Api("moneyTransfer/beneficiary", "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            getbeneDispatch({
-              type: "GET_BENE_SUCCESS",
-              payload: [...getBene.data, Response.data.data],
-            });
-            addbeneDispatch({
-              type: "ADD_BENE_SUCCESS",
-              payload: Response.data.data,
-            });
-            remitterVerifyDispatch({
-              type: "VERIFY_FETCH_FAILURE",
-            });
-            enqueueSnackbar(Response.data.message);
-            handleClose();
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        remitterMobile: remitterContext.remitterMobile,
+        beneficiaryName: data.beneName,
+        ifsc: data.ifsc,
+        accountNumber: data.accountNumber,
+        beneficiaryMobile: data.mobileNumber,
+        beneficiaryEmail: data.email,
+        relationship: data.remitterRelation,
+        bankName: data.bankName,
+        isBeneVerified: data.isBeneVerified,
+        // bankId: data.bankId,
+      };
+      await fetchLocation();
+      await Api("moneyTransfer/beneficiary", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              getbeneDispatch({
+                type: "GET_BENE_SUCCESS",
+                payload: [...getBene.data, Response.data.data],
+              });
+              addbeneDispatch({
+                type: "ADD_BENE_SUCCESS",
+                payload: Response.data.data,
+              });
+              remitterVerifyDispatch({
+                type: "VERIFY_FETCH_FAILURE",
+              });
+              enqueueSnackbar(Response.data.message);
+              handleClose();
+            } else {
+              addbeneDispatch({ type: "ADD_BENE_FAILURE" });
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+            }
           } else {
+            enqueueSnackbar("Internal server error", { variant: "error" });
             addbeneDispatch({ type: "ADD_BENE_FAILURE" });
-            enqueueSnackbar(Response.data.message, { variant: "error" });
           }
-        } else {
-          enqueueSnackbar("Internal server error", { variant: "error" });
-          addbeneDispatch({ type: "ADD_BENE_FAILURE" });
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   function deleteBene(val: any) {
@@ -599,34 +614,40 @@ const BeneList = React.memo(
 
     const verifyBene = async (val: string) => {
       let token = localStorage.getItem("token");
-      let body = {
-        beneficiaryId: val,
-        remitterMobile: remitterNumber,
-      };
-      await fetchLocation();
-      await Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
-        (Response: any) => {
-          if (Response.status == 200) {
-            if (Response.data.code == 200) {
-              enqueueSnackbar(Response.data.message);
-              setCell({
-                ...cell,
-                isVerified: true,
-                beneName: Response.data.name,
-              });
-              UpdateUserDetail({
-                main_wallet_amount: user?.main_wallet_amount - 3,
-              });
+      try {
+        let body = {
+          beneficiaryId: val,
+          remitterMobile: remitterNumber,
+        };
+        await fetchLocation();
+        await Api("moneyTransfer/beneficiary/verify", "POST", body, token).then(
+          (Response: any) => {
+            if (Response.status == 200) {
+              if (Response.data.code == 200) {
+                enqueueSnackbar(Response.data.message);
+                setCell({
+                  ...cell,
+                  isVerified: true,
+                  beneName: Response.data.name,
+                });
+                UpdateUserDetail({
+                  main_wallet_amount: user?.main_wallet_amount - 3,
+                });
+              } else {
+                enqueueSnackbar(Response.data.message, { variant: "error" });
+              }
+              setVarifyStatus(true);
             } else {
-              enqueueSnackbar(Response.data.message, { variant: "error" });
+              enqueueSnackbar("Internal server error", { variant: "error" });
+              setVarifyStatus(true);
             }
-            setVarifyStatus(true);
-          } else {
-            enqueueSnackbar("Internal server error", { variant: "error" });
-            setVarifyStatus(true);
           }
+        );
+      } catch (error) {
+        if (error.code == 1) {
+          enqueueSnackbar(`${error.message} !`, { variant: "error" });
         }
-      );
+      }
     };
 
     const deleteBeneficiary = (val: string) => {

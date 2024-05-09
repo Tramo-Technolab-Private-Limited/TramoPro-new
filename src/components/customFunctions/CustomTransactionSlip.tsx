@@ -250,29 +250,29 @@ function CustomTransactionSlip({ newRow, handleCloseRecipt }: any) {
                       </Typography>
                     </React.Fragment>
                   )}
-                  {newRow[0]?.categoryName?.toLowerCase() == "aeps" ||
-                    (newRow[0]?.categoryName?.toLowerCase() ==
-                      "aadhaar pay" && (
-                      <React.Fragment>
-                        <Typography variant="subtitle1">
-                          Customer Detail
-                        </Typography>
-                        <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
-                          Bank Name :{" "}
-                          <span style={{ fontWeight: 500 }}>
-                            {" "}
-                            {newRow[0]?.operator?.key1}
-                          </span>
-                        </Typography>
-                        <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
-                          Aadhaar Number :{" "}
-                          <span style={{ fontWeight: 500 }}>
-                            {" "}
-                            {newRow[0]?.operator?.key2}
-                          </span>
-                        </Typography>
-                      </React.Fragment>
-                    ))}
+                  {(newRow[0]?.categoryName?.toLowerCase() == "aeps" ||
+                    newRow[0]?.categoryName?.toLowerCase() ==
+                      "aadhaar pay") && (
+                    <React.Fragment>
+                      <Typography variant="subtitle1">
+                        Customer Detail
+                      </Typography>
+                      <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
+                        Bank Name :{" "}
+                        <span style={{ fontWeight: 500 }}>
+                          {" "}
+                          {newRow[0]?.operator?.key1}
+                        </span>
+                      </Typography>
+                      <Typography variant="body2" sx={{ lineHeight: 1.2 }}>
+                        Aadhaar Number :{" "}
+                        <span style={{ fontWeight: 500 }}>
+                          {" "}
+                          {newRow[0]?.operator?.key2}
+                        </span>
+                      </Typography>
+                    </React.Fragment>
+                  )}
                   {newRow[0]?.categoryName?.toLowerCase() == "recharges" && (
                     <React.Fragment>
                       <Typography variant="subtitle1">

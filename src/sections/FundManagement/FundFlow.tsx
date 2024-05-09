@@ -300,8 +300,10 @@ function FundFlow() {
           }
         }
       );
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
   return (

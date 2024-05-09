@@ -179,34 +179,40 @@ export default React.memo(function SettlementToWallet() {
   const settleToMainWallet = async () => {
     setIsSubmitLoading(true);
     let token = localStorage.getItem("token");
-    let body = {
-      amount: String(getValues("amount")),
-      nPin:
-        getValues("otp1") +
-        getValues("otp2") +
-        getValues("otp3") +
-        getValues("otp4") +
-        getValues("otp5") +
-        getValues("otp6"),
-    };
-    await fetchLocation();
-    await Api(`settlement/to_main_wallet`, "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            initialize();
-            handleClose();
-            enqueueSnackbar(Response.data.message);
+    try {
+      let body = {
+        amount: String(getValues("amount")),
+        nPin:
+          getValues("otp1") +
+          getValues("otp2") +
+          getValues("otp3") +
+          getValues("otp4") +
+          getValues("otp5") +
+          getValues("otp6"),
+      };
+      await fetchLocation();
+      await Api(`settlement/to_main_wallet`, "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              initialize();
+              handleClose();
+              enqueueSnackbar(Response.data.message);
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+            }
+            setIsSubmitLoading(false);
           } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
+            enqueueSnackbar("Failed", { variant: "error" });
+            setIsSubmitLoading(false);
           }
-          setIsSubmitLoading(false);
-        } else {
-          enqueueSnackbar("Failed", { variant: "error" });
-          setIsSubmitLoading(false);
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   return (

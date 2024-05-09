@@ -14,6 +14,7 @@ import {
   AuthUserType,
   JWTContextType,
 } from "./types";
+
 import { useNavigate } from "react-router";
 import { fetchLocation } from "src/utils/fetchLocation";
 
@@ -110,7 +111,6 @@ const reducer = (state: AuthStateType, action: ActionsType) => {
     return {
       ...state,
       isAuthenticated: false,
-      isInitialized: true,
       logOut: true,
       user: null,
     };
@@ -131,15 +131,17 @@ type AuthProviderProps = {
 export function AuthProvider({ children }: AuthProviderProps) {
   const siteUrl = process.env.REACT_APP_BASE_URL;
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [location, setLocation] = useState<boolean | null>(null);
+  const [location, setLocation] = useState<boolean | null>(true);
 
   const initialize = useCallback(async () => {
-    let location = await fetchLocation();
-    if (location.coords.latitude && location.coords.longitude) {
-      setLocation(true);
-    } else {
-      setLocation(false);
-    }
+    navigator.geolocation.getCurrentPosition((position) => {
+      if (position.coords.latitude && position.coords.longitude) {
+        setLocation(true);
+      } else {
+        setLocation(false);
+      }
+    });
+
     try {
       const token =
         typeof window !== "undefined" ? localStorage.getItem("token") : "";
@@ -263,8 +265,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
               latitude: localStorage.getItem("lat"),
               longitude: localStorage.getItem("long"),
               ip: localStorage.getItem("ip")?.toString(),
-              "user-Agent": localStorage.getItem("user-Agent"),
-              devicetype: localStorage.getItem("devicetype"),
+              "user-Agent": localStorage.getItem("userAgent"),
+              devicetype: localStorage.getItem("deviceType"),
             },
           }
         : {
@@ -275,8 +277,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
               latitude: localStorage.getItem("lat"),
               longitude: localStorage.getItem("long"),
               ip: localStorage.getItem("ip")?.toString(),
-              "user-Agent": localStorage.getItem("user-Agent"),
-              devicetype: localStorage.getItem("devicetype"),
+              "user-Agent": localStorage.getItem("userAgent"),
+              devicetype: localStorage.getItem("deviceType"),
             },
             body: JSON.stringify(body),
           };
@@ -310,8 +312,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         latitude: localStorage.getItem("lat"),
         longitude: localStorage.getItem("long"),
         ip: localStorage.getItem("ip")?.toString(),
-        "user-Agent": localStorage.getItem("user-Agent"),
-        devicetype: localStorage.getItem("devicetype"),
+        "user-Agent": localStorage.getItem("userAgent"),
+        devicetype: localStorage.getItem("deviceType"),
       },
       body: body,
     };

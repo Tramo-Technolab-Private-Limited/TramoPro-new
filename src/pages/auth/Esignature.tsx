@@ -12,8 +12,10 @@ import { LoadingButton } from "@mui/lab";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { STEP_DASHBOARD } from "src/routes/paths";
 import { fetchLocation } from "src/utils/fetchLocation";
+import { useSnackbar } from "notistack";
 export default function NPinPage() {
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const { user, Api, UploadFileApi } = useAuthContext();
   const [verifyLoding, setVerifyLoading] = useState(false);
 
@@ -22,7 +24,13 @@ export default function NPinPage() {
   }, []);
 
   const redirectToGoogle = async () => {
-    await fetchLocation();
+    try {
+      await fetchLocation();
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
+    }
     setVerifyLoading(true);
     window.location.href = user?.eAgreement_URL;
   };

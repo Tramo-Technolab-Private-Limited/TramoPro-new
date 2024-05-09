@@ -115,8 +115,8 @@ export default function AttendenceAeps(props: any) {
       handleOpen();
       return;
     }
-    await fetchLocation();
     try {
+      await fetchLocation();
       let token = localStorage.getItem("token");
       let body = {
         attendanceType: "DAILY",
@@ -147,8 +147,10 @@ export default function AttendenceAeps(props: any) {
           setMessage("Failed");
         }
       });
-    } catch (Err) {
-      console.log(Err);
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
+      }
     }
   };
 

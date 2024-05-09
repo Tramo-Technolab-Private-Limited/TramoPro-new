@@ -348,34 +348,40 @@ function MobilePrepaid() {
 
   const browsePlan = async () => {
     planDispatch({ type: "PLAN_FETCH_REQUEST" });
-    let token = localStorage.getItem("token");
-    let body = {
-      circle: circleList.filter((item: any) => {
-        return item.value === getValues("circle");
-      })[0]?.value,
-      operator: getValues("operatorName"),
-    };
-    await fetchLocation();
-    await Api("agents/v1/get_plan", "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            planDispatch({
-              type: "PLAN_FETCH_SUCCESS",
-              payload: Response.data.data,
-            });
-            setTabsData(Response.data.data);
-            enqueueSnackbar(Response.data.message);
-          } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
-            planDispatch({
-              type: "PLAN_FETCH_FAILURE",
-              error: Response.data.message,
-            });
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        circle: circleList.filter((item: any) => {
+          return item.value === getValues("circle");
+        })[0]?.value,
+        operator: getValues("operatorName"),
+      };
+      await fetchLocation();
+      await Api("agents/v1/get_plan", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              planDispatch({
+                type: "PLAN_FETCH_SUCCESS",
+                payload: Response.data.data,
+              });
+              setTabsData(Response.data.data);
+              enqueueSnackbar(Response.data.message);
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+              planDispatch({
+                type: "PLAN_FETCH_FAILURE",
+                error: Response.data.message,
+              });
+            }
           }
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   const onSubmit = (data: FormValuesProps) => {
@@ -384,44 +390,50 @@ function MobilePrepaid() {
 
   const formSubmit = async (data: FormValuesProps) => {
     rechargeDispatch({ type: "RECHARGE_FETCH_REQUEST" });
-    let token = localStorage.getItem("token");
-    let body = {
-      OperatorId: getValues("operator"),
-      number: getValues("mobileNumber"),
-      amount: getValues("amount"),
-      nPin:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
-    };
-    await fetchLocation();
-    await Api("agents/v1/doRechargeLTS", "POST", body, token).then(
-      (Response: any) => {
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar("Recharge : " + Response.data.data.status);
-            rechargeDispatch({
-              type: "RECHARGE_FETCH_SUCCESS",
-              payload: Response.data.data,
-            });
-            if (Response.data.data.status == "success") {
-              setIsAnimation(true);
-              setTimeout(() => {
-                setIsAnimation(false);
-              }, 1800);
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        OperatorId: getValues("operator"),
+        number: getValues("mobileNumber"),
+        amount: getValues("amount"),
+        nPin:
+          data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
+      };
+      await fetchLocation();
+      await Api("agents/v1/doRechargeLTS", "POST", body, token).then(
+        (Response: any) => {
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar("Recharge : " + Response.data.data.status);
+              rechargeDispatch({
+                type: "RECHARGE_FETCH_SUCCESS",
+                payload: Response.data.data,
+              });
+              if (Response.data.data.status == "success") {
+                setIsAnimation(true);
+                setTimeout(() => {
+                  setIsAnimation(false);
+                }, 1800);
+              }
+              setTransactionDetail([Response.data.data]);
+              handleOpenResponse();
+              initialize();
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+              rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
             }
-            setTransactionDetail([Response.data.data]);
-            handleOpenResponse();
-            initialize();
+            handleClose1();
           } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
+            enqueueSnackbar("Failed", { variant: "error" });
             rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
           }
-          handleClose1();
-        } else {
-          enqueueSnackbar("Failed", { variant: "error" });
-          rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   return (

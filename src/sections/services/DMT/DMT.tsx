@@ -364,36 +364,42 @@ const OtpSubmissionForRegistrantion = ({
 
   const verifyOtp = async (data: FormValuesProps) => {
     setIsLoading(true);
-    let token = localStorage.getItem("token");
-    let body = {
-      remitterMobile: mobilenumber,
-      otp:
-        data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
-    };
-    await fetchLocation();
-    await Api("moneyTransfer/remitter/verifyOTP", "POST", body, token).then(
-      (Response: any) => {
-        console.log("==============>>> register remmiter Response", Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            reset(defaultValues);
-            callback(mobilenumber);
-            setIsLoading(false);
-            console.log(
-              "==============>>> register remmiter data 200",
-              Response.data.data.message
-            );
-          } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
-            setIsLoading(false);
-            console.log(
-              "==============>>> register remmiter message",
-              Response.data.message
-            );
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        remitterMobile: mobilenumber,
+        otp:
+          data.otp1 + data.otp2 + data.otp3 + data.otp4 + data.otp5 + data.otp6,
+      };
+      await fetchLocation();
+      await Api("moneyTransfer/remitter/verifyOTP", "POST", body, token).then(
+        (Response: any) => {
+          console.log("==============>>> register remmiter Response", Response);
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              reset(defaultValues);
+              callback(mobilenumber);
+              setIsLoading(false);
+              console.log(
+                "==============>>> register remmiter data 200",
+                Response.data.data.message
+              );
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+              setIsLoading(false);
+              console.log(
+                "==============>>> register remmiter message",
+                Response.data.message
+              );
+            }
           }
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   return (
@@ -481,31 +487,37 @@ const NewRegistration = ({ mobilenumber, handleNewRegistaion }: any) => {
 
   const addRemmiter = async (data: FormValuesProps) => {
     setIsLoading(true);
-    let token = localStorage.getItem("token");
-    let body = {
-      remitterMobile: mobilenumber,
-      firstName: data.remitterFirstName,
-      lastName: data.remitterLastName,
-      occupation: data.remitterOccupation,
-      email: data.remitterEmail || "",
-    };
-    await fetchLocation();
-    await Api("moneyTransfer/remitter", "POST", body, token).then(
-      (Response: any) => {
-        console.log("==============>>> register remmiter Response", Response);
-        if (Response.status == 200) {
-          if (Response.data.code == 200) {
-            enqueueSnackbar(Response.data.message);
-            setIsLoading(false);
-            handleNewRegistaion("SUCCESS");
-          } else {
-            enqueueSnackbar(Response.data.message, { variant: "error" });
-            setIsLoading(false);
-            handleNewRegistaion("FAIL");
+    try {
+      let token = localStorage.getItem("token");
+      let body = {
+        remitterMobile: mobilenumber,
+        firstName: data.remitterFirstName,
+        lastName: data.remitterLastName,
+        occupation: data.remitterOccupation,
+        email: data.remitterEmail || "",
+      };
+      await fetchLocation();
+      await Api("moneyTransfer/remitter", "POST", body, token).then(
+        (Response: any) => {
+          console.log("==============>>> register remmiter Response", Response);
+          if (Response.status == 200) {
+            if (Response.data.code == 200) {
+              enqueueSnackbar(Response.data.message);
+              setIsLoading(false);
+              handleNewRegistaion("SUCCESS");
+            } else {
+              enqueueSnackbar(Response.data.message, { variant: "error" });
+              setIsLoading(false);
+              handleNewRegistaion("FAIL");
+            }
           }
         }
+      );
+    } catch (error) {
+      if (error.code == 1) {
+        enqueueSnackbar(`${error.message} !`, { variant: "error" });
       }
-    );
+    }
   };
 
   return (
