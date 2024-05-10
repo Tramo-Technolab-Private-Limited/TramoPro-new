@@ -771,7 +771,23 @@ export default function AuthRegisterForm(props: any) {
               disabled={gOTP}
               name="confirmPassword"
               label="Confirm Password"
-              type={showPassword2 ? "text" : "password"}
+              type={showPassword ? "text" : "password"}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                    >
+                      <Iconify
+                        icon={
+                          showPassword ? "eva:eye-fill" : "eva:eye-off-fill"
+                        }
+                      />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
             />
           </Stack>
           <FormControl>
