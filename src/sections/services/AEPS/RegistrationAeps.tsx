@@ -362,7 +362,7 @@ export default function RegistrationAeps(props: any) {
     }
     if (rdUrl == "") {
       setOtpVerify(true);
-      enqueueSnackbar("Device Not Set!!");
+      enqueueSnackbar("Device Not Set!!", { variant: "error" });
       return;
     }
     var xhr: any;
@@ -380,7 +380,7 @@ export default function RegistrationAeps(props: any) {
     xhr.setRequestHeader("Accept", "text/xml");
     if (!xhr) {
       setOtpVerify(true);
-      enqueueSnackbar("CORS not supported");
+      enqueueSnackbar("CORS not supported", { variant: "error" });
       return;
     }
     xhr.onreadystatechange = function () {
@@ -478,14 +478,16 @@ export default function RegistrationAeps(props: any) {
             setarrofObj(deviceArr);
           } else {
             setOtpVerify(true);
-            enqueueSnackbar(errInfo);
+            enqueueSnackbar(errInfo, { variant: "error" });
           }
         }
       }
     };
     xhr.onerror = function () {
       setOtpVerify(true);
-      enqueueSnackbar("Check If Morpho Service/Utility is Running");
+      enqueueSnackbar("Check If Morpho Service/Utility is Running", {
+        variant: "error",
+      });
     };
     xhr.send(
       user?.fingPayAEPSKycStatus

@@ -107,7 +107,8 @@ export default function Services(props: any) {
 
               {categoryList.map(
                 (tab: any) =>
-                  tab.category_name == superCurrentTab && (
+                  tab.category_name == superCurrentTab &&
+                  (tab.isEnabled ? (
                     <CategoryContext.Provider
                       value={tab}
                       key={tab.category_name}
@@ -145,7 +146,11 @@ export default function Services(props: any) {
                         </Box>
                       </AnimatePresence>
                     </CategoryContext.Provider>
-                  )
+                  ) : (
+                    <Stack m={2}>
+                      <ServiceUnderUpdate />
+                    </Stack>
+                  ))
               )}
             </>
           )}

@@ -188,7 +188,7 @@ export default function DMT1pay({ clearPayout, remitter, beneficiary }: any) {
                 if (Response.data.code == 200) {
                   Response.data.response.map((element: any) => {
                     enqueueSnackbar(element.message);
-                    TextToSpeak(Response.message);
+                    TextToSpeak(element.message);
                     initialize();
                   });
                   setTransactionDetail(
