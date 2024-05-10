@@ -21,6 +21,7 @@ export default function NPinPage() {
 
   useEffect(() => {
     user?.is_eAgreement_signed && navigate(STEP_DASHBOARD.verifyusernpin);
+    console.log(`${user?.eAgreement_URL}?deviceType=web`);
   }, []);
 
   const redirectToGoogle = async () => {
@@ -32,7 +33,7 @@ export default function NPinPage() {
       }
     }
     setVerifyLoading(true);
-    window.location.href = user?.eAgreement_URL;
+    window.location.href = `${user?.eAgreement_URL}?deviceType=web`;
   };
 
   return (
