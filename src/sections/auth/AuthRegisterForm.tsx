@@ -443,7 +443,7 @@ export default function AuthRegisterForm(props: any) {
         FCM_Token: sessionStorage.getItem("fcm"),
       };
       await fetchLocation();
-      await Api(`auth/verifyOTP`, "POST", body, "").then((Response: any) => {
+      await Api(`auth/verify_otp`, "POST", body, "").then((Response: any) => {
         console.log("=============>" + JSON.stringify(Response));
         if (Response.status == 200) {
           if (Response.data.code == 200) {
