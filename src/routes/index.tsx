@@ -40,6 +40,7 @@ import {
   MyFundDeposits,
   LoanScheme,
   Agreement,
+  WalletToWallet,
 } from "./elements";
 
 // ----------------------------------------------------------------------
@@ -160,6 +161,7 @@ export default function Router() {
             { path: "myfundrequest", element: <MyFundRequest /> },
             { path: "managefundflow", element: <ManageFundFlow /> },
             { path: "mynetworkfunds", element: <MyNetwrokFunds /> },
+            { path: "wallettowallet", element: <WalletToWallet /> },
           ],
         },
         { path: "setting", element: <Setting /> },
