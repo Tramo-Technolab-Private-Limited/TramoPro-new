@@ -355,6 +355,8 @@ export default function RegistrationAeps(props: any) {
       rdUrl = "https://127.0.0.1:8005/rd/capture";
     } else if (getValuesOtp("deviceName") == "MORPHO") {
       rdUrl = "http://127.0.0.1:11100/capture";
+    } else if (getValuesOtp("deviceName") == "MORPHO L1") {
+      rdUrl = "http://127.0.0.1:11101/capture";
     } else if (getValuesOtp("deviceName") == "STARTEK") {
       rdUrl = "http://127.0.0.1:11101/rd/capture";
     } else if (getValuesOtp("deviceName") == "SECUGEN") {
@@ -576,6 +578,7 @@ export default function RegistrationAeps(props: any) {
               sx={{ width: "90%", margin: "auto" }}
             >
               <MenuItem value={"MORPHO"}>MORPHO</MenuItem>
+              <MenuItem value={"MORPHO L1"}>MORPHO L1</MenuItem>
               <MenuItem value={"STARTEK"}>STARTEK</MenuItem>
               <MenuItem value={"MANTRA"}>MANTRA</MenuItem>
               <MenuItem value={"SECUGEN"}>SECUGEN</MenuItem>
