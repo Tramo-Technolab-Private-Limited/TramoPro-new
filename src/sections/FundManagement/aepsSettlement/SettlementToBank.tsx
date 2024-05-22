@@ -562,10 +562,10 @@ function TransactionRow({ row }: any) {
           <Typography variant="body2" whiteSpace={"nowrap"}>
             {fIndianCurrency(
               user?.role === "agent"
-                ? newRow?.agentDetails?.oldMainWalletBalance
+                ? newRow?.agentDetails?.oldAEPSWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.oldMainWalletBalance
-                : newRow?.masterDistributorDetails?.oldMainWalletBalance
+                ? newRow?.distributorDetails?.oldAEPSWalletBalance
+                : newRow?.masterDistributorDetails?.oldAEPSWalletBalance
             )}
           </Typography>
         </StyledTableCell>
@@ -601,10 +601,10 @@ function TransactionRow({ row }: any) {
           <Typography variant="body2" whiteSpace={"nowrap"}>
             {fIndianCurrency(
               user?.role === "agent"
-                ? newRow?.agentDetails?.newMainWalletBalance
+                ? newRow?.agentDetails?.newAEPSWalletBalance
                 : user?.role === "distributor"
-                ? newRow?.distributorDetails?.newMainWalletBalance
-                : newRow?.masterDistributorDetails?.newMainWalletBalance
+                ? newRow?.distributorDetails?.newAEPSWalletBalance
+                : newRow?.masterDistributorDetails?.newAEPSWalletBalance
             )}
           </Typography>
         </StyledTableCell>
