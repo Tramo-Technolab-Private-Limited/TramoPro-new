@@ -158,6 +158,7 @@ export default function AadharPay() {
 
   const deviceType = [
     { _id: 1, category_name: "MORPHO" },
+    { _id: 1, category_name: "MORPHO L1" },
     { _id: 2, category_name: "MANTRA" },
     { _id: 3, category_name: "STARTEK" },
     { _id: 4, category_name: "SECUGEN" },
