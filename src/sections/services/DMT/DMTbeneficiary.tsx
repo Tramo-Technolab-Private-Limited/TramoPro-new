@@ -42,6 +42,7 @@ import { useAuthContext } from "src/auth/useAuthContext";
 import Scrollbar from "src/components/scrollbar/Scrollbar";
 import useResponsive from "src/hooks/useResponsive";
 import { fetchLocation } from "src/utils/fetchLocation";
+import { AnyLayout } from "mapbox-gl";
 // ----------------------------------------------------------------------
 
 type FormValuesProps = {
@@ -126,6 +127,8 @@ export default function DMTbeneficiary() {
   const { enqueueSnackbar } = useSnackbar();
   const isMobile = useResponsive("up", "sm");
   const remitterContext: any = useContext(RemitterContext);
+  const [tempData, setTempData] = useState<any>();
+  const [filteredData, setFilteredData] = useState([]);
 
   const [remitterVerify, remitterVerifyDispatch] = useReducer(
     Reducer,
@@ -134,6 +137,26 @@ export default function DMTbeneficiary() {
   const [addBene, addbeneDispatch] = useReducer(Reducer, initialAddBene);
   const [getBene, getbeneDispatch] = useReducer(Reducer, initialgetBene);
   const [getBank, getBankDispatch] = useReducer(Reducer, initialgetBank);
+
+
+  useEffect(() => {
+    const data = getBene?.data?.filter((row: any) => {
+      const searchTerm = tempData?.toLowerCase();
+      return (
+        row?.beneName?.toLowerCase()?.includes(searchTerm) ||
+        row?.mobilenumber?.toLowerCase()?.includes(searchTerm) ||
+        row?.accountnumber?.toLowerCase()?.includes(searchTerm) ||
+        row?.ifsc?.toLowerCase()?.includes(searchTerm) ||
+        row?.bankName?.toLowerCase()?.includes(searchTerm)
+      );
+    });
+    setFilteredData(data);
+  }, [tempData]);
+
+  
+  const handleSearch = (e: any) => {
+    setTempData(e);
+  };
 
   //modal for add Beneficiary
   const [open, setModalEdit] = React.useState(false);
@@ -364,7 +387,12 @@ export default function DMTbeneficiary() {
           <ApiDataLoading />
         ) : (
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
-            <Stack justifyContent={"end"} flexDirection={"row"} mb={1}>
+            <Stack justifyContent={"space-between"} flexDirection={"row"} mb={1} mt={1}>
+            <TextField
+              value={tempData}
+              onChange={(e) => handleSearch(e.target.value)}
+              label="Search by"
+            />
               <LoadingButton
                 variant="contained"
                 size="medium"
@@ -396,11 +424,11 @@ export default function DMTbeneficiary() {
                       <TableCell sx={{ fontWeight: 800 }}>
                         Beneficiary Name
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>A/c No.</TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>Bank Name</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>
                         Mobile Number
                       </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>
                         Verification
                       </TableCell>
@@ -410,16 +438,17 @@ export default function DMTbeneficiary() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {getBene.data.map((row: any) => (
-                      <BeneList
-                        key={row._id}
-                        row={row}
-                        callback={setPayoutData}
-                        remitterNumber={remitterContext.remitterMobile}
-                        deleteBene={deleteBene}
-                        pay={() => setIsOpen(true)}
-                      />
-                    ))}
+                    {(tempData?.length ? filteredData : getBene?.data).map(
+                      (row: any) => (
+                        <BeneList
+                          key={row._id}
+                          row={row}
+                          callback={setPayoutData}
+                          remitterNumber={remitterContext.remitterMobile}
+                          deleteBene={deleteBene}
+                        />
+                      )
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>
