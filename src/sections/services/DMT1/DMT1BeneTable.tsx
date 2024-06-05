@@ -150,7 +150,6 @@ export default function DMTbeneficiary() {
     setFilteredData(data);
   }, [tempData]);
 
-  
   const handleSearch = (e: any) => {
     setTempData(e);
   };
@@ -421,11 +420,11 @@ export default function DMTbeneficiary() {
                       <TableCell sx={{ fontWeight: 800 }}>
                         Beneficiary Name
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>A/c No.</TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>Bank Name</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>
-                        Mobile Number
+                        Account Number
                       </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>
                         Verification
                       </TableCell>

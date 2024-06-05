@@ -426,7 +426,7 @@ export default function DMTbeneficiary() {
                       </TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>Bank Name</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>
-                        Mobile Number
+                        Account Number
                       </TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>

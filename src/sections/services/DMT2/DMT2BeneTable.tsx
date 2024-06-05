@@ -151,11 +151,9 @@ export default function DMT2BeneTable() {
     setFilteredData(data);
   }, [tempData]);
 
-  
   const handleSearch = (e: any) => {
     setTempData(e);
   };
-
 
   //modal for add Beneficiary
   const [open, setModalEdit] = React.useState(false);
@@ -440,11 +438,11 @@ export default function DMT2BeneTable() {
                       <TableCell sx={{ fontWeight: 800 }}>
                         Beneficiary Name
                       </TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>A/c No.</TableCell>
-                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>Bank Name</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>
-                        Mobile Number
+                        Account Number
                       </TableCell>
+                      <TableCell sx={{ fontWeight: 800 }}>IFSC code</TableCell>
                       <TableCell sx={{ fontWeight: 800 }}>
                         Verification
                       </TableCell>
