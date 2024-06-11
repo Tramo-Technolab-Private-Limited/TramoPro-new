@@ -130,6 +130,7 @@ function MobilePrepaid() {
     setModal1(false);
     reset(defaultValues);
     otpReset(defaultValues2);
+    rechargeDispatch({ type: "RECHARGE_FETCH_FAILURE" });
   };
 
   const [responseOpen, setResponseOpen] = useState(false);

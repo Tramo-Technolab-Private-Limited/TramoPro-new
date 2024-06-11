@@ -127,6 +127,8 @@ export default function DMT2BeneTable() {
   const { enqueueSnackbar } = useSnackbar();
   const { user, UpdateUserDetail, Api } = useAuthContext();
   const remitterContext: any = useContext(RemitterContext);
+  const [tempData, setTempData] = useState<any>();
+  const [filteredData, setFilteredData] = useState([]);
   const isMobile = useResponsive("up", "sm");
   const [remitterVerify, remitterVerifyDispatch] = useReducer(
     Reducer,
@@ -135,6 +137,25 @@ export default function DMT2BeneTable() {
   const [addBene, addbeneDispatch] = useReducer(Reducer, initialAddBene);
   const [getBene, getbeneDispatch] = useReducer(Reducer, initialgetBene);
   const [getBank, getBankDispatch] = useReducer(Reducer, initialgetBank);
+  useEffect(() => {
+    const data = getBene?.data?.filter((row: any) => {
+      const searchTerm = tempData?.toLowerCase();
+      return (
+        row?.beneName?.toLowerCase()?.includes(searchTerm) ||
+        row?.mobilenumber?.toLowerCase()?.includes(searchTerm) ||
+        row?.accountnumber?.toLowerCase()?.includes(searchTerm) ||
+        row?.ifsc?.toLowerCase()?.includes(searchTerm) ||
+        row?.bankName?.toLowerCase()?.includes(searchTerm)
+      );
+    });
+    setFilteredData(data);
+  }, [tempData]);
+
+  
+  const handleSearch = (e: any) => {
+    setTempData(e);
+  };
+
 
   //modal for add Beneficiary
   const [open, setModalEdit] = React.useState(false);
@@ -377,7 +398,17 @@ export default function DMT2BeneTable() {
         ) : (
           <Paper sx={{ width: "100%", overflow: "hidden" }}>
             {" "}
-            <Stack justifyContent={"end"} flexDirection={"row"} mb={1}>
+            <Stack
+              justifyContent={"space-between"}
+              flexDirection={"row"}
+              mb={1}
+              mt={1}
+            >
+              <TextField
+                value={tempData}
+                onChange={(e) => handleSearch(e.target.value)}
+                label="Search by"
+              />
               <LoadingButton
                 variant="contained"
                 size="medium"
@@ -423,15 +454,17 @@ export default function DMT2BeneTable() {
                     </TableRow>
                   </TableHead>
                   <TableBody>
-                    {getBene.data.map((row: any) => (
-                      <BeneList
-                        key={row._id}
-                        row={row}
-                        callback={setPayoutData}
-                        remitterNumber={remitterContext.remitterMobile}
-                        deleteBene={deleteBene}
-                      />
-                    ))}
+                    {(tempData?.length ? filteredData : getBene?.data).map(
+                      (row: any) => (
+                        <BeneList
+                          key={row._id}
+                          row={row}
+                          callback={setPayoutData}
+                          remitterNumber={remitterContext.remitterMobile}
+                          deleteBene={deleteBene}
+                        />
+                      )
+                    )}
                   </TableBody>
                 </Table>
               </Scrollbar>

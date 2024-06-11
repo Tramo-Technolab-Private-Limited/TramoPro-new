@@ -4,6 +4,8 @@ function getRDServiceUrl(deviceName: any) {
     rdUrl = "http://127.0.0.1:11100/rd/capture";
   } else if (deviceName == "MORPHO") {
     rdUrl = "http://127.0.0.1:11100/capture";
+  } else if (deviceName == "MORPHO L1") {
+    rdUrl = "http://127.0.0.1:11101/capture";
   } else if (deviceName == "STARTEK") {
     rdUrl = "http://127.0.0.1:11100/rd/capture";
   } else if (deviceName == "SECUGEN") {
