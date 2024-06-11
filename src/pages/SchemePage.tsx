@@ -54,18 +54,18 @@ export default function ViewAllScheme() {
       console.log("======getcategory_list====>", Response);
       if (Response.status == 200) {
         if (Response.data.code == 200) {
-          setCategoryList(
-            Response.data.data.filter(
-              (item: any) =>
-                item.category_name.toLowerCase() !== "bill payment" &&
-                item.category_name.toLowerCase() !== "loan"
-            )
+          const filterCatgeory: any = Response.data.data.filter(
+            (item: any) =>
+              item.category_name.toLowerCase() !== "bill payment" &&
+              item.category_name.toLowerCase() !== "loan" &&
+              item.isEnabled
           );
+          setCategoryList(filterCatgeory);
           setSuperCurrentTab(
-            user?.role != "m_distributor" && Response.data.data[0].category_name
+            user?.role != "m_distributor" && filterCatgeory[0].category_name
           );
           if (user?.role != "m_distributor")
-            getSchemeDetail(Response.data.data[0]._id, user?.schemeId);
+            getSchemeDetail(filterCatgeory[0]._id, user?.schemeId);
         } else {
           enqueueSnackbar(Response.data.message, { variant: "error" });
         }
@@ -193,19 +193,19 @@ export default function ViewAllScheme() {
               <ApiDataLoading />
             ) : (
               <Grid item xs={12} md={6} lg={8}>
-                {superCurrentTab.toLowerCase() == "aeps" ? (
+                {superCurrentTab?.toLowerCase() == "aeps" ? (
                   <ViewAepsTable comData={com} />
-                ) : superCurrentTab.toLowerCase() == "recharges" ? (
+                ) : superCurrentTab?.toLowerCase() == "recharges" ? (
                   <ViewRechargeTable comData={com} />
-                ) : superCurrentTab.toLowerCase() == "money transfer" ? (
+                ) : superCurrentTab?.toLowerCase() == "money transfer" ? (
                   <ViewMoneyTransferTable comData={com} />
-                ) : superCurrentTab.toLowerCase() == "aadhaar pay" ? (
+                ) : superCurrentTab?.toLowerCase() == "aadhaar pay" ? (
                   <ViewAadharPayTable comData={com} />
-                ) : superCurrentTab.toLowerCase() == "dmt1" ? (
+                ) : superCurrentTab?.toLowerCase() == "dmt1" ? (
                   <ViewDmt1Table comData={com} />
-                ) : superCurrentTab.toLowerCase() == "dmt2" ? (
+                ) : superCurrentTab?.toLowerCase() == "dmt2" ? (
                   <ViewDmt2Table comData={com} />
-                ) : superCurrentTab.toLowerCase() == "matm" ? (
+                ) : superCurrentTab?.toLowerCase() == "matm" ? (
                   <ViewMatmTable comData={com} />
                 ) : null}
               </Grid>

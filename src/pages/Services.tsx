@@ -20,8 +20,6 @@ import ServiceUnderUpdate from "./ServiceUnderUpdate";
 import { useAuthContext } from "src/auth/useAuthContext";
 import { m, AnimatePresence } from "framer-motion";
 import { MotionContainer, varSlide } from "src/components/animate";
-import Image from "src/components/image/Image";
-import authorizationImage from "../assets/icons/You are not authorized.svg";
 import RoleBasedGuard from "src/auth/RoleBasedGuard";
 
 // ----------------------------------------------------------------------
@@ -51,14 +49,15 @@ export default function Services(props: any) {
         if (Response.data.code == 200) {
           const sortedData = Response?.data?.data.filter((item: any) => {
             if (
-              item?.category_name.toLowerCase() === "money transfer" ||
-              item?.category_name.toLowerCase() === "aeps" ||
-              item?.category_name.toLowerCase() === "aadhaar pay" ||
-              item?.category_name.toLowerCase() === "recharges" ||
-              item?.category_name.toLowerCase() === "bill payment" ||
-              item?.category_name.toLowerCase() === "dmt2" ||
-              item?.category_name.toLowerCase() === "loan" ||
-              item?.category_name.toLowerCase() === "dmt1"
+              (item?.category_name.toLowerCase() === "money transfer" ||
+                item?.category_name.toLowerCase() === "aeps" ||
+                item?.category_name.toLowerCase() === "aadhaar pay" ||
+                item?.category_name.toLowerCase() === "recharges" ||
+                item?.category_name.toLowerCase() === "bill payment" ||
+                item?.category_name.toLowerCase() === "dmt2" ||
+                item?.category_name.toLowerCase() === "loan" ||
+                item?.category_name.toLowerCase() === "dmt1") &&
+              item?.isEnabled
             ) {
               return item;
             }
