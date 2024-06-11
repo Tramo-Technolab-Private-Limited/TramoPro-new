@@ -982,46 +982,46 @@ export default function AuthRegisterForm(props: any) {
 
       <MotionModal open={open} width={{ xs: "75%" }}>
         <Scrollbar sx={{ maxHeight: 600, minWidth: 650 }}>
-          <AppBar
+          {/* <AppBar
             position="fixed"
             style={{
               borderRadius: "20px",
               border: `1px solid `,
             }}
+          > */}
+          <Tabs
+            value={tabValue}
+            onChange={handleChange}
+            variant="fullWidth"
+            aria-label="full width tabs example"
+            style={{
+              backgroundColor: "#ffffff",
+              borderRadius: "10px",
+              border: `1px solid `,
+            }}
           >
-            <Tabs
-              value={tabValue}
-              onChange={handleChange}
-              variant="fullWidth"
-              aria-label="full width tabs example"
-              style={{
-                backgroundColor: "#ffffff",
-                borderRadius: "10px",
-                border: `1px solid `,
-              }}
-            >
-              <Tab
-                label=" Term and Conditions"
-                {...a11yProps(0)}
-                style={{ color: "#C52031" }}
-              />
-              <Tab
-                label="Refund Policy"
-                {...a11yProps(1)}
-                style={{ color: "#C52031" }}
-              />
-              <Tab
-                label="Privacy Policy"
-                {...a11yProps(2)}
-                style={{ color: "#C52031" }}
-              />
-              <Tab
-                label="Grievance Policy"
-                {...a11yProps(3)}
-                style={{ color: "#C52031" }}
-              />
-            </Tabs>
-          </AppBar>
+            <Tab
+              label=" Term and Conditions"
+              {...a11yProps(0)}
+              style={{ color: "#C52031" }}
+            />
+            <Tab
+              label="Refund Policy"
+              {...a11yProps(1)}
+              style={{ color: "#C52031" }}
+            />
+            <Tab
+              label="Privacy Policy"
+              {...a11yProps(2)}
+              style={{ color: "#C52031" }}
+            />
+            <Tab
+              label="Grievance Policy"
+              {...a11yProps(3)}
+              style={{ color: "#C52031" }}
+            />
+          </Tabs>
+          {/* </AppBar> */}
 
           <TabPanel value={tabValue} index={0} dir={theme.direction}>
             <TermAndCondition />

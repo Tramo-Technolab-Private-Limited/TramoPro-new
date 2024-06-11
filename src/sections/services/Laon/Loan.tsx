@@ -440,6 +440,7 @@ function Loan() {
                               <Stack gap={2}>
                                 <RHFTextField
                                   name="mobileNumber"
+                                  type="number"
                                   label="Customer Mobile Number"
                                 />
 
@@ -1326,7 +1327,11 @@ const LoanTransactionTable = () => {
               <MenuItem value="initiated">Initiated</MenuItem>
             </RHFSelect>
 
-            <RHFTextField name="mobileNumber" label="MobileNumber" />
+            <RHFTextField
+              name="mobileNumber"
+              type="number"
+              label="MobileNumber"
+            />
             <Stack direction={"row"} gap={1}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DatePicker

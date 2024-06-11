@@ -17,6 +17,11 @@ const ICONS = {
   ecommerce: icon("ic_ecommerce"),
   analytics: icon("ic_analytics"),
   dashboard: icon("ic_dashboard"),
+  services: icon("ic_services"),
+  transaction: icon("ic_transaction"),
+  scheme: icon("ic_scheme"),
+  funds: icon("ic_funds"),
+  settings: icon("ic_settings")
 };
 
 const NavConfig = [
@@ -39,7 +44,7 @@ const NavConfig = [
         title: "services",
         path: PATH_DASHBOARD.services,
         roles: ["agent"],
-        icon: ICONS.ecommerce,
+        icon: ICONS.services,
       },
       {
         title: "Network",
@@ -50,7 +55,7 @@ const NavConfig = [
       {
         title: "Transactions",
         path: PATH_DASHBOARD.transaction.root,
-        icon: ICONS.user,
+        icon: ICONS.transaction,
         children: [
           {
             title: "My Transactions",
@@ -73,7 +78,7 @@ const NavConfig = [
       {
         title: "Schemes",
         path: PATH_DASHBOARD.scheme.root,
-        icon: ICONS.user,
+        icon: ICONS.scheme,
         children: [
           {
             title: "All Scheme",
@@ -92,7 +97,7 @@ const NavConfig = [
       {
         title: "Fund Management",
         path: PATH_DASHBOARD.fundmanagement.root,
-        icon: ICONS.user,
+        icon: ICONS.funds,
         children: [
           {
             title: "My Fund Deposits",
@@ -126,7 +131,7 @@ const NavConfig = [
       {
         title: "Setting",
         path: PATH_DASHBOARD.setting,
-        icon: ICONS.ecommerce,
+        icon: ICONS.settings,
       },
       {
         title: "Help & Support",

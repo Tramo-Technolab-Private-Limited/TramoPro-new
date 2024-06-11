@@ -1,27 +1,44 @@
 import { Stack, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 import Chart from "react-apexcharts";
+import { useAuthContext } from "src/auth/useAuthContext";
 
 const DonutView = (props: any) => {
-  const series = [44, 55, 13, 43, 22, 55, 13, 43];
+  const { Api } = useAuthContext();
+  const [categoryList, setCategoryList] = useState<any>([]);
+
+  useEffect(() => getCategoryList(), []);
+
+  const getCategoryList = () => {
+    let token = localStorage.getItem("token");
+    Api(`category/get_CategoryList`, "GET", "", token).then((Response: any) => {
+      console.log("======getcategory_list====>", Response);
+      if (Response.status == 200) {
+        if (Response.data.code == 200) {
+          const filterCatgeory: any = [];
+          Response?.data?.data.map(
+            (item: any) =>
+              item.isEnabled && filterCatgeory.push(item.category_name)
+          );
+          setCategoryList(filterCatgeory);
+        }
+      }
+    });
+  };
+
+  const series = categoryList.map((item: any) =>
+    Number(parseInt(String(Math.random() * 100)))
+  );
 
   const options: any = {
     chart: {
       type: "donut",
-      height: 350,
+      height: 650,
     },
     contextMenu: {
       menu: null,
     },
-    labels: [
-      "Recharge",
-      "Bill Payments",
-      "Money Transfer",
-      "Payout",
-      "AEPS",
-      "Aadhar Pay",
-      "mATM",
-      "Indo Nepal",
-    ],
+    labels: categoryList,
     responsive: [
       {
         breakpoint: 480,

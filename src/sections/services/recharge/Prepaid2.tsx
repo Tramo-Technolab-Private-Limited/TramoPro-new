@@ -191,13 +191,13 @@ export default function Prepaid1(props: any) {
   ];
 
   const circleList = [
-    { id: 1, name: "DelhiNCR" },
-    { id: 2, name: "Gujarat" },
-    { id: 3, name: "Haryana" },
     { id: 4, name: "AndhraPradeshTelangana" },
     { id: 5, name: "Assam" },
     { id: 6, name: "BiharJharkhand" },
     { id: 7, name: "Chennai" },
+    { id: 1, name: "DelhiNCR" },
+    { id: 2, name: "Gujarat" },
+    { id: 3, name: "Haryana" },
     { id: 8, name: "HimachalPradesh" },
     { id: 9, name: "JammuKashmir" },
     { id: 10, name: "Karnataka" },

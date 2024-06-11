@@ -385,7 +385,7 @@ export default React.memo(function SettlementToBank() {
                           justifyContent={"space-between"}
                         >
                           <Typography variant="h5" textAlign={"center"}>
-                            NPIN
+                            MPIN
                           </Typography>
                           {/* <Button onClick={() => setResetNpin(true)}>Reset nPin?</Button> */}
                         </Stack>
