@@ -69,7 +69,10 @@ export default function AuthLoginForm() {
     formState: { errors, isSubmitting, isSubmitSuccessful },
   } = methods;
 
-  useEffect(() => requestPermission(), []);
+  useEffect(() => {
+    fetchLocation();
+    requestPermission();
+  }, []);
 
   const onSubmit = async (data: FormValuesProps) => {
     let body = {
@@ -78,7 +81,6 @@ export default function AuthLoginForm() {
       FCM_token: sessionStorage.getItem("fcm"),
     };
     try {
-      await fetchLocation();
       await Api(`auth/login_in`, "POST", body, "").then((Response: any) => {
         if (Response.status == 200) {
           if (Response.data.code == 200) {
