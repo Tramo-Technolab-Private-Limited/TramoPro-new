@@ -21,7 +21,7 @@ const updateLastUpdated = () => {
   // ISTTime now represents the time in IST coordinates
 
   var dateIST = ISTTime.getDate();
-  var monthIST = ISTTime.getMonth();
+  var monthIST = ISTTime.getMonth() + 1;
   var yearIST = ISTTime.getFullYear();
 
   var hoursIST = ISTTime.getHours();
